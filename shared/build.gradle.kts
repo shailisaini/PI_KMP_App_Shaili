@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
+//    alias(libs.plugins.kotlinCocoapods)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 kotlin {
@@ -24,8 +26,22 @@ kotlin {
     }
 
     sourceSets {
+        androidMain.dependencies {
+            implementation(libs.ktor.client.android)
+        }
+        iosMain.dependencies {
+            implementation(libs.ktor.client.ios)
+            implementation(libs.ktor.client.darwin)
+        }
         commonMain.dependencies {
             //put your multiplatform dependencies here
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.logging)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.content.negotiation)
+
+            implementation(libs.androidx.lifecycle.runtime.compose)
+            implementation(libs.androidx.lifecycle.viewmodel)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -34,7 +50,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.example.pi_kmp_application"
+    namespace = "com.pi.ProjectInclusion"
     compileSdk = 34
     defaultConfig {
         minSdk = 24

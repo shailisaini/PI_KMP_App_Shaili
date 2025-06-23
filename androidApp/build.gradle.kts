@@ -5,10 +5,10 @@ plugins {
 }
 
 android {
-    namespace = "com.example.pi_kmp_application.android"
+    namespace = "com.pi.ProjectInclusion.android"
     compileSdk = 34
     defaultConfig {
-        applicationId = "com.example.pi_kmp_application.android"
+        applicationId = "com.pi.ProjectInclusion.android"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
