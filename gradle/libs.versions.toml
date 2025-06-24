@@ -1,10 +1,13 @@
 [versions]
 agp = "8.5.2"
+koinAndroidxViewmodel = "3.5.3"
 kotlin = "2.0.0"
 compose = "1.5.4"
 compose-material3 = "1.1.2"
-kotlinx-serialization = "1.6.3" # replace with your desired version
+lifecycleViewmodelCompose = "2.9.1"
+serialization = "1.6.3"
 androidx-activityCompose = "1.8.0"
+coroutine = "1.7.1"
 
 ktorClientCore = "3.0.0"
 ktorClientContentNegotiation = "3.0.0"
@@ -13,11 +16,20 @@ ktorClientIos = "2.3.11"
 ktorClientDarwin = "3.0.0"
 ktorLogging = "3.0.0"
 ktorClientAndroid = "3.0.0"
-
+kermit = "2.0.1"
+ktor = "2.3.4"
+koin = "3.5.3"
 lifecycleRuntimeKtx = "2.8.7"
 androidx-lifecycle = "2.8.4"
+compose-compiler = "1.5.3"
+gson = "2.10.1"
+converter-gson = "2.9.0"
+
 
 [libraries]
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinAndroidxViewmodel" }
+koin-androidx-navigation = { module = "io.insert-koin:koin-androidx-navigation", version.ref = "koinAndroidxViewmodel" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
@@ -35,6 +47,17 @@ ktor-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktorLogg
 
 androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutine" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutine" }
+
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+
+touchlab-kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converter-gson" }
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

@@ -28,6 +28,14 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
             implementation(libs.ktor.client.android)
+            implementation(libs.kotlinx.coroutines.android)
+            implementation(libs.converter.gson)
+            implementation(libs.gson)
+            implementation(libs.koin.androidx.compose)
+            implementation(libs.koin.android)
+//            implementation(libs.koin.androidx.viewmodel)
+//            implementation(libs.koin.androidx.viewmodel.v316) // older, if still using classic XML
+            implementation(libs.koin.androidx.navigation) // if using Navigation
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.ios)
@@ -40,8 +48,12 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.content.negotiation)
 
-            implementation(libs.androidx.lifecycle.runtime.compose)
+//            implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.androidx.lifecycle.viewmodel)
+            implementation(libs.kotlinx.coroutines.core)
+            api(libs.touchlab.kermit)
+            implementation(libs.koin.core)
+//            implementation(libs.bundles.ktor.common)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -51,7 +63,7 @@ kotlin {
 
 android {
     namespace = "com.pi.ProjectInclusion"
-    compileSdk = 34
+    compileSdk = 35
     defaultConfig {
         minSdk = 24
     }

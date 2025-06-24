@@ -6,11 +6,11 @@ plugins {
 
 android {
     namespace = "com.pi.ProjectInclusion.android"
-    compileSdk = 34
+    compileSdk = 35
     defaultConfig {
         applicationId = "com.pi.ProjectInclusion.android"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
     }
@@ -41,5 +41,15 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
     implementation(libs.androidx.activity.compose)
+//    implementation(libs.bundles.app.ui)
+//    implementation(libs.multiplatformSettings.common)
+//    implementation(libs.kotlinx.dateTime)
+
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.lifecycle.viewmodel)
+//    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
     debugImplementation(libs.compose.ui.tooling)
+//    coreLibraryDesugaring(libs.android.desugaring)
+//    testImplementation(libs.junit)
 }

@@ -1,4 +1,4 @@
-package com.pi.ProjectInclusion.Ktor
+package com.pi.ProjectInclusion.data.remote
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.DefaultRequest
@@ -16,22 +16,23 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.path
 
-class KtorClient {
-    val STUDENT_BASE_URL = "https://student-api.auroscholar.org/api/"                         // Production
+object KtorClient {
 
-    fun getClient(): HttpClient {
-        return HttpClient {
+    private val timeOut :Long = 3000
+
+    val client = HttpClient {
+//        return HttpClient {
             install(ContentNegotiation) {
                 json(Json { ignoreUnknownKeys = true })
             }
 
             install(HttpTimeout) {
-                socketTimeoutMillis = 3000
-                connectTimeoutMillis = 3000
-                requestTimeoutMillis = 3000
+                socketTimeoutMillis = timeOut
+                connectTimeoutMillis = timeOut
+                requestTimeoutMillis = timeOut
             }
 
-            install(DefaultRequest) {
+            /*install(DefaultRequest) {
                 url {
 //                    host = "jsonplaceholder.typicode.com"
                     host = STUDENT_BASE_URL
@@ -41,9 +42,9 @@ class KtorClient {
                     }
                     contentType(ContentType.Application.Json)
                 }
-            }
+            }*/
 
-        }
+//        }
     }
 // https://jsonplaceholder.typicode.com/posts/1
 
@@ -96,13 +97,4 @@ class KtorClient {
             }.body<Post>()
     }*/
 
-
-    suspend fun deletePost(id: Int): HttpResponse {
-        return getClient()
-            .delete {
-                url {
-                    path("/posts/${id}")
-                }
-            }
-    }
 }
