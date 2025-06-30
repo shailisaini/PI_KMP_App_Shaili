@@ -19,7 +19,15 @@ android {
     }
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += setOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE",
+                "META-INF/NOTICE.md",
+                "META-INF/NOTICE",
+                "META-INF/AL2.0",
+                "META-INF/LGPL2.1",
+                "META-INF/*.kotlin_module"
+            )
         }
     }
     buildTypes {
@@ -44,10 +52,21 @@ dependencies {
 //    implementation(libs.bundles.app.ui)
 //    implementation(libs.multiplatformSettings.common)
 //    implementation(libs.kotlinx.dateTime)
-
+    implementation(libs.koin.androidx.navigation) // if using Navigation
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.lifecycle.viewmodel)
+    implementation(libs.lifecycle.runtime.compose)
 //    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    // Jetpack Compose Navigation
+    implementation(libs.androidx.navigation.compose)
+
+    // Koin for Compose
+    implementation(libs.koin.androidx.compose)
+
+    // Usual Ktor, Koin, and Compose dependencies
+    // This makes shared code accessible in androidApp
+    implementation(project(":shared"))
 
     debugImplementation(libs.compose.ui.tooling)
 //    coreLibraryDesugaring(libs.android.desugaring)

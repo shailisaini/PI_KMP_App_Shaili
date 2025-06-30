@@ -1,5 +1,10 @@
 package com.pi.ProjectInclusion.android.navigation
 
+import kotlinx.serialization.Serializable
+
 sealed class AppRoute(val route: String) {
-    data object LanguageSelect : AppRoute("LanguageSelect")
+
+    @Serializable
+    data object LanguageSelect : AppRoute("language_select")
+
 }
