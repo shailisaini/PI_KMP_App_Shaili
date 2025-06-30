@@ -1,4 +1,3 @@
-/*
 package com.pi.ProjectInclusion.constants
 
 import androidx.activity.OnBackPressedCallback
@@ -39,4 +38,4 @@ public fun BackHandler(enabled: Boolean = true, onBack: () -> Unit) {
             backCallback.remove()
         }
     }
-}*/
+}

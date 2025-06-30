@@ -71,7 +71,7 @@ import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.utils.toast
-//import com.pi.ProjectInclusion.constants.CustomDialog
+import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
 import kotlinx.coroutines.launch
 import org.koin.core.logger.Logger
@@ -86,11 +86,11 @@ fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
     }
     val languageData = remember { mutableStateListOf<GetLanguageListResponse.Data.Result>() }
 
-   /* CustomDialog(
+    CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
         message = "Loading your data..."
-    )*/
+    )
 
     Surface(
         modifier = Modifier.fillMaxWidth(), color = White
@@ -172,8 +172,8 @@ fun languageResponseUI(languageData: MutableList<GetLanguageListResponse.Data.Re
                     ) {
                         val logger = AppLoggerImpl()
                         logger.e(",")
-                       /* items(languageData.size) { index ->
-                            ItemLanguageCard(
+                        items(languageData.size) { index ->
+                            /*ItemLanguageCard(
                                 context,
                                 isSelected = selectedIndex == index,
                                 index,
@@ -189,46 +189,45 @@ fun languageResponseUI(languageData: MutableList<GetLanguageListResponse.Data.Re
 //                                    viewModel.saveLanguageCode(languageData[index].name[0].toString())
                                     println("Selected Item :- $selectedIndex")
                                 }, colors
-                            )
-                        }*/
+                            )*/
+                        }
                     }
                 }
             }
         }
     } else {
-       /* if (!isInternetAvailable) {
-            ShowError(internetMessage, colors)
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.no_data_found),
-                    contentDescription = "logo",
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .background(Color.Unspecified),
-                )
-
-                Text(
-                    text = stringResource(R.string.txt_oops_no_data_found),
-                    modifier = Modifier.wrapContentSize(),
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    color = colors.onSurface,
-                    textAlign = TextAlign.Start
-                )
-            }
-        }*/
+//        if (!isInternetAvailable) {
+//            ShowError(internetMessage, colors)
+//        } else {
+//            Column(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .fillMaxWidth(),
+//                horizontalAlignment = Alignment.CenterHorizontally,
+//                verticalArrangement = Arrangement.Center
+//            ) {
+//                Image(
+//                    painter = painterResource(R.drawable.no_data_found),
+//                    contentDescription = "logo",
+//                    modifier = Modifier
+//                        .padding(vertical = 8.dp)
+//                        .background(Color.Unspecified),
+//                )
+//
+//                Text(
+//                    text = stringResource(R.string.txt_oops_no_data_found),
+//                    modifier = Modifier.wrapContentSize(),
+//                    fontStyle = FontStyle.Normal,
+//                    fontWeight = FontWeight.Bold,
+//                    fontSize = 18.sp,
+//                    color = colors.onSurface,
+//                    textAlign = TextAlign.Start
+//                )
+//            }
+//        }
     }
 }
 
-/*
 @Composable
 fun ItemLanguageCard(
     context: Context,
@@ -236,7 +235,7 @@ fun ItemLanguageCard(
     index: Int,
     selectedLanguage: MutableState<String?>,
     viewModel: LoginViewModel,
-    language: List<Result>,
+    language: MutableList<GetLanguageListResponse.Data.Result>,
     onItemClicked: () -> Unit = {},
     colors: ColorScheme,
 ) {
@@ -270,7 +269,7 @@ fun ItemLanguageCard(
         }
     }
 
-    Card(
+   /* Card(
         modifier = Modifier
             .clickable {
                 if (languageIndex.status == "Active")
@@ -339,9 +338,7 @@ fun ItemLanguageCard(
                         maxLines = 1,
                         fontSize = 16.sp,
                         overflow = TextOverflow.Ellipsis,
-                        */
-/*color = Black,*//*
-
+                        *//*color = Black,*//*
                         color = colors.onSurface, fontFamily = FontFamily(
                             Font(resou, FontWeight.Medium)
                         ),
@@ -367,5 +364,5 @@ fun ItemLanguageCard(
                 }
             }
         }
-    }
-}*/
+    }*/
+}

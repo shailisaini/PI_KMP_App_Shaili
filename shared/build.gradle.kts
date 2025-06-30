@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
-
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinx.serialization)
 }
 
@@ -36,6 +36,14 @@ kotlin {
             implementation(libs.koin.androidx.navigation) // if using Navigation
             implementation(libs.androidx.ui.text)
             implementation(libs.androidx.ui.text.android)
+//            implementation(libs.androidx.material3.android)
+
+            implementation(libs.androidx.activity.compose)
+//            implementation(libs.compose.runtime)
+            implementation(libs.compose.ui)
+            implementation(libs.compose.ui.tooling.preview)
+            implementation(libs.compose.material3)
+            implementation(libs.lifecycle.runtime.compose)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.ios)
@@ -70,6 +78,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
+    buildFeatures {
+        compose = true
+    }
     packaging {
         resources {
             excludes += setOf(
@@ -86,8 +98,8 @@ android {
 }
 dependencies {
 //    implementation(libs.androidx.material3.android)
-    implementation(libs.androidx.ui.tooling.preview.android)
-    implementation(libs.activity.compose)
+//    implementation(libs.androidx.ui.tooling.preview.android)
+//    implementation(libs.activity.compose)
     implementation(libs.androidx.databinding.compiler)
 
 

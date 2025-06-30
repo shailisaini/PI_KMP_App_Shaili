@@ -1,4 +1,3 @@
-/*
 package com.pi.ProjectInclusion.constants
 
 import androidx.compose.foundation.background
@@ -19,6 +18,8 @@ import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.Transparent
 import androidx.compose.material3.*
+import androidx.compose.runtime.*
+
 
 @Preview
 @Composable
@@ -29,11 +30,9 @@ fun CustomDialog(
 ) {
     val colors = MaterialTheme.colorScheme
 
-   */
-/* BackHandler(isVisible) {
+    BackHandler(isVisible) {
         onDismiss()
-    }*//*
-
+    }
     
     if (isVisible) {
         AlertDialog(
@@ -75,4 +74,4 @@ fun CustomDialog(
             modifier = Modifier.fillMaxWidth(0.9f), containerColor = Color.Transparent
         )
     }
-}*/
+}
