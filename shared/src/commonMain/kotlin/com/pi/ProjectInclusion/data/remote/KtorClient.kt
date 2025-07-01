@@ -23,7 +23,10 @@ object KtorClient {
     val client = HttpClient {
 //        return HttpClient {
             install(ContentNegotiation) {
-                json(Json { ignoreUnknownKeys = true })
+                json(Json {
+                    ignoreUnknownKeys = true
+                    isLenient = true
+                })
             }
 
             install(HttpTimeout) {

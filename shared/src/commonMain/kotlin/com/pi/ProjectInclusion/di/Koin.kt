@@ -2,7 +2,6 @@ package com.pi.ProjectInclusion.di
 
 import com.example.kmptemplate.logger.AppLogger
 import com.example.kmptemplate.logger.AppLoggerImpl
-import com.pi.ProjectInclusion.data.remote.KtorClient
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation

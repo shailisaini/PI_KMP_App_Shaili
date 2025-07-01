@@ -1,6 +1,5 @@
 package com.pi.ProjectInclusion.di
 
-import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
 import com.pi.ProjectInclusion.data.remote.ApiService
 import com.pi.ProjectInclusion.data.remote.KtorClient
 import com.pi.ProjectInclusion.data.repository.LanguageRepoImpl

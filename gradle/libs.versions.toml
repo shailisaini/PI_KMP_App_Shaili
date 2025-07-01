@@ -1,5 +1,6 @@
 [versions]
 agp = "8.5.2"
+coilCompose = "2.4.0"
 koinAndroidxViewmodel = "3.5.3"
 kotlin = "2.0.0"
 compose = "1.5.4"
@@ -38,6 +39,8 @@ uiTextAndroidVersion = "1.8.3"
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-ui-text = { module = "androidx.compose.ui:ui-text", version.ref = "uiText" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coilCompose" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinAndroidxViewmodel" }
 koin-androidx-navigation = { module = "io.insert-koin:koin-androidx-navigation", version.ref = "koinAndroidxViewmodel" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }

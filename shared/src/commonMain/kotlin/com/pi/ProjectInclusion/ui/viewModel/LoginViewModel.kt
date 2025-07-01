@@ -29,11 +29,6 @@ class LoginViewModel(
         }
     }
 
-    fun updateLanguagesQuery(page: String, limit: String){
-        query.update { page }
-        query.update { limit }
-    }
-
     fun getLanguages(page: String, limit: String) = viewModelScope.launch {
         _uiState.update { UiState(isLoading = true) }
        val response = getLanguageUsesCases(page, limit)

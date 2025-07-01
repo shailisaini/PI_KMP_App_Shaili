@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+<domain-config cleartextTrafficPermitted="true">
+    <domain includeSubdomains="true">https://student-api.auroscholar.org</domain>
+    <domain includeSubdomains="true">apiz.auroscholar.org</domain>
+    <domain includeSubdomains="true">teacher-api.auroscholar.org</domain>   <!-- teacher Live-->
+    <domain includeSubdomains="true">staging-teacher-api.auroscholar.org</domain>   <!-- teacher UAT-->
+   <!-- <trust-anchors>
+        <certificates src="@raw/student_parent_frontend"/>
+    </trust-anchors>-->
+</domain-config>
+</network-security-config>

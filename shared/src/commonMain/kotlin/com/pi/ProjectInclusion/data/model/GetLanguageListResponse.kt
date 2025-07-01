@@ -28,7 +28,6 @@ data class GetLanguageListResponse(
         @SerialName("totalCount")
         val totalCount: Int
     ) {
-
         @Serializable
         data class Result(
             @SerialName("id")
@@ -37,13 +36,22 @@ data class GetLanguageListResponse(
             @SerialName("name")
             val name: String,
 
+            @SerialName("icon")
+            val icon: String,
+
             @SerialName("nativeName")
             val nativeName: String,
 
             @SerialName("status")
             val status: String,
 
-            var isSelected: Boolean
+            @SerialName("languageCode")
+            val languageCode: String? = null,
+
+            @SerialName("priority")
+            val priority: String? = null,
+
+            var isSelected: Boolean = false // Defaulted, not from API
         )
     }
 }
