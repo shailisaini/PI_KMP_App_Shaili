@@ -1,3 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppTheme" parent="android:Theme.Material.NoActionBar"/>
+
+    <style name="AppTheme" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#FFFFFF</item> <!-- light background -->
+
+        <!-- Optional: make status bar icons dark (on Android 11 and lower) -->
+        <item name="android:windowLightStatusBar">false</item>
+
+        <!-- Required for Compose to work properly -->
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:fitsSystemWindows">true</item>
+        <item name="android:windowBackground">@drawable/splash_img</item>
+    </style>
+
+    <style name="Theme.AuroscholarApp.NoIconSplash" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- Other splash screen style settings -->
+        <item name="android:windowSplashScreenAnimatedIcon">@null</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@null</item>
+        <item name="android:windowSplashScreenBackground">@drawable/splash_img</item>
+    </style>
+
+    <style name="Theme.CodiaDemoComposeUI" parent="android:Theme.Material.Light.NoActionBar" />
+
 </resources>

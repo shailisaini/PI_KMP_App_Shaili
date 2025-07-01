@@ -58,13 +58,9 @@ class SplashActivity : ComponentActivity() {
 @Composable
 fun SplashScreen(navController: NavHostController) {
     LaunchedEffect(Unit) {
-        delay(2000) // simulate loading
+        delay(3500) // simulate loading
         navController.navigate(AppRoute.LanguageSelect.route) {
             popUpTo("splash") { inclusive = true }
         }
-    }
-
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Splash Screen", fontSize = 24.sp)
     }
 }

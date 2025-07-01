@@ -11,17 +11,15 @@ val male_bg = Color(0xFFCDDBFB)
 val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
-val Transparent = Color(0x07000000)
-val FullTransparent = Color(0x00000000)
+val Transparent = Color(0x00000000)
 
-
-val PrimaryBlue = Color(0xFF12AFFF)
-val PrimaryBlue1 = Color(0xFF75CDFA)
+val PrimaryBlue = Color(0xFF101942)
+val PrimaryBlue1 = Color(0xFF2C3EA2)
 val PrimaryBlue2 = Color(0xFFDFF4FF)
-val PrimaryBlueLt = Color(0xFFF2FBFF)
+val PrimaryBlueLt = Color(0xFFE6E9FF)
 val DarkBlue = Color(0xFF0D1292)
 val LightBlue = Color(0xFFDFF4FF)
-val Black = Color(0xFF333333)
+val Black = Color(0xFF000000)
 val Gray = Color(0xFF666666) // gray
 val Bg_Gray = Color(0xFFF5F9FE) // gray
 val Bg_Gray1 = Color(0xF0F5F9FE) // gray

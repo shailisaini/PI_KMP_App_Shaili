@@ -38,9 +38,7 @@ class LoginViewModel(
         else{
             _uiState.update { UiState(error = response.exceptionOrNull()?.message.toString() ) }
         }
-
     }
-
 }
 
 data class UiState(
