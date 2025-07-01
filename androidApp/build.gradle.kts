@@ -71,4 +71,8 @@ dependencies {
     debugImplementation(libs.compose.ui.tooling)
 //    coreLibraryDesugaring(libs.android.desugaring)
 //    testImplementation(libs.junit)
+
+    // image dependencies
+    implementation(libs.coil.compose) // Or latest version
+    implementation(libs.coil.svg) // For SVG support
 }

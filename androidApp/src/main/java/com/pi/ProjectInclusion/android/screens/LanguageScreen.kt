@@ -27,11 +27,10 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -39,7 +38,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,11 +45,6 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -59,12 +52,16 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.kmptemplate.logger.AppLogger
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.SvgDecoder
+import coil.request.ImageRequest
+import coil.size.Size
 import com.example.kmptemplate.logger.AppLoggerImpl
+import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Dark_02
 import com.pi.ProjectInclusion.Dark_Selected_BG
-import com.pi.ProjectInclusion.GrayLight01
+import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
@@ -74,23 +71,51 @@ import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
 import kotlinx.coroutines.launch
-import org.koin.core.logger.Logger
 
 @Composable
 fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
 
     var isDialogVisible by remember { mutableStateOf(false) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val logger = AppLoggerImpl()
     val query by rememberSaveable {
         mutableStateOf("")
     }
+    val context = LocalContext.current
     val languageData = remember { mutableStateListOf<GetLanguageListResponse.Data.Result>() }
-
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
         message = "Loading your data..."
     )
+    LaunchedEffect(Unit) {
+        viewModel.getLanguages("1", "20")
+    }
+
+    LaunchedEffect(uiState) {
+        when {
+            uiState.isLoading -> {
+                languageData.clear()
+                isDialogVisible = true
+            }
+
+            uiState.error.isNotEmpty() -> {
+                languageData.clear()
+                isDialogVisible = false
+                logger.e("Error: ${uiState.error}")
+                context.toast("Choose Language Hindi & English")
+            }
+
+            uiState.success != null -> {
+                isDialogVisible = false
+                uiState.success!!.data.results.reversed().let {
+                    languageData.clear()
+                    languageData.addAll(it)
+                }
+                logger.d("Languages fetched: ${uiState.success!!.data.results.size}")
+            }
+        }
+    }
 
     Surface(
         modifier = Modifier.fillMaxWidth(), color = White
@@ -101,31 +126,22 @@ fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
                 .background(color = PrimaryBlue),
             verticalArrangement = Arrangement.Top
         ) {
-            if (uiState.isLoading){
-                languageData.clear()
-                isDialogVisible = true
-            }
-            if (uiState.error.isNotEmpty()){
-                languageData.clear()
-                isDialogVisible = false
-            }
-            uiState.success.let { response ->
-                languageData.addAll(response?.data?.results?.reversed()!!)
-                languageResponseUI(languageData)
-                isDialogVisible = false
-            }
+            languageResponseUI(context,languageData)
         }
     }
 }
 
 @Composable
-fun languageResponseUI(languageData: MutableList<GetLanguageListResponse.Data.Result>) {
+fun languageResponseUI(
+    context: Context,
+    languageData: MutableList<GetLanguageListResponse.Data.Result>
+) {
     val scrollState = rememberLazyGridState()
     val coroutineScope = rememberCoroutineScope()
     var isInternetAvailable by remember { mutableStateOf(true) }
     var isApiResponded by remember { mutableStateOf(false) }
     var internetMessage by remember { mutableStateOf("") }
-    val context = LocalContext.current
+
     var isDialogVisible by remember { mutableStateOf(false) }
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
     val selectedLanguage = remember { mutableStateOf<String?>(null) }
@@ -170,26 +186,20 @@ fun languageResponseUI(languageData: MutableList<GetLanguageListResponse.Data.Re
                                     }
                                 })
                     ) {
-                        val logger = AppLoggerImpl()
-                        logger.e(",")
                         items(languageData.size) { index ->
-                            /*ItemLanguageCard(
+                            ItemLanguageCard(
                                 context,
                                 isSelected = selectedIndex == index,
                                 index,
-                                selectedLanguage,
-                                viewModel,
                                 language = languageData,
                                 onItemClicked = {
                                     selectedIndex =
                                         if (selectedIndex == index) null else index // Toggle selection
                                     selectedLanguage.value =
                                         languageData[index].id.toString()
-//                                    viewModel.saveLanguageId(languageData[index].id.toString())
-//                                    viewModel.saveLanguageCode(languageData[index].name[0].toString())
                                     println("Selected Item :- $selectedIndex")
-                                }, colors
-                            )*/
+                                }
+                            )
                         }
                     }
                 }
@@ -233,11 +243,8 @@ fun ItemLanguageCard(
     context: Context,
     isSelected: Boolean = true,
     index: Int,
-    selectedLanguage: MutableState<String?>,
-    viewModel: LoginViewModel,
     language: MutableList<GetLanguageListResponse.Data.Result>,
     onItemClicked: () -> Unit = {},
-    colors: ColorScheme,
 ) {
     val languageIndex = language[index]
 
@@ -269,7 +276,7 @@ fun ItemLanguageCard(
         }
     }
 
-   /* Card(
+    Card(
         modifier = Modifier
             .clickable {
                 if (languageIndex.status == "Active")
@@ -285,7 +292,7 @@ fun ItemLanguageCard(
             if (isSystemInDarkTheme()) {
                 Dark_02
             } else {
-                colors.surfaceBright
+                GrayLight02
             }
         ),
         border = selectedBorder
@@ -307,22 +314,21 @@ fun ItemLanguageCard(
                         .padding(start = 8.dp, end = 5.dp)
                         .background(Color.Unspecified)
                         .size(25.dp),
-//                        .wrapContentSize(),
                     contentScale = ContentScale.Fit,
-                    painter = if (languageIndex.icon != null) {
+                    painter = if (languageIndex.icon.isNotEmpty()) {
                         rememberAsyncImagePainter(
                             model = ImageRequest.Builder(LocalContext.current)
                                 .data(languageIndex.icon)
-                                .decoderFactory(SvgDecoder.Factory()) // Adds SVG support
-                                .size(Size.ORIGINAL) // Use original or specify size
-                                .placeholder(R.drawable.icon_hindi)
-                                .error(R.drawable.icon_hindi)
+                                .decoderFactory(SvgDecoder.Factory())
+                                .size(Size.ORIGINAL)
+                                .placeholder(R.drawable.ic_hindi)
+                                .error(R.drawable.ic_hindi)
                                 .build()
                         )
                     } else {
-                        painterResource(R.drawable.icon_hindi)
+                        painterResource(id = R.drawable.ic_hindi)
                     },
-                    contentDescription = "Logo"
+                    contentDescription = "Language Icon"
                 )
 
                 Column(
@@ -338,10 +344,7 @@ fun ItemLanguageCard(
                         maxLines = 1,
                         fontSize = 16.sp,
                         overflow = TextOverflow.Ellipsis,
-                        *//*color = Black,*//*
-                        color = colors.onSurface, fontFamily = FontFamily(
-                            Font(resou, FontWeight.Medium)
-                        ),
+                        color = Black,
                         modifier = Modifier
                             .padding(top = 10.dp, start = 10.dp)
                     )
@@ -353,9 +356,6 @@ fun ItemLanguageCard(
                         fontSize = 10.sp,
                         overflow = TextOverflow.Ellipsis,
                         color = Gray,
-                        fontFamily = FontFamily(
-                            Font(R.font.inter_regular, FontWeight.Normal)
-                        ),
                         modifier = Modifier
                             .wrapContentWidth()
                             .padding(bottom = 10.dp, start = 10.dp)
@@ -364,5 +364,5 @@ fun ItemLanguageCard(
                 }
             }
         }
-    }*/
+    }
 }

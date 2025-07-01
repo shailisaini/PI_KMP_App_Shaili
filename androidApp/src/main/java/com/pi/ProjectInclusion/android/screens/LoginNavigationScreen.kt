@@ -11,15 +11,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.pi.ProjectInclusion.android.MyApplicationTheme
 import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
+import org.koin.androidx.compose.koinViewModel
 
 class LoginNavigationScreen : ComponentActivity() {
-//    @Inject
-//    lateinit var sharedPref: SharedPref
-//    private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val viewModel = koinViewModel<LoginViewModel>()
 //            val loadScreenName = intent.getStringExtra(screenName.screenName)
 //            val startDestination = if (viewModel.getScreenName() == onboarding2) {
             val startDestination = AppRoute.LanguageSelect.route
@@ -35,7 +35,7 @@ class LoginNavigationScreen : ComponentActivity() {
                     modifier = Modifier.background(Color.White)
                 ) {
                     composable(AppRoute.LanguageSelect.route) {
-//                        LanguageScreen(navController)
+                        LanguageScreen(navController,viewModel)
                     }
                 }
             }
