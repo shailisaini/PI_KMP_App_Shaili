@@ -49,9 +49,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
@@ -67,6 +72,8 @@ import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.screens.dashboardScreen.DashboardScreen
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
@@ -74,13 +81,13 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
-
     var isDialogVisible by remember { mutableStateOf(false) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val logger = AppLoggerImpl()
     val query by rememberSaveable {
         mutableStateOf("")
     }
+
     val context = LocalContext.current
     val languageData = remember { mutableStateListOf<GetLanguageListResponse.Data.Result>() }
     CustomDialog(
@@ -119,14 +126,15 @@ fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
 
     Surface(
         modifier = Modifier.fillMaxWidth(), color = White
-    ) {
+    )
+    {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(color = PrimaryBlue),
             verticalArrangement = Arrangement.Top
         ) {
-            languageResponseUI(context,languageData)
+            languageResponseUI(context,languageData, viewModel)
         }
     }
 }
@@ -134,8 +142,11 @@ fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
 @Composable
 fun languageResponseUI(
     context: Context,
-    languageData: MutableList<GetLanguageListResponse.Data.Result>
+    languageData: MutableList<GetLanguageListResponse.Data.Result>,
+    viewModel: LoginViewModel
 ) {
+    val navController = NavHostController(context)
+
     val scrollState = rememberLazyGridState()
     val coroutineScope = rememberCoroutineScope()
     var isInternetAvailable by remember { mutableStateOf(true) }
@@ -197,6 +208,8 @@ fun languageResponseUI(
                                         if (selectedIndex == index) null else index // Toggle selection
                                     selectedLanguage.value =
                                         languageData[index].id.toString()
+                                   // AppNavigator(navController, viewModel )
+                                    navController.navigate("dashboard_screen")
                                     println("Selected Item :- $selectedIndex")
                                 }
                             )
@@ -244,7 +257,7 @@ fun ItemLanguageCard(
     isSelected: Boolean = true,
     index: Int,
     language: MutableList<GetLanguageListResponse.Data.Result>,
-    onItemClicked: () -> Unit = {},
+    onItemClicked:  () -> Unit = {},
 ) {
     val languageIndex = language[index]
 
@@ -366,3 +379,4 @@ fun ItemLanguageCard(
         }
     }
 }
+
