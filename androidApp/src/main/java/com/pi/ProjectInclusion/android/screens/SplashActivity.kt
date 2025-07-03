@@ -20,10 +20,7 @@ import com.pi.ProjectInclusion.android.MyApplicationTheme
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.delay
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.compose.koinViewModel
-import org.koin.core.context.startKoin
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : ComponentActivity() {
@@ -44,8 +41,19 @@ class SplashActivity : ComponentActivity() {
                         SplashScreen(navController)
                     }
                     composable(AppRoute.LanguageSelect.route) {
-                        LanguageScreen(navController,viewModel)
+                        LanguageScreen(navController, viewModel)
                     }
+
+                    composable(AppRoute.ForgetPasswordUI.route) {
+                        ForgetPasswordScreen(navController, viewModel)
+                    }
+
+                    composable(AppRoute.OtpSendVerifyUI.route) {
+                        OtpSendVerifyScreen(navController, viewModel)
+                    }
+//                    composable(AppRoute.StudentDashboardActivity.route) {
+//                        StudentDashboardActivity()
+//                    }
                 }
             }
         }
@@ -57,6 +65,7 @@ fun SplashScreen(navController: NavHostController) {
     LaunchedEffect(Unit) {
         delay(3500) // simulate loading
         navController.navigate(AppRoute.LanguageSelect.route) {
+       // navController.navigate(AppRoute.StudentDashboardActivity.route) {
             popUpTo("splash") { inclusive = true }
         }
     }
