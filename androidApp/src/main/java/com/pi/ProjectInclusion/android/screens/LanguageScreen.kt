@@ -1,5 +1,6 @@
 package com.pi.ProjectInclusion.android.screens
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -38,7 +39,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,6 +62,7 @@ import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import coil.size.Size
 import com.example.kmptemplate.logger.AppLoggerImpl
+import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Bg_Gray
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.Dark_01
@@ -70,7 +71,6 @@ import com.pi.ProjectInclusion.Dark_Selected_BG
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
-import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlue1
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.Transparent
@@ -78,7 +78,6 @@ import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
 import com.pi.ProjectInclusion.constants.CommonFunction.ShowError
-import com.pi.ProjectInclusion.constants.ConstantVariables
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_ACTIVE
 import com.pi.ProjectInclusion.constants.ConstantVariables.PAGE_LENGTH
@@ -92,7 +91,6 @@ fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
 
     var isDialogVisible by remember { mutableStateOf(false) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val logger = AppLoggerImpl()
 
     val context = LocalContext.current
     val languageData = remember { mutableStateListOf<GetLanguageListResponse.Data.Result>() }
@@ -102,7 +100,7 @@ fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
         message = stringResource(R.string.txt_loading)
     )
 
-    logger.d("Screen: "+"LanguageScreen()")
+    LoggerProvider.logger.d("Screen: "+"LanguageScreen()")
     LaunchedEffect(Unit) {
         viewModel.getLanguages(PAGE_LENGTH, PAGE_LIMIT)
     }
@@ -117,7 +115,7 @@ fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
             uiState.error.isNotEmpty() -> {
                 languageData.clear()
                 isDialogVisible = false
-                logger.e("Error: ${uiState.error}")
+                LoggerProvider.logger.d("Error: ${uiState.error}")
                 context.toast(uiState.error)
             }
 
@@ -127,7 +125,7 @@ fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
                     languageData.clear()
                     languageData.addAll(it)
                 }
-                logger.d("Languages fetched: ${uiState.success!!.data.results.size}")
+                LoggerProvider.logger.d("Languages fetched: ${uiState.success!!.data.results.size}")
             }
         }
     }
@@ -141,13 +139,14 @@ fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
                 .background(color = Bg_Gray),
             verticalArrangement = Arrangement.Top
         ) {
-            languageResponseUI(context,languageData)
+            LanguageResponseUI(context,languageData)
         }
     }
 }
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
-fun languageResponseUI(
+fun LanguageResponseUI(
     context: Context,
     languageData: MutableList<GetLanguageListResponse.Data.Result>
 ) {

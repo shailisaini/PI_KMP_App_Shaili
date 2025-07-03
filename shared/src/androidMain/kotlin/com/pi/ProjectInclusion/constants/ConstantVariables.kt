@@ -5,7 +5,9 @@ object ConstantVariables {
     const val STUDENT_BASE_URL = "https://student-api.auroscholar.org/api/"
     const val isRegistration = "isRegistration"
 
+    
     // constant keys
+    var SHARED_PREF_KEY: String = "PI_PREF"
 
     // for language Screen
     var IMG_DESCRIPTION: String = "img"

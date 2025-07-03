@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.sqldelight)
 }
 
 kotlin {
@@ -13,7 +14,7 @@ kotlin {
             }
         }
     }
-    
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -44,10 +45,13 @@ kotlin {
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.compose.material3)
             implementation(libs.lifecycle.runtime.compose)
+            implementation(libs.sqldelight.android)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.ios)
             implementation(libs.ktor.client.darwin)
+            // Sql Delight
+            implementation(libs.sqldelight.native)
         }
         commonMain.dependencies {
             //put your multiplatform dependencies here
@@ -60,6 +64,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             api(libs.touchlab.kermit)
             implementation(libs.koin.core)
+            implementation(libs.sqldelight.coroutines)
 
         }
         commonTest.dependencies {
@@ -101,6 +106,12 @@ dependencies {
 //    implementation(libs.androidx.ui.tooling.preview.android)
 //    implementation(libs.activity.compose)
     implementation(libs.androidx.databinding.compiler)
+}
 
-
+sqldelight {
+    database("PiDatabase") {
+        packageName = "com.pi.ProjectInclusion.database"
+        version = 1
+        // schemaOutputDirectory.set(file("src/commonMain/sqldelight")) // Optional
+    }
 }

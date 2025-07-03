@@ -18,9 +18,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.pi.ProjectInclusion.android.MyApplicationTheme
 import com.pi.ProjectInclusion.android.navigation.AppRoute
-import com.pi.ProjectInclusion.di.dataModule
-import com.pi.ProjectInclusion.domain.di.domainModule
-import com.pi.ProjectInclusion.ui.di.sharedViewModelModule
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.delay
 import org.koin.android.ext.koin.androidContext

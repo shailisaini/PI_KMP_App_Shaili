@@ -33,6 +33,7 @@ activityCompose = "1.10.1"
 databindingCompiler = "8.11.0"
 uiTextAndroid = "1.6.2"
 uiTextAndroidVersion = "1.8.3"
+sqldelight = "1.5.5"
 
 
 [libraries]
@@ -77,6 +78,10 @@ activity-compose = { group = "androidx.activity", name = "activity-compose", ver
 androidx-databinding-compiler = { group = "androidx.databinding", name = "databinding-compiler", version.ref = "databindingCompiler" }
 androidx-ui-text-android = { group = "androidx.compose.ui", name = "ui-text-android", version.ref = "uiTextAndroid" }
 ui-text-android = { group = "androidx.compose.ui", name = "ui-text-android", version.ref = "uiTextAndroidVersion" }
+sqldelight-runtime = { module = "com.squareup.sqldelight:runtime", version.ref = "sqldelight" }
+sqldelight-android = { module = "com.squareup.sqldelight:android-driver", version.ref = "sqldelight" }
+sqldelight-native = { module = "com.squareup.sqldelight:native-driver", version.ref = "sqldelight" }
+sqldelight-coroutines = { module = "com.squareup.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
 
 
 [plugins]
@@ -87,3 +92,4 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+sqldelight = { id = "com.squareup.sqldelight", version.ref = "sqldelight" }
