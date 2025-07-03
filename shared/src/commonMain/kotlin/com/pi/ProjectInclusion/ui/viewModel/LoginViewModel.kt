@@ -22,12 +22,12 @@ class LoginViewModel(
 
     private val query = MutableStateFlow("")
 
-    fun saveUserToken(token: String) {
-        localData.saveValue("user_token", token)
+    fun savePrefData(key: String, value: String) {
+        localData.saveValue(key, value)
     }
 
-    fun getUserToken(): String {
-        return localData.getValue("user_token", "")
+    fun getPrefData(key: String): String {
+        return localData.getValue(key, "")
     }
 
     init {

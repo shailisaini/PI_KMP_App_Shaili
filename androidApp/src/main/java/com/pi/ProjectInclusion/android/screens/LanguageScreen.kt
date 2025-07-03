@@ -61,7 +61,6 @@ import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import coil.size.Size
-import com.example.kmptemplate.logger.AppLoggerImpl
 import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Bg_Gray
 import com.pi.ProjectInclusion.Black
