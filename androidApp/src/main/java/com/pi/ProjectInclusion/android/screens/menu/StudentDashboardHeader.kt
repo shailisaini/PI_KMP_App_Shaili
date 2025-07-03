@@ -67,14 +67,7 @@ fun OpenDashboardHeader(
             .fillMaxWidth()
             .clipToBounds()
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_hindi),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .wrapContentHeight()
-                .fillMaxWidth()
-        )
+
         TopAppBar(
             title = {
 

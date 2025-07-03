@@ -12,7 +12,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
@@ -31,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -49,9 +53,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.pi.ProjectInclusion.Black
+import com.pi.ProjectInclusion.FullTransparent
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight01
 import com.pi.ProjectInclusion.GrayLight02
+import com.pi.ProjectInclusion.GreenDark01
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.MyApplicationTheme
@@ -71,49 +78,49 @@ fun DrawerHeader(
             .fillMaxWidth()/* .clickable {
                 onItemClick.invoke()
             }*/
+
             .wrapContentHeight()
-            .padding(end = 50.dp)
-            .background(
-                color = if (isSystemInDarkTheme()) {
-                    colors.background
-                } else {
-                    Color.White
-                }
-            ),
+            .padding(end = 50.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
+                .height(220.dp)
+
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(Color(0xFF2C3EA2), Color(0xFF101942))
+                    )
+                )
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(top = 30.dp)
                     .clickable { onItemClick.invoke() },
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
-            ) {
+            )
+            {
                 Box(
-                    modifier = Modifier.padding(10.dp)
-                ) {
+                    modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp, top = 30.dp)
+
+                )
+                {
                     Column(
                         modifier = Modifier
                             .wrapContentSize()
-                            .border(
-                                width = 1.dp,
-                                color = GrayLight02,
-                                shape = CircleShape
-                            )
+                            .align(Alignment.Center)
+
                     ) {
                         Image(
-                            painter = painterResource(R.drawable.ic_hindi),
+                            painter = painterResource(R.drawable.profile_user_icon),
                             contentDescription = "logo",
                             modifier = Modifier
-                                .size(72.dp) // Add size modifier to make the image visible
                                 .clip(CircleShape) // Add clip modifier to make the image circular
-                                .background(shape = CircleShape, color = White)
+                                .background(shape = CircleShape, color = FullTransparent)
                                 .border( // Add border modifier to make image stand out
-                                    width = 1.dp, color = GrayLight02, shape = CircleShape
+                                    width = 1.dp, color = GreenDark01, shape = CircleShape
                                 ),
                             contentScale = ContentScale.Crop // Clip the image to a circular shape
                         )
@@ -150,15 +157,23 @@ fun DrawerHeader(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp, bottom = 10.dp)
-                    .height(1.dp)
+                    .padding(start = 10.dp,bottom = 20.dp, top = 20.dp)
+                    .height(35.dp)
+
             ) {
-                Canvas(modifier = Modifier.fillMaxSize()) {
-                    drawLine(
-                        color = GrayLight02,
-                        start = Offset(0f, 0f),
-                        end = Offset(size.width, 0f),
-                        strokeWidth = 0.8.dp.toPx()
+                Card(
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .wrapContentHeight(),
+                    shape = RoundedCornerShape(4.dp),
+                    elevation = CardDefaults.cardElevation(4.dp)
+                    // Do not set containerColor, let the Box inside handle the gradient
+                ){
+                    Text ( modifier = Modifier.wrapContentWidth()
+                        .padding(10.dp),
+                        text = "Edit Profile",
+                        color = Black,
+                        fontSize = 12.sp// Make sure text is readable on gradient
                     )
                 }
             }
@@ -196,7 +211,7 @@ fun DrawerBody(
                     .clickable {
                         onItemClick(item.id)
                     }
-                    .padding(start = 15.dp, end = 16.dp, top = 5.dp, bottom = 5.dp),
+                    .padding(start = 15.dp, end = 15.dp, top = 15.dp, bottom = 15.dp),
                 verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = item.icon,
@@ -208,11 +223,11 @@ fun DrawerBody(
                 Text(
                     text = item.title,
                     modifier = Modifier
-                        .padding(horizontal = 10.dp, vertical = 5.dp)
+                        .padding(horizontal = 10.dp, vertical = 10.dp)
                         .weight(1f),
                     style = MaterialTheme.typography.headlineSmall.copy(
-                        color = Gray,
-                        fontSize = 16.sp,
+                        color = Black,
+                        fontSize = 14.sp,
                     ),
                 )
                 Icon(
