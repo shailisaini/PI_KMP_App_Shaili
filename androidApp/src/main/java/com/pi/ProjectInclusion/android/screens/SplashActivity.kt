@@ -47,7 +47,15 @@ class SplashActivity : ComponentActivity() {
                         SplashScreen(navController)
                     }
                     composable(AppRoute.LanguageSelect.route) {
-                        LanguageScreen(navController,viewModel)
+                        LanguageScreen(navController, viewModel)
+                    }
+
+                    composable(AppRoute.ForgetPasswordUI.route) {
+                        ForgetPasswordScreen(navController, viewModel)
+                    }
+
+                    composable(AppRoute.OtpSendVerifyUI.route) {
+                        OtpSendVerifyScreen(navController, viewModel)
                     }
                 }
             }

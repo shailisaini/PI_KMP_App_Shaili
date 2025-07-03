@@ -67,13 +67,14 @@ import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
 import kotlinx.coroutines.launch
 
 @Composable
-fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
+fun LanguageScreen(navController: NavHostController, viewModel: LoginViewModel) {
 
     var isDialogVisible by remember { mutableStateOf(false) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -126,7 +127,7 @@ fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
                 .background(color = PrimaryBlue),
             verticalArrangement = Arrangement.Top
         ) {
-            languageResponseUI(context,languageData)
+            languageResponseUI(context, languageData, navController)
         }
     }
 }
@@ -134,7 +135,8 @@ fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
 @Composable
 fun languageResponseUI(
     context: Context,
-    languageData: MutableList<GetLanguageListResponse.Data.Result>
+    languageData: MutableList<GetLanguageListResponse.Data.Result>,
+    navController: NavHostController,
 ) {
     val scrollState = rememberLazyGridState()
     val coroutineScope = rememberCoroutineScope()
@@ -188,6 +190,7 @@ fun languageResponseUI(
                     ) {
                         items(languageData.size) { index ->
                             ItemLanguageCard(
+                                navController,
                                 context,
                                 isSelected = selectedIndex == index,
                                 index,
@@ -195,11 +198,9 @@ fun languageResponseUI(
                                 onItemClicked = {
                                     selectedIndex =
                                         if (selectedIndex == index) null else index // Toggle selection
-                                    selectedLanguage.value =
-                                        languageData[index].id.toString()
+                                    selectedLanguage.value = languageData[index].id.toString()
                                     println("Selected Item :- $selectedIndex")
-                                }
-                            )
+                                })
                         }
                     }
                 }
@@ -240,6 +241,7 @@ fun languageResponseUI(
 
 @Composable
 fun ItemLanguageCard(
+    navController: NavHostController,
     context: Context,
     isSelected: Boolean = true,
     index: Int,
@@ -249,8 +251,7 @@ fun ItemLanguageCard(
     val languageIndex = language[index]
 
     var selectedBorder = if (isSelected) BorderStroke(
-        width = 1.dp,
-        if (isSystemInDarkTheme()) {
+        width = 1.dp, if (isSystemInDarkTheme()) {
             PRIMARY_AURO_BLUE
         } else {
             PrimaryBlue
@@ -276,17 +277,17 @@ fun ItemLanguageCard(
         }
     }
 
-    Card(
-        modifier = Modifier
-            .clickable {
-                if (languageIndex.status == "Active")
-                    onItemClicked.invoke()
-                else {
-                    context.toast("Choose Language Hindi & English")
-                }
+    Card(modifier = Modifier
+        .clickable {
+            if (languageIndex.status == "Active") {
+                onItemClicked.invoke()
+                navController.navigate(AppRoute.ForgetPasswordUI.route)
+            } else {
+                context.toast("Choose Language Hindi & English")
             }
-            .padding(5.dp)
-            .fillMaxWidth(),
+        }
+        .padding(5.dp)
+        .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(1.dp),
         colors = CardDefaults.cardColors(
             if (isSystemInDarkTheme()) {
@@ -295,8 +296,7 @@ fun ItemLanguageCard(
                 GrayLight02
             }
         ),
-        border = selectedBorder
-    ) {
+        border = selectedBorder) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -318,12 +318,9 @@ fun ItemLanguageCard(
                     painter = if (languageIndex.icon.isNotEmpty()) {
                         rememberAsyncImagePainter(
                             model = ImageRequest.Builder(LocalContext.current)
-                                .data(languageIndex.icon)
-                                .decoderFactory(SvgDecoder.Factory())
-                                .size(Size.ORIGINAL)
-                                .placeholder(R.drawable.ic_hindi)
-                                .error(R.drawable.ic_hindi)
-                                .build()
+                                .data(languageIndex.icon).decoderFactory(SvgDecoder.Factory())
+                                .size(Size.ORIGINAL).placeholder(R.drawable.ic_hindi)
+                                .error(R.drawable.ic_hindi).build()
                         )
                     } else {
                         painterResource(id = R.drawable.ic_hindi)
@@ -345,8 +342,7 @@ fun ItemLanguageCard(
                         fontSize = 16.sp,
                         overflow = TextOverflow.Ellipsis,
                         color = Black,
-                        modifier = Modifier
-                            .padding(top = 10.dp, start = 10.dp)
+                        modifier = Modifier.padding(top = 10.dp, start = 10.dp)
                     )
 
                     Text(
