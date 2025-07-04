@@ -98,7 +98,7 @@ fun AppBar(
     navHostController: NavHostController
 ) {
     when (currentDestination) {
-        AppRoute.DashboardScreen.route -> {
+        AppRoute.StudentDashboardActivity.route -> {
             OpenDashboardHeader(onNavigationIconClick, navHostController)
         }
 
@@ -206,5 +206,7 @@ fun TopBarPassport(
 fun DashboardPreview() {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    MyApplicationTheme {  }
+    MyApplicationTheme {
+        TopBarPassport(scope, drawerState)
+    }
 }

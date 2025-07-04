@@ -90,6 +90,7 @@ import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.MyApplicationTheme
 import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.screens.dashboardScreen.AddStudentRegisterScreen
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.DashboardScreen
 import com.pi.ProjectInclusion.android.screens.menu.AppBar
 import com.pi.ProjectInclusion.android.screens.menu.BottomNavigationBar
@@ -99,8 +100,6 @@ import com.pi.ProjectInclusion.android.screens.menu.MenuItem
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-
-
 
 class StudentDashboardActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -112,12 +111,10 @@ class StudentDashboardActivity : ComponentActivity() {
 
                 val colors = MaterialTheme.colorScheme
                 val navController = rememberNavController()
-
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination?.route
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
                 val scope = rememberCoroutineScope()
-
                 val bottomSheetState = rememberStandardBottomSheetState(
                     skipHiddenState = false  // Allow transitioning to hidden state
                 )
@@ -147,7 +144,7 @@ class StudentDashboardActivity : ComponentActivity() {
                             )
                             {
                                 DrawerHeader(drawerState, onItemClick = {
-                                    navController.navigate(AppRoute.DashboardScreen.route)
+                                    navController.navigate(AppRoute.DashboardScreen.route) //AddStudentRegisterScreen
                                 })
                                 DrawerBody(
                                     // List of Navigation Drawer
@@ -261,12 +258,11 @@ class StudentDashboardActivity : ComponentActivity() {
 
                                 NavHost(
                                     navController = navController,
-                                    startDestination = AppRoute.DashboardScreen.route,
+                                    startDestination = AppRoute.DashboardScreen.route, //AppRoute.DashboardScreen.route,
                                 ) {
                                     composable(AppRoute.DashboardScreen.route) {
-                                        DashboardScreen(navController
+                                        DashboardScreen(navController)
 
-                                        )
                                     }
 //                                    composable(
 //                                        AppRoute.DashboardScreen(-1).route,
@@ -278,7 +274,7 @@ class StudentDashboardActivity : ComponentActivity() {
 //
 //                                    }
                                     composable(AppRoute.ScreeningScreen.route) {
-                                        DashboardScreen(navController)
+                                        AddStudentRegisterScreen(navController)
                                     }
                                     composable(AppRoute.CourseScreen.route) {
                                         DashboardScreen(navController)
@@ -348,7 +344,6 @@ class StudentDashboardActivity : ComponentActivity() {
     @Composable
     fun DashboardPreview() {
         MyApplicationTheme {  }
-
     }
 
 

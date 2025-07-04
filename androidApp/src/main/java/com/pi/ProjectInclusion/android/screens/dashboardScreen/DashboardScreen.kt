@@ -100,10 +100,6 @@ import com.pi.ProjectInclusion.Transparent
 
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-
 @Composable
 fun DashboardScreen(navHostController: NavHostController) {
 
@@ -142,16 +138,12 @@ fun DashboardScreen(navHostController: NavHostController) {
             // Handle exception
         }
     }
-
-
-
-
     Surface(
         modifier = Modifier.wrapContentSize()
             .background(
                 color = Transparent
             )
-            .padding(0.dp, 115.dp),
+            .padding(0.dp),
 
 
         ) {
@@ -575,8 +567,6 @@ fun ItemAddStudentScreen(context: Context){
                     }
                 }
             }
-
-
         }
 
     }
@@ -587,7 +577,8 @@ fun ItemAddStudentScreen(context: Context){
             onDismissRequest = { showDialog = false },
             title = { Text(text = "Phase 2 - Introduction", style =MaterialTheme.typography.bodyMedium,
                 fontSize = 20.sp,
-                color = Black ) },
+                color = Black,
+                textAlign = TextAlign.Center) },
             text = { Text("This is a simple dialog message.") },
             confirmButton = {
                 //TextButton(onClick = { showDialog = false }) {
@@ -598,7 +589,7 @@ fun ItemAddStudentScreen(context: Context){
                             .wrapContentHeight(),
 
                         colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFF2C3EA2)
+                            containerColor = Color(0xFF101942)
                         ),
                         shape = RoundedCornerShape(8.dp),
                         elevation = CardDefaults.cardElevation(4.dp)
@@ -617,7 +608,7 @@ fun ItemAddStudentScreen(context: Context){
                   //  Text("Got It")
                // }
             },
-
+            containerColor = Color(0xFFFFFFFF)
             )
     }
 

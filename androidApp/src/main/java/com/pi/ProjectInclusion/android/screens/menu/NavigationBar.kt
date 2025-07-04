@@ -125,7 +125,6 @@ fun DrawerHeader(
                             contentScale = ContentScale.Crop // Clip the image to a circular shape
                         )
 
-
                     }
                 }
                 Column(

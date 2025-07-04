@@ -151,7 +151,7 @@ fun AddStudentScreeningScreen(navHostController: NavHostController) {
             .background(
                 color = Transparent
             )
-            .padding(0.dp, 115.dp),
+            .padding(0.dp),
 
 
         ) {
@@ -197,7 +197,7 @@ fun ItemAddScreening(context: Context){
                 shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(8.dp),
                 // Do not set containerColor, let the Box inside handle the gradient
-                colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
                 Box(
                     modifier = Modifier
