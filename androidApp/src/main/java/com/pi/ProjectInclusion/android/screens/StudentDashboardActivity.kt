@@ -87,7 +87,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.pi.ProjectInclusion.android.R
 
-import com.pi.ProjectInclusion.FullTransparent
+import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.MyApplicationTheme
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.DashboardScreen
@@ -143,7 +143,7 @@ class StudentDashboardActivity : ComponentActivity() {
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .padding(end = 30.dp)
-                                    .background(FullTransparent)
+                                    .background(Transparent)
                             )
                             {
                                 DrawerHeader(drawerState, onItemClick = {

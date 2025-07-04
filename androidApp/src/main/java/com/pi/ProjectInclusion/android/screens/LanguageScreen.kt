@@ -63,6 +63,7 @@ import coil.request.ImageRequest
 import coil.size.Size
 import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Bg_Gray
+import com.pi.ProjectInclusion.Bg_Gray1
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Dark_02
@@ -135,7 +136,7 @@ fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = Bg_Gray),
+                .background(color = Bg_Gray1),
             verticalArrangement = Arrangement.Top
         ) {
             LanguageResponseUI(context,languageData)

@@ -54,7 +54,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.pi.ProjectInclusion.Black
-import com.pi.ProjectInclusion.FullTransparent
+import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight01
 import com.pi.ProjectInclusion.GrayLight02
@@ -118,7 +118,7 @@ fun DrawerHeader(
                             contentDescription = "logo",
                             modifier = Modifier
                                 .clip(CircleShape) // Add clip modifier to make the image circular
-                                .background(shape = CircleShape, color = FullTransparent)
+                                .background(shape = CircleShape, color = Transparent)
                                 .border( // Add border modifier to make image stand out
                                     width = 1.dp, color = GreenDark01, shape = CircleShape
                                 ),
