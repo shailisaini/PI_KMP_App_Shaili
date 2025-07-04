@@ -1,6 +1,7 @@
 package com.pi.ProjectInclusion.android
 
 import android.app.Application
+import com.pi.ProjectInclusion.android.di.androidModule
 import com.pi.ProjectInclusion.di.dataModule
 import com.pi.ProjectInclusion.domain.di.domainModule
 import com.pi.ProjectInclusion.ui.di.sharedViewModelModule
@@ -15,7 +16,7 @@ class BaseApplication: Application(){
         startKoin{
 //            androidLogger(if (BuildConfig.LOG_MODE) Level.ERROR else Level.NONE)
             androidContext(this@BaseApplication)
-            modules(dataModule + domainModule + sharedViewModelModule())
+            modules(androidModule+ dataModule + domainModule + sharedViewModelModule())
         }
     }
 }

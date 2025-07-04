@@ -3,6 +3,7 @@ package com.pi.ProjectInclusion.ui.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
+import com.pi.ProjectInclusion.database.LocalDataSource
 import com.pi.ProjectInclusion.domain.useCases.GetLanguageUsesCases
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,12 +14,21 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
-    private val getLanguageUsesCases: GetLanguageUsesCases
+    private val getLanguageUsesCases: GetLanguageUsesCases,
+    private val localData: LocalDataSource
 ):ViewModel() {
     private val _uiState = MutableStateFlow(UiState())
     val uiState = _uiState.asStateFlow()
 
     private val query = MutableStateFlow("")
+
+    fun savePrefData(key: String, value: String) {
+        localData.saveValue(key, value)
+    }
+
+    fun getPrefData(key: String): String {
+        return localData.getValue(key, "")
+    }
 
     init {
         viewModelScope.launch {
@@ -38,9 +48,7 @@ class LoginViewModel(
         else{
             _uiState.update { UiState(error = response.exceptionOrNull()?.message.toString() ) }
         }
-
     }
-
 }
 
 data class UiState(

@@ -2,6 +2,7 @@ package com.pi.ProjectInclusion.di
 
 import com.example.kmptemplate.logger.AppLogger
 import com.example.kmptemplate.logger.AppLoggerImpl
+import com.example.kmptemplate.logger.LoggerProvider
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -39,7 +40,6 @@ val apiModule = module {
 //    single<KtorClient> { ApiClientImpl(get()) }
 
     single {
-        val appLogger: AppLogger = get()
         HttpClient {
             install(ContentNegotiation){
                 json(
@@ -55,7 +55,7 @@ val apiModule = module {
                 level = LogLevel.ALL
                 logger = object : Logger {
                     override fun log(message: String) {
-                        appLogger.d(message)
+                        LoggerProvider.logger.d(message)
                     }
 
                 }

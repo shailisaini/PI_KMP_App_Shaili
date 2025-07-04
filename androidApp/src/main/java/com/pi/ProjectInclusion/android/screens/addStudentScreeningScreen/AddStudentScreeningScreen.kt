@@ -96,10 +96,7 @@ import coil.size.Size
 import com.example.kmptemplate.logger.AppLoggerImpl
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.android.R
-import com.pi.ProjectInclusion.FullTransparent
-import com.pi.ProjectInclusion.Gray
-import com.pi.ProjectInclusion.GrayLight01
-import com.pi.ProjectInclusion.PurpleGrey40
+import com.pi.ProjectInclusion.Transparent
 
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
@@ -152,7 +149,7 @@ fun AddStudentScreeningScreen(navHostController: NavHostController) {
     Surface(
         modifier = Modifier.wrapContentSize()
             .background(
-                color = FullTransparent
+                color = Transparent
             )
             .padding(0.dp, 115.dp),
 
@@ -161,7 +158,7 @@ fun AddStudentScreeningScreen(navHostController: NavHostController) {
         Box(
             modifier = Modifier.fillMaxSize()
                 .background(
-                    color = FullTransparent
+                    color = Transparent
                 )
                 .padding(10.dp),
 

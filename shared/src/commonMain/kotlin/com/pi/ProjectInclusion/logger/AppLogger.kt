@@ -30,3 +30,8 @@ class AppLoggerImpl : AppLogger{
         Logger.w { message }
     }
 }
+
+//Singleton object
+object LoggerProvider {
+    val logger: AppLogger = AppLoggerImpl()
+}

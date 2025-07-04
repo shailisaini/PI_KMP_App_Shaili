@@ -1,0 +1,15 @@
+CREATE TABLE SELECT_LANGUAGE (
+langId Integer NOT NULL,
+langIcon TEXT NOT NULL,
+langText TEXT NOT NULL
+);
+
+getAllLanguage:
+SELECT SELECT_LANGUAGE.*
+FROM SELECT_LANGUAGE;
+
+insertLanguages:
+INSERT INTO SELECT_LANGUAGE(langId, langIcon,langText) VALUES(?,?,?);
+
+deleteAllLanguages:
+DELETE FROM SELECT_LANGUAGE;
