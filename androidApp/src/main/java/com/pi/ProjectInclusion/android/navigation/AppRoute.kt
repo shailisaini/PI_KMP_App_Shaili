@@ -6,6 +6,7 @@ sealed class AppRoute(val route: String) {
 
     @Serializable
     data object LanguageSelect : AppRoute("language_select")
+    data object UserTypeSelect : AppRoute("user_type")
     data object ForgetPasswordUI : AppRoute("forget_password_UI")
     data object OtpSendVerifyUI : AppRoute("otp_send_verify_UI")
 

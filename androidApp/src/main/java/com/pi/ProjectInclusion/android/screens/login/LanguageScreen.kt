@@ -1,4 +1,4 @@
-package com.pi.ProjectInclusion.android.screens
+package com.pi.ProjectInclusion.android.screens.login
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -62,7 +62,6 @@ import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import coil.size.Size
 import com.example.kmptemplate.logger.LoggerProvider
-import com.pi.ProjectInclusion.Bg_Gray
 import com.pi.ProjectInclusion.Bg_Gray1
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.Dark_01
@@ -75,6 +74,7 @@ import com.pi.ProjectInclusion.PrimaryBlue1
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
 import com.pi.ProjectInclusion.constants.CommonFunction.ShowError
@@ -139,7 +139,7 @@ fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
                 .background(color = Bg_Gray1),
             verticalArrangement = Arrangement.Top
         ) {
-            LanguageResponseUI(context,languageData)
+            LanguageResponseUI(context,languageData, navController)
         }
     }
 }
@@ -148,7 +148,8 @@ fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
 @Composable
 fun LanguageResponseUI(
     context: Context,
-    languageData: MutableList<GetLanguageListResponse.Data.Result>
+    languageData: MutableList<GetLanguageListResponse.Data.Result>,
+    navController: NavHostController
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberLazyGridState()
@@ -207,6 +208,7 @@ fun LanguageResponseUI(
                         ) {
                             items(languageData.size) { index ->
                                 ItemLanguageCard(
+                                    navController,
                                     context,
                                     isSelected = selectedIndex == index,
                                     index,
@@ -260,6 +262,7 @@ fun LanguageResponseUI(
 
 @Composable
 fun ItemLanguageCard(
+    navController: NavHostController,
     context: Context,
     isSelected: Boolean = true,
     index: Int,
@@ -300,9 +303,13 @@ fun ItemLanguageCard(
     Card(
         modifier = Modifier
             .clickable {
-                if (languageIndex.status == KEY_ACTIVE)
+                if (languageIndex.status == KEY_ACTIVE){
                     onItemClicked.invoke()
+                navController.popBackStack()
+                navController.navigate(AppRoute.UserTypeSelect.route)
+                    }
                 else {
+                    LoggerProvider.logger.d("Languages fetched: ${languageIndex.status}")
                     context.toast(errorToast)
                 }
             }

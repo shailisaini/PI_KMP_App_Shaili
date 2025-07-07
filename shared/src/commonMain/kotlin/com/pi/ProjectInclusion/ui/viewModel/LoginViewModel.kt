@@ -3,6 +3,7 @@ package com.pi.ProjectInclusion.ui.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
+import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
 import com.pi.ProjectInclusion.database.LocalDataSource
 import com.pi.ProjectInclusion.domain.useCases.GetLanguageUsesCases
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,8 +18,12 @@ class LoginViewModel(
     private val getLanguageUsesCases: GetLanguageUsesCases,
     private val localData: LocalDataSource
 ):ViewModel() {
-    private val _uiState = MutableStateFlow(UiState())
+    private val _uiState = MutableStateFlow(UiState<GetLanguageListResponse>())
     val uiState = _uiState.asStateFlow()
+
+//    private val _uiStateUserType = MutableStateFlow(UiState<List<GetUserTypeResponse>>())
+    private val _uiStateUserType = MutableStateFlow(UiState<GetUserTypeResponse>())
+    val uiStateType = _uiStateUserType.asStateFlow()
 
     private val query = MutableStateFlow("")
 
@@ -41,7 +46,7 @@ class LoginViewModel(
 
     fun getLanguages(page: String, limit: String) = viewModelScope.launch {
         _uiState.update { UiState(isLoading = true) }
-       val response = getLanguageUsesCases(page, limit)
+       val response = getLanguageUsesCases.getLanguage(page, limit)
         if (response.isSuccess){
             _uiState.update { UiState(success = response.getOrThrow() ) }
         }
@@ -49,10 +54,20 @@ class LoginViewModel(
             _uiState.update { UiState(error = response.exceptionOrNull()?.message.toString() ) }
         }
     }
+    fun getUserType() = viewModelScope.launch {
+        _uiStateUserType.update { UiState(isLoading = true) }
+        val response = getLanguageUsesCases.getUserType()
+        if (response.isSuccess){
+            _uiStateUserType.update { UiState(success = response.getOrThrow() ) }
+        }
+        else{
+            _uiStateUserType.update { UiState(error = response.exceptionOrNull()?.message.toString() ) }
+        }
+    }
 }
 
-data class UiState(
-    val isLoading : Boolean = false,
-    val error : String = "",
-    val success : GetLanguageListResponse? = null
+data class UiState<T>(
+    val isLoading: Boolean = false,
+    val error: String = "",
+    val success: T? = null
 )
