@@ -6,5 +6,55 @@
     <string name="select_userType">Select an user type</string>
     <string name="txt_loading">Loading your data..</string>
     <string name="txt_oops_no_data_found">Oops!!, No data found</string>
+    <string name="student_name">Student Name</string>
+    <string name="student_name_ex">eg: Ramesh</string>
+    <string name="student_gender">Gender</string>
+    <string name="student_dob">DOB</string>
+    <string name="dob_format">MM DD YY</string>
+    <string name="search_ic">Search Icon</string>
+    <string name="f_name">Father\'s Name</string>
+    <string name="f_name_ex">eg: Singh</string>
+    <string name="student_class">Class</string>
+    <string name="choose_option">Select an option</string>
+    <string name="string_next">Next</string>
+    <string name="f_occupation">Father’s profession*</string>
+    <string name="m_name">Mother\'s Name</string>
+    <string name="m_name_ex">eg: Sita</string>
+    <string name="m_occupation">Mother’s profession*</string>
+    <string name="parent_mobile">Mobile number of parents*</string>
+    <string name="enter_here">Enter here</string>
+    <string name="education_status">Education Status*</string>
+    <string name="student_board">Board*</string>
+    <string name="type_school">Type of school*</string>
+    <string name="add_student">Add Student</string>
+    <string name="student_screen">Add Student for screening</string>
+    <string name="student_screen_detail">No students have been added yet. Start by adding your first student to begin the screening process.</string>
+    <string name="student_screen_add">+ Add Student</string>
+
+    <string name="welcome_name">Hi, Aman Sharma</string>
+    <string name="welcome_desc">Learn, act, and create impact—one course at a time.</string>
+    <string name="certificate_txt">Certificates</string>
+    <string name="certificate_txt_value">0</string>
+    <string name="refer_txt">Refer fellow teachers >></string>
+    <string name="refer_desc">Invite passionate teachers to join
+and make a difference together!</string>
+    <string name="refer_count"> My refer : 0 </string>
+    <string name="lock_ic">lock</string>
+    <string name="logo_ic">logo</string>
+    <string name="user_name">Aman Sharma</string>
+    <string name="user_profile">Teacher</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_course">Courses</string>
+    <string name="nav_screening">Screening</string>
+    <string name="nav_intervention">Intervention</string>
+    <string name="student_wallet">student_wallet</string>
+    <string name="meeting_txt">Meeting</string>
+    <string name="change_password">Change Password</string>
+    <string name="language_txt">Language</string>
+    <string name="nav_refer_txt">Refer</string>
+    <string name="nav_contact">Contact us</string>
+    <string name="nav_faq">F.A.Q</string>
+
 
 </resources>

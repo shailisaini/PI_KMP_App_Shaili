@@ -87,7 +87,7 @@ import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
 import kotlinx.coroutines.launch
 
 @Composable
-fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
+fun LanguageScreen(navController: NavHostController, viewModel: LoginViewModel) {
 
     var isDialogVisible by remember { mutableStateOf(false) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -100,7 +100,7 @@ fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
         message = stringResource(R.string.txt_loading)
     )
 
-    LoggerProvider.logger.d("Screen: "+"LanguageScreen()")
+    LoggerProvider.logger.d("Screen: " + "LanguageScreen()")
     LaunchedEffect(Unit) {
         viewModel.getLanguages(PAGE_LENGTH, PAGE_LIMIT)
     }
@@ -307,6 +307,8 @@ fun ItemLanguageCard(
                     onItemClicked.invoke()
                 navController.popBackStack()
                 navController.navigate(AppRoute.UserTypeSelect.route)
+                    // by manju
+//                    navController.navigate(AppRoute.StudentDashboardActivity.route)
                     }
                 else {
                     LoggerProvider.logger.d("Languages fetched: ${languageIndex.status}")

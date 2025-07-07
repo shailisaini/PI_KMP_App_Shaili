@@ -19,4 +19,6 @@ sealed class AppRoute(val route: String) {
     data object InterventionScreen : AppRoute("intervention_screen")
 
     data object StudentDashboardActivity : AppRoute("student_screen")
+
+    data object AddStudentRegisterScreen: AppRoute("add_student_register_screen")
 }
