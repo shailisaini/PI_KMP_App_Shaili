@@ -62,7 +62,6 @@ import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import coil.size.Size
 import com.example.kmptemplate.logger.LoggerProvider
-import com.pi.ProjectInclusion.Bg_Gray
 import com.pi.ProjectInclusion.Bg_Gray1
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.Dark_01
@@ -75,6 +74,7 @@ import com.pi.ProjectInclusion.PrimaryBlue1
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
 import com.pi.ProjectInclusion.constants.CommonFunction.ShowError
@@ -87,7 +87,7 @@ import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
 import kotlinx.coroutines.launch
 
 @Composable
-fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
+fun LanguageScreen(navController: NavHostController, viewModel: LoginViewModel) {
 
     var isDialogVisible by remember { mutableStateOf(false) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -100,7 +100,7 @@ fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
         message = stringResource(R.string.txt_loading)
     )
 
-    LoggerProvider.logger.d("Screen: "+"LanguageScreen()")
+    LoggerProvider.logger.d("Screen: " + "LanguageScreen()")
     LaunchedEffect(Unit) {
         viewModel.getLanguages(PAGE_LENGTH, PAGE_LIMIT)
     }
@@ -139,7 +139,7 @@ fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
                 .background(color = Bg_Gray1),
             verticalArrangement = Arrangement.Top
         ) {
-            LanguageResponseUI(context,languageData)
+            LanguageResponseUI(context, languageData, navController)
         }
     }
 }
@@ -148,7 +148,7 @@ fun LanguageScreen(navController: NavHostController,viewModel: LoginViewModel) {
 @Composable
 fun LanguageResponseUI(
     context: Context,
-    languageData: MutableList<GetLanguageListResponse.Data.Result>
+    languageData: MutableList<GetLanguageListResponse.Data.Result>, navController: NavHostController
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberLazyGridState()
@@ -162,104 +162,105 @@ fun LanguageResponseUI(
     val selectedLanguage = remember { mutableStateOf<String?>(null) }
     val title = stringResource(R.string.select_language)
 
-        Box(
+    Box(
+        modifier = Modifier
+            .padding(vertical = 15.dp)
+            .wrapContentSize(Alignment.Center)
+            .background(
+                color = if (isSystemInDarkTheme()) {
+                    Dark_01
+                } else {
+                    Transparent
+                }
+            )
+            .padding(4.dp), // Add horizontal padding,
+    ) {
+        Column(
             modifier = Modifier
-                .padding(vertical = 15.dp)
-                .wrapContentSize(Alignment.Center)
-                .background(
-                    color = if (isSystemInDarkTheme()) {
-                        Dark_01
-                    } else {
-                        Transparent
-                    }
-                )
-                .padding(4.dp), // Add horizontal padding,
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(vertical = 10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(vertical = 10.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                LoginScreenTitle(title, Black)
-                if (languageData.isNotEmpty()) {
-                    Column(
+            LoginScreenTitle(title, Black)
+            if (languageData.isNotEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .weight(1f)
+                ) {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        state = scrollState,
+                        contentPadding = PaddingValues(vertical = 15.dp),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .wrapContentHeight()
-                            .weight(1f)
-                    ) {
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(2),
-                            state = scrollState,
-                            contentPadding = PaddingValues(vertical = 15.dp),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 10.dp, horizontal = 8.dp)
-                                .draggable(
-                                    orientation = Orientation.Vertical,
-                                    state = rememberDraggableState { delta ->
-                                        coroutineScope.launch {
-                                            scrollState.scrollBy(-delta)
-                                        }
-                                    })
-                        ) {
-                            items(languageData.size) { index ->
-                                ItemLanguageCard(
-                                    context,
-                                    isSelected = selectedIndex == index,
-                                    index,
-                                    language = languageData,
-                                    onItemClicked = {
-                                        selectedIndex =
-                                            if (selectedIndex == index) null else index // Toggle selection
-                                        selectedLanguage.value =
-                                            languageData[index].id.toString()
-                                        println("Selected Item :- $selectedIndex")
+                            .padding(vertical = 10.dp, horizontal = 8.dp)
+                            .draggable(
+                                orientation = Orientation.Vertical,
+                                state = rememberDraggableState { delta ->
+                                    coroutineScope.launch {
+                                        scrollState.scrollBy(-delta)
                                     }
-                                )
-                            }
+                                })
+                    ) {
+                        items(languageData.size) { index ->
+                            ItemLanguageCard(
+                                navController,
+                                context,
+                                isSelected = selectedIndex == index,
+                                index,
+                                language = languageData,
+                                onItemClicked = {
+                                    selectedIndex =
+                                        if (selectedIndex == index) null else index // Toggle selection
+                                    selectedLanguage.value =
+                                        languageData[index].id.toString()
+                                    println("Selected Item :- $selectedIndex")
+                                }
+                            )
                         }
                     }
                 }
-                else{
-                    if (!isInternetAvailable) {
-                        ShowError(internetMessage, colors)
-                    } else {
-                        Column(
+            } else {
+                if (!isInternetAvailable) {
+                    ShowError(internetMessage, colors)
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.ic_hindi),
+                            contentDescription = IMG_DESCRIPTION,
                             modifier = Modifier
-                                .fillMaxSize()
-                                .fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Image(
-                                painter = painterResource(R.drawable.ic_hindi),
-                                contentDescription = IMG_DESCRIPTION,
-                                modifier = Modifier
-                                    .padding(vertical = 8.dp)
-                                    .background(Color.Unspecified),
-                            )
+                                .padding(vertical = 8.dp)
+                                .background(Color.Unspecified),
+                        )
 
-                            Text(
-                                text = stringResource(R.string.txt_oops_no_data_found),
-                                modifier = Modifier.wrapContentSize(),
-                                fontStyle = FontStyle.Normal,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp,
-                                color = Gray,
-                                textAlign = TextAlign.Start
-                            )
-                        }
+                        Text(
+                            text = stringResource(R.string.txt_oops_no_data_found),
+                            modifier = Modifier.wrapContentSize(),
+                            fontStyle = FontStyle.Normal,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            color = Gray,
+                            textAlign = TextAlign.Start
+                        )
                     }
                 }
             }
+        }
     }
 }
 
 @Composable
 fun ItemLanguageCard(
+    navController: NavHostController,
     context: Context,
     isSelected: Boolean = true,
     index: Int,
@@ -296,14 +297,18 @@ fun ItemLanguageCard(
             White
         }
     }
-
     Card(
         modifier = Modifier
             .clickable {
-                if (languageIndex.status == KEY_ACTIVE)
+                if (languageIndex.status == KEY_ACTIVE) {
                     onItemClicked.invoke()
-                else {
+                    // by manju
+                    navController.navigate(AppRoute.StudentDashboardActivity.route)
+                } else {
+                    // by manju
                     context.toast(errorToast)
+                    navController.navigate(AppRoute.StudentDashboardActivity.route)
+
                 }
             }
             .padding(8.dp)
@@ -338,8 +343,8 @@ fun ItemLanguageCard(
                         .size(45.dp),
                     contentScale = ContentScale.Fit,
                     painter = if (languageIndex.icon.isNotEmpty()) {
-                        rememberAsyncImagePainter(
-                            model = ImageRequest.Builder(LocalContext.current)
+                    rememberAsyncImagePainter(
+                    model = ImageRequest.Builder(LocalContext.current)
                                 .data(languageIndex.icon)
                                 .decoderFactory(SvgDecoder.Factory())
                                 .size(Size.ORIGINAL)
@@ -352,30 +357,30 @@ fun ItemLanguageCard(
                     },
                     contentDescription = "Language Icon"
                 )
-                    Text(
-                        languageIndex.nativeName,
-                        textAlign = TextAlign.Start,
-                        maxLines = 1,
-                        fontSize = 16.sp,
-                        overflow = TextOverflow.Ellipsis,
-                        color = Black,
-                        modifier = Modifier
-                            .padding(top = 10.dp)
-                    )
+                Text(
+                    languageIndex.nativeName,
+                    textAlign = TextAlign.Start,
+                    maxLines = 1,
+                    fontSize = 16.sp,
+                    overflow = TextOverflow.Ellipsis,
+                    color = Black,
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                )
 
-                    Text(
-                        "${languageIndex.name} ",
-                        textAlign = TextAlign.Start,
-                        maxLines = 1,
-                        fontSize = 14.sp,
-                        overflow = TextOverflow.Ellipsis,
-                        color = Gray,
-                        modifier = Modifier
-                            .wrapContentWidth()
-                            .padding(top = 5.dp)
+                Text(
+                    "${languageIndex.name} ",
+                    textAlign = TextAlign.Start,
+                    maxLines = 1,
+                    fontSize = 14.sp,
+                    overflow = TextOverflow.Ellipsis,
+                    color = Gray,
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .padding(top = 5.dp)
 //                            .heightIn(min = 40.dp)
-                    )
-                }
+                )
+            }
         }
     }
 }

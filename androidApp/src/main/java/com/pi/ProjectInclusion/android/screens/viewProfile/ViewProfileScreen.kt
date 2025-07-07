@@ -101,11 +101,8 @@ import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
 
-
-@OptIn(ExperimentalMaterial3Api::class)
-
 @Composable
-fun AddStudentScreeningScreen(navHostController: NavHostController) {
+fun ViewProfileScreen(navHostController: NavHostController) {
 
     var isDialogVisible by remember { mutableStateOf(false) }
 
@@ -151,7 +148,7 @@ fun AddStudentScreeningScreen(navHostController: NavHostController) {
             .background(
                 color = Transparent
             )
-            .padding(0.dp),
+            .padding(0.dp, 115.dp),
 
 
         ) {
@@ -168,104 +165,14 @@ fun AddStudentScreeningScreen(navHostController: NavHostController) {
                 horizontalAlignment = Alignment.CenterHorizontally // Center rows inside the column
             )
             {
-                ItemAddScreening(context)
+
 
             }
         }
     }
 }
 
-@Composable
-fun ItemAddScreening(context: Context){
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(0.dp)
-            .wrapContentHeight()
-    )
-    {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-        )
-        {
-            Card(
-                modifier = Modifier
-                    .padding(10.dp)
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(8.dp),
-                // Do not set containerColor, let the Box inside handle the gradient
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            brush = Brush.linearGradient(
-                                colors = listOf(Color(0xFFDADFFF), Color(0xFFDADFFF)) // Blue gradient
-                            )
-                        )
-                        .padding(0.dp)
-                        .align(Alignment.CenterHorizontally)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(top = 16.dp, bottom = 16.dp, end = 10.dp, start = 10.dp)
-
-                    )
-                    {
-                        Text(
-                            text = stringResource(R.string.student_screen),
-                            color = Color(0xFF00051F),
-                            textAlign = TextAlign.Center,
-                            fontSize = 16.sp// Make sure text is readable on gradient
-                        )
-                        Spacer(modifier = Modifier.height(5.dp))
-
-                        Text(
-                            text = stringResource(R.string.student_screen_detail),
-                            color = Color(0xFF6C6D72),
-                            textAlign = TextAlign.Center,
-                            fontSize = 14.sp// Make sure text is readable on gradient
-                        )
-                            Card(
-                                modifier = Modifier
-                                    .wrapContentWidth()
-                                    .wrapContentHeight(),
-
-                                colors = CardDefaults.cardColors(
-                                    containerColor = Color(0xFF2C3EA2)
-                                ),
-                                shape = RoundedCornerShape(8.dp),
-                                elevation = CardDefaults.cardElevation(4.dp)
-
-                                // Do not set containerColor, let the Box inside handle the gradient
-                            ){
-                                Text ( modifier = Modifier.wrapContentWidth()
-                                    .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
-                                    .clickable {  },
-                                    text = stringResource(R.string.student_screen_add),
-                                    color = White,
-                                    fontSize = 13.sp// Make sure text is readable on gradient
-                                )
-                            }
-
-
-                    }
-
-                }
-            }
-
-
-        }
-
-    }
-
-
-
-
-}
 
 
 
