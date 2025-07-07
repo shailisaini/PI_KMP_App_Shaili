@@ -1,7 +1,6 @@
 package com.pi.ProjectInclusion.android.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,11 +10,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,11 +30,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -43,15 +47,16 @@ import com.pi.ProjectInclusion.DARK_TITLE_TEXT
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.INVITE_LIGHT_01
-import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
+import com.pi.ProjectInclusion.android.common_UI.CustomProgressBar
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.OtpInputField
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun OtpSendVerifyScreen(navController: NavHostController, viewModel: LoginViewModel) {
@@ -61,21 +66,24 @@ fun OtpSendVerifyScreen(navController: NavHostController, viewModel: LoginViewMo
     val colors = MaterialTheme.colorScheme
     var inValidOTP by remember { mutableStateOf(false) }
     var showError by remember { mutableStateOf(false) }
-    val invalidOtpText = remember { mutableStateOf("Please Enter valid OTP") }
+    val invalidOtpText = stringResource(R.string.txt_Enter_valid_OTP)
     var isDialogVisible by remember { mutableStateOf(false) }
+    var isFinished by remember { mutableStateOf(false) }
+    var timeLeft by remember { mutableStateOf(30000L) }
+    var interval by remember { mutableStateOf(30000L) }
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
         navController.popBackStack()
-        navController.navigate(AppRoute.LanguageSelect.route)
+        navController.navigate(AppRoute.ForgetPasswordUI.route)
     }, content = {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
-                    .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
+                    .padding(start = 16.dp, end = 16.dp)
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = "OTP Sent",
+                    text = stringResource(R.string.txt_OTP_Sent),
                     modifier = Modifier
                         .padding(start = 10.dp, end = 10.dp)
                         .fillMaxWidth(),
@@ -91,7 +99,7 @@ fun OtpSendVerifyScreen(navController: NavHostController, viewModel: LoginViewMo
                 )
 
                 Text(
-                    text = "Please enter the OTP received on phone number XXXXXX9168",
+                    text = stringResource(R.string.txt_OTP_received_phone),
                     modifier = Modifier.padding(top = 8.dp, start = 10.dp, end = 10.dp),
                     textAlign = TextAlign.Center,
                     fontStyle = FontStyle.Normal,
@@ -106,56 +114,64 @@ fun OtpSendVerifyScreen(navController: NavHostController, viewModel: LoginViewMo
 
                 otpValue = otpTextField()
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding()
-                        .padding(10.dp),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    TextWithIconOnLeft(
-                        text = "Resend OTP",
-                        icon = ImageVector.vectorResource(id = R.drawable.message_square),
-                        textColor = if (isSystemInDarkTheme()) {
-                            INVITE_LIGHT_01
-                        } else {
-                            PrimaryBlue
-                        },
-                        iconColor = if (isSystemInDarkTheme()) {
-                            INVITE_LIGHT_01
-                        } else {
-                            PrimaryBlue
-                        },
-                        modifier = Modifier.padding(top = 16.dp),
-                        onClick = {
+                if (isFinished) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding()
+                            .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        TextWithIconOnLeft(
+                            text = stringResource(R.string.txt_Resend_OTP),
+                            icon = ImageVector.vectorResource(id = R.drawable.message_square),
+                            textColor = if (isSystemInDarkTheme()) {
+                                INVITE_LIGHT_01
+                            } else {
+                                PrimaryBlue
+                            },
+                            iconColor = if (isSystemInDarkTheme()) {
+                                INVITE_LIGHT_01
+                            } else {
+                                PrimaryBlue
+                            },
+                            modifier = Modifier.padding(top = 16.dp),
+                            onClick = {
 //                            loginViewModel.setGradeReportPage("")
 //                            loginViewModel.setSelectedTabId(0)
 //                            loginViewModel.setGradeId("")
 //                            navHostController.navigate(AppRoute.TeacherQuizReports.route)
-                        })
+                            })
 
-                    Spacer(modifier = Modifier.weight(1f))
+                        Spacer(modifier = Modifier.weight(1f))
 
-                    TextWithIconOnLeft(
-                        text = "OTP on call",
-                        icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
-                        textColor = if (isSystemInDarkTheme()) {
-                            INVITE_LIGHT_01
-                        } else {
-                            PrimaryBlue
-                        },
-                        iconColor = if (isSystemInDarkTheme()) {
-                            INVITE_LIGHT_01
-                        } else {
-                            PrimaryBlue
-                        },
-                        modifier = Modifier.padding(top = 16.dp),
-                        onClick = {
+                        TextWithIconOnLeft(
+                            text = stringResource(R.string.txt_OTP_call),
+                            icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
+                            textColor = if (isSystemInDarkTheme()) {
+                                INVITE_LIGHT_01
+                            } else {
+                                PrimaryBlue
+                            },
+                            iconColor = if (isSystemInDarkTheme()) {
+                                INVITE_LIGHT_01
+                            } else {
+                                PrimaryBlue
+                            },
+                            modifier = Modifier.padding(top = 16.dp),
+                            onClick = {
 //                            loginViewModel.setGradeReportPage("")
 //                            loginViewModel.setSelectedTabId(0)
 //                            loginViewModel.setGradeId("")
 //                            navHostController.navigate(AppRoute.TeacherQuizReports.route)
-                        })
+                            })
+                    }
+                } else {
+                    CountdownTimer(
+                        totalTime = 30_000L, // 30 seconds
+                        interval = 1_000L,
+                        onFinish = { isFinished = true }
+                    )
                 }
             }
 
@@ -163,7 +179,7 @@ fun OtpSendVerifyScreen(navController: NavHostController, viewModel: LoginViewMo
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
-                    .padding(bottom = 32.dp)
+                    .padding(bottom = 16.dp)
                     .align(Alignment.BottomCenter)
                     .background(
                         color = if (isSystemInDarkTheme()) {
@@ -176,7 +192,7 @@ fun OtpSendVerifyScreen(navController: NavHostController, viewModel: LoginViewMo
             ) {
                 Box(
                     modifier = Modifier
-                        .padding(horizontal = 10.dp, vertical = 24.dp)
+                        .padding(horizontal = 16.dp)
                         .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
@@ -188,8 +204,10 @@ fun OtpSendVerifyScreen(navController: NavHostController, viewModel: LoginViewMo
                     }
 
                     BtnUi(
-                        "Verify & proceed",
+                        stringResource(R.string.txt_Verify_proceed),
                         onClick = {
+                            navController.navigate(AppRoute.SetNewPasswordUI.route)
+
                             showError = otpValue.isEmpty()
                             inValidOTP = showError || otpValue.length < 6
                             if (!inValidOTP) {
@@ -230,4 +248,79 @@ fun otpTextField(): String {
             }
         })
     return otpValue
+}
+
+@Composable
+fun CountdownTimer(
+    totalTime: Long = 60_000L, // 60 seconds
+    interval: Long = 1_000L,   // 1 second interval
+    onFinish: () -> Unit = {},
+) {
+    var timeLeft by remember { mutableStateOf(totalTime) }
+
+    LaunchedEffect(key1 = timeLeft) {
+        if (timeLeft > 0L) {
+            delay(interval)
+            timeLeft -= interval
+        } else {
+            onFinish()
+        }
+    }
+
+    val seconds = (timeLeft / 1000).toInt()
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        ProfileProgress(
+            textStr = stringResource(R.string.txt_Resend_otp_in),
+            progress = seconds.toFloat(),
+        )
+    }
+}
+
+@Composable
+private fun ProfileProgress(
+    textStr: String,
+    progress: Float = 0f,
+) {
+    Row(
+        modifier = Modifier
+            .wrapContentWidth()
+            .padding(horizontal = 8.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(
+            modifier = Modifier
+                .wrapContentWidth()
+                .align(Alignment.CenterVertically)
+                .padding(horizontal = 8.dp, vertical = 8.dp)
+        ) {
+            Text(
+                buildAnnotatedString {
+                    withStyle(
+                        style = SpanStyle(
+                            color = if (isSystemInDarkTheme()) {
+                                DARK_TITLE_TEXT
+                            } else {
+                                Gray
+                            }
+                        )
+                    ) {
+                        append(textStr)
+                    }
+                },
+                fontFamily = FontFamily(
+                    Font(R.font.inter_semi_bold, FontWeight.SemiBold)
+                ),
+                textAlign = TextAlign.Center,
+                fontSize = 12.sp,
+            )
+        }
+
+        CustomProgressBar(percentage = progress, modifier = Modifier.size(35.dp))
+    }
 }

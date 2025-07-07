@@ -51,9 +51,10 @@ class SplashActivity : ComponentActivity() {
                     composable(AppRoute.OtpSendVerifyUI.route) {
                         OtpSendVerifyScreen(navController, viewModel)
                     }
-//                    composable(AppRoute.StudentDashboardActivity.route) {
-//                        StudentDashboardActivity()
-//                    }
+
+                    composable(AppRoute.SetNewPasswordUI.route) {
+                        SetNewPasswordScreen(navController, viewModel)
+                    }
                 }
             }
         }
@@ -65,7 +66,7 @@ fun SplashScreen(navController: NavHostController) {
     LaunchedEffect(Unit) {
         delay(3500) // simulate loading
         navController.navigate(AppRoute.LanguageSelect.route) {
-       // navController.navigate(AppRoute.StudentDashboardActivity.route) {
+            // navController.navigate(AppRoute.StudentDashboardActivity.route) {
             popUpTo("splash") { inclusive = true }
         }
     }
