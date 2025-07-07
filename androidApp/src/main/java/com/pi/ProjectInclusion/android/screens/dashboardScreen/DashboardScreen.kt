@@ -189,11 +189,11 @@ fun ItemHeader(context: Context){
 
         ) {
             Text(
-                "Hi, Aman Sharma", style = MaterialTheme.typography.titleMedium,
+                stringResource(R.string.welcome_name), style = MaterialTheme.typography.titleMedium,
                 fontSize = 18.sp
             )
             Text(
-                "Learn, act, and create impact—one course at a time.",
+                stringResource(R.string.welcome_desc),
                 style = MaterialTheme.typography.bodyMedium,
                 fontSize = 12.sp
             )
@@ -243,14 +243,14 @@ fun ItemCard(
                             .align(Alignment.CenterHorizontally)
                     ) {
                         Text(
-                                text = "Certificates",
+                                text = stringResource(R.string.certificate_txt),
                             style = MaterialTheme.typography.titleMedium,
                             fontSize = 14.sp,
                             color = Color(0xFF535862)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "0",
+                            text = stringResource(R.string.certificate_txt_value),
                             style = MaterialTheme.typography.bodyMedium,
                                     fontSize = 18.sp,
                             color = Black
@@ -282,14 +282,14 @@ fun ItemCard(
                             .align(Alignment.CenterHorizontally)
                     ) {
                         Text(
-                            text = "Certificates",
+                            text = stringResource(R.string.certificate_txt),
                             style = MaterialTheme.typography.titleMedium,
                             fontSize = 14.sp,
                             color = Color(0xFF535862)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "0",
+                            text = stringResource(R.string.certificate_txt_value),
                             style = MaterialTheme.typography.bodyMedium,
                             fontSize = 18.sp,
                             color = Black
@@ -332,14 +332,14 @@ fun ItemCard(
                             .align(Alignment.CenterHorizontally)
                     ) {
                         Text(
-                            text = "Certificates",
+                            text = stringResource(R.string.certificate_txt),
                             style = MaterialTheme.typography.titleMedium,
                             fontSize = 14.sp,
                             color = Color(0xFF535862)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "0",
+                            text = stringResource(R.string.certificate_txt_value),
                             style = MaterialTheme.typography.bodyMedium,
                             fontSize = 18.sp,
                             color = Black
@@ -371,14 +371,14 @@ fun ItemCard(
                             .align(Alignment.CenterHorizontally)
                     ) {
                         Text(
-                            text = "Certificates",
+                            text = stringResource(R.string.certificate_txt),
                             style = MaterialTheme.typography.titleMedium,
                             fontSize = 14.sp,
                             color = Color(0xFF535862)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "0",
+                            text = stringResource(R.string.certificate_txt_value),
                             style = MaterialTheme.typography.bodyMedium,
                             fontSize = 18.sp,
                             color = Black
@@ -434,12 +434,12 @@ fun ItemReferCard(context: Context){
                     )
                     {
                         Text(
-                            text = "Refer fellow teachers >>",
+                            text = stringResource(R.string.refer_txt),
                             color = Color.Black,
                             fontSize = 18.sp// Make sure text is readable on gradient
                         )
                         Text(
-                            text = "Invite passionate teachers to join\nand make a difference together!",
+                            text = stringResource(R.string.refer_desc),
                             color = Color(0xFF6C6D72),
                             fontSize = 12.sp// Make sure text is readable on gradient
                         )
@@ -453,7 +453,7 @@ fun ItemReferCard(context: Context){
                         ){
                             Text ( modifier = Modifier.wrapContentWidth()
                                 .padding(5.dp),
-                                text = " My refer : 0 ",
+                                text = stringResource(R.string.refer_count),
                                 color = Black,
                                 fontSize = 12.sp// Make sure text is readable on gradient
                             )
@@ -470,7 +470,7 @@ fun ItemReferCard(context: Context){
                     {
                         Icon(
                             painter = painterResource(id = R.drawable.refer_banner),
-                            contentDescription = "lock",
+                            contentDescription = stringResource(R.string.lock_ic),
                             tint = Color.Unspecified// Optional color
                         )
                     }

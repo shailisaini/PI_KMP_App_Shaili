@@ -1,67 +1,33 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
-package com.pi.ProjectInclusion.android.screens.dashboardScreen
+package com.pi.ProjectInclusion.android.screens.addStudentRegisterScreen
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.material3.Card
-
-import androidx.compose.material3.ColorScheme
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
-
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
-
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -71,47 +37,22 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
-
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
-import coil.compose.rememberAsyncImagePainter
-import coil.decode.SvgDecoder
-import coil.request.ImageRequest
-import coil.size.Size
-
 import com.example.kmptemplate.logger.AppLoggerImpl
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.Transparent
-
+import com.pi.ProjectInclusion.android.R.*
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
-
-
 @OptIn(ExperimentalMaterial3Api::class)
-
 @Composable
 fun AddStudentRegisterScreen(navHostController: NavHostController) {
     var isDialogVisible by remember { mutableStateOf(false) }
@@ -149,17 +90,12 @@ fun AddStudentRegisterScreen(navHostController: NavHostController) {
         }
     }
 
-
-
-
     Surface(
         modifier = Modifier.wrapContentSize()
             .background(
                 color = Transparent
             )
             .padding(0.dp),
-
-
         ) {
         Box(
             modifier = Modifier.fillMaxSize()
@@ -167,7 +103,6 @@ fun AddStudentRegisterScreen(navHostController: NavHostController) {
                     color = Transparent
                 )
                 .padding(10.dp),
-
         )
         {
             Column(
@@ -192,7 +127,7 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context){
             .padding(16.dp)
     ) {
         Text(
-            text = "Student Name",
+            text = stringResource(R.string.student_name),
             fontSize = 16.sp,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -201,7 +136,7 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context){
             value = text,
             onValueChange = { text = it },
             shape = RoundedCornerShape(8.dp),
-            placeholder = { Text("eg: Ramesh") },
+            placeholder = { Text(stringResource(R.string.student_name_ex)) },
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color(0xFFD0D5DD),
@@ -225,7 +160,7 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context){
             .padding(16.dp)
     ) {
         Text(
-            text = "Gender",
+            text = stringResource(R.string.student_gender),
             fontSize = 16.sp,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -243,7 +178,7 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context){
             .padding(16.dp)
     ) {
         Text(
-            text = "DOB",
+            text = stringResource(R.string.student_dob),
             fontSize = 16.sp,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -252,7 +187,7 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context){
             value = text,
             onValueChange = { text = it },
             shape = RoundedCornerShape(8.dp),
-            placeholder = { Text("MM DD YY") },
+            placeholder = { Text(stringResource(R.string.dob_format)) },
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color(0xFFD0D5DD),
@@ -264,7 +199,7 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context){
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.DateRange, // or any icon you like
-                    contentDescription = "Search Icon"
+                    contentDescription = stringResource(R.string.search_ic)
                 )
             },
             textStyle = TextStyle(fontSize = 16.sp, color = Black)
@@ -281,7 +216,7 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context){
             .padding(16.dp)
     ) {
         Text(
-            text = "Father's Name",
+            text = stringResource(R.string.f_name),
             fontSize = 16.sp,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -290,7 +225,7 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context){
             value = text,
             onValueChange = { text = it },
             shape = RoundedCornerShape(8.dp),
-            placeholder = { Text("eg: Singh") },
+            placeholder = { Text(stringResource(R.string.f_name_ex)) },
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color(0xFFD0D5DD),
@@ -314,7 +249,7 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context){
             .padding(16.dp)
     ) {
         Text(
-            text = "Class",
+            text = stringResource(R.string.student_class),
             fontSize = 16.sp,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -323,7 +258,7 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context){
             value = text,
             onValueChange = { text = it },
             shape = RoundedCornerShape(8.dp),
-            placeholder = { Text("Select an option") },
+            placeholder = { Text(stringResource(R.string.choose_option)) },
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color(0xFFD0D5DD),
@@ -334,12 +269,7 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context){
             ),
 
             textStyle = TextStyle(fontSize = 16.sp, color = Black)
-
         )
-
-
-
-
     }
     Column(
         modifier = Modifier
@@ -362,7 +292,7 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context){
             Text ( modifier = Modifier.wrapContentWidth()
                 .padding(start = 26.dp, end = 26.dp, top = 8.dp, bottom = 8.dp)
                 .clickable {  },
-                text = "Next",
+                text = stringResource(R.string.string_next),
                 color = White,
                 fontSize = 16.sp// Make sure text is readable on gradient
             )
@@ -390,16 +320,15 @@ fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
             .padding(16.dp)
     ) {
         Text(
-            text = "Father’s profession*",
+            text = stringResource(R.string.f_occupation),
             fontSize = 16.sp,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-
         OutlinedTextField(
             value = text,
             onValueChange = { text = it },
             shape = RoundedCornerShape(8.dp),
-            placeholder = { Text("Select an option") },
+            placeholder = { Text(stringResource(R.string.choose_option)) },
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color(0xFFD0D5DD),
@@ -411,15 +340,12 @@ fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown, // or any icon you like
-                    contentDescription = "Search Icon"
+                    contentDescription = stringResource(R.string.search_ic)
                 )
             },
             textStyle = TextStyle(fontSize = 16.sp, color = Black)
 
         )
-
-
-
     }
 
     Column(
@@ -428,7 +354,7 @@ fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
             .padding(16.dp)
     ) {
         Text(
-            text = "Mother's Name",
+            text = stringResource(R.string.m_name),
             fontSize = 16.sp,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -437,7 +363,7 @@ fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
             value = text,
             onValueChange = { text = it },
             shape = RoundedCornerShape(8.dp),
-            placeholder = { Text("eg: Sita") },
+            placeholder = { Text(stringResource(R.string.m_name_ex)) },
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color(0xFFD0D5DD),
@@ -462,7 +388,7 @@ fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
             .padding(16.dp)
     ) {
         Text(
-            text = "Mother’s profession*",
+            text = stringResource(R.string.m_occupation),
             fontSize = 16.sp,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -471,7 +397,7 @@ fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
             value = text,
             onValueChange = { text = it },
             shape = RoundedCornerShape(8.dp),
-            placeholder = { Text("Select an option") },
+            placeholder = { Text(stringResource(R.string.choose_option)) },
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color(0xFFD0D5DD),
@@ -483,77 +409,7 @@ fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown, // or any icon you like
-                    contentDescription = "Search Icon"
-                )
-            },
-            textStyle = TextStyle(fontSize = 16.sp, color = Black)
-
-        )
-
-
-
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "Mobile number of parents*",
-            fontSize = 16.sp,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        OutlinedTextField(
-            value = text,
-            onValueChange = { text = it },
-            shape = RoundedCornerShape(8.dp),
-            placeholder = { Text("Enter here") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFD0D5DD),
-                unfocusedBorderColor = Color(0xFFD0D5DD),
-                cursorColor = Color.Black,
-                containerColor = Color(0xFFFFFFFF)
-
-            ),
-
-            textStyle = TextStyle(fontSize = 16.sp, color = Black)
-
-        )
-
-
-
-
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "Education Status*",
-            fontSize = 16.sp,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        OutlinedTextField(
-            value = text,
-            onValueChange = { text = it },
-            shape = RoundedCornerShape(8.dp),
-            placeholder = { Text("Select an option") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFD0D5DD),
-                unfocusedBorderColor = Color(0xFFD0D5DD),
-                cursorColor = Color.Black,
-                containerColor = Color(0xFFFFFFFF)
-
-            ),
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown, // or any icon you like
-                    contentDescription = "Search Icon"
+                    contentDescription = stringResource(R.string.search_ic)
                 )
             },
             textStyle = TextStyle(fontSize = 16.sp, color = Black)
@@ -569,7 +425,7 @@ fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
             .padding(16.dp)
     ) {
         Text(
-            text = "Board*",
+            text = stringResource(R.string.parent_mobile),
             fontSize = 16.sp,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -578,7 +434,40 @@ fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
             value = text,
             onValueChange = { text = it },
             shape = RoundedCornerShape(8.dp),
-            placeholder = { Text("Select an option") },
+            placeholder = { Text(stringResource(R.string.enter_here)) },
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = Color(0xFFD0D5DD),
+                unfocusedBorderColor = Color(0xFFD0D5DD),
+                cursorColor = Color.Black,
+                containerColor = Color(0xFFFFFFFF)
+
+            ),
+
+            textStyle = TextStyle(fontSize = 16.sp, color = Black)
+
+        )
+
+
+
+
+    }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.education_status),
+            fontSize = 16.sp,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        OutlinedTextField(
+            value = text,
+            onValueChange = { text = it },
+            shape = RoundedCornerShape(8.dp),
+            placeholder = { Text(stringResource(R.string.choose_option)) },
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color(0xFFD0D5DD),
@@ -590,7 +479,7 @@ fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown, // or any icon you like
-                    contentDescription = "Search Icon"
+                    contentDescription = stringResource(R.string.search_ic)
                 )
             },
             textStyle = TextStyle(fontSize = 16.sp, color = Black)
@@ -606,7 +495,7 @@ fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
             .padding(16.dp)
     ) {
         Text(
-            text = "Type of school*",
+            text = stringResource(R.string.student_board),
             fontSize = 16.sp,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -615,7 +504,7 @@ fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
             value = text,
             onValueChange = { text = it },
             shape = RoundedCornerShape(8.dp),
-            placeholder = { Text("Select an option") },
+            placeholder = { Text(stringResource(R.string.choose_option)) },
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color(0xFFD0D5DD),
@@ -627,7 +516,44 @@ fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown, // or any icon you like
-                    contentDescription = "Search Icon"
+                    contentDescription = stringResource(R.string.search_ic)
+                )
+            },
+            textStyle = TextStyle(fontSize = 16.sp, color = Black)
+
+        )
+
+
+
+    }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.type_school),
+            fontSize = 16.sp,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        OutlinedTextField(
+            value = text,
+            onValueChange = { text = it },
+            shape = RoundedCornerShape(8.dp),
+            placeholder = { Text(stringResource(R.string.choose_option)) },
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = Color(0xFFD0D5DD),
+                unfocusedBorderColor = Color(0xFFD0D5DD),
+                cursorColor = Color.Black,
+                containerColor = Color(0xFFFFFFFF)
+
+            ),
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowDown, // or any icon you like
+                    contentDescription = stringResource(R.string.search_ic)
                 )
             },
             textStyle = TextStyle(fontSize = 16.sp, color = Black)
@@ -658,7 +584,7 @@ fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
             Text ( modifier = Modifier.wrapContentWidth()
                 .padding(start = 26.dp, end = 26.dp, top = 8.dp, bottom = 8.dp)
                 .clickable {  },
-                text = "Add Student",
+                text = stringResource(R.string.add_student),
                 color = White,
                 fontSize = 16.sp// Make sure text is readable on gradient
             )

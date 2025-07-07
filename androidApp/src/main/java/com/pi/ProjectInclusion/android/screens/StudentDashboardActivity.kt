@@ -23,14 +23,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
+
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.Card
@@ -90,7 +83,7 @@ import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.MyApplicationTheme
 import com.pi.ProjectInclusion.android.navigation.AppRoute
-import com.pi.ProjectInclusion.android.screens.dashboardScreen.AddStudentRegisterScreen
+import com.pi.ProjectInclusion.android.screens.addStudentRegisterScreen.AddStudentRegisterScreen
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.DashboardScreen
 import com.pi.ProjectInclusion.android.screens.menu.AppBar
 import com.pi.ProjectInclusion.android.screens.menu.BottomNavigationBar
@@ -151,50 +144,50 @@ class StudentDashboardActivity : ComponentActivity() {
                                     items = listOf(
                                         MenuItem(
                                             id = AppRoute.CourseScreen.route,
-                                            title = "Certificate",
-                                            contentDescription = "Go to auth",
+                                            title = stringResource(R.string.certificate_txt),
+                                            contentDescription = "",
                                             icon = ImageVector.vectorResource(id = R.drawable.certificate_ic)
                                         ),
                                         MenuItem(
                                             id = AppRoute.ScreeningScreen.route,
-                                            title = "Meeting",
-                                            contentDescription = "Add new student",
+                                            title = stringResource(R.string.meeting_txt),
+                                            contentDescription = "",
                                             icon = ImageVector.vectorResource(id = R.drawable.meeting_ic)
                                         ),
                                         MenuItem(
                                             id = AppRoute.InterventionScreen.route,
-                                            title = "Change Password",
-                                            contentDescription = "Switch User Profile",
+                                            title = stringResource(R.string.change_password),
+                                            contentDescription = "",
                                             icon = ImageVector.vectorResource(id = R.drawable.password_ic)
                                         ),
                                         MenuItem(
                                             id = AppRoute.InterventionScreen.route,
-                                            title = "Language",
-                                            contentDescription = "Switch User Profile",
+                                            title = stringResource(R.string.language_txt),
+                                            contentDescription = "",
                                             icon = ImageVector.vectorResource(id = R.drawable.language_ic)
                                         ),
                                         MenuItem(
                                             id = AppRoute.InterventionScreen.route,
-                                            title = "Refer",
-                                            contentDescription = "Switch User Profile",
+                                            title = stringResource(R.string.nav_refer_txt),
+                                            contentDescription = "",
                                             icon = ImageVector.vectorResource(id = R.drawable.refer_ic)
                                         ),
                                         MenuItem(
                                             id = AppRoute.InterventionScreen.route,
-                                            title = "Change Password",
-                                            contentDescription = "Switch User Profile",
+                                            title = stringResource(R.string.change_password),
+                                            contentDescription = "",
                                             icon = ImageVector.vectorResource(id = R.drawable.password_ic)
                                         ),
                                         MenuItem(
                                             id = AppRoute.InterventionScreen.route,
-                                            title = "Contact us",
-                                            contentDescription = "Switch User Profile",
+                                            title = stringResource(R.string.nav_contact),
+                                            contentDescription = "",
                                             icon = ImageVector.vectorResource(id = R.drawable.contact_ic)
                                         ),
                                         MenuItem(
                                             id = AppRoute.InterventionScreen.route,
-                                            title = "F.A.Q",
-                                            contentDescription = "Switch User Profile",
+                                            title = stringResource(R.string.nav_faq),
+                                            contentDescription = "",
                                             icon = ImageVector.vectorResource(id = R.drawable.faq_ic)
                                         ),
                                     ), onItemClick = { itemId ->

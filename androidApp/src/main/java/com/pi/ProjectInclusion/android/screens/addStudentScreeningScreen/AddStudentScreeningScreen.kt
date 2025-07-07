@@ -216,7 +216,7 @@ fun ItemAddScreening(context: Context){
                     )
                     {
                         Text(
-                            text = "Add Student for screening",
+                            text = stringResource(R.string.student_screen),
                             color = Color(0xFF00051F),
                             textAlign = TextAlign.Center,
                             fontSize = 16.sp// Make sure text is readable on gradient
@@ -224,7 +224,7 @@ fun ItemAddScreening(context: Context){
                         Spacer(modifier = Modifier.height(5.dp))
 
                         Text(
-                            text = "No students have been added yet. Start by adding your first student to begin the screening process.",
+                            text = stringResource(R.string.student_screen_detail),
                             color = Color(0xFF6C6D72),
                             textAlign = TextAlign.Center,
                             fontSize = 14.sp// Make sure text is readable on gradient
@@ -245,7 +245,7 @@ fun ItemAddScreening(context: Context){
                                 Text ( modifier = Modifier.wrapContentWidth()
                                     .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
                                     .clickable {  },
-                                    text = "+ Add Student",
+                                    text = stringResource(R.string.student_screen_add),
                                     color = White,
                                     fontSize = 13.sp// Make sure text is readable on gradient
                                 )
