@@ -112,7 +112,7 @@ fun DefaultBackgroundUi(
                         modifier = Modifier
                             .align(Alignment.TopStart)
                             .padding(top = 16.dp, start = 8.dp)
-                            .offset(y = 45.dp, x = 10.dp)
+                            .offset(y = 16.dp, x = 10.dp)
                             .size(50.dp) // adjust the size as needed
                             .clickable(onClick = onBackButtonClick),
                         painter = painterResource(id = R.drawable.round_back_key),

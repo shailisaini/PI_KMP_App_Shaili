@@ -3,8 +3,7 @@
 <domain-config cleartextTrafficPermitted="true">
     <domain includeSubdomains="true">https://student-api.auroscholar.org</domain>
     <domain includeSubdomains="true">apiz.auroscholar.org</domain>
-    <domain includeSubdomains="true">teacher-api.auroscholar.org</domain>   <!-- teacher Live-->
-    <domain includeSubdomains="true">staging-teacher-api.auroscholar.org</domain>   <!-- teacher UAT-->
+    <domain includeSubdomains="true">https://staging-api-pi.projectinclusion.in</domain>   <!-- Student UAT-->
    <!-- <trust-anchors>
         <certificates src="@raw/student_parent_frontend"/>
     </trust-anchors>-->

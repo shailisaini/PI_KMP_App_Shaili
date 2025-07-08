@@ -1,4 +1,4 @@
-package com.pi.ProjectInclusion.android.screens
+package com.pi.ProjectInclusion.android.screens.login
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -51,12 +51,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
@@ -74,46 +72,44 @@ import com.pi.ProjectInclusion.PrimaryBlue1
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
 import com.pi.ProjectInclusion.constants.CommonFunction.ShowError
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
-import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_ACTIVE
-import com.pi.ProjectInclusion.constants.ConstantVariables.PAGE_LENGTH
-import com.pi.ProjectInclusion.constants.ConstantVariables.PAGE_LIMIT
 import com.pi.ProjectInclusion.constants.CustomDialog
-import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
+import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
+import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun LanguageScreen(navController: NavHostController, viewModel: LoginViewModel) {
-
+fun UserTypeScreen(navController: NavHostController, viewModel: LoginViewModel) {
     var isDialogVisible by remember { mutableStateOf(false) }
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
-    val languageData = remember { mutableStateListOf<GetLanguageListResponse.Data.Result>() }
+    val userType = remember { mutableStateListOf<GetUserTypeResponse.Data>() }
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
         message = stringResource(R.string.txt_loading)
     )
 
-    LoggerProvider.logger.d("Screen: " + "LanguageScreen()")
+    LoggerProvider.logger.d("Screen: "+"UserTypeScreen()")
     LaunchedEffect(Unit) {
-        viewModel.getLanguages(PAGE_LENGTH, PAGE_LIMIT)
+        viewModel.getUserType()
     }
 
     LaunchedEffect(uiState) {
         when {
             uiState.isLoading -> {
-                languageData.clear()
+                userType.clear()
                 isDialogVisible = true
             }
 
             uiState.error.isNotEmpty() -> {
-                languageData.clear()
+                userType.clear()
                 isDialogVisible = false
                 LoggerProvider.logger.d("Error: ${uiState.error}")
                 context.toast(uiState.error)
@@ -121,11 +117,11 @@ fun LanguageScreen(navController: NavHostController, viewModel: LoginViewModel) 
 
             uiState.success != null -> {
                 isDialogVisible = false
-                uiState.success!!.data.results.reversed().let {
-                    languageData.clear()
-                    languageData.addAll(it)
+                uiState.success!!.data.let {
+                    userType.clear()
+                    userType.addAll(it)
                 }
-                LoggerProvider.logger.d("Languages fetched: ${uiState.success!!.data.results.size}")
+                LoggerProvider.logger.d("Languages fetched: ${uiState.success!!.data}")
             }
         }
     }
@@ -139,16 +135,17 @@ fun LanguageScreen(navController: NavHostController, viewModel: LoginViewModel) 
                 .background(color = Bg_Gray1),
             verticalArrangement = Arrangement.Top
         ) {
-            LanguageResponseUI(context, languageData, navController)
+            UserTypeResponseUI(context,userType, navController)
         }
     }
 }
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
-fun LanguageResponseUI(
+fun UserTypeResponseUI(
     context: Context,
-    languageData: MutableList<GetLanguageListResponse.Data.Result>, navController: NavHostController
+    userTypeData: MutableList<GetUserTypeResponse.Data>,
+    navController: NavHostController
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberLazyGridState()
@@ -160,115 +157,118 @@ fun LanguageResponseUI(
     var isDialogVisible by remember { mutableStateOf(false) }
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
     val selectedLanguage = remember { mutableStateOf<String?>(null) }
-    val title = stringResource(R.string.select_language)
-
-    Box(
-        modifier = Modifier
-            .padding(vertical = 15.dp)
-            .wrapContentSize(Alignment.Center)
-            .background(
-                color = if (isSystemInDarkTheme()) {
-                    Dark_01
-                } else {
-                    Transparent
-                }
-            )
-            .padding(4.dp), // Add horizontal padding,
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(vertical = 10.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            LoginScreenTitle(title, Black)
-            if (languageData.isNotEmpty()) {
-                Column(
+    val title = stringResource(R.string.select_userType)
+    val subTitle = stringResource(R.string.select_userType_subtitle)
+    DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
+        navController.popBackStack()
+        navController.navigate(AppRoute.LanguageSelect.route)
+    }, content = {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .padding(15.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                LoginScreenTitle(title, Black, Gray,subTitle)
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .weight(1f)
+                        .wrapContentSize(Alignment.Center)
+                        .background(
+                            color = if (isSystemInDarkTheme()) {
+                                Dark_01
+                            } else {
+                                Transparent
+                            }
+                        )
+                        .padding(4.dp), // Add horizontal padding,
                 ) {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        state = scrollState,
-                        contentPadding = PaddingValues(vertical = 15.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 10.dp, horizontal = 8.dp)
-                            .draggable(
-                                orientation = Orientation.Vertical,
-                                state = rememberDraggableState { delta ->
-                                    coroutineScope.launch {
-                                        scrollState.scrollBy(-delta)
-                                    }
-                                })
-                    ) {
-                        items(languageData.size) { index ->
-                            ItemLanguageCard(
-                                navController,
-                                context,
-                                isSelected = selectedIndex == index,
-                                index,
-                                language = languageData,
-                                onItemClicked = {
-                                    selectedIndex =
-                                        if (selectedIndex == index) null else index // Toggle selection
-                                    selectedLanguage.value =
-                                        languageData[index].id.toString()
-                                    println("Selected Item :- $selectedIndex")
-                                }
-                            )
-                        }
-                    }
-                }
-            } else {
-                if (!isInternetAvailable) {
-                    ShowError(internetMessage, colors)
-                } else {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.ic_hindi),
-                            contentDescription = IMG_DESCRIPTION,
+                    if (userTypeData.isNotEmpty()) {
+                        Column(
                             modifier = Modifier
-                                .padding(vertical = 8.dp)
-                                .background(Color.Unspecified),
-                        )
+                                .fillMaxWidth()
+                                .wrapContentHeight()
 
-                        Text(
-                            text = stringResource(R.string.txt_oops_no_data_found),
-                            modifier = Modifier.wrapContentSize(),
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            color = Gray,
-                            textAlign = TextAlign.Start
-                        )
+                        ) {
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(2),
+                                state = scrollState,
+                                contentPadding = PaddingValues(vertical = 15.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 10.dp, horizontal = 8.dp)
+                                    .draggable(
+                                        orientation = Orientation.Vertical,
+                                        state = rememberDraggableState { delta ->
+                                            coroutineScope.launch {
+                                                scrollState.scrollBy(-delta)
+                                            }
+                                        })
+                            ) {
+                                items(userTypeData.size) { index ->
+                                    UserTypeCard(
+                                        context,
+                                        isSelected = selectedIndex == index,
+                                        index,
+                                        userType = userTypeData,
+                                        onItemClicked = {
+                                            selectedIndex =
+                                                if (selectedIndex == index) null else index // Toggle selection
+                                            selectedLanguage.value =
+                                                userTypeData[index].id.toString()
+                                            println("Selected Item :- $selectedIndex")
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    } else {
+                        if (!isInternetAvailable) {
+                            ShowError(internetMessage, colors)
+                        } else {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.ic_hindi),
+                                    contentDescription = IMG_DESCRIPTION,
+                                    modifier = Modifier
+                                        .padding(vertical = 8.dp)
+                                        .background(Color.Unspecified),
+                                )
+
+                                Text(
+                                    text = stringResource(R.string.txt_oops_no_data_found),
+                                    modifier = Modifier.wrapContentSize(),
+                                    fontStyle = FontStyle.Normal,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 18.sp,
+                                    color = Gray,
+                                    textAlign = TextAlign.Start
+                                )
+                            }
+                        }
                     }
                 }
             }
         }
-    }
+    })
 }
 
 @Composable
-fun ItemLanguageCard(
-    navController: NavHostController,
+fun UserTypeCard(
     context: Context,
     isSelected: Boolean = true,
     index: Int,
-    language: MutableList<GetLanguageListResponse.Data.Result>,
+    userType: MutableList<GetUserTypeResponse.Data>,
     onItemClicked: () -> Unit = {},
 ) {
-    val languageIndex = language[index]
-    val errorToast = stringResource(R.string.choose_hindi_english)
+    val userTypeIndex = userType[index]
+    val errorToast = stringResource(R.string.select_userType)
 
     val selectedBorder = if (isSelected) BorderStroke(
         width = 1.dp,
@@ -297,19 +297,11 @@ fun ItemLanguageCard(
             White
         }
     }
+
     Card(
         modifier = Modifier
             .clickable {
-                if (languageIndex.status == KEY_ACTIVE) {
-                    onItemClicked.invoke()
-                    // by manju
-                    navController.navigate(AppRoute.StudentDashboardActivity.route)
-                } else {
-                    // by manju
-                    context.toast(errorToast)
-                    navController.navigate(AppRoute.StudentDashboardActivity.route)
 
-                }
             }
             .padding(8.dp)
             .fillMaxWidth(),
@@ -332,7 +324,7 @@ fun ItemLanguageCard(
         ) {
             Column(
                 modifier = Modifier
-                    .padding(vertical = 15.dp)
+                    .padding(vertical = 25.dp)
                     .weight(1f),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -340,40 +332,31 @@ fun ItemLanguageCard(
                 Image(
                     modifier = Modifier
                         .background(Color.Unspecified)
-                        .size(45.dp),
+                        .size(65.dp),
                     contentScale = ContentScale.Fit,
-                    painter = if (languageIndex.icon.isNotEmpty()) {
-                    rememberAsyncImagePainter(
-                    model = ImageRequest.Builder(LocalContext.current)
-                                .data(languageIndex.icon)
+//                    painter = if (userTypeIndex.isNotEmpty()) {
+                    painter =
+                        rememberAsyncImagePainter(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(R.drawable.img_teacher)
                                 .decoderFactory(SvgDecoder.Factory())
                                 .size(Size.ORIGINAL)
-                                .placeholder(R.drawable.ic_hindi)
-                                .error(R.drawable.ic_hindi)
+                                .placeholder(R.drawable.img_teacher)
+                                .error(R.drawable.img_teacher)
                                 .build()
                         )
-                    } else {
-                        painterResource(id = R.drawable.ic_hindi)
-                    },
+                    /*} else {
+                        painterResource(id = R.drawable.img_teacher)
+                    }*/
+            ,
                     contentDescription = "Language Icon"
-                )
-                Text(
-                    languageIndex.nativeName,
-                    textAlign = TextAlign.Start,
-                    maxLines = 1,
-                    fontSize = 16.sp,
-                    overflow = TextOverflow.Ellipsis,
-                    color = Black,
-                    modifier = Modifier
-                        .padding(top = 10.dp)
                 )
 
                 Text(
-                    "${languageIndex.name} ",
+                    "${userTypeIndex.name} ",
                     textAlign = TextAlign.Start,
                     maxLines = 1,
                     fontSize = 14.sp,
-                    overflow = TextOverflow.Ellipsis,
                     color = Gray,
                     modifier = Modifier
                         .wrapContentWidth()

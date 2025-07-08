@@ -116,7 +116,7 @@ fun AddStudentScreeningScreen(navHostController: NavHostController) {
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
     val scrollState = rememberLazyGridState()
     val context = LocalContext.current
-    val languageData = remember { mutableStateListOf<GetLanguageListResponse.Data.Result>() }
+    val languageData = remember { mutableStateListOf<GetLanguageListResponse>() }
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
