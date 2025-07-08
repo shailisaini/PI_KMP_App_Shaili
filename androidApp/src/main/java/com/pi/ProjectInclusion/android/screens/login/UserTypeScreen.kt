@@ -91,7 +91,7 @@ fun UserTypeScreen(navController: NavHostController, viewModel: LoginViewModel) 
     val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
-    val languageData = remember { mutableStateListOf<GetUserTypeResponse.Data>() }
+    val userType = remember { mutableStateListOf<GetUserTypeResponse.Data>() }
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
@@ -100,18 +100,18 @@ fun UserTypeScreen(navController: NavHostController, viewModel: LoginViewModel) 
 
     LoggerProvider.logger.d("Screen: "+"UserTypeScreen()")
     LaunchedEffect(Unit) {
-        viewModel.getLanguages(PAGE_LENGTH, PAGE_LIMIT)
+        viewModel.getUserType()
     }
 
     LaunchedEffect(uiState) {
         when {
             uiState.isLoading -> {
-                languageData.clear()
+                userType.clear()
                 isDialogVisible = true
             }
 
             uiState.error.isNotEmpty() -> {
-                languageData.clear()
+                userType.clear()
                 isDialogVisible = false
                 LoggerProvider.logger.d("Error: ${uiState.error}")
                 context.toast(uiState.error)
@@ -120,8 +120,8 @@ fun UserTypeScreen(navController: NavHostController, viewModel: LoginViewModel) 
             uiState.success != null -> {
                 isDialogVisible = false
                 uiState.success!!.data.let {
-                    languageData.clear()
-                    languageData.addAll(it)
+                    userType.clear()
+                    userType.addAll(it)
                 }
                 LoggerProvider.logger.d("Languages fetched: ${uiState.success!!.data}")
             }
@@ -137,7 +137,7 @@ fun UserTypeScreen(navController: NavHostController, viewModel: LoginViewModel) 
                 .background(color = Bg_Gray1),
             verticalArrangement = Arrangement.Top
         ) {
-            UserTypeResponseUI(context,languageData)
+            UserTypeResponseUI(context,userType)
         }
     }
 }
@@ -321,7 +321,7 @@ fun UserTypeCard(
         ) {
             Column(
                 modifier = Modifier
-                    .padding(vertical = 15.dp)
+                    .padding(vertical = 25.dp)
                     .weight(1f),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -354,7 +354,6 @@ fun UserTypeCard(
                     textAlign = TextAlign.Start,
                     maxLines = 1,
                     fontSize = 14.sp,
-                    overflow = TextOverflow.Ellipsis,
                     color = Gray,
                     modifier = Modifier
                         .wrapContentWidth()

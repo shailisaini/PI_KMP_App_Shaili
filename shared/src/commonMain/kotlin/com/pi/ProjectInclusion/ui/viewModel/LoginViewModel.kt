@@ -2,6 +2,7 @@ package com.pi.ProjectInclusion.ui.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
 import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
 import com.pi.ProjectInclusion.database.LocalDataSource
@@ -58,10 +59,12 @@ class LoginViewModel(
         _uiStateUserType.update { UiState(isLoading = true) }
         val response = getLanguageUsesCases.getUserType()
         if (response.isSuccess){
+            LoggerProvider.logger.d("Screen: "+"UserTypeScreen()"+response)
             _uiStateUserType.update { UiState(success = response.getOrThrow() ) }
         }
         else{
             _uiStateUserType.update { UiState(error = response.exceptionOrNull()?.message.toString() ) }
+            LoggerProvider.logger.d("Screen: "+"UserTypeScreen()"+response.exceptionOrNull())
         }
     }
 }

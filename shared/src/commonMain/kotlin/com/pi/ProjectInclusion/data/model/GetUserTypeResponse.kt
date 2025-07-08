@@ -3,9 +3,10 @@ package com.pi.ProjectInclusion.data.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@Serializable
 data class GetUserTypeResponse(
     @SerialName("data")
-    val `data`: List<Data>,
+    val data: List<Data>,
 
     @SerialName("error")
     val error: String,
@@ -19,6 +20,6 @@ data class GetUserTypeResponse(
         val id: String,
 
         @SerialName("name")
-        val name: String,
+        val name: String
     )
 }
