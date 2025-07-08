@@ -317,9 +317,6 @@ fun BottomNavigationBar(
                             tint = if (currentDestination == screen.appRoute) activeColor else inactiveColor,
                             modifier = Modifier.size(30.dp)
                         )
-
-
-
                         else -> {
                             Icon(
                                 imageVector = screen.selectedIcon,
@@ -332,7 +329,6 @@ fun BottomNavigationBar(
                 }, selected = currentDestination == screen.appRoute, onClick = {
                     if (screen.appRoute == "") { // student_wallet
                         navController.navigate(screen.appRoute)
-
                     } else {
                         navController.navigate(screen.appRoute)
                     }
@@ -346,7 +342,8 @@ fun BottomNavigationBar(
                     )
                 }, colors = NavigationBarItemDefaults.colors(
                     indicatorColor = Color.Transparent // Removes background color when selected
-                )/* selectedColor = activeColor,
+                )/* se
+                lectedColor = activeColor,
                  unselectedContentColor = inactiveColor*/
             )
         }
