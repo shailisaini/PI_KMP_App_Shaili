@@ -8,7 +8,9 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,18 +45,36 @@ object CommonFunction {
     }
 
     @Composable
-    fun LoginScreenTitle(title: String, colors: Color) {
-        Text(
-            title,
-            textAlign = TextAlign.Center,
-            fontSize = 24.sp,
-            fontStyle = FontStyle.Normal,
-            fontWeight = FontWeight.Bold,
-            overflow = TextOverflow.Ellipsis,
-            color = colors,
+    fun LoginScreenTitle(title: String, colors: Color, subtitleColor: Color, subtitle: String) {
+        Column(
             modifier = Modifier
-                .padding(top = 10.dp)
-        )
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(vertical = 10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                title,
+                textAlign = TextAlign.Center,
+                fontSize = 24.sp,
+                fontStyle = FontStyle.Normal,
+                fontWeight = FontWeight.Bold,
+                overflow = TextOverflow.Ellipsis,
+                color = colors,
+                modifier = Modifier
+                    .padding(top = 10.dp)
+            )
+            Text(
+                subtitle,
+                textAlign = TextAlign.Center,
+                fontSize = 14.sp,
+                fontStyle = FontStyle.Normal,
+                fontWeight = FontWeight.Normal,
+                color = subtitleColor,
+                modifier = Modifier
+                    .padding(top = 10.dp)
+            )
+        }
     }
 
     @Composable

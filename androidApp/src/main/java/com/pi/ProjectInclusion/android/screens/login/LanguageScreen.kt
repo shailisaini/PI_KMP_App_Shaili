@@ -183,7 +183,7 @@ fun LanguageResponseUI(
                     .padding(vertical = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                LoginScreenTitle(title, Black)
+                LoginScreenTitle(title, Black, Gray,"")
                 if (languageData.isNotEmpty()) {
                     Column(
                         modifier = Modifier

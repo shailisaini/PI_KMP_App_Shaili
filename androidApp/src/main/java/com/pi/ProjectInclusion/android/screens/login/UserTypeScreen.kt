@@ -51,7 +51,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -73,13 +72,12 @@ import com.pi.ProjectInclusion.PrimaryBlue1
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
+import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
 import com.pi.ProjectInclusion.constants.CommonFunction.ShowError
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
-import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_ACTIVE
-import com.pi.ProjectInclusion.constants.ConstantVariables.PAGE_LENGTH
-import com.pi.ProjectInclusion.constants.ConstantVariables.PAGE_LIMIT
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
@@ -137,7 +135,7 @@ fun UserTypeScreen(navController: NavHostController, viewModel: LoginViewModel) 
                 .background(color = Bg_Gray1),
             verticalArrangement = Arrangement.Top
         ) {
-            UserTypeResponseUI(context,userType)
+            UserTypeResponseUI(context,userType, navController)
         }
     }
 }
@@ -146,7 +144,8 @@ fun UserTypeScreen(navController: NavHostController, viewModel: LoginViewModel) 
 @Composable
 fun UserTypeResponseUI(
     context: Context,
-    userTypeData: MutableList<GetUserTypeResponse.Data>
+    userTypeData: MutableList<GetUserTypeResponse.Data>,
+    navController: NavHostController
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberLazyGridState()
@@ -159,101 +158,105 @@ fun UserTypeResponseUI(
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
     val selectedLanguage = remember { mutableStateOf<String?>(null) }
     val title = stringResource(R.string.select_userType)
-
-    Box(
-        modifier = Modifier
-            .padding(vertical = 15.dp)
-            .wrapContentSize(Alignment.Center)
-            .background(
-                color = if (isSystemInDarkTheme()) {
-                    Dark_01
-                } else {
-                    Transparent
-                }
-            )
-            .padding(4.dp), // Add horizontal padding,
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(vertical = 10.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            LoginScreenTitle(title, Black)
-            if (userTypeData.isNotEmpty()) {
-                Column(
+    val subTitle = stringResource(R.string.select_userType_subtitle)
+    DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
+        navController.popBackStack()
+        navController.navigate(AppRoute.LanguageSelect.route)
+    }, content = {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .padding(15.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                LoginScreenTitle(title, Black, Gray,subTitle)
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .weight(1f)
+                        .wrapContentSize(Alignment.Center)
+                        .background(
+                            color = if (isSystemInDarkTheme()) {
+                                Dark_01
+                            } else {
+                                Transparent
+                            }
+                        )
+                        .padding(4.dp), // Add horizontal padding,
                 ) {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        state = scrollState,
-                        contentPadding = PaddingValues(vertical = 15.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 10.dp, horizontal = 8.dp)
-                            .draggable(
-                                orientation = Orientation.Vertical,
-                                state = rememberDraggableState { delta ->
-                                    coroutineScope.launch {
-                                        scrollState.scrollBy(-delta)
-                                    }
-                                })
-                    ) {
-                        items(userTypeData.size) { index ->
-                            UserTypeCard(
-                                context,
-                                isSelected = selectedIndex == index,
-                                index,
-                                userType = userTypeData,
-                                onItemClicked = {
-                                    selectedIndex =
-                                        if (selectedIndex == index) null else index // Toggle selection
-                                    selectedLanguage.value =
-                                        userTypeData[index].id.toString()
-                                    println("Selected Item :- $selectedIndex")
+                    if (userTypeData.isNotEmpty()) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight()
+
+                        ) {
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(2),
+                                state = scrollState,
+                                contentPadding = PaddingValues(vertical = 15.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 10.dp, horizontal = 8.dp)
+                                    .draggable(
+                                        orientation = Orientation.Vertical,
+                                        state = rememberDraggableState { delta ->
+                                            coroutineScope.launch {
+                                                scrollState.scrollBy(-delta)
+                                            }
+                                        })
+                            ) {
+                                items(userTypeData.size) { index ->
+                                    UserTypeCard(
+                                        context,
+                                        isSelected = selectedIndex == index,
+                                        index,
+                                        userType = userTypeData,
+                                        onItemClicked = {
+                                            selectedIndex =
+                                                if (selectedIndex == index) null else index // Toggle selection
+                                            selectedLanguage.value =
+                                                userTypeData[index].id.toString()
+                                            println("Selected Item :- $selectedIndex")
+                                        }
+                                    )
                                 }
-                            )
+                            }
+                        }
+                    } else {
+                        if (!isInternetAvailable) {
+                            ShowError(internetMessage, colors)
+                        } else {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.ic_hindi),
+                                    contentDescription = IMG_DESCRIPTION,
+                                    modifier = Modifier
+                                        .padding(vertical = 8.dp)
+                                        .background(Color.Unspecified),
+                                )
+
+                                Text(
+                                    text = stringResource(R.string.txt_oops_no_data_found),
+                                    modifier = Modifier.wrapContentSize(),
+                                    fontStyle = FontStyle.Normal,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 18.sp,
+                                    color = Gray,
+                                    textAlign = TextAlign.Start
+                                )
+                            }
                         }
                     }
                 }
             }
-            else{
-                if (!isInternetAvailable) {
-                    ShowError(internetMessage, colors)
-                } else {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.ic_hindi),
-                            contentDescription = IMG_DESCRIPTION,
-                            modifier = Modifier
-                                .padding(vertical = 8.dp)
-                                .background(Color.Unspecified),
-                        )
-
-                        Text(
-                            text = stringResource(R.string.txt_oops_no_data_found),
-                            modifier = Modifier.wrapContentSize(),
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            color = Gray,
-                            textAlign = TextAlign.Start
-                        )
-                    }
-                }
-            }
         }
-    }
+    })
 }
 
 @Composable
@@ -329,7 +332,7 @@ fun UserTypeCard(
                 Image(
                     modifier = Modifier
                         .background(Color.Unspecified)
-                        .size(45.dp),
+                        .size(65.dp),
                     contentScale = ContentScale.Fit,
 //                    painter = if (userTypeIndex.isNotEmpty()) {
                     painter =
