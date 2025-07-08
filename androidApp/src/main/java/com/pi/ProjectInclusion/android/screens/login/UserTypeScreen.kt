@@ -76,6 +76,7 @@ import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
+import com.pi.ProjectInclusion.constants.CommonFunction.NoDataFound
 import com.pi.ProjectInclusion.constants.CommonFunction.ShowError
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.CustomDialog
@@ -96,7 +97,7 @@ fun UserTypeScreen(navController: NavHostController, viewModel: LoginViewModel) 
         message = stringResource(R.string.txt_loading)
     )
 
-    LoggerProvider.logger.d("Screen: "+"UserTypeScreen()")
+    LoggerProvider.logger.d("Screen: " + "UserTypeScreen()")
     LaunchedEffect(Unit) {
         viewModel.getUserType()
     }
@@ -135,7 +136,7 @@ fun UserTypeScreen(navController: NavHostController, viewModel: LoginViewModel) 
                 .background(color = Bg_Gray1),
             verticalArrangement = Arrangement.Top
         ) {
-            UserTypeResponseUI(context,userType, navController)
+            UserTypeResponseUI(context, userType, navController)
         }
     }
 }
@@ -159,6 +160,8 @@ fun UserTypeResponseUI(
     val selectedLanguage = remember { mutableStateOf<String?>(null) }
     val title = stringResource(R.string.select_userType)
     val subTitle = stringResource(R.string.select_userType_subtitle)
+    val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
+
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
         navController.popBackStack()
         navController.navigate(AppRoute.LanguageSelect.route)
@@ -170,7 +173,7 @@ fun UserTypeResponseUI(
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                LoginScreenTitle(title, Black, Gray,subTitle)
+                LoginScreenTitle(title, Black, Gray, subTitle)
                 Box(
                     modifier = Modifier
                         .wrapContentSize(Alignment.Center)
@@ -216,7 +219,6 @@ fun UserTypeResponseUI(
                                                 if (selectedIndex == index) null else index // Toggle selection
                                             selectedLanguage.value =
                                                 userTypeData[index].id.toString()
-                                            println("Selected Item :- $selectedIndex")
                                         }
                                     )
                                 }
@@ -226,31 +228,7 @@ fun UserTypeResponseUI(
                         if (!isInternetAvailable) {
                             ShowError(internetMessage, colors)
                         } else {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .fillMaxWidth(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Image(
-                                    painter = painterResource(R.drawable.ic_hindi),
-                                    contentDescription = IMG_DESCRIPTION,
-                                    modifier = Modifier
-                                        .padding(vertical = 8.dp)
-                                        .background(Color.Unspecified),
-                                )
-
-                                Text(
-                                    text = stringResource(R.string.txt_oops_no_data_found),
-                                    modifier = Modifier.wrapContentSize(),
-                                    fontStyle = FontStyle.Normal,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 18.sp,
-                                    color = Gray,
-                                    textAlign = TextAlign.Start
-                                )
-                            }
+                            NoDataFound(noDataMessage, painterResource(R.drawable.img_teacher))
                         }
                     }
                 }
@@ -336,19 +314,18 @@ fun UserTypeCard(
                     contentScale = ContentScale.Fit,
 //                    painter = if (userTypeIndex.isNotEmpty()) {
                     painter =
-                        rememberAsyncImagePainter(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(R.drawable.img_teacher)
-                                .decoderFactory(SvgDecoder.Factory())
-                                .size(Size.ORIGINAL)
-                                .placeholder(R.drawable.img_teacher)
-                                .error(R.drawable.img_teacher)
-                                .build()
-                        )
+                    rememberAsyncImagePainter(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(R.drawable.img_teacher)
+                            .decoderFactory(SvgDecoder.Factory())
+                            .size(Size.ORIGINAL)
+                            .placeholder(R.drawable.img_teacher)
+                            .error(R.drawable.img_teacher)
+                            .build()
+                    )
                     /*} else {
                         painterResource(id = R.drawable.img_teacher)
-                    }*/
-            ,
+                    }*/,
                     contentDescription = "Language Icon"
                 )
 

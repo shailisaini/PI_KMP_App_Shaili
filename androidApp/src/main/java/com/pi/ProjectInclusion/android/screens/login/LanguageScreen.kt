@@ -48,8 +48,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -77,8 +75,8 @@ import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
+import com.pi.ProjectInclusion.constants.CommonFunction.NoDataFound
 import com.pi.ProjectInclusion.constants.CommonFunction.ShowError
-import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_ACTIVE
 import com.pi.ProjectInclusion.constants.ConstantVariables.PAGE_LENGTH
 import com.pi.ProjectInclusion.constants.ConstantVariables.PAGE_LIMIT
@@ -139,7 +137,7 @@ fun LanguageScreen(navController: NavHostController, viewModel: LoginViewModel) 
                 .background(color = Bg_Gray1),
             verticalArrangement = Arrangement.Top
         ) {
-            LanguageResponseUI(context,languageData, navController)
+            LanguageResponseUI(context, languageData, navController)
         }
     }
 }
@@ -157,106 +155,81 @@ fun LanguageResponseUI(
     val isInternetAvailable by remember { mutableStateOf(true) }
     var isApiResponded by remember { mutableStateOf(false) }
     val internetMessage by remember { mutableStateOf("") }
+    val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
 
     var isDialogVisible by remember { mutableStateOf(false) }
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
     val selectedLanguage = remember { mutableStateOf<String?>(null) }
     val title = stringResource(R.string.select_language)
 
-        Box(
+    Box(
+        modifier = Modifier
+            .padding(vertical = 15.dp)
+            .wrapContentSize(Alignment.Center)
+            .background(
+                color = if (isSystemInDarkTheme()) {
+                    Dark_01
+                } else {
+                    Transparent
+                }
+            )
+            .padding(4.dp), // Add horizontal padding,
+    ) {
+        Column(
             modifier = Modifier
-                .padding(vertical = 15.dp)
-                .wrapContentSize(Alignment.Center)
-                .background(
-                    color = if (isSystemInDarkTheme()) {
-                        Dark_01
-                    } else {
-                        Transparent
-                    }
-                )
-                .padding(4.dp), // Add horizontal padding,
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(vertical = 10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(vertical = 10.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                LoginScreenTitle(title, Black, Gray,"")
-                if (languageData.isNotEmpty()) {
-                    Column(
+            LoginScreenTitle(title, Black, Gray, "")
+            if (languageData.isNotEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .weight(1f)
+                ) {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        state = scrollState,
+                        contentPadding = PaddingValues(vertical = 15.dp),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .wrapContentHeight()
-                            .weight(1f)
-                    ) {
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(2),
-                            state = scrollState,
-                            contentPadding = PaddingValues(vertical = 15.dp),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 10.dp, horizontal = 8.dp)
-                                .draggable(
-                                    orientation = Orientation.Vertical,
-                                    state = rememberDraggableState { delta ->
-                                        coroutineScope.launch {
-                                            scrollState.scrollBy(-delta)
-                                        }
-                                    })
-                        ) {
-                            items(languageData.size) { index ->
-                                ItemLanguageCard(
-                                    navController,
-                                    context,
-                                    isSelected = selectedIndex == index,
-                                    index,
-                                    language = languageData,
-                                    onItemClicked = {
-                                        selectedIndex =
-                                            if (selectedIndex == index) null else index // Toggle selection
-                                        selectedLanguage.value =
-                                            languageData[index].id.toString()
-                                        println("Selected Item :- $selectedIndex")
+                            .padding(vertical = 10.dp, horizontal = 8.dp)
+                            .draggable(
+                                orientation = Orientation.Vertical,
+                                state = rememberDraggableState { delta ->
+                                    coroutineScope.launch {
+                                        scrollState.scrollBy(-delta)
                                     }
-                                )
-                            }
+                                })
+                    ) {
+                        items(languageData.size) { index ->
+                            ItemLanguageCard(
+                                navController,
+                                context,
+                                isSelected = selectedIndex == index,
+                                index,
+                                language = languageData,
+                                onItemClicked = {
+                                    selectedIndex =
+                                        if (selectedIndex == index) null else index // Toggle selection
+                                    selectedLanguage.value =
+                                        languageData[index].id.toString()
+                                }
+                            )
                         }
                     }
                 }
-                else{
-                    if (!isInternetAvailable) {
-                        ShowError(internetMessage, colors)
-                    } else {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Image(
-                                painter = painterResource(R.drawable.ic_hindi),
-                                contentDescription = IMG_DESCRIPTION,
-                                modifier = Modifier
-                                    .padding(vertical = 8.dp)
-                                    .background(Color.Unspecified),
-                            )
-
-                            Text(
-                                text = stringResource(R.string.txt_oops_no_data_found),
-                                modifier = Modifier.wrapContentSize(),
-                                fontStyle = FontStyle.Normal,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp,
-                                color = Gray,
-                                textAlign = TextAlign.Start
-                            )
-                        }
-                    }
+            } else {
+                if (!isInternetAvailable) {
+                    ShowError(internetMessage, colors)
+                } else {
+                    NoDataFound(noDataMessage, painterResource(R.drawable.img_teacher))
                 }
             }
+        }
     }
 }
 
@@ -303,14 +276,13 @@ fun ItemLanguageCard(
     Card(
         modifier = Modifier
             .clickable {
-                if (languageIndex.status == KEY_ACTIVE){
+                if (languageIndex.status == KEY_ACTIVE) {
                     onItemClicked.invoke()
-                navController.popBackStack()
-                navController.navigate(AppRoute.UserTypeSelect.route)
+                    navController.popBackStack()
+                    navController.navigate(AppRoute.UserTypeSelect.route)
                     // by manju
 //                    navController.navigate(AppRoute.StudentDashboardActivity.route)
-                    }
-                else {
+                } else {
                     LoggerProvider.logger.d("Languages fetched: ${languageIndex.status}")
                     context.toast(errorToast)
                 }
@@ -361,30 +333,30 @@ fun ItemLanguageCard(
                     },
                     contentDescription = "Language Icon"
                 )
-                    Text(
-                        languageIndex.nativeName,
-                        textAlign = TextAlign.Start,
-                        maxLines = 1,
-                        fontSize = 16.sp,
-                        overflow = TextOverflow.Ellipsis,
-                        color = Black,
-                        modifier = Modifier
-                            .padding(top = 10.dp)
-                    )
+                Text(
+                    languageIndex.nativeName,
+                    textAlign = TextAlign.Start,
+                    maxLines = 1,
+                    fontSize = 16.sp,
+                    overflow = TextOverflow.Ellipsis,
+                    color = Black,
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                )
 
-                    Text(
-                        "${languageIndex.name} ",
-                        textAlign = TextAlign.Start,
-                        maxLines = 1,
-                        fontSize = 14.sp,
-                        overflow = TextOverflow.Ellipsis,
-                        color = Gray,
-                        modifier = Modifier
-                            .wrapContentWidth()
-                            .padding(top = 5.dp)
+                Text(
+                    "${languageIndex.name} ",
+                    textAlign = TextAlign.Start,
+                    maxLines = 1,
+                    fontSize = 14.sp,
+                    overflow = TextOverflow.Ellipsis,
+                    color = Gray,
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .padding(top = 5.dp)
 //                            .heightIn(min = 40.dp)
-                    )
-                }
+                )
+            }
         }
     }
 }

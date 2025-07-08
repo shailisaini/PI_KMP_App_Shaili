@@ -3,30 +3,33 @@ package com.pi.ProjectInclusion.constants
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.Dark_01
+import com.pi.ProjectInclusion.Gray
+import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 
 object CommonFunction {
 
@@ -104,6 +107,35 @@ object CommonFunction {
                     color = colors.onSurface,
                 )
             }
+        }
+    }
+
+    @Composable
+    fun NoDataFound(message: String, image: Painter) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = image,
+                contentDescription = IMG_DESCRIPTION,
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .background(Color.Unspecified),
+            )
+
+            Text(
+                text = message,
+                modifier = Modifier.wrapContentSize(),
+                fontStyle = FontStyle.Normal,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                color = Gray,
+                textAlign = TextAlign.Start
+            )
         }
     }
 }
