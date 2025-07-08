@@ -67,6 +67,9 @@ dependencies {
     // Usual Ktor, Koin, and Compose dependencies
     // This makes shared code accessible in androidApp
     implementation(project(":shared"))
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.activity)
 
     debugImplementation(libs.compose.ui.tooling)
 //    coreLibraryDesugaring(libs.android.desugaring)

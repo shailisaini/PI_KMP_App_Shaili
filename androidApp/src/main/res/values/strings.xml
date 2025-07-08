@@ -21,11 +21,16 @@
     <string name="txt_Verify_proceed">Verify &amp; proceed</string>
     <string name="txt_Enter_valid_OTP">Please Enter valid OTP</string>
     <string name="txt_Enter_your_password">Enter your password</string>
+    <string name="txt_Enter_your_New_password">Enter your new password</string>
+    <string name="txt_Enter_Old_password">Enter your old password</string>
     <string name="txt_Confirm_your_password">Confirm your password</string>
+    <string name="txt_Confirm_your_new_password">Confirm your new password</string>
     <string name="txt_Update">Update</string>
+    <string name="txt_Save_Update">Save update</string>
     <string name="txt_Set_New_Password">Set New Password</string>
     <string name="txt_Set_New_password_for_your_account">Set a new password for your account. Make sure it’s strong and easy for you to remember.</string>
     <string name="txt_New_Password">New Password</string>
+    <string name="txt_Old_Password">Old Password</string>
     <string name="txt_Confirm_Password">Confirm Password</string>
     <string name="txt_Passwords_must_be_8_16_characters">Passwords must be 8-16 characters</string>
     <string name="txt_Including_one_uppercase_letter">Including one uppercase letter</string>

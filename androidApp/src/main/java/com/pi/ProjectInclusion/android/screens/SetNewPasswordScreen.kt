@@ -77,7 +77,7 @@ fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewM
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
         navController.popBackStack()
-        navController.navigate(AppRoute.OtpSendVerifyUI.route)
+        navController.navigate(AppRoute.ForgetPasswordUI.route)
     }, content = {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -402,5 +402,4 @@ fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewM
             }
         }
     })
-
 }

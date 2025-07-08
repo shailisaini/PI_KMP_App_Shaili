@@ -137,6 +137,7 @@ fun OtpSendVerifyScreen(navController: NavHostController, viewModel: LoginViewMo
                             },
                             modifier = Modifier.padding(top = 16.dp),
                             onClick = {
+                                isFinished = false
 //                            loginViewModel.setGradeReportPage("")
 //                            loginViewModel.setSelectedTabId(0)
 //                            loginViewModel.setGradeId("")
@@ -160,6 +161,7 @@ fun OtpSendVerifyScreen(navController: NavHostController, viewModel: LoginViewMo
                             },
                             modifier = Modifier.padding(top = 16.dp),
                             onClick = {
+                                isFinished = false
 //                            loginViewModel.setGradeReportPage("")
 //                            loginViewModel.setSelectedTabId(0)
 //                            loginViewModel.setGradeId("")

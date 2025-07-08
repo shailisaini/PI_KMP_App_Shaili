@@ -81,6 +81,7 @@ import com.pi.ProjectInclusion.android.common_UI.MobileTextField
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.screens.sideBar.ChangePasswordActivity
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.contactUsTxt
 import kotlinx.coroutines.launch
@@ -217,12 +218,19 @@ fun ForgetPasswordScreen(navController: NavHostController, viewModel: LoginViewM
                     BtnUi(
                         title = txtContinue, onClick = {
                             if (mobNo.value.isEmpty()) {
-                                scope.launch {
-                                    isBottomSheetVisible = true
-                                    sheetState.expand()
-                                }
+                                /* scope.launch {
+                                     isBottomSheetVisible = true
+                                     sheetState.expand()
+                                 }*/
                                 context.toast("Please enter mobile number.")
-//                                navController.navigate(AppRoute.OtpSendVerifyUI.route)
+                                navController.navigate(AppRoute.OtpSendVerifyUI.route)
+
+                                /*context.startActivity(
+                                    Intent(
+                                        context, ChangePasswordActivity::class.java
+                                    ).apply {
+                                        putExtra("", "")
+                                    })*/
                             } else {
                                 showError = mobNo.value.isEmpty()
                                 val firstDigitChar = mobNo.value.toString().first()
