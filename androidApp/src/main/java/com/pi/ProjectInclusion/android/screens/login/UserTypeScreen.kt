@@ -219,7 +219,6 @@ fun UserTypeResponseUI(
                                                 if (selectedIndex == index) null else index // Toggle selection
                                             selectedLanguage.value =
                                                 userTypeData[index].id.toString()
-                                            println("Selected Item :- $selectedIndex")
                                         }
                                     )
                                 }

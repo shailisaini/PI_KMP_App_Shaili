@@ -217,7 +217,6 @@ fun LanguageResponseUI(
                                         if (selectedIndex == index) null else index // Toggle selection
                                     selectedLanguage.value =
                                         languageData[index].id.toString()
-                                    println("Selected Item :- $selectedIndex")
                                 }
                             )
                         }
