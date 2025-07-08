@@ -58,4 +58,36 @@ and make a difference together!</string>
     <string name="nav_faq">F.A.Q</string>
 
 
+
+    <string name="txt_enter_mobile_no.">Enter Mobile No.</string>
+    <string name="txt_Send_OTP">Send OTP</string>
+    <string name="txt_Enter_valid_mobile_number">Enter valid mobile number</string>
+    <string name="txt_Forgot_Password">Forgot Password</string>
+    <string name="txt_enter_mobile_number_receive_OTP">Please enter your mobile number to receive OTP for reset password.</string>
+    <string name="txt_Mobile_Number">Mobile Number</string>
+    <string name="txt_OTP_Sent">OTP Sent</string>
+    <string name="txt_OTP_received_phone">Please enter the OTP received on phone number XXXXXX9168</string>
+    <string name="txt_Resend_OTP">Resend OTP</string>
+    <string name="txt_OTP_call">OTP on call</string>
+    <string name="txt_Resend_otp_in">Resend otp in</string>
+    <string name="txt_Verify_proceed">Verify &amp; proceed</string>
+    <string name="txt_Enter_valid_OTP">Please Enter valid OTP</string>
+    <string name="txt_Enter_your_password">Enter your password</string>
+    <string name="txt_Enter_your_New_password">Enter your new password</string>
+    <string name="txt_Enter_Old_password">Enter your old password</string>
+    <string name="txt_Confirm_your_password">Confirm your password</string>
+    <string name="txt_Confirm_your_new_password">Confirm your new password</string>
+    <string name="txt_Update">Update</string>
+    <string name="txt_Save_Update">Save update</string>
+    <string name="txt_Set_New_Password">Set New Password</string>
+    <string name="txt_Set_New_password_for_your_account">Set a new password for your account. Make sure it’s strong and easy for you to remember.</string>
+    <string name="txt_New_Password">New Password</string>
+    <string name="txt_Old_Password">Old Password</string>
+    <string name="txt_Confirm_Password">Confirm Password</string>
+    <string name="txt_Passwords_must_be_8_16_characters">Passwords must be 8-16 characters</string>
+    <string name="txt_Including_one_uppercase_letter">Including one uppercase letter</string>
+    <string name="txt_Must_include_at_least_one_number">Must include at least one number</string>
+    <string name="txt_Must_include_one_special_characters">Must include one special characters</string>
+    <string name="txt_Please_enter_password.">Please enter password.</string>
+    <string name="txt_Contact_us">Contact us</string>
 </resources>

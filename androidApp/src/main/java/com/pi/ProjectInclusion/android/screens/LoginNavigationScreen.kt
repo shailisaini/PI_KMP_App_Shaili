@@ -50,6 +50,10 @@ class LoginNavigationScreen : ComponentActivity() {
                     composable(AppRoute.OtpSendVerifyUI.route) {
                         OtpSendVerifyScreen(navController, viewModel)
                     }
+
+                    composable(AppRoute.SetNewPasswordUI.route) {
+                        SetNewPasswordScreen(navController, viewModel)
+                    }
                 }
             }
         }

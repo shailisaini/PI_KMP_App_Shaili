@@ -21,7 +21,7 @@ val PrimaryBlueLt = Color(0xFFF2FBFF)
 val DarkBlue = Color(0xFF101942) //#101942
 val LightBlue = Color(0xFF5E72E7) //#5E72E7
 val Black = Color(0xFF111111)
-val Gray = Color(0xFF808080) // gray
+val Gray = Color(0xFF808080) // gray // #9F9F9F
 val Bg_Gray = Color(0xFF6C6D72) // gray
 val Bg_Gray1 = Color(0xF0F5F9FE) // gray
 val GrayLight01 = Color(0xFFA0A0A0)
@@ -68,6 +68,9 @@ val LightRed02 = Color(0xFFFEECEB)
 val BannerColor00 = Color(0xFFF6E4D0)
 val BannerColor01 = Color(0xFFFAD6AE)
 val BannerColor02 = Color(0xFFFAB364)
+
+
+val contactUsTxt = Color(0xFF1B244D)
 
 // Use only dark mode purpose
 val Dark_01 = Color(0xFF181A20)

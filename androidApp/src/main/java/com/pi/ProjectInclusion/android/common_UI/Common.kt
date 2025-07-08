@@ -1,6 +1,9 @@
 package com.pi.ProjectInclusion.android.common_UI
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,8 +28,11 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -35,6 +41,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -42,16 +49,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -63,6 +74,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pi.ProjectInclusion.Black
+import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
 import com.pi.ProjectInclusion.DarkBlue
 import com.pi.ProjectInclusion.Dark_01
@@ -76,6 +88,7 @@ import com.pi.ProjectInclusion.GrayLight03
 import com.pi.ProjectInclusion.LightBlue
 import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
+import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.android.R
 import kotlinx.coroutines.delay
 
@@ -112,7 +125,7 @@ fun DefaultBackgroundUi(
                         modifier = Modifier
                             .align(Alignment.TopStart)
                             .padding(top = 16.dp, start = 8.dp)
-                            .offset(y = 16.dp, x = 10.dp)
+                            .offset(y = 8.dp, x = 8.dp)
                             .size(50.dp) // adjust the size as needed
                             .clickable(onClick = onBackButtonClick),
                         painter = painterResource(id = R.drawable.round_back_key),
@@ -135,7 +148,7 @@ fun DefaultBackgroundUi(
             ) {
                 Column(
                     modifier = modifier
-                        .padding(top = 16.dp)
+                        .padding(top = 8.dp)
                         .fillMaxWidth()
                         .fillMaxHeight()
                 ) {
@@ -449,6 +462,189 @@ fun TextWithIconOnLeft(
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Start
             )
+        )
+    }
+}
+
+@Composable
+fun PasswordTextField(
+    modifier: Modifier = Modifier,
+    password: MutableState<String> = remember { mutableStateOf("") },
+    showPassword: MutableState<Boolean> = remember { mutableStateOf(false) },
+    hint: String = remember { mutableStateOf("") }.toString(),
+) {
+    TextField(
+        value = password.value,
+        onValueChange = { password.value = it },
+        shape = RoundedCornerShape(8.dp),
+        singleLine = true,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
+            .wrapContentHeight()
+            .border(
+                width = 1.dp, color = if (isSystemInDarkTheme()) {
+                    Dark_03
+                } else {
+                    GrayLight02
+                }, shape = RoundedCornerShape(8.dp)
+            ),
+        textStyle = TextStyle(
+            fontStyle = FontStyle.Normal,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 16.sp,
+            color = if (isSystemInDarkTheme()) {
+                White
+            } else {
+                Black
+            }
+        ),
+
+        placeholder = { Text(hint, color = GrayLight01, fontSize = 13.sp) },
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = if (isSystemInDarkTheme()) {
+                Dark_03
+            } else {
+                White
+            },
+            focusedTextColor = if (isSystemInDarkTheme()) {
+                White
+            } else {
+                Black
+            },
+            unfocusedTextColor = if (isSystemInDarkTheme()) {
+                Dark_03
+            } else {
+                White
+            },
+            focusedIndicatorColor = if (isSystemInDarkTheme()) {
+                Dark_03
+            } else {
+                White
+            },
+            unfocusedContainerColor = if (isSystemInDarkTheme()) {
+                Dark_03
+            } else {
+                White
+            },
+            unfocusedIndicatorColor = if (isSystemInDarkTheme()) {
+                Dark_03
+            } else {
+                White
+            }
+        ),
+        trailingIcon = {
+            IconButton(onClick = { showPassword.value = !showPassword.value }) {
+                Icon(
+                    imageVector = if (showPassword.value) ImageVector.vectorResource(id = R.drawable.eye_open) else ImageVector.vectorResource(
+                        id = R.drawable.eye_close
+                    ), contentDescription = "Show/Hide Password"
+                )
+            }
+        },
+        visualTransformation = if (showPassword.value) VisualTransformation.None else PasswordVisualTransformation(
+            '*'
+        )
+    )
+}
+
+
+@Composable
+fun PasswordCheckField(
+    isChecked: Boolean = false,
+    hint: String = remember { mutableStateOf("") }.toString(),
+    padding: Modifier,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = padding
+    ) {
+        Checkbox(
+            checked = isChecked,
+            onCheckedChange = { it }, // Disabled for display-only
+            colors = if (isSystemInDarkTheme()) {
+                CheckboxDefaults.colors(
+                    checkedColor = Transparent,     // Light purple-gray
+                    uncheckedColor = Color.LightGray,   // Same for unchecked
+                    checkmarkColor = PrimaryBlue
+                )
+            } else {
+                CheckboxDefaults.colors(
+                    checkedColor = Transparent,     // Light purple-gray
+                    uncheckedColor = Color.LightGray,   // Same for unchecked
+                    checkmarkColor = PrimaryBlue
+                )
+            },
+            modifier = Modifier.size(20.dp)
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Text(
+            text = hint,
+            modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+            textAlign = TextAlign.Center,
+            fontStyle = FontStyle.Normal,
+            fontWeight = FontWeight.Normal,
+            fontSize = 12.sp,
+            color = if (isSystemInDarkTheme()) {
+                DARK_BODY_TEXT
+            } else {
+                Gray
+            }
+        )
+    }
+}
+
+@Composable
+fun CustomProgressBar(
+    percentage: Float = 0f,
+    modifier: Modifier = Modifier,
+    color: Color = PrimaryBlue,
+    secondaryColor: Color = PrimaryBlueLt,
+    strokeWidth: Float = 12f,
+) {
+    val clampedPercentage = percentage.coerceIn(1f, 100f)
+
+    val animatedPercentage by animateFloatAsState(
+        targetValue = clampedPercentage,
+        animationSpec = tween(durationMillis = 100)
+    )
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+    ) {
+        Canvas(modifier = modifier) {
+            val diameter = size.minDimension
+            val radius = diameter / 2
+            val center = size.center
+
+            drawArc(
+                color = secondaryColor,
+                startAngle = -90f,
+                sweepAngle = 360f,
+                useCenter = false,
+                style = Stroke(strokeWidth, cap = StrokeCap.Round)
+            )
+
+            drawArc(
+                color = color,
+                startAngle = -90f,
+                sweepAngle = 360 * (animatedPercentage / 30),
+                useCenter = false,
+                topLeft = center - Offset(radius, radius),
+                size = Size(diameter, diameter),
+                style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+            )
+        }
+
+        Text(
+            text = "${animatedPercentage.toInt()}",
+            fontStyle = FontStyle.Normal,
+            fontWeight = FontWeight.Bold,
+            fontSize = 12.sp,
+            color = color,
         )
     }
 }
