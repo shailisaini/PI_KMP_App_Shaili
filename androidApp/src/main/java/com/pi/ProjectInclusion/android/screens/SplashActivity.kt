@@ -46,13 +46,6 @@ class SplashActivity : ComponentActivity() {
                         ).also { finish() }
                     }
 
-                    composable(AppRoute.ForgetPasswordUI.route) {
-                        ForgetPasswordScreen(navController, viewModel)
-                    }
-
-                    composable(AppRoute.OtpSendVerifyUI.route) {
-                        OtpSendVerifyScreen(navController, viewModel)
-                    }
                     composable(AppRoute.StudentDashboardActivity.route) {
                         DashboardScreen(navController)
                     }
