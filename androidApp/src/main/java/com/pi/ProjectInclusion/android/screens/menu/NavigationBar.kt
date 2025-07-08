@@ -115,7 +115,7 @@ fun DrawerHeader(
                     ) {
                         Image(
                             painter = painterResource(R.drawable.profile_user_icon),
-                            contentDescription = "logo",
+                            contentDescription = stringResource(R.string.logo_ic),
                             modifier = Modifier
                                 .clip(CircleShape) // Add clip modifier to make the image circular
                                 .background(shape = CircleShape, color = Transparent)
@@ -124,7 +124,6 @@ fun DrawerHeader(
                                 ),
                             contentScale = ContentScale.Crop // Clip the image to a circular shape
                         )
-
 
                     }
                 }
@@ -135,10 +134,10 @@ fun DrawerHeader(
                 ) {
                     var textName: String = ""
                     var textEmail: String = ""
-                    textName = "Aman Sharma"
+                    textName = stringResource(R.string.user_name)
 
                     //  email
-                    textEmail = "Teacher"
+                    textEmail = stringResource(R.string.user_profile)
                     Text(
                         text = textName, style = MaterialTheme.typography.bodyMedium.copy(
                             /* color = Black,*/  color = colors.onSurface,
@@ -171,7 +170,7 @@ fun DrawerHeader(
                 ){
                     Text ( modifier = Modifier.wrapContentWidth()
                         .padding(10.dp),
-                        text = "Edit Profile",
+                        text = stringResource(R.string.edit_profile),
                         color = Black,
                         fontSize = 12.sp// Make sure text is readable on gradient
                     )
@@ -250,22 +249,22 @@ fun BottomNavigationBar(
     val item = listOf(
         BottomNavigationItems(
             appRoute = AppRoute.DashboardScreen.route,
-            title = "Home",
+            title = stringResource(R.string.nav_home),
             selectedIcon = ImageVector.vectorResource(id = R.drawable.home_icon),
             unSelectedIcon = ImageVector.vectorResource(id = R.drawable.active_home_ic)
         ), BottomNavigationItems(
             appRoute = AppRoute.CourseScreen.route,
-            title = "Courses",
+            title = stringResource(R.string.nav_course),
             selectedIcon = ImageVector.vectorResource(id = R.drawable.course_icon),
             unSelectedIcon = ImageVector.vectorResource(id = R.drawable.course_icon)
         ), BottomNavigationItems(
             appRoute = AppRoute.ScreeningScreen.route,
-            title = "Screening",
+            title = stringResource(R.string.nav_screening),
             selectedIcon = ImageVector.vectorResource(id = R.drawable.screening_icon),
             unSelectedIcon = ImageVector.vectorResource(id = R.drawable.screening_icon)
         ), BottomNavigationItems(
             appRoute = AppRoute.InterventionScreen.route,
-            title = "Intervention",
+            title = stringResource(R.string.nav_intervention),
             selectedIcon = ImageVector.vectorResource(id = R.drawable.intervention_icon),
             unSelectedIcon = ImageVector.vectorResource(id = R.drawable.intervention_icon)
         )
@@ -331,7 +330,7 @@ fun BottomNavigationBar(
                         }
                     }
                 }, selected = currentDestination == screen.appRoute, onClick = {
-                    if (screen.appRoute == "student_wallet") {
+                    if (screen.appRoute == "") { // student_wallet
                         navController.navigate(screen.appRoute)
 
                     } else {

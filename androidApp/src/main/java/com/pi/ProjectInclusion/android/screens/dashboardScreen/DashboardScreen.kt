@@ -100,10 +100,6 @@ import com.pi.ProjectInclusion.Transparent
 
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-
 @Composable
 fun DashboardScreen(navHostController: NavHostController) {
 
@@ -116,7 +112,7 @@ fun DashboardScreen(navHostController: NavHostController) {
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
     val scrollState = rememberLazyGridState()
     val context = LocalContext.current
-    val languageData = remember { mutableStateListOf<GetLanguageListResponse.Data.Result>() }
+//    val languageData = remember { mutableStateListOf<GetLanguageListResponse.Data.Result>() }
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
@@ -142,16 +138,12 @@ fun DashboardScreen(navHostController: NavHostController) {
             // Handle exception
         }
     }
-
-
-
-
     Surface(
         modifier = Modifier.wrapContentSize()
             .background(
                 color = Transparent
             )
-            .padding(0.dp, 115.dp),
+            .padding(0.dp),
 
 
         ) {
@@ -197,11 +189,11 @@ fun ItemHeader(context: Context){
 
         ) {
             Text(
-                "Hi, Aman Sharma", style = MaterialTheme.typography.titleMedium,
+                stringResource(R.string.welcome_name), style = MaterialTheme.typography.titleMedium,
                 fontSize = 18.sp
             )
             Text(
-                "Learn, act, and create impact—one course at a time.",
+                stringResource(R.string.welcome_desc),
                 style = MaterialTheme.typography.bodyMedium,
                 fontSize = 12.sp
             )
@@ -251,14 +243,14 @@ fun ItemCard(
                             .align(Alignment.CenterHorizontally)
                     ) {
                         Text(
-                                text = "Certificates",
+                                text = stringResource(R.string.certificate_txt),
                             style = MaterialTheme.typography.titleMedium,
                             fontSize = 14.sp,
                             color = Color(0xFF535862)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "0",
+                            text = stringResource(R.string.certificate_txt_value),
                             style = MaterialTheme.typography.bodyMedium,
                                     fontSize = 18.sp,
                             color = Black
@@ -290,14 +282,14 @@ fun ItemCard(
                             .align(Alignment.CenterHorizontally)
                     ) {
                         Text(
-                            text = "Certificates",
+                            text = stringResource(R.string.certificate_txt),
                             style = MaterialTheme.typography.titleMedium,
                             fontSize = 14.sp,
                             color = Color(0xFF535862)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "0",
+                            text = stringResource(R.string.certificate_txt_value),
                             style = MaterialTheme.typography.bodyMedium,
                             fontSize = 18.sp,
                             color = Black
@@ -340,14 +332,14 @@ fun ItemCard(
                             .align(Alignment.CenterHorizontally)
                     ) {
                         Text(
-                            text = "Certificates",
+                            text = stringResource(R.string.certificate_txt),
                             style = MaterialTheme.typography.titleMedium,
                             fontSize = 14.sp,
                             color = Color(0xFF535862)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "0",
+                            text = stringResource(R.string.certificate_txt_value),
                             style = MaterialTheme.typography.bodyMedium,
                             fontSize = 18.sp,
                             color = Black
@@ -379,14 +371,14 @@ fun ItemCard(
                             .align(Alignment.CenterHorizontally)
                     ) {
                         Text(
-                            text = "Certificates",
+                            text = stringResource(R.string.certificate_txt),
                             style = MaterialTheme.typography.titleMedium,
                             fontSize = 14.sp,
                             color = Color(0xFF535862)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "0",
+                            text = stringResource(R.string.certificate_txt_value),
                             style = MaterialTheme.typography.bodyMedium,
                             fontSize = 18.sp,
                             color = Black
@@ -442,12 +434,12 @@ fun ItemReferCard(context: Context){
                     )
                     {
                         Text(
-                            text = "Refer fellow teachers >>",
+                            text = stringResource(R.string.refer_txt),
                             color = Color.Black,
                             fontSize = 18.sp// Make sure text is readable on gradient
                         )
                         Text(
-                            text = "Invite passionate teachers to join\nand make a difference together!",
+                            text = stringResource(R.string.refer_desc),
                             color = Color(0xFF6C6D72),
                             fontSize = 12.sp// Make sure text is readable on gradient
                         )
@@ -461,7 +453,7 @@ fun ItemReferCard(context: Context){
                         ){
                             Text ( modifier = Modifier.wrapContentWidth()
                                 .padding(5.dp),
-                                text = " My refer : 0 ",
+                                text = stringResource(R.string.refer_count),
                                 color = Black,
                                 fontSize = 12.sp// Make sure text is readable on gradient
                             )
@@ -478,7 +470,7 @@ fun ItemReferCard(context: Context){
                     {
                         Icon(
                             painter = painterResource(id = R.drawable.refer_banner),
-                            contentDescription = "lock",
+                            contentDescription = stringResource(R.string.lock_ic),
                             tint = Color.Unspecified// Optional color
                         )
                     }
@@ -575,8 +567,6 @@ fun ItemAddStudentScreen(context: Context){
                     }
                 }
             }
-
-
         }
 
     }
@@ -587,7 +577,8 @@ fun ItemAddStudentScreen(context: Context){
             onDismissRequest = { showDialog = false },
             title = { Text(text = "Phase 2 - Introduction", style =MaterialTheme.typography.bodyMedium,
                 fontSize = 20.sp,
-                color = Black ) },
+                color = Black,
+                textAlign = TextAlign.Center) },
             text = { Text("This is a simple dialog message.") },
             confirmButton = {
                 //TextButton(onClick = { showDialog = false }) {
@@ -598,7 +589,7 @@ fun ItemAddStudentScreen(context: Context){
                             .wrapContentHeight(),
 
                         colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFF2C3EA2)
+                            containerColor = Color(0xFF101942)
                         ),
                         shape = RoundedCornerShape(8.dp),
                         elevation = CardDefaults.cardElevation(4.dp)
@@ -617,7 +608,7 @@ fun ItemAddStudentScreen(context: Context){
                   //  Text("Got It")
                // }
             },
-
+            containerColor = Color(0xFFFFFFFF)
             )
     }
 

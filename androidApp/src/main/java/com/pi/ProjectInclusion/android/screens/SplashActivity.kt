@@ -1,23 +1,20 @@
 package com.pi.ProjectInclusion.android.screens
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.pi.ProjectInclusion.android.MyApplicationTheme
 import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.screens.login.LanguageScreen
+import com.pi.ProjectInclusion.android.screens.dashboardScreen.DashboardScreen
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
@@ -41,7 +38,12 @@ class SplashActivity : ComponentActivity() {
                         SplashScreen(navController)
                     }
                     composable(AppRoute.LanguageSelect.route) {
-                        LanguageScreen(navController, viewModel)
+                        startActivity(
+                            Intent(
+                                this@SplashActivity,
+                                LoginNavigationScreen::class.java
+                            )
+                        ).also { finish() }
                     }
 
                     composable(AppRoute.ForgetPasswordUI.route) {
@@ -51,9 +53,8 @@ class SplashActivity : ComponentActivity() {
                     composable(AppRoute.OtpSendVerifyUI.route) {
                         OtpSendVerifyScreen(navController, viewModel)
                     }
-
-                    composable(AppRoute.SetNewPasswordUI.route) {
-                        SetNewPasswordScreen(navController, viewModel)
+                    composable(AppRoute.StudentDashboardActivity.route) {
+                        DashboardScreen(navController)
                     }
                 }
             }
@@ -66,7 +67,7 @@ fun SplashScreen(navController: NavHostController) {
     LaunchedEffect(Unit) {
         delay(3500) // simulate loading
         navController.navigate(AppRoute.LanguageSelect.route) {
-            // navController.navigate(AppRoute.StudentDashboardActivity.route) {
+       // navController.navigate(AppRoute.StudentDashboardActivity.route) {
             popUpTo("splash") { inclusive = true }
         }
     }

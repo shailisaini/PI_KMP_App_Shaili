@@ -15,8 +15,8 @@ import kotlinx.coroutines.launch
 class DashboardViewModel(
     private val getLanguageUsesCases: GetLanguageUsesCases
 ):ViewModel() {
-    private val _uiState = MutableStateFlow(UiState())
-    val uiState = _uiState.asStateFlow()
+//    private val _uiState = MutableStateFlow(UiState())
+//    val uiState = _uiState.asStateFlow()
 
     private val query = MutableStateFlow("")
 
@@ -29,17 +29,17 @@ class DashboardViewModel(
         }
     }
 
-    fun getLanguages(page: String, limit: String) = viewModelScope.launch {
-        _uiState.update { UiState(isLoading = true) }
-       val response = getLanguageUsesCases(page, limit)
-        if (response.isSuccess){
-            _uiState.update { UiState(success = response.getOrThrow() ) }
-        }
-        else{
-            _uiState.update { UiState(error = response.exceptionOrNull()?.message.toString() ) }
-        }
-
-    }
+//    fun getLanguages(page: String, limit: String) = viewModelScope.launch {
+//        _uiState.update { UiState(isLoading = true) }
+//       val response = getLanguageUsesCases(page, limit)
+//        if (response.isSuccess){
+//            _uiState.update { UiState(success = response.getOrThrow() ) }
+//        }
+//        else{
+//            _uiState.update { UiState(error = response.exceptionOrNull()?.message.toString() ) }
+//        }
+//
+//    }
 
 }
 

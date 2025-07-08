@@ -11,6 +11,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.pi.ProjectInclusion.android.MyApplicationTheme
 import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.screens.login.LanguageScreen
+import com.pi.ProjectInclusion.android.screens.login.UserTypeScreen
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -36,6 +38,9 @@ class LoginNavigationScreen : ComponentActivity() {
                 ) {
                     composable(AppRoute.LanguageSelect.route) {
                         LanguageScreen(navController, viewModel)
+                    }
+                    composable(AppRoute.UserTypeSelect.route) {
+                        UserTypeScreen(navController, viewModel)
                     }
 
                     composable(AppRoute.ForgetPasswordUI.route) {
