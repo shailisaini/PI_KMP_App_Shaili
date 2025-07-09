@@ -1,7 +1,6 @@
-package com.pi.ProjectInclusion.android.screens
+package com.pi.ProjectInclusion.android.screens.login
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,7 +44,6 @@ import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
-import com.pi.ProjectInclusion.android.common_UI.PasswordCheckField
 import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.toast

@@ -479,7 +479,7 @@ fun PasswordUpdateDialog(onDismiss: () -> Unit) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Your password has been updated successfully.",
+                    text = stringResource(R.string.txt_Password_updated_successfully),
                     modifier = Modifier
                         .wrapContentWidth()
                         .padding(start = 8.dp, end = 8.dp),
@@ -506,7 +506,7 @@ fun PasswordUpdateDialog(onDismiss: () -> Unit) {
                         onClick = {
                             onDismiss()
                         },
-                        title = "Ok! Got it.",
+                        title = stringResource(R.string.txt_Ok_Got_it),
                         enabled = true
                     )
                 }
