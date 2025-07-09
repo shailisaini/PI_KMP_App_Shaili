@@ -48,8 +48,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -68,6 +66,7 @@ import com.pi.ProjectInclusion.Dark_Selected_BG
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
+import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlue1
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.Transparent
@@ -170,7 +169,15 @@ fun UserTypeResponseUI(
             Column(
                 modifier = Modifier
                     .padding(15.dp)
+                    .background(
+                        color = if (isSystemInDarkTheme()) {
+                            Dark_01
+                        } else {
+                            Transparent
+                        }
+                    )
                     .fillMaxWidth(),
+
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 LoginScreenTitle(title, Black, Gray, subTitle)
@@ -210,6 +217,7 @@ fun UserTypeResponseUI(
                             ) {
                                 items(userTypeData.size) { index ->
                                     UserTypeCard(
+                                        navController,
                                         context,
                                         isSelected = selectedIndex == index,
                                         index,
@@ -239,6 +247,7 @@ fun UserTypeResponseUI(
 
 @Composable
 fun UserTypeCard(
+    navController: NavHostController,
     context: Context,
     isSelected: Boolean = true,
     index: Int,
@@ -253,7 +262,7 @@ fun UserTypeCard(
         if (isSystemInDarkTheme()) {
             PRIMARY_AURO_BLUE
         } else {
-            PrimaryBlue1
+            PrimaryBlue
         }
     ) else BorderStroke(
         width = 0.5.dp, if (isSystemInDarkTheme()) {
@@ -279,7 +288,9 @@ fun UserTypeCard(
     Card(
         modifier = Modifier
             .clickable {
-
+                onItemClicked.invoke()
+                navController.popBackStack()
+                navController.navigate(AppRoute.UserNameScreen.route)
             }
             .padding(8.dp)
             .fillMaxWidth(),
@@ -288,7 +299,7 @@ fun UserTypeCard(
             if (isSystemInDarkTheme()) {
                 Dark_02
             } else {
-                GrayLight02
+                White
             }
         ),
         border = selectedBorder,
@@ -326,7 +337,7 @@ fun UserTypeCard(
                     /*} else {
                         painterResource(id = R.drawable.img_teacher)
                     }*/,
-                    contentDescription = "Language Icon"
+                    contentDescription = IMG_DESCRIPTION
                 )
 
                 Text(

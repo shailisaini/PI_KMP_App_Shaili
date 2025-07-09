@@ -4,6 +4,9 @@
     <string name="select_language">Select Language</string>
     <string name="choose_hindi_english">Choose Language Hindi &amp; English</string>
     <string name="select_userType">Select an user type</string>
+    <string name="text_enter_no">Please enter valid mobile number</string>
+    <string name="text_mobile_no_user">Mobile Number/Username</string>
+    <string name="text_continue">Continue</string>
     <string name="select_userType_subtitle">Select your user type to continue. This helps us tailor your experience</string>
     <string name="txt_loading">Loading your data..</string>
     <string name="txt_oops_no_data_found">Oops!!, No data found</string>

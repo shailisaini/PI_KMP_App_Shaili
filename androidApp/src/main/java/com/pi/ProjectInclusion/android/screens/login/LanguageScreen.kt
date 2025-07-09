@@ -68,7 +68,7 @@ import com.pi.ProjectInclusion.Dark_Selected_BG
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
-import com.pi.ProjectInclusion.PrimaryBlue1
+import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
@@ -77,6 +77,7 @@ import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
 import com.pi.ProjectInclusion.constants.CommonFunction.NoDataFound
 import com.pi.ProjectInclusion.constants.CommonFunction.ShowError
+import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_ACTIVE
 import com.pi.ProjectInclusion.constants.ConstantVariables.PAGE_LENGTH
 import com.pi.ProjectInclusion.constants.ConstantVariables.PAGE_LIMIT
@@ -156,8 +157,6 @@ fun LanguageResponseUI(
     var isApiResponded by remember { mutableStateOf(false) }
     val internetMessage by remember { mutableStateOf("") }
     val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
-
-    var isDialogVisible by remember { mutableStateOf(false) }
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
     val selectedLanguage = remember { mutableStateOf<String?>(null) }
     val title = stringResource(R.string.select_language)
@@ -250,7 +249,7 @@ fun ItemLanguageCard(
         if (isSystemInDarkTheme()) {
             PRIMARY_AURO_BLUE
         } else {
-            PrimaryBlue1
+            PrimaryBlue
         }
     ) else BorderStroke(
         width = 0.5.dp, if (isSystemInDarkTheme()) {
@@ -331,7 +330,7 @@ fun ItemLanguageCard(
                     } else {
                         painterResource(id = R.drawable.ic_hindi)
                     },
-                    contentDescription = "Language Icon"
+                    contentDescription = IMG_DESCRIPTION
                 )
                 Text(
                     languageIndex.nativeName,

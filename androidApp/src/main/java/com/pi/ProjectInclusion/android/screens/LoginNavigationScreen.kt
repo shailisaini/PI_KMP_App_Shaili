@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.pi.ProjectInclusion.android.MyApplicationTheme
 import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.screens.login.EnterUserNameScreen
 import com.pi.ProjectInclusion.android.screens.login.LanguageScreen
 import com.pi.ProjectInclusion.android.screens.login.UserTypeScreen
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
@@ -41,6 +42,9 @@ class LoginNavigationScreen : ComponentActivity() {
                     }
                     composable(AppRoute.UserTypeSelect.route) {
                         UserTypeScreen(navController, viewModel)
+                    }
+                    composable(AppRoute.UserNameScreen.route) {
+                        EnterUserNameScreen(navController, viewModel)
                     }
 
                     composable(AppRoute.ForgetPasswordUI.route) {

@@ -8,6 +8,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +27,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -47,6 +50,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
@@ -58,11 +62,14 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -70,9 +77,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
@@ -90,7 +99,13 @@ import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import kotlinx.coroutines.delay
+
+fun BackButtonPress(navController: NavHostController, route: String) {
+    navController.popBackStack()
+    navController.navigate(route)
+}
 
 @Composable
 fun DefaultBackgroundUi(
@@ -118,9 +133,9 @@ fun DefaultBackgroundUi(
             Box(
                 modifier = modifier
                     .fillMaxWidth()
-                    .height(120.dp)
+                    .height(80.dp)
             ) {
-                if (isShowBackButton) {
+                if (isShowBackButton && !LocalInspectionMode.current) {
                     Image(
                         modifier = Modifier
                             .align(Alignment.TopStart)
@@ -129,7 +144,7 @@ fun DefaultBackgroundUi(
                             .size(50.dp) // adjust the size as needed
                             .clickable(onClick = onBackButtonClick),
                         painter = painterResource(id = R.drawable.round_back_key),
-                        contentDescription = "back_button"
+                        contentDescription = IMG_DESCRIPTION
                     )
                 }
             }
@@ -167,11 +182,19 @@ fun MobileTextField(
     number: MutableState<String> = remember { mutableStateOf("") },
     hint: String = remember { mutableStateOf("") }.toString(),
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+    val keyboardController = LocalSoftwareKeyboardController.current
     TextField(
         value = number.value,
         onValueChange = {
             if (it.length <= 10 && it.all { char -> char.isDigit() }) {
                 number.value = it
+
+                //  Hide keyboard on 10 digits
+                if (it.length == 10) {
+                    keyboardController?.hide()
+                }
             }
         },
         enabled = trueFalse,
@@ -184,13 +207,21 @@ fun MobileTextField(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
+            .shadow(
+                elevation = if (isFocused) 8.dp else 2.dp,
+                shape = RoundedCornerShape(8.dp),
+                ambientColor = LightBlue.copy(alpha = 0.6f),
+                spotColor = LightBlue.copy(alpha = 0.6f)
+            )
             .border(
-                width = 1.dp, color = if (isSystemInDarkTheme()) {
-                    Dark_02
-                } else {
-                    LightBlue
+                width = 1.dp,
+                color = when {
+                    isFocused -> LightBlue
+                    isSystemInDarkTheme() -> Dark_02
+                    else -> GrayLight02
                 }, shape = RoundedCornerShape(8.dp)
             ),
+        interactionSource = interactionSource,
         textStyle = TextStyle(
             fontStyle = FontStyle.Normal,
             fontWeight = FontWeight.SemiBold,
@@ -333,6 +364,53 @@ fun OtpInputField(
                 }
             }
         })
+}
+
+
+@Composable
+fun TermsAndPrivacyText(
+    onTermsClick: () -> Unit,
+    onPrivacyClick: () -> Unit
+) {
+    val annotatedText = buildAnnotatedString {
+        append("By continue, you agree to our ")
+
+        // Terms of Service
+        pushStringAnnotation(tag = "TERMS", annotation = "terms")
+        withStyle(style = SpanStyle(color = Gray, fontWeight = FontWeight.Medium)) {
+            append("Terms of Service")
+        }
+        pop()
+
+        append(" and ")
+
+        // Privacy Policy
+        pushStringAnnotation(tag = "PRIVACY", annotation = "privacy")
+        withStyle(style = SpanStyle(color = Color.Blue, fontWeight = FontWeight.Medium)) {
+            append("Privacy Policy")
+        }
+        pop()
+
+        append(".")
+    }
+
+    ClickableText(
+        text = annotatedText,
+        style = TextStyle(
+            fontSize = 14.sp,
+            color = Color.Gray // base color for normal text
+        ),
+        onClick = { offset ->
+            annotatedText.getStringAnnotations(tag = "TERMS", start = offset, end = offset)
+                .firstOrNull()?.let { onTermsClick() }
+
+            annotatedText.getStringAnnotations(tag = "PRIVACY", start = offset, end = offset)
+                .firstOrNull()?.let { onPrivacyClick() }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(12.dp)
+    )
 }
 
 @Composable
