@@ -312,7 +312,7 @@ private fun ProfileProgress(
                     }
                 },
                 fontFamily = FontFamily(
-                    Font(R.font.inter_semi_bold, FontWeight.SemiBold)
+                    Font(R.font.roboto_semi_bold, FontWeight.SemiBold)
                 ),
                 textAlign = TextAlign.Center,
                 fontSize = 12.sp,

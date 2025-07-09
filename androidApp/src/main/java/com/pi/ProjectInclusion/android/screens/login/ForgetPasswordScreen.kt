@@ -71,6 +71,7 @@ import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.contactUsTxt
 import kotlinx.coroutines.launch
 
@@ -294,14 +295,14 @@ fun BottomSheetReferAFriendScreen(
                                 } else {
                                     Black
                                 }, fontSize = 18.sp, fontFamily = FontFamily(
-                                    Font(R.font.inter_bold, FontWeight.Bold)
+                                    Font(R.font.roboto_bold, FontWeight.Bold)
                                 ), textAlign = TextAlign.Start
                             )
                         )
 
                         Image(
                             painter = painterResource(R.drawable.line),
-                            contentDescription = "logo",
+                            contentDescription = IMG_DESCRIPTION,
                             modifier = Modifier
                                 .wrapContentWidth()
                                 .align(Alignment.CenterVertically)
@@ -325,7 +326,7 @@ fun BottomSheetReferAFriendScreen(
                                 } else {
                                     Black
                                 }, fontSize = 18.sp, fontFamily = FontFamily(
-                                    Font(R.font.inter_bold, FontWeight.Bold)
+                                    Font(R.font.roboto_bold, FontWeight.Bold)
                                 ), textAlign = TextAlign.Start
                             )
                         )
@@ -340,7 +341,7 @@ fun BottomSheetReferAFriendScreen(
                         },
                         fontSize = 12.sp,
                         fontFamily = FontFamily(
-                            Font(R.font.inter_regular, FontWeight.Normal)
+                            Font(R.font.roboto_regular, FontWeight.Normal)
                         ),
                         textAlign = TextAlign.Start,
                         modifier = Modifier.padding(top = 16.dp, start = 16.dp)
@@ -401,7 +402,7 @@ fun BottomSheetReferAFriendScreen(
                                     } else {
                                         contactUsTxt
                                     }, fontSize = 14.sp, fontFamily = FontFamily(
-                                        Font(R.font.inter_medium, FontWeight.Medium)
+                                        Font(R.font.roboto_medium, FontWeight.Medium)
                                     ), textAlign = TextAlign.Start
                                 )
                             )
@@ -452,7 +453,7 @@ fun BottomSheetReferAFriendScreen(
                                     } else {
                                         contactUsTxt
                                     }, fontSize = 14.sp, fontFamily = FontFamily(
-                                        Font(R.font.inter_medium, FontWeight.Medium)
+                                        Font(R.font.roboto_medium, FontWeight.Medium)
                                     ), textAlign = TextAlign.Start
                                 )
                             )
