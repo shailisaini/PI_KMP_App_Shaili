@@ -2,6 +2,7 @@ package com.pi.ProjectInclusion.android.screens.login
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -73,11 +74,11 @@ import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
 import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
 import com.pi.ProjectInclusion.constants.CommonFunction.NoDataFound
 import com.pi.ProjectInclusion.constants.CommonFunction.ShowError
-import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
@@ -177,7 +178,6 @@ fun UserTypeResponseUI(
                         }
                     )
                     .fillMaxWidth(),
-
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 LoginScreenTitle(title, Black, Gray, subTitle)
@@ -291,6 +291,14 @@ fun UserTypeCard(
                 onItemClicked.invoke()
                 navController.popBackStack()
                 navController.navigate(AppRoute.UserNameScreen.route)
+
+                // Aashish
+                /*context.startActivity(
+                    Intent(
+                        context,
+                        StudentDashboardActivity::class.java
+                    )
+                )*/
             }
             .padding(8.dp)
             .fillMaxWidth(),
@@ -325,15 +333,15 @@ fun UserTypeCard(
                     contentScale = ContentScale.Fit,
 //                    painter = if (userTypeIndex.isNotEmpty()) {
                     painter =
-                    rememberAsyncImagePainter(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(R.drawable.img_teacher)
-                            .decoderFactory(SvgDecoder.Factory())
-                            .size(Size.ORIGINAL)
-                            .placeholder(R.drawable.img_teacher)
-                            .error(R.drawable.img_teacher)
-                            .build()
-                    )
+                        rememberAsyncImagePainter(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(R.drawable.img_teacher)
+                                .decoderFactory(SvgDecoder.Factory())
+                                .size(Size.ORIGINAL)
+                                .placeholder(R.drawable.img_teacher)
+                                .error(R.drawable.img_teacher)
+                                .build()
+                        )
                     /*} else {
                         painterResource(id = R.drawable.img_teacher)
                     }*/,
