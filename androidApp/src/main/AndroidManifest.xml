@@ -23,17 +23,16 @@
             android:name=".screens.sideBar.ChangePasswordActivity"
             android:exported="false" />
         <activity
-            android:name=".screens.SplashActivity"
+            android:name=".screens.StudentDashboardActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".screens.LoginNavigationScreen"/>
         <activity
-            android:name=".screens.StudentDashboardActivity"/>
+            android:name=".screens.SplashActivity"/>
     </application>
 
 </manifest>

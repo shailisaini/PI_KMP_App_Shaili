@@ -118,14 +118,13 @@ class StudentDashboardActivity : ComponentActivity() {
                 val halfScreenHeight = screenHeight / 2
                 var sheetPeekHeight by remember { mutableStateOf(0.dp) }
                 var isDialogVisible by remember { mutableStateOf(false) }
-
-                BottomSheetScaffold(
-                    scaffoldState = bottomSheetScaffoldState, sheetContent = {
-
-
-                    }, sheetPeekHeight = sheetPeekHeight
-                )
-                {
+//                BottomSheetScaffold(
+//                    scaffoldState = bottomSheetScaffoldState, sheetContent = {
+//
+//
+//                    }, sheetPeekHeight = sheetPeekHeight
+//                )
+//                {
                     ModalNavigationDrawer(
                         drawerState = drawerState,
                         drawerContent = {
@@ -248,7 +247,6 @@ class StudentDashboardActivity : ComponentActivity() {
                                     .zIndex(1f)
                             )
                             {
-
                                 NavHost(
                                     navController = navController,
                                     startDestination = AppRoute.DashboardScreen.route, //AppRoute.DashboardScreen.route,
@@ -276,7 +274,7 @@ class StudentDashboardActivity : ComponentActivity() {
                             }
                         })
                     }
-                }
+               // }
 
 //                NavHost(
 //                    navController = navController,
@@ -286,9 +284,6 @@ class StudentDashboardActivity : ComponentActivity() {
 //
 //                }
            // }
-
-
-
             }
         }
     }
@@ -333,10 +328,5 @@ class StudentDashboardActivity : ComponentActivity() {
 
 
 
-    @Preview(showBackground = true)
-    @Composable
-    fun DashboardPreview() {
-        MyApplicationTheme {  }
-    }
 
 

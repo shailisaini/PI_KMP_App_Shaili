@@ -85,7 +85,7 @@ fun DrawerHeader(
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
-                .height(220.dp)
+                .height(200.dp)
 
                 .background(
                     brush = Brush.linearGradient(
@@ -96,14 +96,14 @@ fun DrawerHeader(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 30.dp)
+                    .padding(top = 20.dp)
                     .clickable { onItemClick.invoke() },
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             )
             {
                 Box(
-                    modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp, top = 30.dp)
+                    modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp, top = 20.dp)
 
                 )
                 {
