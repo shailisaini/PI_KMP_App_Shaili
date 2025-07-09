@@ -2,6 +2,7 @@ package com.pi.ProjectInclusion.android.screens.login
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -48,8 +49,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -68,12 +67,14 @@ import com.pi.ProjectInclusion.Dark_Selected_BG
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
+import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlue1
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
 import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
 import com.pi.ProjectInclusion.constants.CommonFunction.NoDataFound
@@ -170,6 +171,13 @@ fun UserTypeResponseUI(
             Column(
                 modifier = Modifier
                     .padding(15.dp)
+                    .background(
+                        color = if (isSystemInDarkTheme()) {
+                            Dark_01
+                        } else {
+                            Transparent
+                        }
+                    )
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -210,6 +218,7 @@ fun UserTypeResponseUI(
                             ) {
                                 items(userTypeData.size) { index ->
                                     UserTypeCard(
+                                        navController,
                                         context,
                                         isSelected = selectedIndex == index,
                                         index,
@@ -239,6 +248,7 @@ fun UserTypeResponseUI(
 
 @Composable
 fun UserTypeCard(
+    navController: NavHostController,
     context: Context,
     isSelected: Boolean = true,
     index: Int,
@@ -253,7 +263,7 @@ fun UserTypeCard(
         if (isSystemInDarkTheme()) {
             PRIMARY_AURO_BLUE
         } else {
-            PrimaryBlue1
+            PrimaryBlue
         }
     ) else BorderStroke(
         width = 0.5.dp, if (isSystemInDarkTheme()) {
@@ -279,7 +289,17 @@ fun UserTypeCard(
     Card(
         modifier = Modifier
             .clickable {
+                onItemClicked.invoke()
+                navController.popBackStack()
+                navController.navigate(AppRoute.UserNameScreen.route)
 
+                // Aashish
+                /*context.startActivity(
+                    Intent(
+                        context,
+                        StudentDashboardActivity::class.java
+                    )
+                )*/
             }
             .padding(8.dp)
             .fillMaxWidth(),
@@ -288,7 +308,7 @@ fun UserTypeCard(
             if (isSystemInDarkTheme()) {
                 Dark_02
             } else {
-                GrayLight02
+                White
             }
         ),
         border = selectedBorder,
@@ -314,19 +334,19 @@ fun UserTypeCard(
                     contentScale = ContentScale.Fit,
 //                    painter = if (userTypeIndex.isNotEmpty()) {
                     painter =
-                    rememberAsyncImagePainter(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(R.drawable.img_teacher)
-                            .decoderFactory(SvgDecoder.Factory())
-                            .size(Size.ORIGINAL)
-                            .placeholder(R.drawable.img_teacher)
-                            .error(R.drawable.img_teacher)
-                            .build()
-                    )
+                        rememberAsyncImagePainter(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(R.drawable.img_teacher)
+                                .decoderFactory(SvgDecoder.Factory())
+                                .size(Size.ORIGINAL)
+                                .placeholder(R.drawable.img_teacher)
+                                .error(R.drawable.img_teacher)
+                                .build()
+                        )
                     /*} else {
                         painterResource(id = R.drawable.img_teacher)
                     }*/,
-                    contentDescription = "Language Icon"
+                    contentDescription = IMG_DESCRIPTION
                 )
 
                 Text(

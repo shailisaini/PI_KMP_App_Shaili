@@ -1,4 +1,4 @@
-package com.pi.ProjectInclusion.android.screens
+package com.pi.ProjectInclusion.android.screens.login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -63,14 +62,11 @@ fun OtpSendVerifyScreen(navController: NavHostController, viewModel: LoginViewMo
 
     var otpValue by remember { mutableStateOf("") }
     var phoneNo by remember { mutableStateOf("") }
-    val colors = MaterialTheme.colorScheme
     var inValidOTP by remember { mutableStateOf(false) }
     var showError by remember { mutableStateOf(false) }
     val invalidOtpText = stringResource(R.string.txt_Enter_valid_OTP)
     var isDialogVisible by remember { mutableStateOf(false) }
     var isFinished by remember { mutableStateOf(false) }
-    var timeLeft by remember { mutableStateOf(30000L) }
-    var interval by remember { mutableStateOf(30000L) }
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
         navController.popBackStack()
@@ -316,7 +312,7 @@ private fun ProfileProgress(
                     }
                 },
                 fontFamily = FontFamily(
-                    Font(R.font.inter_semi_bold, FontWeight.SemiBold)
+                    Font(R.font.roboto_semi_bold, FontWeight.SemiBold)
                 ),
                 textAlign = TextAlign.Center,
                 fontSize = 12.sp,

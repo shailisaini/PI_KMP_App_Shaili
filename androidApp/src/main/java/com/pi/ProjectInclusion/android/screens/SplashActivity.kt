@@ -13,7 +13,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.pi.ProjectInclusion.android.MyApplicationTheme
 import com.pi.ProjectInclusion.android.navigation.AppRoute
-import com.pi.ProjectInclusion.android.screens.login.LanguageScreen
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.DashboardScreen
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.delay

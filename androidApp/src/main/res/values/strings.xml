@@ -4,6 +4,9 @@
     <string name="select_language">Select Language</string>
     <string name="choose_hindi_english">Choose Language Hindi &amp; English</string>
     <string name="select_userType">Select an user type</string>
+    <string name="text_enter_no">Please enter valid mobile number</string>
+    <string name="text_mobile_no_user">Mobile Number/Username</string>
+    <string name="text_continue">Continue</string>
     <string name="select_userType_subtitle">Select your user type to continue. This helps us tailor your experience</string>
     <string name="txt_loading">Loading your data..</string>
     <string name="txt_oops_no_data_found">Oops!!, No data found</string>
@@ -57,8 +60,6 @@ and make a difference together!</string>
     <string name="nav_contact">Contact us</string>
     <string name="nav_faq">F.A.Q</string>
 
-
-
     <string name="txt_enter_mobile_no.">Enter Mobile No.</string>
     <string name="txt_Send_OTP">Send OTP</string>
     <string name="txt_Enter_valid_mobile_number">Enter valid mobile number</string>
@@ -90,4 +91,9 @@ and make a difference together!</string>
     <string name="txt_Must_include_one_special_characters">Must include one special characters</string>
     <string name="txt_Please_enter_password.">Please enter password.</string>
     <string name="txt_Contact_us">Contact us</string>
+    <string name="txt_Password_updated_successfully">Your password has been updated successfully.</string>
+    <string name="txt_Ok_Got_it">Ok! Got it.</string>
+    <string name="txt_Pending_1">Pending (01)</string>
+    <string name="txt_In_progress_1">In-progress (01)</string>
+    <string name="txt_Completed">Completed</string>
 </resources>

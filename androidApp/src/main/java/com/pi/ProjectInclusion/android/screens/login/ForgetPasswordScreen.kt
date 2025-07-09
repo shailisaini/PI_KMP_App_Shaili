@@ -1,11 +1,8 @@
-package com.pi.ProjectInclusion.android.screens
+package com.pi.ProjectInclusion.android.screens.login
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ResolveInfo
 import android.net.Uri
-import android.widget.Toast
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -48,12 +45,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -69,23 +63,17 @@ import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_TITLE_TEXT
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Gray
-import com.pi.ProjectInclusion.GrayLight02
-import com.pi.ProjectInclusion.LightPink02
 import com.pi.ProjectInclusion.LightRed01
-import com.pi.ProjectInclusion.PrimaryBlue
-import com.pi.ProjectInclusion.Transparent
-import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.MobileTextField
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import com.pi.ProjectInclusion.android.R
-import com.pi.ProjectInclusion.android.screens.sideBar.ChangePasswordActivity
 import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.contactUsTxt
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -116,7 +104,6 @@ fun ForgetPasswordScreen(navController: NavHostController, viewModel: LoginViewM
                 isBottomSheetVisible = false
             }
         })
-
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
         navController.popBackStack()
@@ -308,14 +295,14 @@ fun BottomSheetReferAFriendScreen(
                                 } else {
                                     Black
                                 }, fontSize = 18.sp, fontFamily = FontFamily(
-                                    Font(R.font.inter_bold, FontWeight.Bold)
+                                    Font(R.font.roboto_bold, FontWeight.Bold)
                                 ), textAlign = TextAlign.Start
                             )
                         )
 
                         Image(
                             painter = painterResource(R.drawable.line),
-                            contentDescription = "logo",
+                            contentDescription = IMG_DESCRIPTION,
                             modifier = Modifier
                                 .wrapContentWidth()
                                 .align(Alignment.CenterVertically)
@@ -339,7 +326,7 @@ fun BottomSheetReferAFriendScreen(
                                 } else {
                                     Black
                                 }, fontSize = 18.sp, fontFamily = FontFamily(
-                                    Font(R.font.inter_bold, FontWeight.Bold)
+                                    Font(R.font.roboto_bold, FontWeight.Bold)
                                 ), textAlign = TextAlign.Start
                             )
                         )
@@ -354,7 +341,7 @@ fun BottomSheetReferAFriendScreen(
                         },
                         fontSize = 12.sp,
                         fontFamily = FontFamily(
-                            Font(R.font.inter_regular, FontWeight.Normal)
+                            Font(R.font.roboto_regular, FontWeight.Normal)
                         ),
                         textAlign = TextAlign.Start,
                         modifier = Modifier.padding(top = 16.dp, start = 16.dp)
@@ -415,7 +402,7 @@ fun BottomSheetReferAFriendScreen(
                                     } else {
                                         contactUsTxt
                                     }, fontSize = 14.sp, fontFamily = FontFamily(
-                                        Font(R.font.inter_medium, FontWeight.Medium)
+                                        Font(R.font.roboto_medium, FontWeight.Medium)
                                     ), textAlign = TextAlign.Start
                                 )
                             )
@@ -466,7 +453,7 @@ fun BottomSheetReferAFriendScreen(
                                     } else {
                                         contactUsTxt
                                     }, fontSize = 14.sp, fontFamily = FontFamily(
-                                        Font(R.font.inter_medium, FontWeight.Medium)
+                                        Font(R.font.roboto_medium, FontWeight.Medium)
                                     ), textAlign = TextAlign.Start
                                 )
                             )
