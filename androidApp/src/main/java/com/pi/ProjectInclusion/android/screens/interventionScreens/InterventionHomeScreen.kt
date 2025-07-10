@@ -7,9 +7,11 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,7 +26,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ScrollableTabRow
@@ -34,10 +35,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -51,6 +54,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.pi.ProjectInclusion.Black
@@ -58,13 +62,17 @@ import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_TITLE_TEXT
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Dark_02
+import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight01
 import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.White
+import com.pi.ProjectInclusion.Yellow
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.screens.menu.TabItem
+import com.pi.ProjectInclusion.android.screens.sideBar.PasswordUpdateDialog
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -81,6 +89,7 @@ fun InterventionHomeScreen(navHostController: NavHostController) {
     )
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val pagerState = rememberPagerState { tabItems.size }
+    var showDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(selectedTabIndex) {
         pagerState.animateScrollToPage(selectedTabIndex)
@@ -89,6 +98,12 @@ fun InterventionHomeScreen(navHostController: NavHostController) {
     LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
         if (!pagerState.isScrollInProgress) {
             selectedTabIndex = pagerState.currentPage
+        }
+    }
+
+    if (showDialog) {
+        InterventionIntroDialog {
+            showDialog = false
         }
     }
 
@@ -186,6 +201,83 @@ fun InterventionHomeScreen(navHostController: NavHostController) {
 }
 
 @Composable
+fun InterventionIntroDialog(onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = { onDismiss() }) {
+        Box(
+            modifier = Modifier
+                .padding(8.dp)
+                .clip(RoundedCornerShape(20.dp))
+                .background(
+                    if (isSystemInDarkTheme()) {
+                        Dark_02
+                    } else {
+                        Color.White
+                    }
+                )
+                .fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(bottom = 16.dp, start = 8.dp, end = 8.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(R.string.txt_Intervention_Introduction),
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .padding(start = 8.dp, end = 8.dp),
+                    fontStyle = FontStyle.Normal,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = if (isSystemInDarkTheme()) {
+                        DARK_TITLE_TEXT
+                    } else {
+                        Black
+                    },
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = stringResource(R.string.txt_Intervention_Introduction_Details),
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .padding(start = 8.dp, end = 8.dp),
+                    fontStyle = FontStyle.Normal,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 14.sp,
+                    color = if (isSystemInDarkTheme()) {
+                        DARK_TITLE_TEXT
+                    } else {
+                        Gray
+                    },
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Column(
+                    modifier = Modifier
+                        .padding(bottom = 8.dp, start = 8.dp, end = 8.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    BtnUi(
+                        onClick = {
+                            onDismiss()
+                        },
+                        title = stringResource(R.string.text_continue),
+                        enabled = true
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun PendingIntervention() {
     val interventionListData = listOf(
         InterventionData(
@@ -223,7 +315,7 @@ fun PendingIntervention() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 16.dp)
+            .padding(start = 8.dp, end = 8.dp, bottom = 8.dp, top = 8.dp)
             .background(
                 if (isSystemInDarkTheme()) {
                     Dark_01
@@ -253,136 +345,176 @@ fun InterventionDataUI(interData: InterventionData) {
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
-            .padding(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 10.dp)
+            .padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 16.dp)
             .fillMaxWidth()
             .wrapContentHeight(),
         colors = if (isSystemInDarkTheme()) {
             CardDefaults.cardColors(Dark_02)
         } else {
             CardDefaults.cardColors(
-                containerColor = White,
-                contentColor = White,
-                disabledContentColor = White,
-                disabledContainerColor = White
+                containerColor = Yellow,
+                contentColor = Yellow,
+                disabledContentColor = Yellow,
+                disabledContainerColor = Yellow
             )
-        },
-        border = selectedBorder
+        }
     ) {
         Column(
-            modifier = Modifier.padding(
-                start = 5.dp, end = 5.dp, top = 5.dp, bottom = 5.dp
-            ), horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = Color.Transparent)
         ) {
-            Row(modifier = Modifier.padding(horizontal = 5.dp)) {
-                Card(
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier
-                        .padding(horizontal = 5.dp, vertical = 10.dp)
-                        .width(100.dp)
-                        .wrapContentHeight()
-                        .weight(1f),
-                    colors = if (isSystemInDarkTheme()) {
-                        CardDefaults.cardColors(Dark_01)
-                    } else {
-                        CardDefaults.cardColors(
-                            containerColor = White,
-                            contentColor = White,
-                            disabledContentColor = White,
-                            disabledContainerColor = White
-                        )
-                    },
-                    border = selectedBorder,
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .wrapContentHeight()
-                            .fillMaxWidth()
-                            .background(Color.Unspecified)
-                    ) {
-                        Image(
-                            painter = interData.image,
-                            contentDescription = "logo",
-                            modifier = Modifier
-                                .wrapContentHeight()
-                                .fillMaxWidth()
-                                .background(Color.Unspecified),
-                            contentScale = ContentScale.Crop
-                        )
-
-                        Image(
-                            painter = painterResource(R.drawable.okay_check_img),
-                            contentDescription = "logo",
-                            modifier = Modifier
-                                .height(75.dp)
-                                .fillMaxWidth()
-                                .background(Color.Unspecified)
-                                .align(Alignment.BottomCenter),
-                        )
-                    }
-                }
-
+            Card(
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 8.dp)
+                    .wrapContentHeight(),
+                colors = if (isSystemInDarkTheme()) {
+                    CardDefaults.cardColors(Dark_02)
+                } else {
+                    CardDefaults.cardColors(
+                        containerColor = White,
+                        contentColor = White,
+                        disabledContentColor = White,
+                        disabledContainerColor = White
+                    )
+                },
+                border = selectedBorder
+            ) {
                 Column(
                     modifier = Modifier.padding(
                         start = 5.dp, end = 5.dp, top = 5.dp, bottom = 5.dp
                     ), horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = interData.name,
+                    Row(
                         modifier = Modifier
-                            .wrapContentWidth()
-                            .padding(start = 8.dp, end = 8.dp),
-                        fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp,
-                        color = if (isSystemInDarkTheme()) {
-                            DARK_TITLE_TEXT
-                        } else {
-                            Black
-                        },
-                        textAlign = TextAlign.Center
-                    )
+                            .padding(horizontal = 5.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Card(
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier
+                                .width(90.dp)
+                                .height(110.dp),
+                            colors = if (isSystemInDarkTheme()) {
+                                CardDefaults.cardColors(Dark_01)
+                            } else {
+                                CardDefaults.cardColors(
+                                    containerColor = White,
+                                    contentColor = White,
+                                    disabledContentColor = White,
+                                    disabledContainerColor = White
+                                )
+                            }
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .wrapContentHeight()
+                                    .fillMaxWidth()
+                                    .background(Color.Unspecified)
+                            ) {
+                                Image(
+                                    painter = interData.image,
+                                    contentDescription = "logo",
+                                    modifier = Modifier
+                                        .wrapContentHeight()
+                                        .fillMaxWidth()
+                                        .background(Color.Unspecified),
+                                    contentScale = ContentScale.Crop
+                                )
 
-                    Text(
-                        text = interData.grade,
-                        modifier = Modifier
-                            .wrapContentWidth()
-                            .padding(start = 8.dp, end = 8.dp),
-                        fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp,
-                        color = if (isSystemInDarkTheme()) {
-                            DARK_TITLE_TEXT
-                        } else {
-                            Black
-                        },
-                        textAlign = TextAlign.Center
-                    )
+                                Image(
+                                    painter = painterResource(R.drawable.okay_check_img),
+                                    contentDescription = "logo",
+                                    modifier = Modifier
+                                        .height(50.dp)
+                                        .fillMaxWidth()
+                                        .background(Color.Unspecified)
+                                        .align(Alignment.BottomCenter),
+                                )
+                            }
+                        }
+
+                        Column(
+                            modifier = Modifier
+                                .padding(
+                                    start = 5.dp, end = 5.dp, top = 5.dp, bottom = 5.dp
+                                )
+                                .weight(1f), horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = interData.name,
+                                modifier = Modifier
+                                    .wrapContentWidth()
+                                    .padding(start = 8.dp, end = 8.dp),
+                                fontStyle = FontStyle.Normal,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                color = if (isSystemInDarkTheme()) {
+                                    DARK_TITLE_TEXT
+                                } else {
+                                    Black
+                                },
+                                textAlign = TextAlign.Start
+                            )
+
+                            Text(
+                                text = interData.grade,
+                                modifier = Modifier
+                                    .wrapContentWidth()
+                                    .padding(start = 8.dp, end = 8.dp),
+                                fontStyle = FontStyle.Normal,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 12.sp,
+                                color = if (isSystemInDarkTheme()) {
+                                    DARK_TITLE_TEXT
+                                } else {
+                                    Black
+                                },
+                                textAlign = TextAlign.Start
+                            )
+                        }
+                    }
                 }
             }
 
-            Row(modifier = Modifier.padding(horizontal = 8.dp)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        if (isSystemInDarkTheme()) {
+                            Dark_01
+                        } else {
+                            White
+                        }
+                    ),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
                     text = interData.interventionStatus,
                     modifier = Modifier
                         .wrapContentWidth()
                         .padding(start = 8.dp, end = 8.dp),
                     fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 12.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_TITLE_TEXT
                     } else {
                         Black
                     },
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Start
                 )
 
                 Image(
                     painter = painterResource(R.drawable.okay_check_img),
                     contentDescription = "logo",
                     modifier = Modifier
-                        .height(75.dp)
-                        .fillMaxWidth()
+                        .size(50.dp)
                         .background(Color.Unspecified)
                 )
             }
