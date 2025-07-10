@@ -1,8 +1,10 @@
 package com.pi.ProjectInclusion.android.common_UI
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -33,22 +35,28 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -67,6 +75,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
@@ -106,6 +115,7 @@ import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 fun BackButtonPress(navController: NavHostController, route: String) {
     navController.popBackStack()
@@ -128,6 +138,101 @@ fun SurfaceLine() {
         // Empty surface to create a line
     }
 }
+
+@SuppressLint("SuspiciousIndentation")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ChooseOneBottomSheet(onCallClick: () -> Unit = {},
+                         onWhatsappClick: () -> Unit = {}, onDismiss: () -> Unit) {
+    val sheetState = rememberModalBottomSheetState()
+               ModalBottomSheet(
+                onDismissRequest = {
+                    onDismiss()
+                },
+                sheetState = sheetState
+            ) {
+                // Sheet content
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 15.dp, end = 15.dp, bottom = 20.dp)
+                ) {
+
+                    Text(
+                        stringResource(R.string.choose_an_option),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 10.dp, start = 10.dp),
+                        fontSize = 14.sp,
+                        fontFamily = fontRegular,
+                        color = Gray,
+                        textAlign = TextAlign.Start
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 5.dp, bottom = 20.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Card(
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier
+                                .wrapContentHeight()
+                                .padding(horizontal = 10.dp)
+                                .weight(1f)
+                                .clickable { onCallClick() },
+                            colors = if (isSystemInDarkTheme()) {
+                                CardDefaults.cardColors(Dark_01)
+                            } else {
+                                CardDefaults.cardColors(
+                                    containerColor = com.pi.ProjectInclusion.White,
+                                    contentColor = com.pi.ProjectInclusion.White,
+                                    disabledContentColor = com.pi.ProjectInclusion.White,
+                                    disabledContainerColor = com.pi.ProjectInclusion.White
+                                )
+                            },
+                            border = BorderStroke(1.dp, color = GrayLight01)
+                        ) {
+                            TextWithIconOnLeft(text = stringResource(R.string.txt_OTP_call),
+                                icon = ImageVector.vectorResource(id = R.drawable.ic_otp_on_call),
+                                textColor = Black,
+                                iconColor = Color.Unspecified,
+                                modifier = Modifier.padding(10.dp),
+                                onClick = {onCallClick()})
+                        }
+                        Card(
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier
+                                .wrapContentHeight()
+                                .clickable{onWhatsappClick()}
+                                .padding(end = 10.dp)
+                                .weight(1f),
+                            colors = if (isSystemInDarkTheme()) {
+                                CardDefaults.cardColors(Dark_01)
+                            } else {
+                                CardDefaults.cardColors(
+                                    containerColor = com.pi.ProjectInclusion.White,
+                                    contentColor = com.pi.ProjectInclusion.White,
+                                    disabledContentColor = com.pi.ProjectInclusion.White,
+                                    disabledContainerColor = com.pi.ProjectInclusion.White
+                                )
+                            },
+                            border = BorderStroke(1.dp, color = GrayLight01)
+                        ) {
+                            TextWithIconOnLeft(text = stringResource(R.string.txt_otp_whatsapp),
+                                icon = ImageVector.vectorResource(id = R.drawable.ic_whatsapp_otp),
+                                textColor = Black,
+                                iconColor = Color.Unspecified,
+                                modifier = Modifier.padding(10.dp),
+                                onClick = {
+                                    onWhatsappClick()
+                                })
+                        }
+                    }
+                }
+            }
+        }
 
 @Composable
 fun DefaultBackgroundUi(
@@ -272,6 +377,34 @@ fun MobileTextField(
             disabledContainerColor = GrayLight03
         )
     )
+}
+
+@Preview
+@Composable
+fun OTPBtnUi(
+    title: String = "Continue", onClick: () -> Unit = {}
+) {
+    Button(
+        onClick = onClick, modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp)),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = White,
+            contentColor = PrimaryBlue
+        ),
+        border =  BorderStroke(1.dp, color = PrimaryBlue)
+    ) {
+        Text(
+            title,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp, top = 8.dp),
+            fontSize = 16.sp,
+            color = PrimaryBlue,
+            textAlign = TextAlign.Center
+        )
+    }
 }
 
 @Preview

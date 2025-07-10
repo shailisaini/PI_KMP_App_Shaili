@@ -20,6 +20,7 @@
     <string name="f_name_ex">eg: Singh</string>
     <string name="student_class">Class</string>
     <string name="choose_option">Select an option</string>
+    <string name="choose_an_option">Choose an option</string>
     <string name="string_next">Next</string>
     <string name="f_occupation">Father’s profession*</string>
     <string name="m_name">Mother\'s Name</string>
@@ -101,5 +102,8 @@ and make a difference together!</string>
     <string name="txt_Intervention_Introduction_Details">The Intervention Phase focuses on providing targeted strategies and support based on the concerns identified during screening. This phase includes personalised plans and activities tailored to the child’s unique needs, aiming to enhance their learning outcomes, participation, and overall development in an inclusive setting.The guide appears only once when the user clicks on the Screening navigation for the first time.</string>
     <string name="txt_password">Password</string>
     <string name="txt_or">or</string>
+    <string name="txt_login">Login</string>
+    <string name="txt_login_otp">Login via OTP</string>
+    <string name="txt_otp_whatsapp">OTP on Whatsapp</string>
     <string name="txt_Profiler">Profiler</string>
 </resources>
