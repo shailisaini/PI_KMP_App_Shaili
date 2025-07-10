@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.ClickableText
@@ -99,12 +100,32 @@ import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.utils.fontMedium
+import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import kotlinx.coroutines.delay
 
 fun BackButtonPress(navController: NavHostController, route: String) {
     navController.popBackStack()
     navController.navigate(route)
+}
+
+@Composable
+fun SurfaceLine() {
+        Surface(
+            modifier = Modifier
+                .height(1.dp)
+                .width(50.dp)
+            ,
+            shape = RoundedCornerShape(corner = CornerSize(4.dp)),
+            color = if (isSystemInDarkTheme()) {
+                DARK_BODY_TEXT
+            } else {
+                GrayLight02
+            }
+        ) {
+            // Empty surface to create a line
+        }
 }
 
 @Composable
@@ -372,45 +393,64 @@ fun TermsAndPrivacyText(
     onTermsClick: () -> Unit,
     onPrivacyClick: () -> Unit
 ) {
-    val annotatedText = buildAnnotatedString {
-        append("By continue, you agree to our ")
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        val annotatedText = buildAnnotatedString {
+            append("By continue, you agree to our ")
 
-        // Terms of Service
-        pushStringAnnotation(tag = "TERMS", annotation = "terms")
-        withStyle(style = SpanStyle(color = Gray, fontWeight = FontWeight.Medium)) {
-            append("Terms of Service")
+            // Terms of Service
+            pushStringAnnotation(tag = "TERMS", annotation = "terms")
+            withStyle(
+                style = SpanStyle(
+                    color = PrimaryBlue,
+                    fontSize = 12.sp,
+                    fontFamily = fontRegular
+                )
+            ) {
+                append("Terms of Service")
+            }
+            pop()
+
+            append(" and ")
+
+            // Privacy Policy
+            pushStringAnnotation(tag = "PRIVACY", annotation = "privacy")
+            withStyle(
+                style = SpanStyle(
+                    color = PrimaryBlue,
+                    fontFamily = fontRegular
+                )
+            ) {
+                append("Privacy Policy")
+            }
+            pop()
+
+            append(".")
         }
-        pop()
 
-        append(" and ")
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            ClickableText(
+                text = annotatedText,
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    color = Gray,
+                    textAlign = TextAlign.Center,
+                    fontFamily = fontRegular
+                ),
+                onClick = { offset ->
+                    annotatedText.getStringAnnotations("TERMS", offset, offset)
+                        .firstOrNull()?.let { onTermsClick() }
 
-        // Privacy Policy
-        pushStringAnnotation(tag = "PRIVACY", annotation = "privacy")
-        withStyle(style = SpanStyle(color = Color.Blue, fontWeight = FontWeight.Medium)) {
-            append("Privacy Policy")
+                    annotatedText.getStringAnnotations("PRIVACY", offset, offset)
+                        .firstOrNull()?.let { onPrivacyClick() }
+                }
+            )
         }
-        pop()
-
-        append(".")
     }
-
-    ClickableText(
-        text = annotatedText,
-        style = TextStyle(
-            fontSize = 14.sp,
-            color = Color.Gray // base color for normal text
-        ),
-        onClick = { offset ->
-            annotatedText.getStringAnnotations(tag = "TERMS", start = offset, end = offset)
-                .firstOrNull()?.let { onTermsClick() }
-
-            annotatedText.getStringAnnotations(tag = "PRIVACY", start = offset, end = offset)
-                .firstOrNull()?.let { onPrivacyClick() }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(12.dp)
-    )
 }
 
 @Composable
@@ -553,7 +593,11 @@ fun PasswordTextField(
 ) {
     TextField(
         value = password.value,
-        onValueChange = { password.value = it },
+        onValueChange = {
+            if (it.length <= 15) {
+                password.value = it
+            }
+                        },
         shape = RoundedCornerShape(8.dp),
         singleLine = true,
         modifier = modifier

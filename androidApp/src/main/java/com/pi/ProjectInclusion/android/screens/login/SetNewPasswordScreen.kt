@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Bg_Gray
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
@@ -53,9 +54,9 @@ import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewModel) {
 
     val context = LocalContext.current
-    var enterPasswordStr = rememberSaveable { mutableStateOf("") }
-    var enterConfirmPasswordStr = rememberSaveable { mutableStateOf("") }
-    val enterPassword = stringResource(R.string.txt_Enter_your_password)
+        var enterPasswordStr = rememberSaveable { mutableStateOf("") }
+        var enterConfirmPasswordStr = rememberSaveable { mutableStateOf("") }
+        val enterPassword = stringResource(R.string.txt_Enter_your_password)
     val enterConfirmPassword = stringResource(R.string.txt_Confirm_your_password)
     val txtContinue = stringResource(R.string.txt_Update)
     var showError by remember { mutableStateOf(false) }
@@ -72,6 +73,8 @@ fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewM
     var isCheckedUppercase by remember { mutableStateOf(false) }
     var isCheckedAtleastOne by remember { mutableStateOf(false) }
     var isCheckedSpecialCharacter by remember { mutableStateOf(false) }
+
+    LoggerProvider.logger.d("Screen: " + "SetNewPasswordScreen()")
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
         navController.popBackStack()
