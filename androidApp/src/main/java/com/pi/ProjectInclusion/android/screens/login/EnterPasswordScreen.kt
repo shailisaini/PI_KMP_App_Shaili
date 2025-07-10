@@ -143,15 +143,14 @@ fun PasswordUI(
     var isDialogVisible by remember { mutableStateOf(false) }
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
     val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
-    val invalidMobNo = stringResource(id = R.string.text_enter_no)
+    val invalidMobNo = stringResource(id = R.string.txt_Please_enter_password_)
 //  languageData[LanguageTranslationsResponse.KEY_INVALID_MOBILE_NO_ERROR].toString()
     val txtContinue = stringResource(id = R.string.text_continue)
     val tvPassword = stringResource(id = R.string.txt_password)
     val forgotPassword = stringResource(id = R.string.txt_Forgot_Password_q)
 
-    var mobNo = rememberSaveable { mutableStateOf("") }
+    var passwordText = rememberSaveable { mutableStateOf("") }
     val enterMobile = stringResource(R.string.txt_enter_mobile_no_)
-    var showError by remember { mutableStateOf(false) }
     var inValidMobNo by remember { mutableStateOf(false) }
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
@@ -225,17 +224,13 @@ fun PasswordUI(
                         )
                         Spacer(modifier = Modifier.height(15.dp))
                         BtnUi(
-                            enabled = mobNo.value.length >= 10,
+                            enabled = passwordText.value.length >= 10,
                             title = txtContinue,
                             onClick = {
-                                if (mobNo.value.isEmpty()) {
-                                    /* scope.launch {
-                                         isBottomSheetVisible = true
-                                         sheetState.expand()
-                                     }*/
-                                    context.toast("Please enter mobile number.")
-                                    navController.navigate(AppRoute.OtpSendVerifyUI.route)
+                                if (passwordText.value.isEmpty()) {
 
+                                    context.toast(invalidMobNo)
+                                    inValidMobNo = true
                                     /*context.startActivity(
                                         Intent(
                                             context, ChangePasswordActivity::class.java
@@ -243,18 +238,11 @@ fun PasswordUI(
                                             putExtra("", "")
                                         })*/
                                 } else {
-                                    showError = mobNo.value.isEmpty()
-                                    val firstDigitChar = mobNo.value.toString().first()
-                                    val firstDigit = firstDigitChar.digitToInt()
-                                    if (showError || mobNo.value.length < 10) {
+                                    if (passwordText.value.length < 6) {
                                         inValidMobNo = true
                                     } else { // if first digit of mobile is less than 6 then error will show
-                                        if (firstDigit < 6) {
-                                            inValidMobNo = true
-                                        } else {
-                                            isDialogVisible = true
-
-                                        }
+                                        isDialogVisible = true
+                                        navController.navigate(AppRoute.OtpSendVerifyUI.route)
                                     }
                                 }
                             },
