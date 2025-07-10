@@ -105,4 +105,5 @@ and make a difference together!</string>
     <string name="txt_login">Login</string>
     <string name="txt_login_otp">Login via OTP</string>
     <string name="txt_otp_whatsapp">OTP on Whatsapp</string>
+    <string name="txt_Profiler">Profiler</string>
 </resources>
