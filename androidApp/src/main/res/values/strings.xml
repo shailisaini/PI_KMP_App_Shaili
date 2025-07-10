@@ -101,4 +101,5 @@ and make a difference together!</string>
     <string name="txt_Intervention_Introduction_Details">The Intervention Phase focuses on providing targeted strategies and support based on the concerns identified during screening. This phase includes personalised plans and activities tailored to the child’s unique needs, aiming to enhance their learning outcomes, participation, and overall development in an inclusive setting.The guide appears only once when the user clicks on the Screening navigation for the first time.</string>
     <string name="txt_password">Password</string>
     <string name="txt_or">or</string>
+    <string name="txt_Profiler">Profiler</string>
 </resources>

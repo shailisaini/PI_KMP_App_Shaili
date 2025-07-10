@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -83,6 +84,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.pi.ProjectInclusion.BannerColor03
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
@@ -96,11 +98,11 @@ import com.pi.ProjectInclusion.GrayLight01
 import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.GrayLight03
 import com.pi.ProjectInclusion.LightBlue
+import com.pi.ProjectInclusion.LightGreen06
 import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.android.R
-import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import kotlinx.coroutines.delay
@@ -112,20 +114,19 @@ fun BackButtonPress(navController: NavHostController, route: String) {
 
 @Composable
 fun SurfaceLine() {
-        Surface(
-            modifier = Modifier
-                .height(1.dp)
-                .width(50.dp)
-            ,
-            shape = RoundedCornerShape(corner = CornerSize(4.dp)),
-            color = if (isSystemInDarkTheme()) {
-                DARK_BODY_TEXT
-            } else {
-                GrayLight02
-            }
-        ) {
-            // Empty surface to create a line
+    Surface(
+        modifier = Modifier
+            .height(1.dp)
+            .width(50.dp),
+        shape = RoundedCornerShape(corner = CornerSize(4.dp)),
+        color = if (isSystemInDarkTheme()) {
+            DARK_BODY_TEXT
+        } else {
+            GrayLight02
         }
+    ) {
+        // Empty surface to create a line
+    }
 }
 
 @Composable
@@ -391,7 +392,7 @@ fun OtpInputField(
 @Composable
 fun TermsAndPrivacyText(
     onTermsClick: () -> Unit,
-    onPrivacyClick: () -> Unit
+    onPrivacyClick: () -> Unit,
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         val annotatedText = buildAnnotatedString {
@@ -597,7 +598,7 @@ fun PasswordTextField(
             if (it.length <= 15) {
                 password.value = it
             }
-                        },
+        },
         shape = RoundedCornerShape(8.dp),
         singleLine = true,
         modifier = modifier
@@ -768,5 +769,38 @@ fun CustomProgressBar(
             fontSize = 12.sp,
             color = color,
         )
+    }
+}
+
+@Composable
+fun CustomHorizontalProgressBar(progressBar: Float) {
+    val progress by remember { mutableStateOf(progressBar) } // Example progress value
+    Column(
+        modifier = Modifier
+            .wrapContentSize()
+            .padding(bottom = 16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .height(4.dp)
+                .fillMaxWidth(fraction = 1f)
+                .clip(RoundedCornerShape(50))
+                .background(
+                    if (isSystemInDarkTheme()) {
+                        Dark_03
+                    } else {
+                        BannerColor03
+                    }
+                )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(fraction = progress)
+                    .background(LightGreen06)
+            )
+        }
     }
 }

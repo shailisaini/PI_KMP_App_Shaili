@@ -12,11 +12,13 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 val Transparent = Color(0x00000000)
+val SemiTransparent = Color(0xAA000000)
 
 
 val PrimaryBlue = Color(0xFF2C3EA2) // #2C3EA2
 val PrimaryBlue1 = Color(0xFF75CDFA)
 val PrimaryBlue2 = Color(0xFFDFF4FF)
+val PrimaryBlue3 = Color(0xFFF0F9FF) //#F0F9FF
 val PrimaryBlueLt = Color(0xFFF2FBFF)
 val DarkBlue = Color(0xFF101942) //#101942
 val LightBlue = Color(0xFF5E72E7) //#5E72E7
@@ -47,6 +49,7 @@ val LightGreen02 = Color(0xFFACE9B4)
 val LightGreen03 = Color(0xFFDEFFE2)
 val LightGreen04 = Color(0xFFF5F9FE)
 val LightGreen05 = Color(0xFFECFAED)
+val LightGreen06 = Color(0xFF56A42F) // #56A42F
 
 val Yellow = Color(0xFFFFDD00) // #FFDD00
 val LightYellow = Color(0xFFFBDE9D)
@@ -68,6 +71,7 @@ val LightRed02 = Color(0xFFFEECEB)
 val BannerColor00 = Color(0xFFF6E4D0)
 val BannerColor01 = Color(0xFFFAD6AE)
 val BannerColor02 = Color(0xFFFAB364)
+val BannerColor03 = Color(0xFFEFF0F5) //#EFF0F5
 
 
 val contactUsTxt = Color(0xFF1B244D)

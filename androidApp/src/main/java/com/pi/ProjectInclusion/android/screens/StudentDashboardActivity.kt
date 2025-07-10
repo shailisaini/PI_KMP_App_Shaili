@@ -87,6 +87,7 @@ import com.pi.ProjectInclusion.android.screens.addStudentRegisterScreen.AddStude
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.AddStudentScreeningScreen
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.DashboardScreen
 import com.pi.ProjectInclusion.android.screens.interventionScreens.InterventionHomeScreen
+import com.pi.ProjectInclusion.android.screens.interventionScreens.InterventionStudentDetailsScreen
 import com.pi.ProjectInclusion.android.screens.menu.AppBar
 import com.pi.ProjectInclusion.android.screens.menu.BottomNavigationBar
 import com.pi.ProjectInclusion.android.screens.menu.DrawerBody
@@ -267,6 +268,10 @@ class StudentDashboardActivity : ComponentActivity() {
 
                                 composable(AppRoute.InterventionScreen.route) {
                                     InterventionHomeScreen(navController)
+                                }
+
+                                composable(AppRoute.InterventionStudentDetails.route) {
+                                    InterventionStudentDetailsScreen(navController)
                                 }
                             }
                         }
