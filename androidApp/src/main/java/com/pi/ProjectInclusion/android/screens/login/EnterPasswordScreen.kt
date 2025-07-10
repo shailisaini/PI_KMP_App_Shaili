@@ -7,6 +7,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,11 +29,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,15 +44,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Bg_Gray1
+import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.LightRed01
+import com.pi.ProjectInclusion.PrimaryBlue
+import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
-import com.pi.ProjectInclusion.android.common_UI.MobileTextField
-import com.pi.ProjectInclusion.android.common_UI.TermsAndPrivacyText
+import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
+import com.pi.ProjectInclusion.android.common_UI.SurfaceLine
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.toast
@@ -60,7 +66,7 @@ import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 
 @Composable
-fun EnterUserNameScreen(navController: NavHostController, viewModel: LoginViewModel) {
+fun EnterPasswordScreen(navController: NavHostController, viewModel: LoginViewModel) {
     var isDialogVisible by remember { mutableStateOf(false) }
     val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
 
@@ -113,31 +119,35 @@ fun EnterUserNameScreen(navController: NavHostController, viewModel: LoginViewMo
                 .background(color = Bg_Gray1),
             verticalArrangement = Arrangement.Top
         ) {
-            LoginUI(context, navController)
+            PasswordUI(context, navController)
         }
     }
 }
 
 @Composable
-fun LoginUI(
+fun PasswordUI(
     context: Context,
     navController: NavHostController
 ) {
-    val colors = MaterialTheme.colorScheme
     val scrollState = rememberLazyGridState()
     val coroutineScope = rememberCoroutineScope()
     val isInternetAvailable by remember { mutableStateOf(true) }
     var isApiResponded by remember { mutableStateOf(false) }
     val internetMessage by remember { mutableStateOf("") }
 
+    var enterPasswordStr = rememberSaveable { mutableStateOf("") }
+    var enterConfirmPasswordStr = rememberSaveable { mutableStateOf("") }
+    val enterPassword = stringResource(R.string.txt_Enter_your_password)
+    val showPassword = remember { mutableStateOf(false) }
+
     var isDialogVisible by remember { mutableStateOf(false) }
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
-
     val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
     val invalidMobNo = stringResource(id = R.string.text_enter_no)
 //  languageData[LanguageTranslationsResponse.KEY_INVALID_MOBILE_NO_ERROR].toString()
     val txtContinue = stringResource(id = R.string.text_continue)
-    val tvMobNo = stringResource(id = R.string.text_mobile_no_user)
+    val tvPassword = stringResource(id = R.string.txt_password)
+    val forgotPassword = stringResource(id = R.string.txt_Forgot_Password_q)
 
     var mobNo = rememberSaveable { mutableStateOf("") }
     val enterMobile = stringResource(R.string.txt_enter_mobile_no_)
@@ -167,13 +177,12 @@ fun LoginUI(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 8.dp, vertical = 8.dp),
                 ) {
                     Spacer(modifier = Modifier.height(10.dp))
 
                     Text(
-                        tvMobNo,
-                        modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),
+                        tvPassword,
+                        modifier = Modifier.padding(vertical = 10.dp, horizontal = 8.dp),
                         fontFamily = fontMedium,
                         fontSize = 14.sp,
                         color = if (isSystemInDarkTheme()) {
@@ -183,62 +192,94 @@ fun LoginUI(
                         }
                     )
 
-                    MobileTextField(
-                        colors = colors,
-                        number = mobNo,
-                        trueFalse = true,
-                        hint = enterMobile.toString()
+                    PasswordTextField(
+                        password = enterPasswordStr,
+                        showPassword = showPassword,
+                        hint = enterPassword
                     )
 
                     if (inValidMobNo) {
                         Text(
                             invalidMobNo.toString(),
                             color = LightRed01,
-                            modifier = Modifier.padding(5.dp),
+                            modifier = Modifier.padding(horizontal = 10.dp),
                             fontSize = 10.sp
                         )
                     }
-
-                    Spacer(modifier = Modifier.height(15.dp))
-                    BtnUi(
-                        enabled = mobNo.value.length >= 10,
-                        title = txtContinue,
-                        onClick = {
-                            if (mobNo.value.isEmpty()) {
-                                inValidMobNo = true
-                            } else {
-                                if (showError || mobNo.value.length < 10) {
-                                    inValidMobNo = true
-                                } else { // if first digit of mobile is less than 6 then error will show
-                                    showError = mobNo.value.isEmpty()
-                                    val firstDigitChar = mobNo.value.toString().first()
-                                    val firstDigit = firstDigitChar.digitToInt()
-                                    if (firstDigit < 6) {
-                                        inValidMobNo = true
-                                    } else {
-                                        isDialogVisible = true
-                                        navController.popBackStack()
-                                        navController.navigate(AppRoute.UserPasswordScreen.route)
-
-                                    }
-                                }
-                            }
-                        },
-                    )
 
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
                             .weight(1f)
-                            .padding(horizontal = 8.dp, vertical = 8.dp),
-                        verticalArrangement = Arrangement.Bottom
+                            .padding(8.dp)
                     ) {
-                        TermsAndPrivacyText(
-                            onTermsClick = {
-
-                            },
-                            onPrivacyClick = { }
+                        Text(
+                            forgotPassword,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(5.dp),
+                            fontFamily = fontMedium,
+                            fontSize = 14.sp,
+                            color = PrimaryBlue,
+                            textAlign = TextAlign.End
                         )
+                        Spacer(modifier = Modifier.height(15.dp))
+                        BtnUi(
+                            enabled = mobNo.value.length >= 10,
+                            title = txtContinue,
+                            onClick = {
+                                if (mobNo.value.isEmpty()) {
+                                    /* scope.launch {
+                                         isBottomSheetVisible = true
+                                         sheetState.expand()
+                                     }*/
+                                    context.toast("Please enter mobile number.")
+                                    navController.navigate(AppRoute.OtpSendVerifyUI.route)
+
+                                    /*context.startActivity(
+                                        Intent(
+                                            context, ChangePasswordActivity::class.java
+                                        ).apply {
+                                            putExtra("", "")
+                                        })*/
+                                } else {
+                                    showError = mobNo.value.isEmpty()
+                                    val firstDigitChar = mobNo.value.toString().first()
+                                    val firstDigit = firstDigitChar.digitToInt()
+                                    if (showError || mobNo.value.length < 10) {
+                                        inValidMobNo = true
+                                    } else { // if first digit of mobile is less than 6 then error will show
+                                        if (firstDigit < 6) {
+                                            inValidMobNo = true
+                                        } else {
+                                            isDialogVisible = true
+
+                                        }
+                                    }
+                                }
+                            },
+                        )
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 10.dp),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            SurfaceLine()
+                            Text(
+                                modifier = Modifier.padding(horizontal = 15.dp),
+                                text = stringResource(R.string.txt_or),
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    color = Gray,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    textAlign = TextAlign.Start
+                                )
+                            )
+                            SurfaceLine()
+                        }
                     }
                 }
             }
@@ -249,8 +290,8 @@ fun LoginUI(
 
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
-fun LoginScreen() {
+fun LoginPassScreen() {
     val navController = rememberNavController()
     val context = LocalContext.current
-    LoginUI(context, navController)
+    PasswordUI(context, navController)
 }

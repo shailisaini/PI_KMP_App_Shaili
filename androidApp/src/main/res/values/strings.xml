@@ -64,6 +64,7 @@ and make a difference together!</string>
     <string name="txt_Send_OTP">Send OTP</string>
     <string name="txt_Enter_valid_mobile_number">Enter valid mobile number</string>
     <string name="txt_Forgot_Password">Forgot Password</string>
+    <string name="txt_Forgot_Password_q">Forgot Password?</string>
     <string name="txt_enter_mobile_number_receive_OTP">Please enter your mobile number to receive OTP for reset password.</string>
     <string name="txt_Mobile_Number">Mobile Number</string>
     <string name="txt_OTP_Sent">OTP Sent</string>
@@ -96,4 +97,6 @@ and make a difference together!</string>
     <string name="txt_Pending_1">Pending (01)</string>
     <string name="txt_In_progress_1">In-progress (01)</string>
     <string name="txt_Completed">Completed</string>
+    <string name="txt_password">Password</string>
+    <string name="txt_or">or</string>
 </resources>
