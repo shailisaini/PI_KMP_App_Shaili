@@ -29,7 +29,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -44,7 +43,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Bg_Gray1
-import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.LightRed01
@@ -53,7 +51,9 @@ import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
+import com.pi.ProjectInclusion.android.common_UI.ChooseOneBottomSheet
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
+import com.pi.ProjectInclusion.android.common_UI.OTPBtnUi
 import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
 import com.pi.ProjectInclusion.android.common_UI.SurfaceLine
 import com.pi.ProjectInclusion.android.navigation.AppRoute
@@ -72,6 +72,7 @@ fun EnterPasswordScreen(navController: NavHostController, viewModel: LoginViewMo
 
     val context = LocalContext.current
     val userType = remember { mutableStateListOf<GetUserTypeResponse.Data>() }
+
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
@@ -134,7 +135,7 @@ fun PasswordUI(
     val isInternetAvailable by remember { mutableStateOf(true) }
     var isApiResponded by remember { mutableStateOf(false) }
     val internetMessage by remember { mutableStateOf("") }
-
+    var showBottomSheet by remember { mutableStateOf(false) }
     var enterPasswordStr = rememberSaveable { mutableStateOf("") }
     var enterConfirmPasswordStr = rememberSaveable { mutableStateOf("") }
     val enterPassword = stringResource(R.string.txt_Enter_your_password)
@@ -145,13 +146,27 @@ fun PasswordUI(
     val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
     val invalidMobNo = stringResource(id = R.string.txt_Please_enter_password_)
 //  languageData[LanguageTranslationsResponse.KEY_INVALID_MOBILE_NO_ERROR].toString()
-    val txtContinue = stringResource(id = R.string.text_continue)
+    val txtContinue = stringResource(id = R.string.txt_login)
     val tvPassword = stringResource(id = R.string.txt_password)
     val forgotPassword = stringResource(id = R.string.txt_Forgot_Password_q)
 
     var passwordText = rememberSaveable { mutableStateOf("") }
     val enterMobile = stringResource(R.string.txt_enter_mobile_no_)
     var inValidMobNo by remember { mutableStateOf(false) }
+
+    if (showBottomSheet) {
+        ChooseOneBottomSheet(
+            onCallClick = {
+                navController.popBackStack()
+                navController.navigate(AppRoute.OtpSendVerifyUI.route)
+            }, onWhatsappClick = {
+                navController.popBackStack()
+                navController.navigate(AppRoute.OtpSendVerifyUI.route)
+            },
+            onDismiss = {
+                showBottomSheet = false
+            })
+    }
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
         BackButtonPress(navController, AppRoute.UserTypeSelect.route)
@@ -228,8 +243,6 @@ fun PasswordUI(
                             title = txtContinue,
                             onClick = {
                                 if (passwordText.value.isEmpty()) {
-
-                                    context.toast(invalidMobNo)
                                     inValidMobNo = true
                                     /*context.startActivity(
                                         Intent(
@@ -268,6 +281,12 @@ fun PasswordUI(
                             )
                             SurfaceLine()
                         }
+                        OTPBtnUi(
+                            title = stringResource(R.string.txt_login_otp),
+                            onClick = {
+                                showBottomSheet = true
+
+                            })
                     }
                 }
             }
