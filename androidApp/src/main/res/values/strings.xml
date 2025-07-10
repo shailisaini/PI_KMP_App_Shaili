@@ -96,4 +96,6 @@ and make a difference together!</string>
     <string name="txt_Pending_1">Pending (01)</string>
     <string name="txt_In_progress_1">In-progress (01)</string>
     <string name="txt_Completed">Completed</string>
+    <string name="txt_Intervention_Introduction">Intervention  - Introduction</string>
+    <string name="txt_Intervention_Introduction_Details">The Intervention Phase focuses on providing targeted strategies and support based on the concerns identified during screening. This phase includes personalised plans and activities tailored to the child’s unique needs, aiming to enhance their learning outcomes, participation, and overall development in an inclusive setting.The guide appears only once when the user clicks on the Screening navigation for the first time.</string>
 </resources>

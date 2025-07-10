@@ -48,7 +48,7 @@ val LightGreen03 = Color(0xFFDEFFE2)
 val LightGreen04 = Color(0xFFF5F9FE)
 val LightGreen05 = Color(0xFFECFAED)
 
-val Yellow = Color(0xFFFEB51B)
+val Yellow = Color(0xFFFFDD00) // #FFDD00
 val LightYellow = Color(0xFFFBDE9D)
 val LightYellow02 = Color(0xFFFFFBF3)
 val LightYellow03 = Color(0xFFFCF6EC)
