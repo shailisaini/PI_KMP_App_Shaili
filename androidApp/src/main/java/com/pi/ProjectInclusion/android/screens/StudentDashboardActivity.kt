@@ -230,7 +230,8 @@ class StudentDashboardActivity : ComponentActivity() {
                                     )
                                 }
                             }
-                        }, topBar = {
+                        },
+                            topBar = {
                             if (currentDestination == AppRoute.DashboardScreen.route) {
                                 AppBar(
                                      onNavigationIconClick = {
@@ -239,7 +240,8 @@ class StudentDashboardActivity : ComponentActivity() {
                                 )
                             }
 
-                        }, content = {
+                        },
+                            content = {
                         innerPadding ->
                             Column(
                                 modifier = Modifier

@@ -64,34 +64,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Blue
-import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
-
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
-import coil.compose.rememberAsyncImagePainter
-import coil.decode.SvgDecoder
-import coil.request.ImageRequest
-import coil.size.Size
+
 
 import com.example.kmptemplate.logger.AppLoggerImpl
 import com.pi.ProjectInclusion.Black
@@ -139,17 +117,12 @@ fun ViewProfileScreen(navHostController: NavHostController) {
             // Handle exception
         }
     }
-
-
-
-
     Surface(
         modifier = Modifier.wrapContentSize()
             .background(
                 color = Transparent
             )
             .padding(0.dp, 115.dp),
-
 
         ) {
         Box(
@@ -165,7 +138,6 @@ fun ViewProfileScreen(navHostController: NavHostController) {
                 horizontalAlignment = Alignment.CenterHorizontally // Center rows inside the column
             )
             {
-
 
             }
         }

@@ -21,6 +21,7 @@
     <string name="student_class">Class</string>
     <string name="choose_option">Select an option</string>
     <string name="string_next">Next</string>
+    <string name="string_addphoto">Add Photo</string>
     <string name="f_occupation">Father’s profession*</string>
     <string name="m_name">Mother\'s Name</string>
     <string name="m_name_ex">eg: Sita</string>
