@@ -217,8 +217,8 @@ fun LoginUI(
                                         inValidMobNo = true
                                     } else {
                                         isDialogVisible = true
-                                        navController.popBackStack()
-                                        navController.navigate(AppRoute.UserPasswordScreen.route)
+                                        /*navController.popBackStack()
+                                        navController.navigate(AppRoute.UserPasswordScreen.route)*/
 
                                     }
                                 }
