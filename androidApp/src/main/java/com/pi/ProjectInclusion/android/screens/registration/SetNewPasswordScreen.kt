@@ -49,14 +49,15 @@ import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
+import okhttp3.Route
 
 @Composable
 fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewModel) {
 
     val context = LocalContext.current
-        var enterPasswordStr = rememberSaveable { mutableStateOf("") }
-        var enterConfirmPasswordStr = rememberSaveable { mutableStateOf("") }
-        val enterPassword = stringResource(R.string.txt_Enter_your_password)
+    var enterPasswordStr = rememberSaveable { mutableStateOf("") }
+    var enterConfirmPasswordStr = rememberSaveable { mutableStateOf("") }
+    val enterPassword = stringResource(R.string.txt_Enter_your_password)
     val enterConfirmPassword = stringResource(R.string.txt_Confirm_your_password)
     val txtContinue = stringResource(R.string.txt_Update)
     var showError by remember { mutableStateOf(false) }
@@ -382,18 +383,18 @@ fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewM
                                 context.toast("Password and confirm password should be same.")
                             } else {
                                 showError = enterConfirmPasswordStr.value.isEmpty()
-                                val firstDigitChar =
-                                    enterConfirmPasswordStr.value.toString().first()
-                                val firstDigit = firstDigitChar.digitToInt()
+//                                val firstDigitChar = enterConfirmPasswordStr.value.toString().first()
+//                                val firstDigit = firstDigitChar.digitToInt()
                                 if (showError || enterConfirmPasswordStr.value.length < 10) {
                                     inValidPassword = true
                                 } else { // if first digit of mobile is less than 6 then error will show
-                                    if (firstDigit < 6) {
+                                    if (enterConfirmPasswordStr.value.length < 6) {
                                         inValidPassword = true
                                     } else {
                                         isDialogVisible = true
 //                                viewModel.saveUserPhoneNo(mobNo.value)
                                         buttonClicked = true
+                                        navController.navigate(AppRoute.UserNameScreen.route)
                                     }
                                 }
                             }
