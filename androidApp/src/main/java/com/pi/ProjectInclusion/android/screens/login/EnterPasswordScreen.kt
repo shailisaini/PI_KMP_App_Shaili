@@ -3,6 +3,7 @@ package com.pi.ProjectInclusion.android.screens.login
 import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -128,7 +130,7 @@ fun EnterPasswordScreen(navController: NavHostController, viewModel: LoginViewMo
 @Composable
 fun PasswordUI(
     context: Context,
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     val scrollState = rememberLazyGridState()
     val coroutineScope = rememberCoroutineScope()
@@ -155,17 +157,15 @@ fun PasswordUI(
     var inValidMobNo by remember { mutableStateOf(false) }
 
     if (showBottomSheet) {
-        ChooseOneBottomSheet(
-            onCallClick = {
-                navController.popBackStack()
-                navController.navigate(AppRoute.OtpSendVerifyUI.route)
-            }, onWhatsappClick = {
-                navController.popBackStack()
-                navController.navigate(AppRoute.OtpSendVerifyUI.route)
-            },
-            onDismiss = {
-                showBottomSheet = false
-            })
+        ChooseOneBottomSheet(onCallClick = {
+            navController.popBackStack()
+            navController.navigate(AppRoute.OtpSendVerifyUI.route)
+        }, onWhatsappClick = {
+            navController.popBackStack()
+            navController.navigate(AppRoute.OtpSendVerifyUI.route)
+        }, onDismiss = {
+            showBottomSheet = false
+        })
     }
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
@@ -189,10 +189,9 @@ fun PasswordUI(
                 )
 
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
                         tvPassword,
@@ -230,21 +229,26 @@ fun PasswordUI(
                         Text(
                             forgotPassword,
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(5.dp),
+                                .wrapContentWidth()
+                                .padding(5.dp)
+                                .align(Alignment.End)
+                                .clickable {
+                                    navController.navigate(AppRoute.ForgetPasswordUI.route)
+                                },
                             fontFamily = fontMedium,
                             fontSize = 14.sp,
                             color = PrimaryBlue,
                             textAlign = TextAlign.End
                         )
-                        Spacer(modifier = Modifier.height(15.dp))
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
                         BtnUi(
                             enabled = passwordText.value.length >= 10,
                             title = txtContinue,
                             onClick = {
                                 if (passwordText.value.isEmpty()) {
-                                    inValidMobNo = true
-                                    /*context.startActivity(
+                                    inValidMobNo = true/*context.startActivity(
                                         Intent(
                                             context, ChangePasswordActivity::class.java
                                         ).apply {
@@ -264,13 +268,14 @@ fun PasswordUI(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 10.dp),
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             SurfaceLine()
+
                             Text(
-                                modifier = Modifier.padding(horizontal = 15.dp),
+                                modifier = Modifier.padding(horizontal = 16.dp),
                                 text = stringResource(R.string.txt_or),
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     color = Gray,
@@ -279,13 +284,13 @@ fun PasswordUI(
                                     textAlign = TextAlign.Start
                                 )
                             )
+
                             SurfaceLine()
                         }
-                        OTPBtnUi(
-                            title = stringResource(R.string.txt_login_otp),
-                            onClick = {
-                                showBottomSheet = true
 
+                        OTPBtnUi(
+                            title = stringResource(R.string.txt_login_otp), onClick = {
+                                showBottomSheet = true
                             })
                     }
                 }
