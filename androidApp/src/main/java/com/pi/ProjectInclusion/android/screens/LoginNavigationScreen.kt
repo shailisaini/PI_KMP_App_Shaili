@@ -16,7 +16,7 @@ import com.pi.ProjectInclusion.android.screens.login.ForgetPasswordScreen
 import com.pi.ProjectInclusion.android.screens.login.EnterUserNameScreen
 import com.pi.ProjectInclusion.android.screens.login.LanguageScreen
 import com.pi.ProjectInclusion.android.screens.login.OtpSendVerifyScreen
-import com.pi.ProjectInclusion.android.screens.login.SetNewPasswordScreen
+import com.pi.ProjectInclusion.android.screens.registration.SetNewPasswordScreen
 import com.pi.ProjectInclusion.android.screens.login.UserTypeScreen
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel

@@ -1,4 +1,4 @@
-package com.pi.ProjectInclusion.android.screens.login
+package com.pi.ProjectInclusion.android.screens.registration
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
