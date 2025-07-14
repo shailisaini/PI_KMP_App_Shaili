@@ -72,6 +72,7 @@ and make a difference together!</string>
     <string name="txt_OTP_received_phone">Please enter the OTP received on phone number XXXXXX9168</string>
     <string name="txt_Resend_OTP">Resend OTP</string>
     <string name="txt_OTP_call">OTP on call</string>
+    <string name="txt_change_user">You can change user type now. It locks after password creation.</string>
     <string name="txt_Resend_otp_in">Resend otp in</string>
     <string name="txt_Verify_proceed">Verify &amp; proceed</string>
     <string name="txt_Enter_valid_OTP">Please Enter valid OTP</string>
@@ -83,6 +84,7 @@ and make a difference together!</string>
     <string name="txt_Update">Update</string>
     <string name="txt_Save_Update">Save update</string>
     <string name="txt_Set_New_Password">Set New Password</string>
+    <string name="txt_Set_your_Password">Set Your Password</string>
     <string name="txt_Set_New_password_for_your_account">Set a new password for your account. Make sure it’s strong and easy for you to remember.</string>
     <string name="txt_New_Password">New Password</string>
     <string name="txt_Old_Password">Old Password</string>
@@ -106,4 +108,6 @@ and make a difference together!</string>
     <string name="txt_login_otp">Login via OTP</string>
     <string name="txt_otp_whatsapp">OTP on Whatsapp</string>
     <string name="txt_Profiler">Profiler</string>
+    <string name="txt_set_password_desc">Create a strong password to protect your account</string>
+    <string name="txt_change">Change</string>
 </resources>

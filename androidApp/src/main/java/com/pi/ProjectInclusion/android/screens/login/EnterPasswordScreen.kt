@@ -154,7 +154,7 @@ fun PasswordUI(
 
     var passwordText = rememberSaveable { mutableStateOf("") }
     val enterMobile = stringResource(R.string.txt_enter_mobile_no_)
-    var inValidMobNo by remember { mutableStateOf(false) }
+    var isValidMobNo by remember { mutableStateOf(false) }
 
     if (showBottomSheet) {
         ChooseOneBottomSheet(onCallClick = {
@@ -162,7 +162,8 @@ fun PasswordUI(
             navController.navigate(AppRoute.OtpSendVerifyUI.route)
         }, onWhatsappClick = {
             navController.popBackStack()
-            navController.navigate(AppRoute.OtpSendVerifyUI.route)
+//            navController.navigate(AppRoute.OtpSendVerifyUI.route)
+            navController.navigate(AppRoute.CreatePasswordScreen.route)   // just for UI
         }, onDismiss = {
             showBottomSheet = false
         })
@@ -211,7 +212,7 @@ fun PasswordUI(
                         hint = enterPassword
                     )
 
-                    if (inValidMobNo) {
+                    if (isValidMobNo) {
                         Text(
                             invalidMobNo.toString(),
                             color = LightRed01,
@@ -244,19 +245,14 @@ fun PasswordUI(
                         Spacer(modifier = Modifier.height(10.dp))
 
                         BtnUi(
-                            enabled = passwordText.value.length >= 10,
+                            enabled = passwordText.value.length >= 6,
                             title = txtContinue,
                             onClick = {
                                 if (passwordText.value.isEmpty()) {
-                                    inValidMobNo = true/*context.startActivity(
-                                        Intent(
-                                            context, ChangePasswordActivity::class.java
-                                        ).apply {
-                                            putExtra("", "")
-                                        })*/
+                                    isValidMobNo = true
                                 } else {
                                     if (passwordText.value.length < 6) {
-                                        inValidMobNo = true
+                                        isValidMobNo = true
                                     } else { // if first digit of mobile is less than 6 then error will show
                                         isDialogVisible = true
                                         navController.navigate(AppRoute.OtpSendVerifyUI.route)
