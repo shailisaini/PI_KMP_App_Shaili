@@ -34,7 +34,7 @@ val WhiteA = Color(0xFFFFF5DE)
 val BackgroundGray = Color(0xFF666666)
 val BlueBackground = Color(0x4DF6F4FE)
 val BlueBackground1 = Color(0xFFF5F9FE)
-val BlueBackground2 = Color(0xFF35383F) //#35383F   // CFD1D9
+val BlueBackground2 = Color(0xFF35383F) //#35383F   // CFD1D9  // #9EABF5
 
 val PurpleDark01 = Color(0xFF3B2C6E)
 val PurpleDark02 = Color(0xFF978FED)
@@ -61,7 +61,8 @@ val LightPink = Color(0xFFF7AAED)
 val LightPink02 = Color(0xFFFDF2F8)
 
 val Orange = Color(0xFFEA973D)
-val LightOrange = Color(0xFFFFEEDB)
+val LightOrange = Color(0xFFFFF7F2) // #FFF7F2
+val LightOrange1 = Color(0xFFF3D4D4) // #F3D4D4
 
 val DarkRed1 = Color(0xFFB12F30)
 val DarkRed2 = Color(0xFFD76B66)
