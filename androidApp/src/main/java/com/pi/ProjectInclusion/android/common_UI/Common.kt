@@ -241,6 +241,7 @@ fun ChooseOneBottomSheet(
     }
 }
 
+
 @Composable
 fun DefaultBackgroundUi(
     modifier: Modifier = Modifier,
@@ -420,7 +421,8 @@ fun BtnUi(
     title: String = "Continue", onClick: () -> Unit = {}, enabled: Boolean = false,
 ) {
     Button(
-        onClick = onClick, modifier = Modifier
+        onClick = onClick,
+        modifier = Modifier
             .fillMaxWidth()
             .clip(
                 RoundedCornerShape(

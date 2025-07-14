@@ -18,6 +18,8 @@ import com.pi.ProjectInclusion.android.screens.login.LanguageScreen
 import com.pi.ProjectInclusion.android.screens.login.OtpSendVerifyScreen
 import com.pi.ProjectInclusion.android.screens.registration.SetNewPasswordScreen
 import com.pi.ProjectInclusion.android.screens.login.UserTypeScreen
+import com.pi.ProjectInclusion.android.screens.registration.CreateNewPasswordScreen
+import com.pi.ProjectInclusion.android.screens.registration.EnterUserScreen1
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -50,15 +52,18 @@ class LoginNavigationScreen : ComponentActivity() {
                     composable(AppRoute.UserNameScreen.route) {
                         EnterUserNameScreen(navController, viewModel)
                     }
-
                     composable(AppRoute.UserPasswordScreen.route) {
                         EnterPasswordScreen(navController, viewModel)
                     }
-
+                    composable(AppRoute.CreatePasswordScreen.route) {
+                        CreateNewPasswordScreen(navController, viewModel)
+                    }
+                    composable(AppRoute.EnterUserProfileScreen.route) {
+                        EnterUserScreen1(navController, viewModel)
+                    }
                     composable(AppRoute.ForgetPasswordUI.route) {
                         ForgetPasswordScreen(navController, viewModel)
                     }
-
                     composable(AppRoute.OtpSendVerifyUI.route) {
                         OtpSendVerifyScreen(navController, viewModel)
                     }
