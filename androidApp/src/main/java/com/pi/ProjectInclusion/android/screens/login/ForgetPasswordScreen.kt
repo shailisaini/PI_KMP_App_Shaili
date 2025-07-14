@@ -107,7 +107,7 @@ fun ForgetPasswordScreen(navController: NavHostController, viewModel: LoginViewM
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
         navController.popBackStack()
-        navController.navigate(AppRoute.LanguageSelect.route)
+        navController.navigate(AppRoute.UserPasswordScreen.route)
     }, content = {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -210,7 +210,6 @@ fun ForgetPasswordScreen(navController: NavHostController, viewModel: LoginViewM
                                      sheetState.expand()
                                  }*/
                                 context.toast("Please enter mobile number.")
-                                navController.navigate(AppRoute.OtpSendVerifyUI.route)
 
                                 /*context.startActivity(
                                     Intent(
@@ -231,6 +230,7 @@ fun ForgetPasswordScreen(navController: NavHostController, viewModel: LoginViewM
                                         isDialogVisible = true
 //                                viewModel.saveUserPhoneNo(mobNo.value)
                                         buttonClicked = true
+                                        navController.navigate(AppRoute.OtpSendVerifyUI.route)
                                     }
                                 }
                             }

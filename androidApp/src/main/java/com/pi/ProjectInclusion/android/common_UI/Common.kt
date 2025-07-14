@@ -1,8 +1,10 @@
 package com.pi.ProjectInclusion.android.common_UI
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,28 +27,38 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -62,9 +74,12 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
@@ -82,9 +97,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import com.pi.ProjectInclusion.BannerColor03
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
+import com.pi.ProjectInclusion.DARK_TITLE_TEXT
 import com.pi.ProjectInclusion.DarkBlue
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Dark_02
@@ -95,16 +114,137 @@ import com.pi.ProjectInclusion.GrayLight01
 import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.GrayLight03
 import com.pi.ProjectInclusion.LightBlue
+import com.pi.ProjectInclusion.LightGreen06
 import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
+import com.pi.ProjectInclusion.PrimaryBlue3
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 fun BackButtonPress(navController: NavHostController, route: String) {
     navController.popBackStack()
     navController.navigate(route)
+}
+
+@Composable
+fun SurfaceLine() {
+    Surface(
+        modifier = Modifier
+            .height(1.dp)
+            .width(50.dp),
+        shape = RoundedCornerShape(corner = CornerSize(4.dp)),
+        color = if (isSystemInDarkTheme()) {
+            DARK_BODY_TEXT
+        } else {
+            GrayLight02
+        }
+    ) {
+        // Empty surface to create a line
+    }
+}
+
+@SuppressLint("SuspiciousIndentation")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ChooseOneBottomSheet(
+    onCallClick: () -> Unit = {},
+    onWhatsappClick: () -> Unit = {}, onDismiss: () -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState()
+    ModalBottomSheet(
+        onDismissRequest = {
+            onDismiss()
+        },
+        sheetState = sheetState
+    ) {
+        // Sheet content
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 15.dp, end = 15.dp, bottom = 20.dp)
+        ) {
+
+            Text(
+                stringResource(R.string.choose_an_option),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 10.dp, start = 10.dp),
+                fontSize = 14.sp,
+                fontFamily = fontRegular,
+                color = Gray,
+                textAlign = TextAlign.Start
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 5.dp, bottom = 20.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Card(
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .padding(horizontal = 10.dp)
+                        .weight(1f)
+                        .clickable { onCallClick() },
+                    colors = if (isSystemInDarkTheme()) {
+                        CardDefaults.cardColors(Dark_01)
+                    } else {
+                        CardDefaults.cardColors(
+                            containerColor = com.pi.ProjectInclusion.White,
+                            contentColor = com.pi.ProjectInclusion.White,
+                            disabledContentColor = com.pi.ProjectInclusion.White,
+                            disabledContainerColor = com.pi.ProjectInclusion.White
+                        )
+                    },
+                    border = BorderStroke(1.dp, color = GrayLight01)
+                ) {
+                    TextWithIconOnLeft(
+                        text = stringResource(R.string.txt_OTP_call),
+                        icon = ImageVector.vectorResource(id = R.drawable.ic_otp_on_call),
+                        textColor = Black,
+                        iconColor = Color.Unspecified,
+                        modifier = Modifier.padding(10.dp),
+                        onClick = { onCallClick() })
+                }
+                Card(
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .clickable { onWhatsappClick() }
+                        .padding(end = 10.dp)
+                        .weight(1f),
+                    colors = if (isSystemInDarkTheme()) {
+                        CardDefaults.cardColors(Dark_01)
+                    } else {
+                        CardDefaults.cardColors(
+                            containerColor = com.pi.ProjectInclusion.White,
+                            contentColor = com.pi.ProjectInclusion.White,
+                            disabledContentColor = com.pi.ProjectInclusion.White,
+                            disabledContainerColor = com.pi.ProjectInclusion.White
+                        )
+                    },
+                    border = BorderStroke(1.dp, color = GrayLight01)
+                ) {
+                    TextWithIconOnLeft(
+                        text = stringResource(R.string.txt_otp_whatsapp),
+                        icon = ImageVector.vectorResource(id = R.drawable.ic_whatsapp_otp),
+                        textColor = Black,
+                        iconColor = Color.Unspecified,
+                        modifier = Modifier.padding(10.dp),
+                        onClick = {
+                            onWhatsappClick()
+                        })
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -254,6 +394,34 @@ fun MobileTextField(
 
 @Preview
 @Composable
+fun OTPBtnUi(
+    title: String = "Continue", onClick: () -> Unit = {},
+) {
+    Button(
+        onClick = onClick, modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp)),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = White,
+            contentColor = PrimaryBlue
+        ),
+        border = BorderStroke(1.dp, color = PrimaryBlue)
+    ) {
+        Text(
+            title,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp, top = 8.dp),
+            fontSize = 16.sp,
+            color = PrimaryBlue,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Preview
+@Composable
 fun BtnUi(
     title: String = "Continue", onClick: () -> Unit = {}, enabled: Boolean = false,
 ) {
@@ -370,47 +538,66 @@ fun OtpInputField(
 @Composable
 fun TermsAndPrivacyText(
     onTermsClick: () -> Unit,
-    onPrivacyClick: () -> Unit
+    onPrivacyClick: () -> Unit,
 ) {
-    val annotatedText = buildAnnotatedString {
-        append("By continue, you agree to our ")
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        val annotatedText = buildAnnotatedString {
+            append("By continue, you agree to our ")
 
-        // Terms of Service
-        pushStringAnnotation(tag = "TERMS", annotation = "terms")
-        withStyle(style = SpanStyle(color = Gray, fontWeight = FontWeight.Medium)) {
-            append("Terms of Service")
+            // Terms of Service
+            pushStringAnnotation(tag = "TERMS", annotation = "terms")
+            withStyle(
+                style = SpanStyle(
+                    color = PrimaryBlue,
+                    fontSize = 12.sp,
+                    fontFamily = fontRegular
+                )
+            ) {
+                append("Terms of Service")
+            }
+            pop()
+
+            append(" and ")
+
+            // Privacy Policy
+            pushStringAnnotation(tag = "PRIVACY", annotation = "privacy")
+            withStyle(
+                style = SpanStyle(
+                    color = PrimaryBlue,
+                    fontFamily = fontRegular
+                )
+            ) {
+                append("Privacy Policy")
+            }
+            pop()
+
+            append(".")
         }
-        pop()
 
-        append(" and ")
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            ClickableText(
+                text = annotatedText,
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    color = Gray,
+                    textAlign = TextAlign.Center,
+                    fontFamily = fontRegular
+                ),
+                onClick = { offset ->
+                    annotatedText.getStringAnnotations("TERMS", offset, offset)
+                        .firstOrNull()?.let { onTermsClick() }
 
-        // Privacy Policy
-        pushStringAnnotation(tag = "PRIVACY", annotation = "privacy")
-        withStyle(style = SpanStyle(color = Color.Blue, fontWeight = FontWeight.Medium)) {
-            append("Privacy Policy")
+                    annotatedText.getStringAnnotations("PRIVACY", offset, offset)
+                        .firstOrNull()?.let { onPrivacyClick() }
+                }
+            )
         }
-        pop()
-
-        append(".")
     }
-
-    ClickableText(
-        text = annotatedText,
-        style = TextStyle(
-            fontSize = 14.sp,
-            color = Color.Gray // base color for normal text
-        ),
-        onClick = { offset ->
-            annotatedText.getStringAnnotations(tag = "TERMS", start = offset, end = offset)
-                .firstOrNull()?.let { onTermsClick() }
-
-            annotatedText.getStringAnnotations(tag = "PRIVACY", start = offset, end = offset)
-                .firstOrNull()?.let { onPrivacyClick() }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(12.dp)
-    )
 }
 
 @Composable
@@ -553,7 +740,11 @@ fun PasswordTextField(
 ) {
     TextField(
         value = password.value,
-        onValueChange = { password.value = it },
+        onValueChange = {
+            if (it.length <= 15) {
+                password.value = it
+            }
+        },
         shape = RoundedCornerShape(8.dp),
         singleLine = true,
         modifier = modifier
@@ -724,5 +915,234 @@ fun CustomProgressBar(
             fontSize = 12.sp,
             color = color,
         )
+    }
+}
+
+@Composable
+fun CustomHorizontalProgressBar(progressBar: Float) {
+    val progress by remember { mutableStateOf(progressBar) } // Example progress value
+    Column(
+        modifier = Modifier
+            .wrapContentSize()
+            .padding(bottom = 16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .height(4.dp)
+                .fillMaxWidth(fraction = 1f)
+                .clip(RoundedCornerShape(50))
+                .background(
+                    if (isSystemInDarkTheme()) {
+                        Dark_03
+                    } else {
+                        BannerColor03
+                    }
+                )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(fraction = progress)
+                    .background(LightGreen06)
+            )
+        }
+    }
+}
+
+@Composable
+fun DetailsBackgroundUi(
+    modifier: Modifier = Modifier,
+    isShowBackButton: Boolean = true,
+    onBackButtonClick: () -> Unit = {},
+    content: @Composable () -> Unit,
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(), color = White
+    ) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .background(
+                    color = if (isSystemInDarkTheme()) {
+                        DarkBlue
+                    } else {
+                        DarkBlue
+                    }
+                ),
+            verticalArrangement = Arrangement.Top
+        ) {
+            Row(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .height(80.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .background(Color.Unspecified)
+                ) {
+                    if (isShowBackButton && !LocalInspectionMode.current) {
+                        Image(
+                            modifier = Modifier
+                                .padding(start = 8.dp)
+                                .size(25.dp) // adjust the size as needed
+                                .clickable(onClick = onBackButtonClick),
+                            painter = painterResource(id = R.drawable.left_back_arrow),
+                            contentDescription = IMG_DESCRIPTION
+                        )
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 8.dp)
+                        .height(50.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .background(Color.Unspecified)
+                    ) {
+                        CustomCircularImageViewWithBorder(
+                            gender = "Female",
+                            imageRes = painterResource(R.drawable.dummy_image),
+                            borderColor = GrayLight02,
+                            borderWidth = 1f
+                        )
+                    }
+
+                    Column(
+                        modifier = modifier
+                            .fillMaxSize()
+                            .padding(top = 8.dp)
+                            .background(
+                                color = if (isSystemInDarkTheme()) {
+                                    DarkBlue
+                                } else {
+                                    DarkBlue
+                                }
+                            ),
+                        verticalArrangement = Arrangement.Top
+                    ) {
+                        Text(
+                            text = "Student Name",
+                            modifier = Modifier
+                                .wrapContentWidth()
+                                .padding(start = 16.dp, end = 8.dp),
+                            fontStyle = FontStyle.Normal,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 12.sp,
+                            color = if (isSystemInDarkTheme()) {
+                                DARK_TITLE_TEXT
+                            } else {
+                                White
+                            },
+                            textAlign = TextAlign.Start
+                        )
+
+                        Text(
+                            text = "Grade 5",
+                            modifier = Modifier
+                                .wrapContentWidth()
+                                .padding(start = 16.dp, end = 8.dp),
+                            fontStyle = FontStyle.Normal,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 12.sp,
+                            color = if (isSystemInDarkTheme()) {
+                                DARK_TITLE_TEXT
+                            } else {
+                                White
+                            },
+                            textAlign = TextAlign.Start
+                        )
+                    }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .background(Color.Unspecified)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.more_info_img),
+                        contentDescription = IMG_DESCRIPTION,
+                        modifier = Modifier
+                            .size(45.dp)
+                            .padding(start = 8.dp, end = 16.dp)
+                            .background(Color.Unspecified)
+                    )
+                }
+            }
+
+            Column(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .background(
+                        if (isSystemInDarkTheme()) {
+                            Dark_01
+                        } else {
+                            White
+                        }
+                    )
+            ) {
+                Column(
+                    modifier = modifier
+                        .padding(top = 8.dp)
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                ) {
+                    content()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CustomCircularImageViewWithBorder(
+    gender: String,
+    imageRes: Any, // Can be either a URL or a drawable resource ID
+    borderColor: Color,
+    borderWidth: Float,
+    modifier: Modifier = Modifier, // Allow passing additional modifiers
+) {
+    Box(
+        modifier = modifier
+            .size(50.dp)
+            .border(
+                width = borderWidth.dp, color = borderColor, shape = CircleShape
+            )
+            .clip(CircleShape) // Clip to a circle
+    ) {
+        Image(
+            painter = painterResource(
+                if (gender != null) {
+                    getGenderIconState(gender)
+                } else {
+                    R.drawable.dummy_image
+                }
+            ),
+            contentDescription = null, // Provide a meaningful description if needed
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Unspecified),
+            contentScale = ContentScale.Crop // Crop to fill the circle
+        )
+    }
+}
+
+fun getGenderIconState(state: String?): Int {
+    return when (state) {
+        "Female" -> R.drawable.dummy_image
+        "F" -> R.drawable.dummy_image
+        "Male" -> R.drawable.dummy_image
+        "M" -> R.drawable.dummy_image
+        else -> R.drawable.dummy_image
     }
 }

@@ -1,4 +1,4 @@
-package com.pi.ProjectInclusion.android.screens.login
+package com.pi.ProjectInclusion.android.screens.registration
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Bg_Gray
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
@@ -48,6 +49,7 @@ import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
+import okhttp3.Route
 
 @Composable
 fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewModel) {
@@ -72,6 +74,8 @@ fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewM
     var isCheckedUppercase by remember { mutableStateOf(false) }
     var isCheckedAtleastOne by remember { mutableStateOf(false) }
     var isCheckedSpecialCharacter by remember { mutableStateOf(false) }
+
+    LoggerProvider.logger.d("Screen: " + "SetNewPasswordScreen()")
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
         navController.popBackStack()
@@ -379,18 +383,18 @@ fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewM
                                 context.toast("Password and confirm password should be same.")
                             } else {
                                 showError = enterConfirmPasswordStr.value.isEmpty()
-                                val firstDigitChar =
-                                    enterConfirmPasswordStr.value.toString().first()
-                                val firstDigit = firstDigitChar.digitToInt()
+//                                val firstDigitChar = enterConfirmPasswordStr.value.toString().first()
+//                                val firstDigit = firstDigitChar.digitToInt()
                                 if (showError || enterConfirmPasswordStr.value.length < 10) {
                                     inValidPassword = true
                                 } else { // if first digit of mobile is less than 6 then error will show
-                                    if (firstDigit < 6) {
+                                    if (enterConfirmPasswordStr.value.length < 6) {
                                         inValidPassword = true
                                     } else {
                                         isDialogVisible = true
 //                                viewModel.saveUserPhoneNo(mobNo.value)
                                         buttonClicked = true
+                                        navController.navigate(AppRoute.UserNameScreen.route)
                                     }
                                 }
                             }
