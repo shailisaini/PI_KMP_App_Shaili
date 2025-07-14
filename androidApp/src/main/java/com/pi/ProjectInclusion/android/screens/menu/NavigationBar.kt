@@ -85,7 +85,7 @@ fun DrawerHeader(
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
-                .height(220.dp)
+                .height(200.dp)
 
                 .background(
                     brush = Brush.linearGradient(
@@ -96,14 +96,14 @@ fun DrawerHeader(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 30.dp)
+                    .padding(top = 20.dp)
                     .clickable { onItemClick.invoke() },
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             )
             {
                 Box(
-                    modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp, top = 30.dp)
+                    modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp, top = 20.dp)
 
                 )
                 {
@@ -317,9 +317,6 @@ fun BottomNavigationBar(
                             tint = if (currentDestination == screen.appRoute) activeColor else inactiveColor,
                             modifier = Modifier.size(30.dp)
                         )
-
-
-
                         else -> {
                             Icon(
                                 imageVector = screen.selectedIcon,
@@ -332,7 +329,6 @@ fun BottomNavigationBar(
                 }, selected = currentDestination == screen.appRoute, onClick = {
                     if (screen.appRoute == "") { // student_wallet
                         navController.navigate(screen.appRoute)
-
                     } else {
                         navController.navigate(screen.appRoute)
                     }
@@ -346,7 +342,8 @@ fun BottomNavigationBar(
                     )
                 }, colors = NavigationBarItemDefaults.colors(
                     indicatorColor = Color.Transparent // Removes background color when selected
-                )/* selectedColor = activeColor,
+                )/* se
+                lectedColor = activeColor,
                  unselectedContentColor = inactiveColor*/
             )
         }

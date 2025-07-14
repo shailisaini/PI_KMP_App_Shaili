@@ -4,18 +4,26 @@ import android.Manifest
 import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.material3.Card
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
@@ -37,11 +45,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -109,8 +124,64 @@ fun AddStudentRegisterScreen(navHostController: NavHostController) {
                 horizontalAlignment = Alignment.CenterHorizontally // Center rows inside the column
             )
             {
+                ProfileItem(context)
                 ItemAddStudentScreeningRegisterScreen(context)
+            }
+        }
+    }
+}
 
+@Composable
+fun ProfileItem(context: Context) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically // Aligns image & text vertically
+    )
+    {
+        // Profile Image
+        Image(
+            painter = painterResource(id = R.drawable.upload_profile_ic), // your image
+            contentDescription = "Profile Image",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(64.dp)
+                .clip(RectangleShape)
+                .border(1.dp, Color.Gray, RectangleShape)
+        )
+
+        Spacer(modifier = Modifier.width(16.dp)) // Space between image and text
+
+        // Text on the right
+        Column {
+            Text(
+                text = "Upload a profile photo of the student.",
+                fontSize = 16.sp,
+                fontFamily = FontFamily(
+                    Font(R.font.roboto_regular)
+                )
+            )
+            Card(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .wrapContentHeight(),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFFFFFFFF)
+                ),
+                shape = RoundedCornerShape(8.dp),
+                border = BorderStroke(1.dp, Color(0xFF2C3EA2)),
+                elevation = CardDefaults.cardElevation(4.dp)
+
+                // Do not set containerColor, let the Box inside handle the gradient
+            ){
+                Text ( modifier = Modifier.wrapContentWidth()
+                    .padding(start = 26.dp, end = 26.dp, top = 8.dp, bottom = 8.dp)
+                    .clickable {  },
+                    text = stringResource(R.string.string_addphoto),
+                    color = White,
+                    fontSize = 16.sp// Make sure text is readable on gradient
+                )
             }
         }
     }
