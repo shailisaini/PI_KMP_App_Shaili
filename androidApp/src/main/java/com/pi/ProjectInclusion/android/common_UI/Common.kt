@@ -58,7 +58,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -71,11 +70,11 @@ import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -97,8 +96,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.pi.ProjectInclusion.BannerColor03
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
@@ -117,14 +114,11 @@ import com.pi.ProjectInclusion.LightBlue
 import com.pi.ProjectInclusion.LightGreen06
 import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
-import com.pi.ProjectInclusion.PrimaryBlue3
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.android.R
-import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 fun BackButtonPress(navController: NavHostController, route: String) {
     navController.popBackStack()
@@ -953,16 +947,22 @@ fun CustomHorizontalProgressBar(progressBar: Float) {
 
 @Composable
 fun DetailsBackgroundUi(
+    imgUrl: String,
+    studentName: String,
+    grade: String,
     modifier: Modifier = Modifier,
     isShowBackButton: Boolean = true,
+    isShowProfile: Boolean = true,
+    isShowMoreInfo: Boolean = true,
     onBackButtonClick: () -> Unit = {},
-    content: @Composable () -> Unit,
+    onMoreInfoClick: () -> Unit = {},
+    content: @Composable (() -> Unit),
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(), color = White
     ) {
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .background(
                     color = if (isSystemInDarkTheme()) {
@@ -974,10 +974,17 @@ fun DetailsBackgroundUi(
             verticalArrangement = Arrangement.Top
         ) {
             Row(
-                modifier = modifier
+                modifier = Modifier
+                    .padding(8.dp)
                     .fillMaxWidth()
-                    .height(80.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .background(
+                        color = if (isSystemInDarkTheme()) {
+                            DarkBlue
+                        } else {
+                            DarkBlue
+                        }
+                    ), verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Absolute.SpaceBetween
             ) {
                 Box(
                     modifier = Modifier
@@ -986,54 +993,49 @@ fun DetailsBackgroundUi(
                 ) {
                     if (isShowBackButton && !LocalInspectionMode.current) {
                         Image(
+                            painter = painterResource(R.drawable.left_back_arrow),
+                            contentDescription = IMG_DESCRIPTION,
                             modifier = Modifier
-                                .padding(start = 8.dp)
-                                .size(25.dp) // adjust the size as needed
+                                .background(Color.Unspecified)
                                 .clickable(onClick = onBackButtonClick),
-                            painter = painterResource(id = R.drawable.left_back_arrow),
-                            contentDescription = IMG_DESCRIPTION
+                            colorFilter = ColorFilter.tint(White)
                         )
                     }
                 }
 
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 8.dp)
-                        .height(50.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                        .wrapContentWidth()
+                        .padding(start = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Box(
-                        modifier = Modifier
-                            .background(Color.Unspecified)
+                        modifier = Modifier.background(Color.Unspecified)
                     ) {
-                        CustomCircularImageViewWithBorder(
-                            gender = "Female",
-                            imageRes = painterResource(R.drawable.dummy_image),
-                            borderColor = GrayLight02,
-                            borderWidth = 1f
-                        )
+                        if (isShowProfile && !LocalInspectionMode.current) {
+                            CustomCircularImageViewWithBorder(
+                                gender = "Female",
+                                imageRes = painterResource(R.drawable.dummy_image),
+                                borderColor = GrayLight02,
+                                borderWidth = 1f
+                            )
+                        }
                     }
 
                     Column(
-                        modifier = modifier
-                            .fillMaxSize()
-                            .padding(top = 8.dp)
+                        modifier = Modifier
                             .background(
                                 color = if (isSystemInDarkTheme()) {
                                     DarkBlue
                                 } else {
                                     DarkBlue
                                 }
-                            ),
-                        verticalArrangement = Arrangement.Top
+                            )
                     ) {
                         Text(
-                            text = "Student Name",
+                            text = studentName.toString(),
                             modifier = Modifier
-                                .wrapContentWidth()
-                                .padding(start = 16.dp, end = 8.dp),
+                                .padding(start = 8.dp, end = 8.dp),
                             fontStyle = FontStyle.Normal,
                             fontWeight = FontWeight.Medium,
                             fontSize = 12.sp,
@@ -1046,10 +1048,9 @@ fun DetailsBackgroundUi(
                         )
 
                         Text(
-                            text = "Grade 5",
+                            text = grade.toString(),
                             modifier = Modifier
-                                .wrapContentWidth()
-                                .padding(start = 16.dp, end = 8.dp),
+                                .padding(start = 8.dp, end = 8.dp),
                             fontStyle = FontStyle.Normal,
                             fontWeight = FontWeight.Medium,
                             fontSize = 12.sp,
@@ -1063,24 +1064,36 @@ fun DetailsBackgroundUi(
                     }
                 }
 
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Spacer(modifier = Modifier.width(16.dp))
+
                 Box(
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
                         .background(Color.Unspecified)
                 ) {
-                    Image(
-                        painter = painterResource(R.drawable.more_info_img),
-                        contentDescription = IMG_DESCRIPTION,
-                        modifier = Modifier
-                            .size(45.dp)
-                            .padding(start = 8.dp, end = 16.dp)
-                            .background(Color.Unspecified)
-                    )
+                    if (isShowMoreInfo && !LocalInspectionMode.current) {
+                        Image(
+                            painter = painterResource(R.drawable.more_info_img),
+                            contentDescription = IMG_DESCRIPTION,
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .padding(start = 10.dp)
+                                .background(Color.Unspecified)
+                                .clickable(onClick = onMoreInfoClick),
+                            colorFilter = ColorFilter.tint(White)
+                        )
+                    }
                 }
             }
 
             Column(
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
                     .background(
@@ -1092,7 +1105,7 @@ fun DetailsBackgroundUi(
                     )
             ) {
                 Column(
-                    modifier = modifier
+                    modifier = Modifier
                         .padding(top = 8.dp)
                         .fillMaxWidth()
                         .fillMaxHeight()

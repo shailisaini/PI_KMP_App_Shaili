@@ -1,6 +1,7 @@
 package com.pi.ProjectInclusion.android.screens.login
 
 import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -59,6 +60,7 @@ import com.pi.ProjectInclusion.android.common_UI.OTPBtnUi
 import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
 import com.pi.ProjectInclusion.android.common_UI.SurfaceLine
 import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
@@ -248,7 +250,16 @@ fun PasswordUI(
                             title = txtContinue,
                             onClick = {
                                 if (passwordText.value.isEmpty()) {
-                                    inValidMobNo = true/*context.startActivity(
+                                    inValidMobNo = true
+
+                                    context.startActivity(
+                                        Intent(
+                                            context,
+                                            StudentDashboardActivity::class.java
+                                        )
+                                    )
+
+                                    /*context.startActivity(
                                         Intent(
                                             context, ChangePasswordActivity::class.java
                                         ).apply {

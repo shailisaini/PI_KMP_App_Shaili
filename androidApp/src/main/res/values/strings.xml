@@ -106,4 +106,6 @@ and make a difference together!</string>
     <string name="txt_login_otp">Login via OTP</string>
     <string name="txt_otp_whatsapp">OTP on Whatsapp</string>
     <string name="txt_Profiler">Profiler</string>
+    <string name="txt_following_domains_disc">The following domains and the sub domains of the child are affected. kindly select the domain and then the subdomain to read the concerns found in the child.</string>
+    <string name="txt_We_Invite_disc">We Invite you to submit text documents, images or videos, showcasing your educational activities and student progress to help us inspire others, and recognize your education.</string>
 </resources>
