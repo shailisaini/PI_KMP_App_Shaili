@@ -22,6 +22,7 @@
     <string name="choose_option">Select an option</string>
     <string name="choose_an_option">Choose an option</string>
     <string name="string_next">Next</string>
+    <string name="string_addphoto">Add Photo</string>
     <string name="f_occupation">Father’s profession*</string>
     <string name="m_name">Mother\'s Name</string>
     <string name="m_name_ex">eg: Sita</string>
@@ -41,7 +42,7 @@
     <string name="certificate_txt">Certificates</string>
     <string name="certificate_txt_value">0</string>
     <string name="refer_txt">Refer fellow teachers >></string>
-    <string name="refer_desc">Invite passionate teachers to join
+    <string name="refer_desc">Invite passionate teachers to join\n
 and make a difference together!</string>
     <string name="refer_count"> My refer : 0 </string>
     <string name="lock_ic">lock</string>
