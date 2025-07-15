@@ -61,6 +61,7 @@ val LightPink = Color(0xFFF7AAED)
 val LightPink02 = Color(0xFFFDF2F8)
 
 val Orange = Color(0xFFEA973D)
+val OrangeSubTitle = Color(0xFFE99050)
 val LightOrange = Color(0xFFFFF7F2) // #FFF7F2
 val LightOrange1 = Color(0xFFF3D4D4) // #F3D4D4
 

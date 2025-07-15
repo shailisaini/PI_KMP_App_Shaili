@@ -111,6 +111,12 @@ and make a difference together!</string>
     <string name="txt_Profiler">Profiler</string>
     <string name="txt_set_password_desc">Create a strong password to protect your account</string>
     <string name="txt_change">Change</string>
+    <string name="txt_create_profile">Create Profile</string>
+    <string name="txt_step_1">Step 1 of 2</string>
+    <string name="txt_add_photo">Add Photo</string>
+    <string name="txt_first_name">First Name</string>
+    <string name="txt_eg_first_name">Eg: RAMESH</string>
+    <string name="txt_profile_pic_upload">Upload your profile picture to personalize your account.</string>
     <string name="txt_following_domains_disc">The following domains and the sub domains of the child are affected. kindly select the domain and then the subdomain to read the concerns found in the child.</string>
     <string name="txt_We_Invite_disc">We Invite you to submit text documents, images or videos, showcasing your educational activities and student progress to help us inspire others, and recognize your education.</string>
 </resources>

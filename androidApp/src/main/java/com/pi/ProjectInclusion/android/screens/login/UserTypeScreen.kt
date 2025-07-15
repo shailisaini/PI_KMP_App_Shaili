@@ -291,7 +291,8 @@ fun UserTypeCard(
             .clickable {
                 onItemClicked.invoke()
                 navController.popBackStack()
-                navController.navigate(AppRoute.UserNameScreen.route)
+//                navController.navigate(AppRoute.UserNameScreen.route)
+                navController.navigate(AppRoute.EnterUserProfileScreen.route)
 
                 // Aashish
                 /*context.startActivity(

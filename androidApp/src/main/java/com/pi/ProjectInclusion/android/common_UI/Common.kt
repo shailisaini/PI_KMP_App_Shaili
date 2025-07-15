@@ -61,9 +61,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.center
@@ -91,12 +93,14 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.pi.ProjectInclusion.BannerColor03
+import com.pi.ProjectInclusion.Bg_Gray1
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
@@ -112,10 +116,13 @@ import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.GrayLight03
 import com.pi.ProjectInclusion.LightBlue
 import com.pi.ProjectInclusion.LightGreen06
+import com.pi.ProjectInclusion.OrangeSubTitle
 import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.utils.fontBold
+import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import kotlinx.coroutines.delay
@@ -319,6 +326,7 @@ fun MobileTextField(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
+
     val keyboardController = LocalSoftwareKeyboardController.current
     TextField(
         value = number.value,
@@ -342,12 +350,15 @@ fun MobileTextField(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .shadow(
-                elevation = if (isFocused) 8.dp else 2.dp,
-                shape = RoundedCornerShape(8.dp),
-                ambientColor = LightBlue.copy(alpha = 0.6f),
-                spotColor = LightBlue.copy(alpha = 0.6f)
-            )
+            .drawBehind {
+                if (isFocused) {
+                    drawRoundRect(
+                        color = LightBlue.copy(alpha = 0.4f),
+                        cornerRadius = CornerRadius(8.dp.toPx(), 8.dp.toPx()),
+                        style = Stroke(width = 4.dp.toPx())
+                    )
+                }
+            }
             .border(
                 width = 1.dp,
                 color = when {
@@ -410,6 +421,127 @@ fun OTPBtnUi(
                 .padding(bottom = 8.dp, top = 8.dp),
             fontSize = 16.sp,
             color = PrimaryBlue,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RegistrationHeader(
+    title: String = "",
+    colors: Color = Black,
+    subtitle: String = "",
+    subtitleColor: Color = OrangeSubTitle,
+    onBackButtonClick: () -> Unit = {}
+) {
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = White)
+            .drawBehind {
+                val strokeWidth = 1.dp.toPx()
+                val y = size.height - strokeWidth / 2
+                drawLine(
+                    color = GrayLight02,
+                    start = Offset(0f, y),
+                    end = Offset(size.width, y),
+                    strokeWidth = strokeWidth
+                )
+            }
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(vertical = 15.dp)
+        ) {
+            Image(
+                modifier = Modifier
+                    .offset(y = 8.dp, x = 8.dp)
+                    .size(50.dp) // adjust the size as needed
+                    .clickable(onClick = onBackButtonClick),
+                painter = painterResource(id = R.drawable.round_back_key),
+                contentDescription = IMG_DESCRIPTION
+            )
+            Column(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .wrapContentHeight()
+                    .padding(10.dp),
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Text(
+                    title,
+                    textAlign = TextAlign.Center,
+                    fontSize = 18.sp,
+                    fontFamily = fontBold,
+                    color = colors,
+                    modifier = Modifier
+                        .padding(start = 10.dp)
+                )
+                Text(
+                    subtitle,
+                    textAlign = TextAlign.Center,
+                    fontSize = 12.sp,
+                    fontFamily = fontMedium,
+                    color = subtitleColor,
+                    modifier = Modifier
+                        .padding(start = 10.dp)
+                )
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun SmallBtnUi(
+    title: String = "Continue", onClick: () -> Unit = {}, enabled: Boolean = false,
+) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .wrapContentSize()
+            .clip(
+                RoundedCornerShape(
+                    5.dp
+                )
+            ),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (enabled) {
+                if (isSystemInDarkTheme()) {
+                    Dark_Selected_BG
+                } else {
+                    DarkBlue
+                }
+            } else {
+                if (isSystemInDarkTheme()) {
+                    GrayLight03
+                } else {
+                    GrayLight03
+                }
+            },
+            contentColor = if (enabled) {
+                White
+            } else {
+                White
+            }
+        )
+    ) {
+        Text(
+            title,
+            modifier = Modifier
+                .wrapContentSize()
+                .padding(bottom = 8.dp, top = 8.dp),
+            fontSize = 16.sp,
+            color = if (enabled) {
+                White
+            } else {
+                White
+            },
             textAlign = TextAlign.Center
         )
     }

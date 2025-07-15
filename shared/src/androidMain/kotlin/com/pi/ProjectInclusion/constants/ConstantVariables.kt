@@ -18,4 +18,5 @@ object ConstantVariables {
     var STATUS_LANG: Int = 1
     var PAGE_LENGTH: String = "1"
     var PAGE_LIMIT: String = "20"
+    var ASTRICK: String = "*"
 }
