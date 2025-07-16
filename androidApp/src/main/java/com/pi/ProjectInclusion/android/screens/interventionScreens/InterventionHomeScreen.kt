@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.pi.ProjectInclusion.BannerColor03
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_TITLE_TEXT
@@ -66,6 +67,9 @@ import com.pi.ProjectInclusion.Dark_02
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight01
 import com.pi.ProjectInclusion.GrayLight02
+import com.pi.ProjectInclusion.GrayLight03
+import com.pi.ProjectInclusion.LightGreen06
+import com.pi.ProjectInclusion.LightPurple04
 import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlue3
@@ -907,9 +911,9 @@ fun InterventionInProgressDataUI(
                             ) {
                                 if (inProgress.inProgressNum != null) {
                                     val num: Float = (inProgress.inProgressNum.toFloat() / 100)
-                                    CustomHorizontalProgressBar(num)
+                                    CustomHorizontalProgressBar(num, LightGreen06, BannerColor03)
                                 } else {
-                                    CustomHorizontalProgressBar(0.0f)
+                                    CustomHorizontalProgressBar(0.0f, LightGreen06, BannerColor03)
                                 }
                             }
                         }
@@ -1278,9 +1282,9 @@ fun InterventionCompletedDataUI(completedData: InterventionData, navigation: Nav
                             ) {
                                 if (completedData.inProgressNum != null) {
                                     val num: Float = (completedData.inProgressNum.toFloat() / 100)
-                                    CustomHorizontalProgressBar(num)
+                                    CustomHorizontalProgressBar(num, LightGreen06, BannerColor03)
                                 } else {
-                                    CustomHorizontalProgressBar(0.0f)
+                                    CustomHorizontalProgressBar(0.0f, LightGreen06, BannerColor03)
                                 }
                             }
                         }
