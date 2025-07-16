@@ -25,8 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,6 +40,8 @@ import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.utils.fontMedium
+import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,8 +84,7 @@ fun TeachingPlanScreen(navHostController: NavHostController) {
                                 .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
                                 .fillMaxWidth(),
                             textAlign = TextAlign.Start,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Medium,
+                            fontFamily = fontMedium,
                             fontSize = 14.sp,
                             color = if (isSystemInDarkTheme()) {
                                 DARK_TITLE_TEXT
@@ -100,8 +99,7 @@ fun TeachingPlanScreen(navHostController: NavHostController) {
                                 .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
                                 .fillMaxWidth(),
                             textAlign = TextAlign.Start,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Normal,
+                            fontFamily = fontRegular,
                             fontSize = 14.sp,
                             color = if (isSystemInDarkTheme()) {
                                 DARK_BODY_TEXT
@@ -116,8 +114,7 @@ fun TeachingPlanScreen(navHostController: NavHostController) {
                                 .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
                                 .fillMaxWidth(),
                             textAlign = TextAlign.Start,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Medium,
+                            fontFamily = fontMedium,
                             fontSize = 14.sp,
                             color = if (isSystemInDarkTheme()) {
                                 DARK_TITLE_TEXT
@@ -132,8 +129,7 @@ fun TeachingPlanScreen(navHostController: NavHostController) {
                                 .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
                                 .fillMaxWidth(),
                             textAlign = TextAlign.Start,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Normal,
+                            fontFamily = fontRegular,
                             fontSize = 14.sp,
                             color = if (isSystemInDarkTheme()) {
                                 DARK_BODY_TEXT
@@ -148,8 +144,7 @@ fun TeachingPlanScreen(navHostController: NavHostController) {
                                 .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
                                 .fillMaxWidth(),
                             textAlign = TextAlign.Start,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Medium,
+                            fontFamily = fontMedium,
                             fontSize = 14.sp,
                             color = if (isSystemInDarkTheme()) {
                                 DARK_TITLE_TEXT
@@ -164,8 +159,7 @@ fun TeachingPlanScreen(navHostController: NavHostController) {
                                 .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
                                 .fillMaxWidth(),
                             textAlign = TextAlign.Start,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Normal,
+                            fontFamily = fontRegular,
                             fontSize = 14.sp,
                             color = if (isSystemInDarkTheme()) {
                                 DARK_BODY_TEXT
@@ -190,8 +184,7 @@ fun TeachingPlanScreen(navHostController: NavHostController) {
                                 .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
                                 .fillMaxWidth(),
                             textAlign = TextAlign.Start,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Medium,
+                            fontFamily = fontMedium,
                             fontSize = 14.sp,
                             color = if (isSystemInDarkTheme()) {
                                 DARK_TITLE_TEXT
@@ -228,8 +221,7 @@ fun TeachingPlanScreen(navHostController: NavHostController) {
                                 text = stringResource(R.string.txt_Demonstrate_climb_slow),
                                 modifier = Modifier.padding(start = 4.dp, end = 4.dp),
                                 textAlign = TextAlign.Start,
-                                fontStyle = FontStyle.Normal,
-                                fontWeight = FontWeight.Normal,
+                                fontFamily = fontRegular,
                                 fontSize = 14.sp,
                                 color = if (isSystemInDarkTheme()) {
                                     DARK_BODY_TEXT
@@ -267,8 +259,7 @@ fun TeachingPlanScreen(navHostController: NavHostController) {
                                 text = stringResource(R.string.txt_Initially_allow_climb_assistance),
                                 modifier = Modifier.padding(start = 4.dp, end = 4.dp),
                                 textAlign = TextAlign.Start,
-                                fontStyle = FontStyle.Normal,
-                                fontWeight = FontWeight.Normal,
+                                fontFamily = fontRegular,
                                 fontSize = 14.sp,
                                 color = if (isSystemInDarkTheme()) {
                                     DARK_BODY_TEXT
@@ -306,8 +297,7 @@ fun TeachingPlanScreen(navHostController: NavHostController) {
                                 text = stringResource(R.string.txt_Provide_simple_clear_instructions),
                                 modifier = Modifier.padding(start = 4.dp, end = 4.dp),
                                 textAlign = TextAlign.Start,
-                                fontStyle = FontStyle.Normal,
-                                fontWeight = FontWeight.Normal,
+                                fontFamily = fontRegular,
                                 fontSize = 14.sp,
                                 color = if (isSystemInDarkTheme()) {
                                     DARK_BODY_TEXT
@@ -345,8 +335,7 @@ fun TeachingPlanScreen(navHostController: NavHostController) {
                                 text = stringResource(R.string.txt_Initially_allow_climb_assistance),
                                 modifier = Modifier.padding(start = 4.dp, end = 4.dp),
                                 textAlign = TextAlign.Start,
-                                fontStyle = FontStyle.Normal,
-                                fontWeight = FontWeight.Normal,
+                                fontFamily = fontRegular,
                                 fontSize = 14.sp,
                                 color = if (isSystemInDarkTheme()) {
                                     DARK_BODY_TEXT
@@ -384,8 +373,7 @@ fun TeachingPlanScreen(navHostController: NavHostController) {
                                 text = stringResource(R.string.txt_Start_training_fewer_gradually),
                                 modifier = Modifier.padding(start = 4.dp, end = 4.dp),
                                 textAlign = TextAlign.Start,
-                                fontStyle = FontStyle.Normal,
-                                fontWeight = FontWeight.Normal,
+                                fontFamily = fontRegular,
                                 fontSize = 14.sp,
                                 color = if (isSystemInDarkTheme()) {
                                     DARK_BODY_TEXT

@@ -34,12 +34,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -66,7 +63,9 @@ import com.pi.ProjectInclusion.android.common_UI.NoBtnUi
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnRight
 import com.pi.ProjectInclusion.android.common_UI.YesBtnUi
 import com.pi.ProjectInclusion.android.navigation.AppRoute
-import com.pi.ProjectInclusion.android.screens.sideBar.PasswordUpdateDialog
+import com.pi.ProjectInclusion.android.utils.fontBold
+import com.pi.ProjectInclusion.android.utils.fontMedium
+import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 
 @Composable
@@ -85,6 +84,7 @@ fun InterventionAcceptLevelScreen(navHostController: NavHostController) {
     var isCheckedLevelThree by remember { mutableStateOf(false) }
     var showLevelCheckDialog by remember { mutableStateOf(false) }
     var showHowMarkLevelDialog by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
 
     if (showLevelCheckDialog) {
         LevelCheckDialog {
@@ -98,6 +98,12 @@ fun InterventionAcceptLevelScreen(navHostController: NavHostController) {
         }
     }
 
+    if (showDialog) {
+        InterventionIntroDialog {
+            showDialog = false
+        }
+    }
+
     DetailsBackgroundUi(
         "",
         stringResource(R.string.txt_Intervention),
@@ -108,7 +114,9 @@ fun InterventionAcceptLevelScreen(navHostController: NavHostController) {
         onBackButtonClick = {
             BackButtonPress(navHostController, AppRoute.InterventionStudentDetails.route)
         },
-        onMoreInfoClick = {},
+        onMoreInfoClick = {
+            showDialog = true
+        },
         content = {
             Column(
                 modifier = Modifier
@@ -127,8 +135,7 @@ fun InterventionAcceptLevelScreen(navHostController: NavHostController) {
                     modifier = Modifier.padding(
                         start = 8.dp, end = 8.dp, bottom = 8.dp, top = 8.dp
                     ),
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Normal,
+                    fontFamily = fontRegular,
                     fontSize = 13.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_TITLE_TEXT
@@ -149,8 +156,7 @@ fun InterventionAcceptLevelScreen(navHostController: NavHostController) {
                     Text(
                         text = stringResource(R.string.txt_Socialization_Domain),
                         modifier = Modifier.wrapContentWidth(),
-                        fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = fontMedium,
                         fontSize = 14.sp,
                         color = if (isSystemInDarkTheme()) {
                             White
@@ -169,8 +175,7 @@ fun InterventionAcceptLevelScreen(navHostController: NavHostController) {
                             .clickable {
                                 showHowMarkLevelDialog = true
                             },
-                        fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.Medium,
+                        fontFamily = fontMedium,
                         fontSize = 12.sp,
                         color = if (isSystemInDarkTheme()) {
                             White
@@ -215,8 +220,7 @@ fun InterventionAcceptLevelScreen(navHostController: NavHostController) {
                                 modifier = Modifier
                                     .wrapContentWidth()
                                     .padding(start = 8.dp, end = 8.dp, top = 8.dp),
-                                fontStyle = FontStyle.Normal,
-                                fontWeight = FontWeight.SemiBold,
+                                fontFamily = fontRegular,
                                 fontSize = 12.sp,
                                 color = if (isSystemInDarkTheme()) {
                                     DARK_TITLE_TEXT
@@ -262,9 +266,10 @@ fun InterventionAcceptLevelScreen(navHostController: NavHostController) {
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(
-                                    start = 16.dp, end = 8.dp, bottom = 16.dp, top = 16.dp
-                                )
+                                modifier = Modifier
+                                    .padding(
+                                        start = 16.dp, end = 8.dp, bottom = 16.dp, top = 16.dp
+                                    )
                             ) {
                                 Checkbox(
                                     checked = isCheckedLevelOne, onCheckedChange = {
@@ -283,7 +288,12 @@ fun InterventionAcceptLevelScreen(navHostController: NavHostController) {
                                             uncheckedColor = White,   // Same for unchecked
                                             checkmarkColor = White
                                         )
-                                    }, modifier = Modifier.size(20.dp)
+                                    }, modifier = Modifier
+                                        .size(20.dp)
+                                        /*.background(
+                                            color = White,
+                                            shape = RoundedCornerShape(8.dp)
+                                        )*/
                                 )
 
                                 Spacer(modifier = Modifier.width(4.dp))
@@ -292,8 +302,7 @@ fun InterventionAcceptLevelScreen(navHostController: NavHostController) {
                                     text = stringResource(R.string.txt_Level_1),
                                     modifier = Modifier.padding(start = 4.dp, end = 8.dp),
                                     textAlign = TextAlign.Center,
-                                    fontStyle = FontStyle.Normal,
-                                    fontWeight = FontWeight.SemiBold,
+                                    fontFamily = fontRegular,
                                     fontSize = 12.sp,
                                     color = if (isSystemInDarkTheme()) {
                                         DARK_TITLE_TEXT
@@ -334,8 +343,7 @@ fun InterventionAcceptLevelScreen(navHostController: NavHostController) {
                                     text = stringResource(R.string.txt_Level_2),
                                     modifier = Modifier.padding(start = 4.dp, end = 8.dp),
                                     textAlign = TextAlign.Center,
-                                    fontStyle = FontStyle.Normal,
-                                    fontWeight = FontWeight.SemiBold,
+                                    fontFamily = fontRegular,
                                     fontSize = 12.sp,
                                     color = if (isSystemInDarkTheme()) {
                                         DARK_TITLE_TEXT
@@ -376,8 +384,7 @@ fun InterventionAcceptLevelScreen(navHostController: NavHostController) {
                                     text = stringResource(R.string.txt_Level_3),
                                     modifier = Modifier.padding(start = 4.dp, end = 8.dp),
                                     textAlign = TextAlign.Center,
-                                    fontStyle = FontStyle.Normal,
-                                    fontWeight = FontWeight.SemiBold,
+                                    fontFamily = fontRegular,
                                     fontSize = 12.sp,
                                     color = if (isSystemInDarkTheme()) {
                                         DARK_TITLE_TEXT
@@ -438,8 +445,7 @@ fun LevelCheckDialog(onDismiss: () -> Unit) {
                     modifier = Modifier
                         .wrapContentWidth()
                         .padding(start = 8.dp, end = 8.dp),
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Bold,
+                    fontFamily = fontBold,
                     fontSize = 18.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_TITLE_TEXT
@@ -456,8 +462,7 @@ fun LevelCheckDialog(onDismiss: () -> Unit) {
                     modifier = Modifier
                         .wrapContentWidth()
                         .padding(start = 8.dp, end = 8.dp),
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Normal,
+                    fontFamily = fontRegular,
                     fontSize = 14.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_TITLE_TEXT
@@ -523,8 +528,7 @@ fun HowMarkLevelDialog(onDismiss: () -> Unit) {
                     modifier = Modifier
                         .wrapContentWidth()
                         .padding(start = 8.dp, end = 8.dp),
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Bold,
+                    fontFamily = fontBold,
                     fontSize = 18.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_TITLE_TEXT
@@ -545,8 +549,7 @@ fun HowMarkLevelDialog(onDismiss: () -> Unit) {
                         text = stringResource(R.string.txt_Level_1_D),
                         modifier = Modifier.padding(start = 4.dp, end = 4.dp),
                         textAlign = TextAlign.Start,
-                        fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = fontMedium,
                         fontSize = 14.sp,
                         color = if (isSystemInDarkTheme()) {
                             DARK_TITLE_TEXT
@@ -560,8 +563,7 @@ fun HowMarkLevelDialog(onDismiss: () -> Unit) {
                     Text(
                         text = "40%",
                         textAlign = TextAlign.Start,
-                        fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = fontMedium,
                         fontSize = 14.sp,
                         color = if (isSystemInDarkTheme()) {
                             LightOrange2
@@ -577,8 +579,7 @@ fun HowMarkLevelDialog(onDismiss: () -> Unit) {
                         .padding(start = 8.dp, end = 8.dp)
                         .fillMaxWidth(),
                     textAlign = TextAlign.Start,
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Normal,
+                    fontFamily = fontRegular,
                     fontSize = 14.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_BODY_TEXT
@@ -598,8 +599,7 @@ fun HowMarkLevelDialog(onDismiss: () -> Unit) {
                         text = stringResource(R.string.txt_Level_2_D),
                         modifier = Modifier.padding(start = 4.dp, end = 4.dp),
                         textAlign = TextAlign.Start,
-                        fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = fontMedium,
                         fontSize = 14.sp,
                         color = if (isSystemInDarkTheme()) {
                             DARK_TITLE_TEXT
@@ -613,8 +613,7 @@ fun HowMarkLevelDialog(onDismiss: () -> Unit) {
                     Text(
                         text = "60%",
                         textAlign = TextAlign.Start,
-                        fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = fontMedium,
                         fontSize = 14.sp,
                         color = if (isSystemInDarkTheme()) {
                             LightOrange2
@@ -630,8 +629,7 @@ fun HowMarkLevelDialog(onDismiss: () -> Unit) {
                         .padding(start = 8.dp, end = 8.dp)
                         .fillMaxWidth(),
                     textAlign = TextAlign.Start,
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Normal,
+                    fontFamily = fontRegular,
                     fontSize = 14.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_BODY_TEXT
@@ -651,8 +649,7 @@ fun HowMarkLevelDialog(onDismiss: () -> Unit) {
                         text = stringResource(R.string.txt_Level_3_D),
                         modifier = Modifier.padding(start = 4.dp, end = 4.dp),
                         textAlign = TextAlign.Start,
-                        fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = fontMedium,
                         fontSize = 14.sp,
                         color = if (isSystemInDarkTheme()) {
                             DARK_TITLE_TEXT
@@ -666,8 +663,7 @@ fun HowMarkLevelDialog(onDismiss: () -> Unit) {
                     Text(
                         text = "80% and above",
                         textAlign = TextAlign.Start,
-                        fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = fontMedium,
                         fontSize = 14.sp,
                         color = if (isSystemInDarkTheme()) {
                             LightOrange2
@@ -683,8 +679,7 @@ fun HowMarkLevelDialog(onDismiss: () -> Unit) {
                         .padding(start = 8.dp, end = 8.dp)
                         .fillMaxWidth(),
                     textAlign = TextAlign.Start,
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Normal,
+                    fontFamily = fontRegular,
                     fontSize = 14.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_BODY_TEXT

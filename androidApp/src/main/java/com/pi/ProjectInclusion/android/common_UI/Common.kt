@@ -85,8 +85,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -99,7 +97,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.pi.ProjectInclusion.BannerColor03
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
@@ -114,12 +111,13 @@ import com.pi.ProjectInclusion.GrayLight01
 import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.GrayLight03
 import com.pi.ProjectInclusion.LightBlue
-import com.pi.ProjectInclusion.LightGreen06
 import com.pi.ProjectInclusion.LightPurple04
 import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.utils.fontBold
+import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import kotlinx.coroutines.delay
@@ -456,11 +454,12 @@ fun BtnUi(
         )
     ) {
         Text(
-            title,
+            text = title,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 8.dp, top = 8.dp),
             fontSize = 16.sp,
+            fontFamily = fontMedium,
             color = if (enabled) {
                 White
             } else {
@@ -508,7 +507,7 @@ fun YesBtnUi(
         )
     ) {
         Text(
-            title,
+            text = title,
             modifier = Modifier
                 .wrapContentWidth()
                 .padding(bottom = 8.dp, top = 8.dp),
@@ -518,7 +517,8 @@ fun YesBtnUi(
             } else {
                 White
             },
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            fontFamily = fontMedium,
         )
     }
 }
@@ -560,7 +560,7 @@ fun NoBtnUi(
         )
     ) {
         Text(
-            title,
+            text = title,
             modifier = Modifier
                 .wrapContentWidth()
                 .padding(bottom = 8.dp, top = 8.dp),
@@ -570,7 +570,8 @@ fun NoBtnUi(
             } else {
                 PrimaryBlue
             },
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            fontFamily = fontMedium,
         )
     }
 }
@@ -855,8 +856,7 @@ fun TextWithIconOnRight(
                 color = textColor,
                 fontSize = 13.sp,
                 textAlign = TextAlign.Start,
-                fontStyle = FontStyle.Normal,
-                fontWeight = FontWeight.Medium,
+                fontFamily = fontMedium,
             )
         )
 
@@ -1185,8 +1185,7 @@ fun DetailsBackgroundUi(
                             text = studentName.toString(),
                             modifier = Modifier
                                 .padding(start = 8.dp, end = 8.dp),
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Bold,
+                            fontFamily = fontBold,
                             fontSize = 14.sp,
                             color = if (isSystemInDarkTheme()) {
                                 DARK_TITLE_TEXT
@@ -1200,8 +1199,7 @@ fun DetailsBackgroundUi(
                             text = grade.toString(),
                             modifier = Modifier
                                 .padding(start = 8.dp, end = 8.dp),
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Medium,
+                            fontFamily = fontMedium,
                             fontSize = 12.sp,
                             color = if (isSystemInDarkTheme()) {
                                 LightPurple04
@@ -1326,8 +1324,7 @@ fun DetailsNoImgBackgroundUi(
                     text = pageTitle.toString(),
                     modifier = Modifier
                         .padding(end = 16.dp, top = 8.dp, bottom = 8.dp),
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Bold,
+                    fontFamily = fontBold,
                     fontSize = 16.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_TITLE_TEXT

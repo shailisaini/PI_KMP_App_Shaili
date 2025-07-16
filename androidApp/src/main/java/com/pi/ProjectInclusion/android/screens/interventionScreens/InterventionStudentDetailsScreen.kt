@@ -30,7 +30,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
@@ -50,13 +49,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -73,7 +67,6 @@ import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.GrayLight03
 import com.pi.ProjectInclusion.LightOrange
 import com.pi.ProjectInclusion.LightOrange1
-import com.pi.ProjectInclusion.LightPink02
 import com.pi.ProjectInclusion.LightPurple04
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlue3
@@ -83,6 +76,8 @@ import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
 import com.pi.ProjectInclusion.android.common_UI.CustomHorizontalProgressBar
 import com.pi.ProjectInclusion.android.common_UI.DetailsBackgroundUi
 import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.utils.fontMedium
+import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.contactUsTxt
@@ -91,6 +86,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
+
+    val context = LocalContext.current
 
     val selectedBorder = BorderStroke(
         width = 1.dp, if (isSystemInDarkTheme()) {
@@ -111,6 +108,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
     var showSocialAndCommunicationUI by remember { mutableStateOf(false) }
     var showCognitiveUI by remember { mutableStateOf(false) }
     var showBehavioralUI by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
     var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
@@ -126,6 +124,12 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
             }
         })
 
+    if (showDialog) {
+        InterventionIntroDialog {
+            showDialog = false
+        }
+    }
+
     DetailsBackgroundUi(
         imgUrl = "",
         stringResource(R.string.txt_Student_Name),
@@ -136,7 +140,9 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
         onBackButtonClick = {
             BackButtonPress(navHostController, AppRoute.InterventionScreen.route)
         },
-        onMoreInfoClick = {},
+        onMoreInfoClick = {
+            showDialog = true
+        },
         content = {
             LazyColumn(
                 Modifier
@@ -165,8 +171,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                         Text(
                             text = stringResource(R.string.txt_following_domains_disc),
                             modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Normal,
+                            fontFamily = fontRegular,
                             fontSize = 13.sp,
                             color = if (isSystemInDarkTheme()) {
                                 DARK_TITLE_TEXT
@@ -207,8 +212,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                     modifier = Modifier
                                         .wrapContentWidth()
                                         .padding(start = 12.dp, end = 8.dp, top = 8.dp),
-                                    fontStyle = FontStyle.Normal,
-                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = fontMedium,
                                     fontSize = 16.sp,
                                     color = if (isSystemInDarkTheme()) {
                                         DARK_TITLE_TEXT
@@ -244,8 +248,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                             Text(
                                                 text = stringResource(R.string.txt_Progress_achieved),
                                                 modifier = Modifier.wrapContentWidth(),
-                                                fontStyle = FontStyle.Normal,
-                                                fontWeight = FontWeight.Normal,
+                                                fontFamily = fontRegular,
                                                 fontSize = 12.sp,
                                                 color = if (isSystemInDarkTheme()) {
                                                     PrimaryBlue
@@ -258,8 +261,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                             Text(
                                                 text = "40%",
                                                 modifier = Modifier.wrapContentWidth(),
-                                                fontStyle = FontStyle.Normal,
-                                                fontWeight = FontWeight.Medium,
+                                                fontFamily = fontMedium,
                                                 fontSize = 14.sp,
                                                 color = if (isSystemInDarkTheme()) {
                                                     PrimaryBlue
@@ -347,8 +349,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                     modifier = Modifier
                                         .wrapContentWidth()
                                         .padding(start = 12.dp, end = 8.dp, top = 8.dp),
-                                    fontStyle = FontStyle.Normal,
-                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = fontMedium,
                                     fontSize = 16.sp,
                                     color = if (isSystemInDarkTheme()) {
                                         DARK_TITLE_TEXT
@@ -384,8 +385,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                             Text(
                                                 text = stringResource(R.string.txt_Progress_achieved),
                                                 modifier = Modifier.wrapContentWidth(),
-                                                fontStyle = FontStyle.Normal,
-                                                fontWeight = FontWeight.Normal,
+                                                fontFamily = fontRegular,
                                                 fontSize = 12.sp,
                                                 color = if (isSystemInDarkTheme()) {
                                                     PrimaryBlue
@@ -398,8 +398,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                             Text(
                                                 text = "20%",
                                                 modifier = Modifier.wrapContentWidth(),
-                                                fontStyle = FontStyle.Normal,
-                                                fontWeight = FontWeight.Medium,
+                                                fontFamily = fontMedium,
                                                 fontSize = 14.sp,
                                                 color = if (isSystemInDarkTheme()) {
                                                     PrimaryBlue
@@ -486,8 +485,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                     modifier = Modifier
                                         .wrapContentWidth()
                                         .padding(start = 12.dp, end = 8.dp, top = 8.dp),
-                                    fontStyle = FontStyle.Normal,
-                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = fontMedium,
                                     fontSize = 16.sp,
                                     color = if (isSystemInDarkTheme()) {
                                         DARK_TITLE_TEXT
@@ -523,8 +521,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                             Text(
                                                 text = stringResource(R.string.txt_Progress_achieved),
                                                 modifier = Modifier.wrapContentWidth(),
-                                                fontStyle = FontStyle.Normal,
-                                                fontWeight = FontWeight.Normal,
+                                                fontFamily = fontRegular,
                                                 fontSize = 12.sp,
                                                 color = if (isSystemInDarkTheme()) {
                                                     PrimaryBlue
@@ -537,8 +534,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                             Text(
                                                 text = "0%",
                                                 modifier = Modifier.wrapContentWidth(),
-                                                fontStyle = FontStyle.Normal,
-                                                fontWeight = FontWeight.Medium,
+                                                fontFamily = fontMedium,
                                                 fontSize = 14.sp,
                                                 color = if (isSystemInDarkTheme()) {
                                                     PrimaryBlue
@@ -625,8 +621,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                     modifier = Modifier.padding(
                                         start = 8.dp, end = 8.dp, top = 8.dp, bottom = 8.dp
                                     ),
-                                    fontStyle = FontStyle.Normal,
-                                    fontWeight = FontWeight.Normal,
+                                    fontFamily = fontRegular,
                                     fontSize = 13.sp,
                                     color = if (isSystemInDarkTheme()) {
                                         DARK_TITLE_TEXT
@@ -685,8 +680,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                     Text(
                                         text = stringResource(R.string.txt_Upload_Doc),
                                         modifier = Modifier.wrapContentWidth(),
-                                        fontStyle = FontStyle.Normal,
-                                        fontWeight = FontWeight.Medium,
+                                        fontFamily = fontMedium,
                                         fontSize = 14.sp,
                                         color = if (isSystemInDarkTheme()) {
                                             White
@@ -709,8 +703,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                 Text(
                                     text = stringResource(R.string.txt_Uploaded_Documents),
                                     modifier = Modifier.wrapContentWidth(),
-                                    fontStyle = FontStyle.Normal,
-                                    fontWeight = FontWeight.SemiBold,
+                                    fontFamily = fontMedium,
                                     fontSize = 14.sp,
                                     color = if (isSystemInDarkTheme()) {
                                         White
@@ -729,8 +722,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                         .clickable {
                                             navHostController.navigate(AppRoute.UploadedDocuments.route)
                                         },
-                                    fontStyle = FontStyle.Normal,
-                                    fontWeight = FontWeight.Medium,
+                                    fontFamily = fontMedium,
                                     fontSize = 14.sp,
                                     color = if (isSystemInDarkTheme()) {
                                         White
@@ -782,8 +774,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                     Text(
                                         text = stringResource(R.string.txt_ScreeningReport_doc),
                                         modifier = Modifier.wrapContentWidth(),
-                                        fontStyle = FontStyle.Normal,
-                                        fontWeight = FontWeight.Normal,
+                                        fontFamily = fontRegular,
                                         fontSize = 12.sp,
                                         color = if (isSystemInDarkTheme()) {
                                             DARK_TITLE_TEXT
@@ -796,8 +787,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                     Text(
                                         text = stringResource(R.string.txt_date),
                                         modifier = Modifier.wrapContentWidth(),
-                                        fontStyle = FontStyle.Normal,
-                                        fontWeight = FontWeight.Normal,
+                                        fontFamily = fontRegular,
                                         fontSize = 11.sp,
                                         color = if (isSystemInDarkTheme()) {
                                             DARK_BODY_TEXT
@@ -811,7 +801,11 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                 Spacer(modifier = Modifier.weight(1f))
 
                                 Box(
-                                    modifier = Modifier.background(Color.Unspecified)
+                                    modifier = Modifier
+                                        .background(Color.Unspecified)
+                                        .clickable {
+                                            context.toast("Under processing for preview documents...")
+                                        }
                                 ) {
                                     Image(
                                         painter = painterResource(R.drawable.docs_preview_img),
@@ -862,8 +856,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                     Text(
                                         text = stringResource(R.string.txt_ScreeningReport_pdf),
                                         modifier = Modifier.wrapContentWidth(),
-                                        fontStyle = FontStyle.Normal,
-                                        fontWeight = FontWeight.Normal,
+                                        fontFamily = fontRegular,
                                         fontSize = 12.sp,
                                         color = if (isSystemInDarkTheme()) {
                                             DARK_TITLE_TEXT
@@ -876,8 +869,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                     Text(
                                         text = stringResource(R.string.txt_date),
                                         modifier = Modifier.wrapContentWidth(),
-                                        fontStyle = FontStyle.Normal,
-                                        fontWeight = FontWeight.Normal,
+                                        fontFamily = fontRegular,
                                         fontSize = 11.sp,
                                         color = if (isSystemInDarkTheme()) {
                                             DARK_BODY_TEXT
@@ -891,7 +883,11 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                 Spacer(modifier = Modifier.weight(1f))
 
                                 Box(
-                                    modifier = Modifier.background(Color.Unspecified)
+                                    modifier = Modifier
+                                        .background(Color.Unspecified)
+                                        .clickable {
+                                            context.toast("Under processing for preview documents...")
+                                        }
                                 ) {
                                     Image(
                                         painter = painterResource(R.drawable.docs_preview_img),
@@ -955,8 +951,7 @@ private fun SocialAndCommunicationUI(navHostController: NavHostController) {
                     modifier = Modifier
                         .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
                         .wrapContentWidth(),
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Medium,
+                    fontFamily = fontMedium,
                     fontSize = 14.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_TITLE_TEXT
@@ -966,26 +961,40 @@ private fun SocialAndCommunicationUI(navHostController: NavHostController) {
                     textAlign = TextAlign.Start
                 )
 
-                Text(
-                    text = buildAnnotatedString {
-                        append(stringResource(R.string.txt_Progress_achieved))
-                        pushStyle(SpanStyle(color = Color.Black))
-                        append("20%")
-                        pop()
-                    },
+                Row(
                     modifier = Modifier
+                        .wrapContentWidth()
                         .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
-                        .wrapContentWidth(),
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 12.sp,
-                    color = if (isSystemInDarkTheme()) {
-                        DARK_BODY_TEXT
-                    } else {
-                        Gray
-                    },
-                    textAlign = TextAlign.Start
-                )
+                        .wrapContentHeight(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.txt_Progress_achieved),
+                        modifier = Modifier
+                            .wrapContentWidth(),
+                        fontFamily = fontRegular,
+                        fontSize = 12.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_BODY_TEXT
+                        } else {
+                            Gray
+                        },
+                        textAlign = TextAlign.Start
+                    )
+
+                    Text(
+                        text = " 20%",
+                        modifier = Modifier.wrapContentWidth(),
+                        fontFamily = fontMedium,
+                        fontSize = 14.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            PrimaryBlue
+                        } else {
+                            Black
+                        },
+                        textAlign = TextAlign.Start
+                    )
+                }
             }
 
             Box(
@@ -1054,26 +1063,40 @@ private fun SocialAndCommunicationUI(navHostController: NavHostController) {
                     textAlign = TextAlign.Start
                 )
 
-                Text(
-                    text = buildAnnotatedString {
-                        append(stringResource(R.string.txt_Progress_achieved))
-                        pushStyle(SpanStyle(color = Color.Black))
-                        append("20%")
-                        pop()
-                    },
+                Row(
                     modifier = Modifier
+                        .wrapContentWidth()
                         .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
-                        .wrapContentWidth(),
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 12.sp,
-                    color = if (isSystemInDarkTheme()) {
-                        DARK_BODY_TEXT
-                    } else {
-                        Gray
-                    },
-                    textAlign = TextAlign.Start
-                )
+                        .wrapContentHeight(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.txt_Progress_achieved),
+                        modifier = Modifier
+                            .wrapContentWidth(),
+                        fontFamily = fontRegular,
+                        fontSize = 12.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_BODY_TEXT
+                        } else {
+                            Gray
+                        },
+                        textAlign = TextAlign.Start
+                    )
+
+                    Text(
+                        text = " 20%",
+                        modifier = Modifier.wrapContentWidth(),
+                        fontFamily = fontMedium,
+                        fontSize = 14.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            PrimaryBlue
+                        } else {
+                            Black
+                        },
+                        textAlign = TextAlign.Start
+                    )
+                }
             }
 
             Box(
@@ -1140,8 +1163,7 @@ fun CognitiveUI() {
                     modifier = Modifier
                         .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
                         .wrapContentWidth(),
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Medium,
+                    fontFamily = fontMedium,
                     fontSize = 14.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_TITLE_TEXT
@@ -1151,26 +1173,40 @@ fun CognitiveUI() {
                     textAlign = TextAlign.Start
                 )
 
-                Text(
-                    text = buildAnnotatedString {
-                        append(stringResource(R.string.txt_Progress_achieved))
-                        pushStyle(SpanStyle(color = Color.Black))
-                        append("20%")
-                        pop()
-                    },
+                Row(
                     modifier = Modifier
+                        .wrapContentWidth()
                         .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
-                        .wrapContentWidth(),
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 12.sp,
-                    color = if (isSystemInDarkTheme()) {
-                        DARK_BODY_TEXT
-                    } else {
-                        Gray
-                    },
-                    textAlign = TextAlign.Start
-                )
+                        .wrapContentHeight(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.txt_Progress_achieved),
+                        modifier = Modifier
+                            .wrapContentWidth(),
+                        fontFamily = fontRegular,
+                        fontSize = 12.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_BODY_TEXT
+                        } else {
+                            Gray
+                        },
+                        textAlign = TextAlign.Start
+                    )
+
+                    Text(
+                        text = " 20%",
+                        modifier = Modifier.wrapContentWidth(),
+                        fontFamily = fontMedium,
+                        fontSize = 14.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            PrimaryBlue
+                        } else {
+                            Black
+                        },
+                        textAlign = TextAlign.Start
+                    )
+                }
             }
 
             Box(
@@ -1237,26 +1273,40 @@ fun CognitiveUI() {
                     textAlign = TextAlign.Start
                 )
 
-                Text(
-                    text = buildAnnotatedString {
-                        append(stringResource(R.string.txt_Progress_achieved))
-                        pushStyle(SpanStyle(color = Color.Black))
-                        append("20%")
-                        pop()
-                    },
+                Row(
                     modifier = Modifier
+                        .wrapContentWidth()
                         .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
-                        .wrapContentWidth(),
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 12.sp,
-                    color = if (isSystemInDarkTheme()) {
-                        DARK_BODY_TEXT
-                    } else {
-                        Gray
-                    },
-                    textAlign = TextAlign.Start
-                )
+                        .wrapContentHeight(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.txt_Progress_achieved),
+                        modifier = Modifier
+                            .wrapContentWidth(),
+                        fontFamily = fontRegular,
+                        fontSize = 12.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_BODY_TEXT
+                        } else {
+                            Gray
+                        },
+                        textAlign = TextAlign.Start
+                    )
+
+                    Text(
+                        text = " 20%",
+                        modifier = Modifier.wrapContentWidth(),
+                        fontFamily = fontMedium,
+                        fontSize = 14.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            PrimaryBlue
+                        } else {
+                            Black
+                        },
+                        textAlign = TextAlign.Start
+                    )
+                }
             }
 
             Box(
@@ -1323,8 +1373,7 @@ fun BehavioralUI() {
                     modifier = Modifier
                         .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
                         .wrapContentWidth(),
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Medium,
+                    fontFamily = fontMedium,
                     fontSize = 14.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_TITLE_TEXT
@@ -1334,26 +1383,40 @@ fun BehavioralUI() {
                     textAlign = TextAlign.Start
                 )
 
-                Text(
-                    text = buildAnnotatedString {
-                        append(stringResource(R.string.txt_Progress_achieved))
-                        pushStyle(SpanStyle(color = Color.Black))
-                        append("20%")
-                        pop()
-                    },
+                Row(
                     modifier = Modifier
+                        .wrapContentWidth()
                         .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
-                        .wrapContentWidth(),
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 12.sp,
-                    color = if (isSystemInDarkTheme()) {
-                        DARK_BODY_TEXT
-                    } else {
-                        Gray
-                    },
-                    textAlign = TextAlign.Start
-                )
+                        .wrapContentHeight(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.txt_Progress_achieved),
+                        modifier = Modifier
+                            .wrapContentWidth(),
+                        fontFamily = fontRegular,
+                        fontSize = 12.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_BODY_TEXT
+                        } else {
+                            Gray
+                        },
+                        textAlign = TextAlign.Start
+                    )
+
+                    Text(
+                        text = " 20%",
+                        modifier = Modifier.wrapContentWidth(),
+                        fontFamily = fontMedium,
+                        fontSize = 14.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            PrimaryBlue
+                        } else {
+                            Black
+                        },
+                        textAlign = TextAlign.Start
+                    )
+                }
             }
 
             Box(
@@ -1420,26 +1483,40 @@ fun BehavioralUI() {
                     textAlign = TextAlign.Start
                 )
 
-                Text(
-                    text = buildAnnotatedString {
-                        append(stringResource(R.string.txt_Progress_achieved))
-                        pushStyle(SpanStyle(color = Color.Black))
-                        append("20%")
-                        pop()
-                    },
+                Row(
                     modifier = Modifier
+                        .wrapContentWidth()
                         .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
-                        .wrapContentWidth(),
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 12.sp,
-                    color = if (isSystemInDarkTheme()) {
-                        DARK_BODY_TEXT
-                    } else {
-                        Gray
-                    },
-                    textAlign = TextAlign.Start
-                )
+                        .wrapContentHeight(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.txt_Progress_achieved),
+                        modifier = Modifier
+                            .wrapContentWidth(),
+                        fontFamily = fontRegular,
+                        fontSize = 12.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_BODY_TEXT
+                        } else {
+                            Gray
+                        },
+                        textAlign = TextAlign.Start
+                    )
+
+                    Text(
+                        text = " 20%",
+                        modifier = Modifier.wrapContentWidth(),
+                        fontFamily = fontMedium,
+                        fontSize = 14.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            PrimaryBlue
+                        } else {
+                            Black
+                        },
+                        textAlign = TextAlign.Start
+                    )
+                }
             }
 
             Box(
@@ -1509,9 +1586,7 @@ fun BottomSheetCamGalScreen(
                                     DARK_TITLE_TEXT
                                 } else {
                                     Black
-                                }, fontSize = 18.sp, fontFamily = FontFamily(
-                                    Font(R.font.roboto_bold, FontWeight.Bold)
-                                ), textAlign = TextAlign.Start
+                                }, fontSize = 18.sp, textAlign = TextAlign.Start
                             )
                         )
 
@@ -1540,9 +1615,7 @@ fun BottomSheetCamGalScreen(
                                     DARK_TITLE_TEXT
                                 } else {
                                     Black
-                                }, fontSize = 18.sp, fontFamily = FontFamily(
-                                    Font(R.font.roboto_bold, FontWeight.Bold)
-                                ), textAlign = TextAlign.Start
+                                }, fontSize = 18.sp, textAlign = TextAlign.Start
                             )
                         )
                     }
@@ -1555,9 +1628,7 @@ fun BottomSheetCamGalScreen(
                             Gray
                         },
                         fontSize = 16.sp,
-                        fontFamily = FontFamily(
-                            Font(R.font.roboto_regular, FontWeight.Medium)
-                        ),
+                        fontFamily = fontMedium,
                         textAlign = TextAlign.Start,
                         modifier = Modifier
                             .padding(top = 16.dp, start = 16.dp)
@@ -1608,9 +1679,10 @@ fun BottomSheetCamGalScreen(
                                         DARK_TITLE_TEXT
                                     } else {
                                         contactUsTxt
-                                    }, fontSize = 14.sp, fontFamily = FontFamily(
-                                        Font(R.font.roboto_medium, FontWeight.Medium)
-                                    ), textAlign = TextAlign.Start
+                                    },
+                                    fontSize = 14.sp,
+                                    fontFamily = fontMedium,
+                                    textAlign = TextAlign.Start
                                 )
                             )
                         }
@@ -1651,9 +1723,10 @@ fun BottomSheetCamGalScreen(
                                         DARK_TITLE_TEXT
                                     } else {
                                         contactUsTxt
-                                    }, fontSize = 14.sp, fontFamily = FontFamily(
-                                        Font(R.font.roboto_medium, FontWeight.Medium)
-                                    ), textAlign = TextAlign.Start
+                                    },
+                                    fontSize = 14.sp,
+                                    fontFamily = fontMedium,
+                                    textAlign = TextAlign.Start
                                 )
                             )
                         }

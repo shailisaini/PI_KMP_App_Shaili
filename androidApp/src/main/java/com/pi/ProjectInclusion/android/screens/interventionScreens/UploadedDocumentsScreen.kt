@@ -2,6 +2,7 @@ package com.pi.ProjectInclusion.android.screens.interventionScreens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,10 +25,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,6 +43,9 @@ import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.utils.fontMedium
+import com.pi.ProjectInclusion.android.utils.fontRegular
+import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 
 @Composable
@@ -109,6 +112,9 @@ fun UploadedDocumentsScreen(navHostController: NavHostController) {
 
 @Composable
 fun UploadedDocumentsDataUI(data: DocumentsData, controller: NavHostController) {
+
+    val context = LocalContext.current
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -157,8 +163,7 @@ fun UploadedDocumentsDataUI(data: DocumentsData, controller: NavHostController) 
                 Text(
                     text = data.documentName,
                     modifier = Modifier.wrapContentWidth(),
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Medium,
+                    fontFamily = fontMedium,
                     fontSize = 14.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_TITLE_TEXT
@@ -171,8 +176,7 @@ fun UploadedDocumentsDataUI(data: DocumentsData, controller: NavHostController) 
                 Text(
                     text = data.date,
                     modifier = Modifier.wrapContentWidth(),
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Normal,
+                    fontFamily = fontRegular,
                     fontSize = 12.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_BODY_TEXT
@@ -186,7 +190,11 @@ fun UploadedDocumentsDataUI(data: DocumentsData, controller: NavHostController) 
             Spacer(modifier = Modifier.weight(1f))
 
             Box(
-                modifier = Modifier.background(Color.Unspecified)
+                modifier = Modifier
+                    .background(Color.Unspecified)
+                    .clickable {
+                        context.toast("Under processing for preview documents...")
+                    }
             ) {
                 Image(
                     painter = data.openImage,
