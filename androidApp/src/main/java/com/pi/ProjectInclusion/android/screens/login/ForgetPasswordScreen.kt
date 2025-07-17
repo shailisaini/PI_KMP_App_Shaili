@@ -95,8 +95,7 @@ fun ForgetPasswordScreen(navController: NavHostController, viewModel: LoginViewM
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true, confirmValueChange = { it != SheetValue.Hidden })
 
-    BottomSheetReferAFriendScreen(
-        colors = colors,
+    BottomSheetContactUsScreen(
         isBottomSheetVisible = isBottomSheetVisible,
         sheetState = sheetState,
         onDismiss = {
@@ -246,8 +245,7 @@ fun ForgetPasswordScreen(navController: NavHostController, viewModel: LoginViewM
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomSheetReferAFriendScreen(
-    colors: ColorScheme,
+fun BottomSheetContactUsScreen(
     isBottomSheetVisible: Boolean,
     sheetState: SheetState,
     onDismiss: () -> Unit,

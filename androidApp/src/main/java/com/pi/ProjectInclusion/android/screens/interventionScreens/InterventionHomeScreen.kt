@@ -47,10 +47,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -58,6 +54,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.pi.ProjectInclusion.BannerColor03
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_TITLE_TEXT
@@ -66,6 +63,7 @@ import com.pi.ProjectInclusion.Dark_02
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight01
 import com.pi.ProjectInclusion.GrayLight02
+import com.pi.ProjectInclusion.LightGreen06
 import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlue3
@@ -77,6 +75,10 @@ import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.CustomHorizontalProgressBar
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.screens.menu.TabItem
+import com.pi.ProjectInclusion.android.utils.fontBold
+import com.pi.ProjectInclusion.android.utils.fontMedium
+import com.pi.ProjectInclusion.android.utils.fontRegular
+import com.pi.ProjectInclusion.android.utils.fontSemiBold
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -94,6 +96,7 @@ fun InterventionHomeScreen(navHostController: NavHostController) {
     )
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val pagerState = rememberPagerState { tabItems.size }
+    var showDialog by remember { mutableStateOf(true) }
 
     LaunchedEffect(selectedTabIndex) {
         pagerState.animateScrollToPage(selectedTabIndex)
@@ -102,6 +105,13 @@ fun InterventionHomeScreen(navHostController: NavHostController) {
     LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
         if (!pagerState.isScrollInProgress) {
             selectedTabIndex = pagerState.currentPage
+        }
+    }
+
+    // This function will be change according to recommend
+    if (showDialog) {
+        InterventionIntroDialog {
+            showDialog = false
         }
     }
 
@@ -133,7 +143,6 @@ fun InterventionHomeScreen(navHostController: NavHostController) {
                     text = {
                         Text(
                             text = tabItem.title,
-                            modifier = Modifier.padding(vertical = 5.dp),
                             color = if (index == selectedTabIndex) {
                                 if (isSystemInDarkTheme()) {
                                     PRIMARY_AURO_BLUE
@@ -147,9 +156,7 @@ fun InterventionHomeScreen(navHostController: NavHostController) {
                                     GrayLight01
                                 }
                             },
-                            fontFamily = FontFamily(
-                                Font(R.font.roboto_semi_bold, FontWeight.SemiBold)
-                            ),
+                            fontFamily = fontSemiBold,
                             fontSize = 14.sp
                         )
                     })
@@ -225,8 +232,7 @@ fun InterventionIntroDialog(onDismiss: () -> Unit) {
                     modifier = Modifier
                         .wrapContentWidth()
                         .padding(top = 16.dp, start = 8.dp, end = 8.dp),
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Bold,
+                    fontFamily = fontBold,
                     fontSize = 18.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_TITLE_TEXT
@@ -243,8 +249,7 @@ fun InterventionIntroDialog(onDismiss: () -> Unit) {
                     modifier = Modifier
                         .wrapContentWidth()
                         .padding(start = 8.dp, end = 8.dp),
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Normal,
+                    fontFamily = fontRegular,
                     fontSize = 14.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_TITLE_TEXT
@@ -329,12 +334,6 @@ fun PendingIntervention(navHostController: NavHostController) {
             painterResource(id = R.drawable.dummy_image)
         )
     )
-    var showDialog by remember { mutableStateOf(false) }
-    if (showDialog) {
-        InterventionIntroDialog {
-            showDialog = false
-        }
-    }
 
     Column(
         modifier = Modifier
@@ -351,7 +350,6 @@ fun PendingIntervention(navHostController: NavHostController) {
         LazyColumn {
             items(interventionListData) { interventionData ->
                 InterventionDataUI(interventionData, navHostController)
-//                showDialog = true
             }
         }
     }
@@ -429,7 +427,7 @@ fun InterventionDataUI(interData: InterventionData, navHostController: NavHostCo
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier
                                 .width(90.dp)
-                                .height(100.dp),
+                                .height(90.dp),
                             colors = if (isSystemInDarkTheme()) {
                                 CardDefaults.cardColors(Dark_01)
                             } else {
@@ -443,16 +441,16 @@ fun InterventionDataUI(interData: InterventionData, navHostController: NavHostCo
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .width(100.dp)
-                                    .height(100.dp)
+                                    .width(90.dp)
+                                    .height(90.dp)
                                     .background(Color.Unspecified)
                             ) {
                                 Image(
                                     painter = interData.image,
                                     contentDescription = IMG_DESCRIPTION,
                                     modifier = Modifier
-                                        .width(100.dp)
-                                        .height(100.dp)
+                                        .width(90.dp)
+                                        .height(90.dp)
                                         .background(Color.Unspecified),
                                     contentScale = ContentScale.Crop
                                 )
@@ -479,8 +477,7 @@ fun InterventionDataUI(interData: InterventionData, navHostController: NavHostCo
                                         modifier = Modifier
                                             .padding(start = 4.dp, end = 8.dp)
                                             .wrapContentWidth(),
-                                        fontStyle = FontStyle.Normal,
-                                        fontWeight = FontWeight.Bold,
+                                        fontFamily = fontRegular,
                                         fontSize = 12.sp,
                                         color = if (isSystemInDarkTheme()) {
                                             DARK_TITLE_TEXT
@@ -506,8 +503,7 @@ fun InterventionDataUI(interData: InterventionData, navHostController: NavHostCo
                                 modifier = Modifier
                                     .wrapContentWidth()
                                     .padding(start = 8.dp, end = 8.dp),
-                                fontStyle = FontStyle.Normal,
-                                fontWeight = FontWeight.Bold,
+                                fontFamily = fontMedium,
                                 fontSize = 16.sp,
                                 color = if (isSystemInDarkTheme()) {
                                     DARK_TITLE_TEXT
@@ -522,8 +518,7 @@ fun InterventionDataUI(interData: InterventionData, navHostController: NavHostCo
                                 modifier = Modifier
                                     .wrapContentWidth()
                                     .padding(start = 8.dp, end = 8.dp),
-                                fontStyle = FontStyle.Normal,
-                                fontWeight = FontWeight.Normal,
+                                fontFamily = fontMedium,
                                 fontSize = 12.sp,
                                 color = if (isSystemInDarkTheme()) {
                                     DARK_TITLE_TEXT
@@ -571,8 +566,7 @@ fun InterventionDataUI(interData: InterventionData, navHostController: NavHostCo
                     modifier = Modifier
                         .wrapContentWidth()
                         .padding(start = 16.dp, end = 8.dp),
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Medium,
+                    fontFamily = fontMedium,
                     fontSize = 12.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_TITLE_TEXT
@@ -652,12 +646,6 @@ fun InProgressIntervention(navHostController: NavHostController) {
             painterResource(id = R.drawable.dummy_image)
         )
     )
-    var showDialog by remember { mutableStateOf(false) }
-    if (showDialog) {
-        InterventionIntroDialog {
-            showDialog = false
-        }
-    }
 
     Column(
         modifier = Modifier
@@ -674,7 +662,6 @@ fun InProgressIntervention(navHostController: NavHostController) {
         LazyColumn {
             items(interventionListData) { interventionData ->
                 InterventionInProgressDataUI(interventionData, navHostController)
-//                showDialog = true
             }
         }
     }
@@ -755,7 +742,7 @@ fun InterventionInProgressDataUI(
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier
                                 .width(90.dp)
-                                .height(100.dp),
+                                .height(90.dp),
                             colors = if (isSystemInDarkTheme()) {
                                 CardDefaults.cardColors(Dark_01)
                             } else {
@@ -769,16 +756,16 @@ fun InterventionInProgressDataUI(
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .width(100.dp)
-                                    .height(100.dp)
+                                    .width(90.dp)
+                                    .height(90.dp)
                                     .background(Color.Unspecified)
                             ) {
                                 Image(
                                     painter = inProgress.image,
                                     contentDescription = IMG_DESCRIPTION,
                                     modifier = Modifier
-                                        .width(100.dp)
-                                        .height(100.dp)
+                                        .width(90.dp)
+                                        .height(90.dp)
                                         .background(Color.Unspecified),
                                     contentScale = ContentScale.Crop
                                 )
@@ -805,8 +792,7 @@ fun InterventionInProgressDataUI(
                                         modifier = Modifier
                                             .padding(start = 4.dp, end = 8.dp)
                                             .wrapContentWidth(),
-                                        fontStyle = FontStyle.Normal,
-                                        fontWeight = FontWeight.Bold,
+                                        fontFamily = fontRegular,
                                         fontSize = 12.sp,
                                         color = if (isSystemInDarkTheme()) {
                                             DARK_TITLE_TEXT
@@ -832,8 +818,7 @@ fun InterventionInProgressDataUI(
                                 modifier = Modifier
                                     .wrapContentWidth()
                                     .padding(start = 8.dp, end = 8.dp),
-                                fontStyle = FontStyle.Normal,
-                                fontWeight = FontWeight.Bold,
+                                fontFamily = fontMedium,
                                 fontSize = 16.sp,
                                 color = if (isSystemInDarkTheme()) {
                                     DARK_TITLE_TEXT
@@ -848,8 +833,7 @@ fun InterventionInProgressDataUI(
                                 modifier = Modifier
                                     .wrapContentWidth()
                                     .padding(start = 8.dp, end = 8.dp),
-                                fontStyle = FontStyle.Normal,
-                                fontWeight = FontWeight.Normal,
+                                fontFamily = fontMedium,
                                 fontSize = 12.sp,
                                 color = if (isSystemInDarkTheme()) {
                                     DARK_TITLE_TEXT
@@ -871,8 +855,7 @@ fun InterventionInProgressDataUI(
                                     text = inProgress.inProgressAchieved,
                                     modifier = Modifier
                                         .wrapContentWidth(),
-                                    fontStyle = FontStyle.Normal,
-                                    fontWeight = FontWeight.Normal,
+                                    fontFamily = fontRegular,
                                     fontSize = 14.sp,
                                     color = if (isSystemInDarkTheme()) {
                                         DARK_TITLE_TEXT
@@ -886,8 +869,7 @@ fun InterventionInProgressDataUI(
                                     text = "${inProgress.inProgressNum}%",
                                     modifier = Modifier
                                         .wrapContentWidth(),
-                                    fontStyle = FontStyle.Normal,
-                                    fontWeight = FontWeight.Medium,
+                                    fontFamily = fontMedium,
                                     fontSize = 14.sp,
                                     color = if (isSystemInDarkTheme()) {
                                         DARK_TITLE_TEXT
@@ -907,9 +889,9 @@ fun InterventionInProgressDataUI(
                             ) {
                                 if (inProgress.inProgressNum != null) {
                                     val num: Float = (inProgress.inProgressNum.toFloat() / 100)
-                                    CustomHorizontalProgressBar(num)
+                                    CustomHorizontalProgressBar(num, LightGreen06, BannerColor03)
                                 } else {
-                                    CustomHorizontalProgressBar(0.0f)
+                                    CustomHorizontalProgressBar(0.0f, LightGreen06, BannerColor03)
                                 }
                             }
                         }
@@ -948,8 +930,7 @@ fun InterventionInProgressDataUI(
                     modifier = Modifier
                         .wrapContentWidth()
                         .padding(start = 16.dp, end = 8.dp),
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Medium,
+                    fontFamily = fontMedium,
                     fontSize = 12.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_TITLE_TEXT
@@ -1026,12 +1007,6 @@ fun CompletedIntervention(navHostController: NavHostController) {
             painterResource(id = R.drawable.dummy_image)
         )
     )
-    var showDialog by remember { mutableStateOf(false) }
-    if (showDialog) {
-        InterventionIntroDialog {
-            showDialog = false
-        }
-    }
 
     Column(
         modifier = Modifier
@@ -1048,7 +1023,6 @@ fun CompletedIntervention(navHostController: NavHostController) {
         LazyColumn {
             items(interventionListData) { interventionData ->
                 InterventionCompletedDataUI(interventionData, navHostController)
-//                showDialog = true
             }
         }
     }
@@ -1176,8 +1150,7 @@ fun InterventionCompletedDataUI(completedData: InterventionData, navigation: Nav
                                         modifier = Modifier
                                             .padding(start = 4.dp, end = 8.dp)
                                             .wrapContentWidth(),
-                                        fontStyle = FontStyle.Normal,
-                                        fontWeight = FontWeight.Bold,
+                                        fontFamily = fontRegular,
                                         fontSize = 12.sp,
                                         color = if (isSystemInDarkTheme()) {
                                             DARK_TITLE_TEXT
@@ -1203,8 +1176,7 @@ fun InterventionCompletedDataUI(completedData: InterventionData, navigation: Nav
                                 modifier = Modifier
                                     .wrapContentWidth()
                                     .padding(start = 8.dp, end = 8.dp),
-                                fontStyle = FontStyle.Normal,
-                                fontWeight = FontWeight.Bold,
+                                fontFamily = fontMedium,
                                 fontSize = 16.sp,
                                 color = if (isSystemInDarkTheme()) {
                                     DARK_TITLE_TEXT
@@ -1219,8 +1191,7 @@ fun InterventionCompletedDataUI(completedData: InterventionData, navigation: Nav
                                 modifier = Modifier
                                     .wrapContentWidth()
                                     .padding(start = 8.dp, end = 8.dp),
-                                fontStyle = FontStyle.Normal,
-                                fontWeight = FontWeight.Normal,
+                                fontFamily = fontMedium,
                                 fontSize = 12.sp,
                                 color = if (isSystemInDarkTheme()) {
                                     DARK_TITLE_TEXT
@@ -1242,8 +1213,7 @@ fun InterventionCompletedDataUI(completedData: InterventionData, navigation: Nav
                                     text = completedData.inProgressAchieved,
                                     modifier = Modifier
                                         .wrapContentWidth(),
-                                    fontStyle = FontStyle.Normal,
-                                    fontWeight = FontWeight.Normal,
+                                    fontFamily = fontRegular,
                                     fontSize = 14.sp,
                                     color = if (isSystemInDarkTheme()) {
                                         DARK_TITLE_TEXT
@@ -1257,8 +1227,7 @@ fun InterventionCompletedDataUI(completedData: InterventionData, navigation: Nav
                                     text = "${completedData.inProgressNum}%",
                                     modifier = Modifier
                                         .wrapContentWidth(),
-                                    fontStyle = FontStyle.Normal,
-                                    fontWeight = FontWeight.Medium,
+                                    fontFamily = fontMedium,
                                     fontSize = 14.sp,
                                     color = if (isSystemInDarkTheme()) {
                                         DARK_TITLE_TEXT
@@ -1278,9 +1247,9 @@ fun InterventionCompletedDataUI(completedData: InterventionData, navigation: Nav
                             ) {
                                 if (completedData.inProgressNum != null) {
                                     val num: Float = (completedData.inProgressNum.toFloat() / 100)
-                                    CustomHorizontalProgressBar(num)
+                                    CustomHorizontalProgressBar(num, LightGreen06, BannerColor03)
                                 } else {
-                                    CustomHorizontalProgressBar(0.0f)
+                                    CustomHorizontalProgressBar(0.0f, LightGreen06, BannerColor03)
                                 }
                             }
                         }
@@ -1319,8 +1288,7 @@ fun InterventionCompletedDataUI(completedData: InterventionData, navigation: Nav
                     modifier = Modifier
                         .wrapContentWidth()
                         .padding(start = 16.dp, end = 8.dp),
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Medium,
+                    fontFamily = fontMedium,
                     fontSize = 12.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_TITLE_TEXT

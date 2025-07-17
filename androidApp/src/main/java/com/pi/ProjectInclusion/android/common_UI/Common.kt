@@ -84,6 +84,7 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -107,7 +108,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.pi.ProjectInclusion.BannerColor03
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
@@ -122,6 +122,7 @@ import com.pi.ProjectInclusion.GrayLight01
 import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.GrayLight03
 import com.pi.ProjectInclusion.LightBlue
+import com.pi.ProjectInclusion.LightPurple04
 import com.pi.ProjectInclusion.LightGreen06
 import com.pi.ProjectInclusion.OrangeSubTitle
 import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
@@ -699,9 +700,62 @@ fun BtnUi(
         )
     ) {
         Text(
-            title,
+            text = title,
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(bottom = 8.dp, top = 8.dp),
+            fontSize = 16.sp,
+            fontFamily = fontMedium,
+            color = if (enabled) {
+                White
+            } else {
+                White
+            },
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Preview
+@Composable
+fun YesBtnUi(
+    title: String = "Continue", onClick: () -> Unit = {}, enabled: Boolean = false,
+) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .width(135.dp)
+            .clip(
+                RoundedCornerShape(
+                    5.dp
+                )
+            ),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (enabled) {
+                if (isSystemInDarkTheme()) {
+                    Dark_Selected_BG
+                } else {
+                    DarkBlue
+                }
+            } else {
+                if (isSystemInDarkTheme()) {
+                    GrayLight03
+                } else {
+                    GrayLight03
+                }
+            },
+            contentColor = if (enabled) {
+                White
+            } else {
+                White
+            }
+        )
+    ) {
+        Text(
+            text = title,
+            modifier = Modifier
+                .wrapContentWidth()
                 .padding(bottom = 8.dp, top = 8.dp),
             fontSize = 16.sp,
             color = if (enabled) {
@@ -709,7 +763,61 @@ fun BtnUi(
             } else {
                 White
             },
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            fontFamily = fontMedium,
+        )
+    }
+}
+
+@Preview
+@Composable
+fun NoBtnUi(
+    title: String = "No", onClick: () -> Unit = {}, enabled: Boolean = false,
+) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .width(135.dp)
+            .border(
+                width = 1.dp, color = PrimaryBlue, RoundedCornerShape(
+                    8.dp
+                )
+            ),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (enabled) {
+                if (isSystemInDarkTheme()) {
+                    White
+                } else {
+                    White
+                }
+            } else {
+                if (isSystemInDarkTheme()) {
+                    White
+                } else {
+                    White
+                }
+            },
+            contentColor = if (enabled) {
+                White
+            } else {
+                White
+            }
+        )
+    ) {
+        Text(
+            text = title,
+            modifier = Modifier
+                .wrapContentWidth()
+                .padding(bottom = 8.dp, top = 8.dp),
+            fontSize = 16.sp,
+            color = if (enabled) {
+                PrimaryBlue
+            } else {
+                PrimaryBlue
+            },
+            textAlign = TextAlign.Center,
+            fontFamily = fontMedium,
         )
     }
 }
@@ -975,6 +1083,40 @@ fun TextWithIconOnLeft(
 }
 
 @Composable
+fun TextWithIconOnRight(
+    text: String,
+    icon: ImageVector,
+    textColor: Color,
+    iconColor: Color,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+) {
+    Row(
+        modifier = modifier
+            .clickable { onClick() },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = text, style = MaterialTheme.typography.bodyMedium.copy(
+                color = textColor,
+                fontSize = 13.sp,
+                textAlign = TextAlign.Start,
+                fontFamily = fontMedium,
+            )
+        )
+
+//        Spacer(modifier = Modifier.width(4.dp)) // Add space between text and icon
+
+        Icon(
+            imageVector = icon, contentDescription = IMG_DESCRIPTION, // Decorative element
+            tint = iconColor,
+            modifier = Modifier.size(20.dp)
+        )
+    }
+}
+
+@Composable
 fun PasswordTextField(
     modifier: Modifier = Modifier,
     password: MutableState<String> = remember { mutableStateOf("") },
@@ -1162,7 +1304,11 @@ fun CustomProgressBar(
 }
 
 @Composable
-fun CustomHorizontalProgressBar(progressBar: Float) {
+fun CustomHorizontalProgressBar(
+    progressBar: Float,
+    progressColor: Color,
+    backgroundColor: Color,
+) {
     val progress by remember { mutableStateOf(progressBar) } // Example progress value
     Column(
         modifier = Modifier
@@ -1180,7 +1326,7 @@ fun CustomHorizontalProgressBar(progressBar: Float) {
                     if (isSystemInDarkTheme()) {
                         Dark_03
                     } else {
-                        BannerColor03
+                        backgroundColor
                     }
                 )
         ) {
@@ -1188,7 +1334,7 @@ fun CustomHorizontalProgressBar(progressBar: Float) {
                 modifier = Modifier
                     .fillMaxHeight()
                     .fillMaxWidth(fraction = progress)
-                    .background(LightGreen06)
+                    .background(progressColor)
             )
         }
     }
@@ -1285,9 +1431,8 @@ fun DetailsBackgroundUi(
                             text = studentName.toString(),
                             modifier = Modifier
                                 .padding(start = 8.dp, end = 8.dp),
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 12.sp,
+                            fontFamily = fontBold,
+                            fontSize = 14.sp,
                             color = if (isSystemInDarkTheme()) {
                                 DARK_TITLE_TEXT
                             } else {
@@ -1300,13 +1445,12 @@ fun DetailsBackgroundUi(
                             text = grade.toString(),
                             modifier = Modifier
                                 .padding(start = 8.dp, end = 8.dp),
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Medium,
+                            fontFamily = fontMedium,
                             fontSize = 12.sp,
                             color = if (isSystemInDarkTheme()) {
-                                DARK_TITLE_TEXT
+                                LightPurple04
                             } else {
-                                White
+                                LightPurple04
                             },
                             textAlign = TextAlign.Start
                         )
@@ -1333,6 +1477,132 @@ fun DetailsBackgroundUi(
                             modifier = Modifier
                                 .align(Alignment.CenterEnd)
                                 .padding(start = 10.dp)
+                                .background(Color.Unspecified)
+                                .clickable(onClick = onMoreInfoClick),
+                            colorFilter = ColorFilter.tint(White)
+                        )
+                    }
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .background(
+                        if (isSystemInDarkTheme()) {
+                            Dark_01
+                        } else {
+                            White
+                        }
+                    )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                ) {
+                    content()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DetailsNoImgBackgroundUi(
+    pageTitle: String,
+    moreInfoIcon: Painter,
+    modifier: Modifier = Modifier,
+    isShowBackButton: Boolean = true,
+    isShowMoreInfo: Boolean = true,
+    onBackButtonClick: () -> Unit = {},
+    onMoreInfoClick: () -> Unit = {},
+    content: @Composable (() -> Unit),
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(), color = White
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    color = if (isSystemInDarkTheme()) {
+                        DarkBlue
+                    } else {
+                        DarkBlue
+                    }
+                ),
+            verticalArrangement = Arrangement.Top
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .background(
+                        color = if (isSystemInDarkTheme()) {
+                            DarkBlue
+                        } else {
+                            DarkBlue
+                        }
+                    ), verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Absolute.SpaceBetween
+            ) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .background(Color.Unspecified)
+                ) {
+                    if (isShowBackButton && !LocalInspectionMode.current) {
+                        Image(
+                            painter = painterResource(R.drawable.left_back_arrow),
+                            contentDescription = IMG_DESCRIPTION,
+                            modifier = Modifier
+                                .background(Color.Unspecified)
+                                .clickable(onClick = onBackButtonClick),
+                            colorFilter = ColorFilter.tint(White)
+                        )
+                    }
+                }
+
+                Text(
+                    text = pageTitle.toString(),
+                    modifier = Modifier
+                        .padding(end = 16.dp, top = 8.dp, bottom = 8.dp),
+                    fontFamily = fontBold,
+                    fontSize = 16.sp,
+                    color = if (isSystemInDarkTheme()) {
+                        DARK_TITLE_TEXT
+                    } else {
+                        White
+                    },
+                    textAlign = TextAlign.Start
+                )
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .background(Color.Unspecified)
+                ) {
+                    if (isShowMoreInfo && !LocalInspectionMode.current) {
+                        Image(
+                            painter = moreInfoIcon,
+                            contentDescription = IMG_DESCRIPTION,
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .padding(start = 8.dp, end = 6.dp)
+                                .size(30.dp)
                                 .background(Color.Unspecified)
                                 .clickable(onClick = onMoreInfoClick),
                             colorFilter = ColorFilter.tint(White)
