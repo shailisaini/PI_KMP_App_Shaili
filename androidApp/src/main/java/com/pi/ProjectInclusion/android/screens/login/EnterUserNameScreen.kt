@@ -184,6 +184,8 @@ fun LoginUI(
                     )
 
                     MobileTextField(
+                        isIcon = false,
+                        icon = null,
                         colors = colors,
                         number = mobNo,
                         trueFalse = true,

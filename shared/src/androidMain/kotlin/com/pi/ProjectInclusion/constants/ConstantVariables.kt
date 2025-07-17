@@ -15,6 +15,9 @@ object ConstantVariables {
     var IMG_DESCRIPTION: String = "img"
     var KEY_LOADING: String = "Loading..."
     var KEY_ACTIVE: String = "Active"
+    var KEY_MALE: String = "Male"
+    var KEY_FEMALE: String = "Female"
+    var KEY_OTHER: String = "Other"
     var STATUS_LANG: Int = 1
     var PAGE_LENGTH: String = "1"
     var PAGE_LIMIT: String = "20"

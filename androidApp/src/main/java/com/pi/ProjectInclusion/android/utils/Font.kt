@@ -16,3 +16,7 @@ val fontMedium = FontFamily(
 val fontBold = FontFamily(
     Font(R.font.roboto_bold, FontWeight.Bold)
 )
+
+val fontSemiBold = FontFamily(
+    Font(R.font.roboto_semi_bold, FontWeight.SemiBold)
+)

@@ -162,6 +162,8 @@ fun ForgetPasswordScreen(navController: NavHostController, viewModel: LoginViewM
                 )
 
                 MobileTextField(
+                    isIcon = false,
+                    icon = null,
                     colors = colors, number = mobNo, trueFalse = true, hint = enterMobile.toString()
                 )
 

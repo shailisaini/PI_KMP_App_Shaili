@@ -1,6 +1,8 @@
 package com.pi.ProjectInclusion.android.common_UI
 
 import android.annotation.SuppressLint
+import android.app.DatePickerDialog
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -18,17 +20,23 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,6 +55,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -58,11 +67,11 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.CornerRadius
@@ -93,14 +102,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.pi.ProjectInclusion.BannerColor03
-import com.pi.ProjectInclusion.Bg_Gray1
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
@@ -124,8 +131,12 @@ import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
+import com.pi.ProjectInclusion.android.utils.fontSemiBold
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import kotlinx.coroutines.delay
+import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_FEMALE
+import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_MALE
+import java.util.Calendar
 
 fun BackButtonPress(navController: NavHostController, route: String) {
     navController.popBackStack()
@@ -317,11 +328,13 @@ fun DefaultBackgroundUi(
 }
 
 @Composable
-fun MobileTextField(
+fun TextViewField(
+    isIcon: Boolean = false,
+    icon: ImageVector?,
     colors: ColorScheme,
     trueFalse: Boolean,
     modifier: Modifier = Modifier,
-    number: MutableState<String> = remember { mutableStateOf("") },
+    text: MutableState<String> = remember { mutableStateOf("") },
     hint: String = remember { mutableStateOf("") }.toString(),
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -329,23 +342,31 @@ fun MobileTextField(
 
     val keyboardController = LocalSoftwareKeyboardController.current
     TextField(
-        value = number.value,
+        value = text.value,
         onValueChange = {
-            if (it.length <= 10 && it.all { char -> char.isDigit() }) {
-                number.value = it
+                text.value = it
 
-                //  Hide keyboard on 10 digits
-                if (it.length == 10) {
+                //  Hide keyboard on 20 digits
+                if (it.length == 20) {
                     keyboardController?.hide()
                 }
-            }
         },
         enabled = trueFalse,
         placeholder = { Text(hint, color = GrayLight01, fontSize = 14.sp) },
         shape = RoundedCornerShape(8.dp),
         singleLine = true,
-        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
         visualTransformation = VisualTransformation.None,
+
+        leadingIcon = if (isIcon) {
+            {
+                Icon(
+                    imageVector = icon!!,
+                    contentDescription = null,
+                    tint = if (isSystemInDarkTheme()) White else Black
+                )
+            }
+        } else null,
 
         modifier = modifier
             .fillMaxWidth()
@@ -371,6 +392,100 @@ fun MobileTextField(
         textStyle = TextStyle(
             fontStyle = FontStyle.Normal,
             fontWeight = FontWeight.SemiBold,
+            fontSize = 14.sp,
+            color = if (isSystemInDarkTheme()) {
+                DARK_DEFAULT_BUTTON_TEXT
+            } else {
+                Black
+            }
+        ),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = if (isSystemInDarkTheme()) {
+                Dark_02
+            } else {
+                White
+            },
+            focusedTextColor = Gray,
+            unfocusedTextColor = colors.onSurface,
+            focusedIndicatorColor = Transparent,
+            unfocusedContainerColor = if (isSystemInDarkTheme()) {
+                Dark_02
+            } else {
+                White
+            },
+            unfocusedIndicatorColor = Transparent,
+            disabledContainerColor = GrayLight03
+        )
+    )
+}
+
+@Composable
+fun MobileTextField(
+    isIcon: Boolean = false,
+    icon: ImageVector?,
+    colors: ColorScheme,
+    trueFalse: Boolean,
+    modifier: Modifier = Modifier,
+    number: MutableState<String> = remember { mutableStateOf("") },
+    hint: String = remember { mutableStateOf("") }.toString(),
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    TextField(
+        value = number.value,
+        onValueChange = {
+            if (it.length <= 10 && it.all { char -> char.isDigit() }) {
+                number.value = it
+
+                //  Hide keyboard on 10 digits
+                if (it.length == 10) {
+                    keyboardController?.hide()
+                }
+            }
+        },
+        enabled = trueFalse,
+        placeholder = { Text(hint, color = GrayLight01, fontSize = 14.sp) },
+        shape = RoundedCornerShape(8.dp),
+        singleLine = true,
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+        visualTransformation = VisualTransformation.None,
+
+        leadingIcon = if (isIcon) {
+            {
+                Icon(
+                    imageVector = icon!!,
+                    contentDescription = null,
+                    tint = if (isSystemInDarkTheme()) White else Gray
+                )
+            }
+        } else null,
+
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .drawBehind {
+                if (isFocused) {
+                    drawRoundRect(
+                        color = LightBlue.copy(alpha = 0.4f),
+                        cornerRadius = CornerRadius(8.dp.toPx(), 8.dp.toPx()),
+                        style = Stroke(width = 4.dp.toPx())
+                    )
+                }
+            }
+            .border(
+                width = 1.dp,
+                color = when {
+                    isFocused -> LightBlue
+                    isSystemInDarkTheme() -> Dark_02
+                    else -> GrayLight02
+                }, shape = RoundedCornerShape(8.dp)
+            ),
+        interactionSource = interactionSource,
+        textStyle = TextStyle(
+            fontFamily = fontSemiBold,
             fontSize = 14.sp,
             color = if (isSystemInDarkTheme()) {
                 DARK_DEFAULT_BUTTON_TEXT
@@ -1284,12 +1399,307 @@ fun CustomCircularImageViewWithBorder(
     }
 }
 
+@Composable
+fun TextFieldWithLeftIcon(
+    modifier: Modifier = Modifier,
+    value: MutableState<String> = remember { mutableStateOf("") },
+    placeholder: String = "Enter Here",
+) {
+    val colors = MaterialTheme.colorScheme
+    val selectedBorder = BorderStroke(
+        width = 0.5.dp, if (isSystemInDarkTheme()) {
+            Dark_03
+        } else {
+            GrayLight02
+        }
+    )
+
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier
+            .wrapContentHeight(),
+        colors = if (isSystemInDarkTheme()) {
+            CardDefaults.cardColors(Dark_03)
+        } else {
+            CardDefaults.cardColors(White)
+        },
+        border = selectedBorder,
+    ) {
+        Row(
+            modifier = modifier
+                .background(
+                    if (isSystemInDarkTheme()) {
+                        Dark_03
+                    } else {
+                        White
+                    }
+                )
+                .height(50.dp)
+                .fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(R.drawable.calendar),
+                contentDescription = "data is here",
+                modifier = Modifier
+                    .size(24.dp)
+                    .padding(start = 7.dp)
+            )
+            Text(
+                text = placeholder, modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(10.dp),
+                color = if (isSystemInDarkTheme()) {
+                    DARK_DEFAULT_BUTTON_TEXT
+                } else {
+                    Black
+                },
+                fontSize = 14.sp,
+                fontFamily = fontSemiBold
+
+            )
+        }
+    }
+}
+
 fun getGenderIconState(state: String?): Int {
     return when (state) {
-        "Female" -> R.drawable.dummy_image
+        KEY_FEMALE -> R.drawable.dummy_image
         "F" -> R.drawable.dummy_image
-        "Male" -> R.drawable.dummy_image
+        KEY_MALE -> R.drawable.dummy_image
         "M" -> R.drawable.dummy_image
         else -> R.drawable.dummy_image
+    }
+}
+
+@Preview
+@Composable
+fun GenderOption(
+    gender: String = "",
+    isSelected: Boolean = false,
+    onSelected: () -> Unit = {}
+) {
+    val icon = when (gender) {
+        KEY_MALE -> R.drawable.ic_male
+        KEY_FEMALE -> R.drawable.ic_female
+        else -> R.drawable.ic_other
+    }
+
+    val selectedIcon = when (gender) {
+        KEY_MALE -> R.drawable.ic_male_selected
+        KEY_FEMALE -> R.drawable.ic_female_selected
+        else -> R.drawable.ic_other_selected
+    }
+
+    Column(
+        modifier = Modifier
+            .clickable { onSelected() }
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            painter = if (isSelected)painterResource(id = selectedIcon) else painterResource(id = icon),
+            contentDescription = gender,
+            tint = Color.Unspecified,
+            modifier = Modifier.size(80.dp)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = gender,
+            color = Black,
+            fontSize = 14.sp,
+         fontFamily = if (isSelected) fontSemiBold else fontRegular
+        )
+    }
+}
+
+fun showDatePickerDialog(
+    context: Context, onDateSelected: (year: Int, month: Int, dayOfMonth: Int) -> Unit,
+) {
+    val calendar = Calendar.getInstance()
+    val fiveYearsAgoCalendar = Calendar.getInstance().apply {
+        add(Calendar.YEAR, -4)
+    }
+    val year = calendar.get(Calendar.YEAR)
+    val month = calendar.get(Calendar.MONTH) // This is 0-based
+    val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
+
+    // Set the maximum date to today
+//    val maxDate = calendar.timeInMillis
+    val maxDate = fiveYearsAgoCalendar.timeInMillis
+
+    val datePickerDialog = DatePickerDialog(
+        context, { _, selectedYear, selectedMonth, selectedDayOfMonth ->
+            // Adjust the month by adding 1 to convert from 0-based to 1-based
+            val mon = selectedMonth
+            onDateSelected(selectedYear, mon + 1, selectedDayOfMonth)
+        }, year, month, dayOfMonth
+        // Set the background color of the date picker dialog
+    ).apply {
+        datePicker.maxDate = maxDate
+//        datePicker.minDate = calendar.timeInMillis
+    }
+    // Set the maximum date to prevent future date selection
+//    datePickerDialog.datePicker.maxDate = maxDate
+    datePickerDialog.show()
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SchoolListBottomSheet(
+    isBottomSheetVisible: Boolean,
+    sheetState: SheetState,
+    onDismiss: () -> Unit,
+    onDecline: () -> Unit,
+    onTextSelected: (String) -> Unit = { "" },
+    myList: List<String>,
+) {
+//    var mySchoolList: List<String> = myList
+    val colors = MaterialTheme.colorScheme
+//    val viewModel: LoginViewModel = hiltViewModel()
+//    val languageListName = stringResource(id = R.string.key_lang_list)
+    val chooseOption = stringResource(id = R.string.choose_option)
+    val searchHere = stringResource(id = R.string.txt_search_here)
+    val otherOption = stringResource(id = R.string.txt_other)
+    var languageData = HashMap<String, String>()
+//    languageData = viewModel.getLanguageTranslationData(languageListName)
+
+    if (isBottomSheetVisible) {
+        ModalBottomSheet(
+            onDismissRequest = onDismiss,
+            sheetState = sheetState,
+            containerColor = if (isSystemInDarkTheme()) {
+               Black
+            } else {
+                White
+            },
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+            dragHandle = null,
+            scrimColor = Color.Black.copy(alpha = 0.5f),
+            windowInsets = WindowInsets(0, 0, 0, 0).add(WindowInsets.ime)
+        ) {
+            var text by remember { mutableStateOf("") }
+            val filteredList = remember(myList, text) {
+                myList.filter { it.toString().contains(text, ignoreCase = true) }
+            }
+
+            Column(
+                modifier = Modifier
+                    .padding(vertical = 20.dp)
+                    .background(
+                        color = if (isSystemInDarkTheme()) {
+                            Dark_03
+                        } else {
+                            Color.White
+                        }
+                    )
+                    .windowInsetsPadding(WindowInsets.ime)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .background(
+                            color = if (isSystemInDarkTheme()) {
+                                Dark_03
+                            } else {
+                                Color.White
+                            }
+                        )
+                        .fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_search),
+                        contentDescription = IMG_DESCRIPTION,
+                        modifier = Modifier
+                            .background(
+                                color = if (isSystemInDarkTheme()) {
+                                    Dark_03
+                                } else {
+                                    White
+                                }
+                            )
+                            .padding()
+                            .padding(10.dp)
+                            .background(Color.Unspecified)
+                    )
+                    TextField(
+                        value = text,
+                        onValueChange = { newText ->
+                            text = newText
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = if (isSystemInDarkTheme()) {
+                                    Dark_03
+                                } else {
+                                    Color.White
+                                }
+                            ), // Set background color to white
+                        placeholder = {
+                            Text(
+                                text = searchHere,
+                                color = Color.Gray,
+                                fontFamily = fontRegular
+                            )
+                        }, // Placeholder text color
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = if (isSystemInDarkTheme()) {
+                                Dark_03
+                            } else {
+                                Color.White
+                            },
+                            cursorColor = Black,
+                            focusedIndicatorColor = Transparent,
+                            unfocusedIndicatorColor = Transparent
+                        ),
+                        singleLine = true
+                    )
+                }
+                val selectedItem = remember { mutableStateOf<String?>(null) }
+                val filteredListWithOther =
+                    filteredList + listOf(otherOption)
+
+                LazyColumn() {
+                    items(filteredListWithOther) { item ->
+                        val isSelected = selectedItem.value == item.toString()
+                        Text(
+                            text = item,
+                            modifier = Modifier
+                                .background(
+                                    color = if (isSelected) {
+                                        if (isSystemInDarkTheme()) {
+                                            Dark_03
+                                        } else {
+                                            PrimaryBlueLt
+                                        }
+                                    } else {
+                                        if (isSystemInDarkTheme()) {
+                                            Dark_03
+                                        } else {
+                                            White
+                                        }
+                                    }
+                                )
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .clickable {
+                                    selectedItem.value = item
+                                    onTextSelected.invoke(item)
+                                    onDismiss.invoke()
+                                },
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if (myList.isEmpty()) {
+            onTextSelected.invoke(chooseOption)
+        }
     }
 }
