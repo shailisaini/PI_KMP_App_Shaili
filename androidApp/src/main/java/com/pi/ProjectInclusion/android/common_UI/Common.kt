@@ -129,6 +129,7 @@ import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
@@ -172,8 +173,7 @@ fun ChooseOneBottomSheet(
     ModalBottomSheet(
         onDismissRequest = {
             onDismiss()
-        },
-        sheetState = sheetState
+        }, sheetState = sheetState
     ) {
         // Sheet content
         Column(
@@ -243,8 +243,7 @@ fun ChooseOneBottomSheet(
                             disabledContainerColor = com.pi.ProjectInclusion.White
                         )
                     },
-                    border = BorderStroke(1.dp, color = GrayLight01)
-                ) {
+                    border = BorderStroke(1.dp, color = GrayLight01)) {
                     TextWithIconOnLeft(
                         text = stringResource(R.string.txt_otp_whatsapp),
                         icon = ImageVector.vectorResource(id = R.drawable.ic_whatsapp_otp),
@@ -280,8 +279,7 @@ fun DefaultBackgroundUi(
                     } else {
                         White
                     }
-                ),
-            verticalArrangement = Arrangement.Top
+                ), verticalArrangement = Arrangement.Top
         ) {
 
             Box(
@@ -345,12 +343,12 @@ fun TextViewField(
     TextField(
         value = text.value,
         onValueChange = {
-                text.value = it
+            text.value = it
 
-                //  Hide keyboard on 20 digits
-                if (it.length == 20) {
-                    keyboardController?.hide()
-                }
+            //  Hide keyboard on 20 digits
+            if (it.length == 20) {
+                keyboardController?.hide()
+            }
         },
         enabled = trueFalse,
         placeholder = { Text(hint, color = GrayLight01, fontSize = 14.sp) },
@@ -382,8 +380,7 @@ fun TextViewField(
                 }
             }
             .border(
-                width = 1.dp,
-                color = when {
+                width = 1.dp, color = when {
                     isFocused -> LightBlue
                     isSystemInDarkTheme() -> Dark_02
                     else -> GrayLight02
@@ -416,8 +413,7 @@ fun TextViewField(
             },
             unfocusedIndicatorColor = Transparent,
             disabledContainerColor = GrayLight03
-        )
-    )
+        ))
 }
 
 @Composable
@@ -477,8 +473,7 @@ fun MobileTextField(
                 }
             }
             .border(
-                width = 1.dp,
-                color = when {
+                width = 1.dp, color = when {
                     isFocused -> LightBlue
                     isSystemInDarkTheme() -> Dark_02
                     else -> GrayLight02
@@ -486,9 +481,7 @@ fun MobileTextField(
             ),
         interactionSource = interactionSource,
         textStyle = TextStyle(
-            fontFamily = fontSemiBold,
-            fontSize = 14.sp,
-            color = if (isSystemInDarkTheme()) {
+            fontFamily = fontSemiBold, fontSize = 14.sp, color = if (isSystemInDarkTheme()) {
                 DARK_DEFAULT_BUTTON_TEXT
             } else {
                 Black
@@ -510,8 +503,7 @@ fun MobileTextField(
             },
             unfocusedIndicatorColor = Transparent,
             disabledContainerColor = GrayLight03
-        )
-    )
+        ))
 }
 
 @Preview
@@ -520,13 +512,13 @@ fun OTPBtnUi(
     title: String = "Continue", onClick: () -> Unit = {},
 ) {
     Button(
-        onClick = onClick, modifier = Modifier
+        onClick = onClick,
+        modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp)),
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = White,
-            contentColor = PrimaryBlue
+            containerColor = White, contentColor = PrimaryBlue
         ),
         border = BorderStroke(1.dp, color = PrimaryBlue)
     ) {
@@ -549,7 +541,7 @@ fun RegistrationHeader(
     colors: Color = Black,
     subtitle: String = "",
     subtitleColor: Color = OrangeSubTitle,
-    onBackButtonClick: () -> Unit = {}
+    onBackButtonClick: () -> Unit = {},
 ) {
 
     Box(
@@ -565,8 +557,7 @@ fun RegistrationHeader(
                     end = Offset(size.width, y),
                     strokeWidth = strokeWidth
                 )
-            }
-    ) {
+            }) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -594,8 +585,7 @@ fun RegistrationHeader(
                     fontSize = 18.sp,
                     fontFamily = fontBold,
                     color = colors,
-                    modifier = Modifier
-                        .padding(start = 10.dp)
+                    modifier = Modifier.padding(start = 10.dp)
                 )
                 Text(
                     subtitle,
@@ -603,8 +593,7 @@ fun RegistrationHeader(
                     fontSize = 12.sp,
                     fontFamily = fontMedium,
                     color = subtitleColor,
-                    modifier = Modifier
-                        .padding(start = 10.dp)
+                    modifier = Modifier.padding(start = 10.dp)
                 )
             }
         }
@@ -617,16 +606,13 @@ fun SmallBtnUi(
     title: String = "Continue", onClick: () -> Unit = {}, enabled: Boolean = false,
 ) {
     Button(
-        onClick = onClick,
-        modifier = Modifier
+        onClick = onClick, modifier = Modifier
             .wrapContentSize()
             .clip(
                 RoundedCornerShape(
                     5.dp
                 )
-            ),
-        shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(
+            ), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(
             containerColor = if (enabled) {
                 if (isSystemInDarkTheme()) {
                     Dark_Selected_BG
@@ -639,8 +625,7 @@ fun SmallBtnUi(
                 } else {
                     GrayLight03
                 }
-            },
-            contentColor = if (enabled) {
+            }, contentColor = if (enabled) {
                 White
             } else {
                 White
@@ -669,16 +654,13 @@ fun BtnUi(
     title: String = "Continue", onClick: () -> Unit = {}, enabled: Boolean = false,
 ) {
     Button(
-        onClick = onClick,
-        modifier = Modifier
+        onClick = onClick, modifier = Modifier
             .fillMaxWidth()
             .clip(
                 RoundedCornerShape(
                     5.dp
                 )
-            ),
-        shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(
+            ), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(
             containerColor = if (enabled) {
                 if (isSystemInDarkTheme()) {
                     Dark_Selected_BG
@@ -691,8 +673,7 @@ fun BtnUi(
                 } else {
                     GrayLight03
                 }
-            },
-            contentColor = if (enabled) {
+            }, contentColor = if (enabled) {
                 White
             } else {
                 White
@@ -718,20 +699,17 @@ fun BtnUi(
 
 @Preview
 @Composable
-fun YesBtnUi(
+fun BtnWithRightIconUi(
     title: String = "Continue", onClick: () -> Unit = {}, enabled: Boolean = false,
 ) {
     Button(
-        onClick = onClick,
-        modifier = Modifier
-            .width(135.dp)
+        onClick = onClick, modifier = Modifier
+            .fillMaxWidth()
             .clip(
                 RoundedCornerShape(
                     5.dp
                 )
-            ),
-        shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(
+            ), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(
             containerColor = if (enabled) {
                 if (isSystemInDarkTheme()) {
                     Dark_Selected_BG
@@ -744,8 +722,66 @@ fun YesBtnUi(
                 } else {
                     GrayLight03
                 }
-            },
-            contentColor = if (enabled) {
+            }, contentColor = if (enabled) {
+                White
+            } else {
+                White
+            }
+        )
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = title,
+                modifier = Modifier.padding(bottom = 8.dp, top = 8.dp),
+                fontSize = 16.sp,
+                fontFamily = fontMedium,
+                color = if (enabled) {
+                    White
+                } else {
+                    White
+                },
+                textAlign = TextAlign.Center
+            )
+
+            Icon(
+                painter = painterResource(R.drawable.double_right_arrow_img),
+                contentDescription = IMG_DESCRIPTION,
+                modifier = Modifier.size(20.dp),
+                tint = White,
+            )
+        }
+    }
+}
+
+@Composable
+fun YesBtnUi(
+    title: String = "Continue",
+    modifier: Modifier,
+    onClick: () -> Unit = {},
+    enabled: Boolean = false,
+) {
+    Button(
+        onClick = onClick, modifier = modifier.clip(
+                RoundedCornerShape(
+                    5.dp
+                )
+            ), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(
+            containerColor = if (enabled) {
+                if (isSystemInDarkTheme()) {
+                    Dark_Selected_BG
+                } else {
+                    DarkBlue
+                }
+            } else {
+                if (isSystemInDarkTheme()) {
+                    GrayLight03
+                } else {
+                    GrayLight03
+                }
+            }, contentColor = if (enabled) {
                 White
             } else {
                 White
@@ -775,16 +811,13 @@ fun NoBtnUi(
     title: String = "No", onClick: () -> Unit = {}, enabled: Boolean = false,
 ) {
     Button(
-        onClick = onClick,
-        modifier = Modifier
+        onClick = onClick, modifier = Modifier
             .width(135.dp)
             .border(
                 width = 1.dp, color = PrimaryBlue, RoundedCornerShape(
                     8.dp
                 )
-            ),
-        shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(
+            ), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(
             containerColor = if (enabled) {
                 if (isSystemInDarkTheme()) {
                     White
@@ -797,8 +830,7 @@ fun NoBtnUi(
                 } else {
                     White
                 }
-            },
-            contentColor = if (enabled) {
+            }, contentColor = if (enabled) {
                 White
             } else {
                 White
@@ -899,9 +931,7 @@ fun TermsAndPrivacyText(
             pushStringAnnotation(tag = "TERMS", annotation = "terms")
             withStyle(
                 style = SpanStyle(
-                    color = PrimaryBlue,
-                    fontSize = 12.sp,
-                    fontFamily = fontRegular
+                    color = PrimaryBlue, fontSize = 12.sp, fontFamily = fontRegular
                 )
             ) {
                 append("Terms of Service")
@@ -914,8 +944,7 @@ fun TermsAndPrivacyText(
             pushStringAnnotation(tag = "PRIVACY", annotation = "privacy")
             withStyle(
                 style = SpanStyle(
-                    color = PrimaryBlue,
-                    fontFamily = fontRegular
+                    color = PrimaryBlue, fontFamily = fontRegular
                 )
             ) {
                 append("Privacy Policy")
@@ -932,21 +961,18 @@ fun TermsAndPrivacyText(
             contentAlignment = Alignment.Center
         ) {
             ClickableText(
-                text = annotatedText,
-                style = TextStyle(
+                text = annotatedText, style = TextStyle(
                     fontSize = 14.sp,
                     color = Gray,
                     textAlign = TextAlign.Center,
                     fontFamily = fontRegular
-                ),
-                onClick = { offset ->
-                    annotatedText.getStringAnnotations("TERMS", offset, offset)
-                        .firstOrNull()?.let { onTermsClick() }
+                ), onClick = { offset ->
+                    annotatedText.getStringAnnotations("TERMS", offset, offset).firstOrNull()
+                        ?.let { onTermsClick() }
 
-                    annotatedText.getStringAnnotations("PRIVACY", offset, offset)
-                        .firstOrNull()?.let { onPrivacyClick() }
-                }
-            )
+                    annotatedText.getStringAnnotations("PRIVACY", offset, offset).firstOrNull()
+                        ?.let { onPrivacyClick() }
+                })
         }
     }
 }
@@ -986,8 +1012,7 @@ internal fun CharacterContainer(
             modifier = Modifier
                 .size(45.dp) // Ensure this is wide enough
                 .border(
-                    width = if (isFocused) 2.dp else 1.dp,
-                    color = if (isFocused) {
+                    width = if (isFocused) 2.dp else 1.dp, color = if (isFocused) {
                         if (isSystemInDarkTheme()) {
                             Dark_03
                         } else {
@@ -1003,8 +1028,7 @@ internal fun CharacterContainer(
                         } else {
                             LightBlue
                         }
-                    },
-                    shape = RoundedCornerShape(6.dp)
+                    }, shape = RoundedCornerShape(6.dp)
                 )
                 .padding(2.dp)
         ) {
@@ -1092,8 +1116,7 @@ fun TextWithIconOnRight(
     onClick: () -> Unit = {},
 ) {
     Row(
-        modifier = modifier
-            .clickable { onClick() },
+        modifier = modifier.clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
@@ -1110,8 +1133,7 @@ fun TextWithIconOnRight(
 
         Icon(
             imageVector = icon, contentDescription = IMG_DESCRIPTION, // Decorative element
-            tint = iconColor,
-            modifier = Modifier.size(20.dp)
+            tint = iconColor, modifier = Modifier.size(20.dp)
         )
     }
 }
@@ -1160,28 +1182,23 @@ fun PasswordTextField(
                 Dark_03
             } else {
                 White
-            },
-            focusedTextColor = if (isSystemInDarkTheme()) {
+            }, focusedTextColor = if (isSystemInDarkTheme()) {
                 White
             } else {
                 Black
-            },
-            unfocusedTextColor = if (isSystemInDarkTheme()) {
+            }, unfocusedTextColor = if (isSystemInDarkTheme()) {
                 Dark_03
             } else {
                 White
-            },
-            focusedIndicatorColor = if (isSystemInDarkTheme()) {
+            }, focusedIndicatorColor = if (isSystemInDarkTheme()) {
                 Dark_03
             } else {
                 White
-            },
-            unfocusedContainerColor = if (isSystemInDarkTheme()) {
+            }, unfocusedContainerColor = if (isSystemInDarkTheme()) {
                 Dark_03
             } else {
                 White
-            },
-            unfocusedIndicatorColor = if (isSystemInDarkTheme()) {
+            }, unfocusedIndicatorColor = if (isSystemInDarkTheme()) {
                 Dark_03
             } else {
                 White
@@ -1210,12 +1227,10 @@ fun PasswordCheckField(
     padding: Modifier,
 ) {
     Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = padding
+        verticalAlignment = Alignment.CenterVertically, modifier = padding
     ) {
         Checkbox(
-            checked = isChecked,
-            onCheckedChange = { it }, // Disabled for display-only
+            checked = isChecked, onCheckedChange = { it }, // Disabled for display-only
             colors = if (isSystemInDarkTheme()) {
                 CheckboxDefaults.colors(
                     checkedColor = Transparent,     // Light purple-gray
@@ -1228,8 +1243,7 @@ fun PasswordCheckField(
                     uncheckedColor = Color.LightGray,   // Same for unchecked
                     checkmarkColor = PrimaryBlue
                 )
-            },
-            modifier = Modifier.size(20.dp)
+            }, modifier = Modifier.size(20.dp)
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -1261,13 +1275,11 @@ fun CustomProgressBar(
     val clampedPercentage = percentage.coerceIn(1f, 100f)
 
     val animatedPercentage by animateFloatAsState(
-        targetValue = clampedPercentage,
-        animationSpec = tween(durationMillis = 100)
+        targetValue = clampedPercentage, animationSpec = tween(durationMillis = 100)
     )
 
     Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
+        contentAlignment = Alignment.Center, modifier = modifier
     ) {
         Canvas(modifier = modifier) {
             val diameter = size.minDimension
@@ -1365,8 +1377,7 @@ fun DetailsBackgroundUi(
                     } else {
                         DarkBlue
                     }
-                ),
-            verticalArrangement = Arrangement.Top
+                ), verticalArrangement = Arrangement.Top
         ) {
             Row(
                 modifier = Modifier
@@ -1378,7 +1389,8 @@ fun DetailsBackgroundUi(
                         } else {
                             DarkBlue
                         }
-                    ), verticalAlignment = Alignment.CenterVertically,
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Absolute.SpaceBetween
             ) {
                 Box(
@@ -1418,8 +1430,7 @@ fun DetailsBackgroundUi(
                     }
 
                     Column(
-                        modifier = Modifier
-                            .background(
+                        modifier = Modifier.background(
                                 color = if (isSystemInDarkTheme()) {
                                     DarkBlue
                                 } else {
@@ -1429,8 +1440,7 @@ fun DetailsBackgroundUi(
                     ) {
                         Text(
                             text = studentName.toString(),
-                            modifier = Modifier
-                                .padding(start = 8.dp, end = 8.dp),
+                            modifier = Modifier.padding(start = 8.dp, end = 8.dp),
                             fontFamily = fontBold,
                             fontSize = 14.sp,
                             color = if (isSystemInDarkTheme()) {
@@ -1443,8 +1453,7 @@ fun DetailsBackgroundUi(
 
                         Text(
                             text = grade.toString(),
-                            modifier = Modifier
-                                .padding(start = 8.dp, end = 8.dp),
+                            modifier = Modifier.padding(start = 8.dp, end = 8.dp),
                             fontFamily = fontMedium,
                             fontSize = 12.sp,
                             color = if (isSystemInDarkTheme()) {
@@ -1533,8 +1542,7 @@ fun DetailsNoImgBackgroundUi(
                     } else {
                         DarkBlue
                     }
-                ),
-            verticalArrangement = Arrangement.Top
+                ), verticalArrangement = Arrangement.Top
         ) {
             Row(
                 modifier = Modifier
@@ -1546,7 +1554,8 @@ fun DetailsNoImgBackgroundUi(
                         } else {
                             DarkBlue
                         }
-                    ), verticalAlignment = Alignment.CenterVertically,
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Absolute.SpaceBetween
             ) {
                 Box(
@@ -1568,8 +1577,7 @@ fun DetailsNoImgBackgroundUi(
 
                 Text(
                     text = pageTitle.toString(),
-                    modifier = Modifier
-                        .padding(end = 16.dp, top = 8.dp, bottom = 8.dp),
+                    modifier = Modifier.padding(end = 16.dp, top = 8.dp, bottom = 8.dp),
                     fontFamily = fontBold,
                     fontSize = 16.sp,
                     color = if (isSystemInDarkTheme()) {
@@ -1686,8 +1694,7 @@ fun TextFieldWithLeftIcon(
 
     Card(
         shape = RoundedCornerShape(12.dp),
-        modifier = Modifier
-            .wrapContentHeight(),
+        modifier = Modifier.wrapContentHeight(),
         colors = if (isSystemInDarkTheme()) {
             CardDefaults.cardColors(Dark_03)
         } else {
@@ -1715,7 +1722,8 @@ fun TextFieldWithLeftIcon(
                     .padding(start = 7.dp)
             )
             Text(
-                text = placeholder, modifier = Modifier
+                text = placeholder,
+                modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(10.dp),
@@ -1747,7 +1755,7 @@ fun getGenderIconState(state: String?): Int {
 fun GenderOption(
     gender: String = "",
     isSelected: Boolean = false,
-    onSelected: () -> Unit = {}
+    onSelected: () -> Unit = {},
 ) {
     val icon = when (gender) {
         KEY_MALE -> R.drawable.ic_male
@@ -1761,14 +1769,12 @@ fun GenderOption(
         else -> R.drawable.ic_other_selected
     }
 
-    Column(
-        modifier = Modifier
-            .clickable { onSelected() }
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    Column(modifier = Modifier
+        .clickable { onSelected() }
+        .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(
-            painter = if (isSelected)painterResource(id = selectedIcon) else painterResource(id = icon),
+            painter = if (isSelected) painterResource(id = selectedIcon) else painterResource(id = icon),
             contentDescription = gender,
             tint = Color.Unspecified,
             modifier = Modifier.size(80.dp)
@@ -1778,7 +1784,7 @@ fun GenderOption(
             text = gender,
             color = Black,
             fontSize = 14.sp,
-         fontFamily = if (isSelected) fontSemiBold else fontRegular
+            fontFamily = if (isSelected) fontSemiBold else fontRegular
         )
     }
 }
@@ -1839,7 +1845,7 @@ fun SchoolListBottomSheet(
             onDismissRequest = onDismiss,
             sheetState = sheetState,
             containerColor = if (isSystemInDarkTheme()) {
-               Black
+                Black
             } else {
                 White
             },
@@ -1894,11 +1900,9 @@ fun SchoolListBottomSheet(
                             .background(Color.Unspecified)
                     )
                     TextField(
-                        value = text,
-                        onValueChange = { newText ->
+                        value = text, onValueChange = { newText ->
                             text = newText
-                        },
-                        modifier = Modifier
+                        }, modifier = Modifier
                             .fillMaxWidth()
                             .background(
                                 color = if (isSystemInDarkTheme()) {
@@ -1909,9 +1913,7 @@ fun SchoolListBottomSheet(
                             ), // Set background color to white
                         placeholder = {
                             Text(
-                                text = searchHere,
-                                color = Color.Gray,
-                                fontFamily = fontRegular
+                                text = searchHere, color = Color.Gray, fontFamily = fontRegular
                             )
                         }, // Placeholder text color
                         colors = TextFieldDefaults.textFieldColors(
@@ -1923,20 +1925,17 @@ fun SchoolListBottomSheet(
                             cursorColor = Black,
                             focusedIndicatorColor = Transparent,
                             unfocusedIndicatorColor = Transparent
-                        ),
-                        singleLine = true
+                        ), singleLine = true
                     )
                 }
                 val selectedItem = remember { mutableStateOf<String?>(null) }
-                val filteredListWithOther =
-                    filteredList + listOf(otherOption)
+                val filteredListWithOther = filteredList + listOf(otherOption)
 
                 LazyColumn() {
                     items(filteredListWithOther) { item ->
                         val isSelected = selectedItem.value == item.toString()
                         Text(
-                            text = item,
-                            modifier = Modifier
+                            text = item, modifier = Modifier
                                 .background(
                                     color = if (isSelected) {
                                         if (isSystemInDarkTheme()) {
@@ -1958,8 +1957,7 @@ fun SchoolListBottomSheet(
                                     selectedItem.value = item
                                     onTextSelected.invoke(item)
                                     onDismiss.invoke()
-                                },
-                            style = MaterialTheme.typography.bodyLarge
+                                }, style = MaterialTheme.typography.bodyLarge
                         )
                     }
                 }
