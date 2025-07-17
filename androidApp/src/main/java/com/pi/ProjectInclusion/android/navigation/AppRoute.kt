@@ -20,6 +20,7 @@ sealed class AppRoute(val route: String) {
     data object CourseScreen : AppRoute("course_screen")
 
     data object ScreeningScreen : AppRoute("screening_screen")
+    data object AddStudentRegister : AppRoute("add_student_register")
 
     data object InterventionScreen : AppRoute("intervention_screen")
     data object InterventionStudentDetails : AppRoute("intervention_student_details")
@@ -30,7 +31,4 @@ sealed class AppRoute(val route: String) {
     data object ChangePasswordActivity : AppRoute("change_password_screen")
 
     data object StudentDashboardActivity : AppRoute("student_screen")
-
-
-    data object AddStudentRegisterScreen: AppRoute("add_student_register_screen")
 }
