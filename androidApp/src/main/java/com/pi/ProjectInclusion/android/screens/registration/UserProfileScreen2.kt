@@ -1,31 +1,26 @@
 package com.pi.ProjectInclusion.android.screens.registration
 
 import android.content.Context
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,12 +32,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SpanStyle
@@ -64,34 +57,27 @@ import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.LightRed01
 import com.pi.ProjectInclusion.OrangeSubTitle
-import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
-import com.pi.ProjectInclusion.android.common_UI.GenderOption
 import com.pi.ProjectInclusion.android.common_UI.MobileTextField
 import com.pi.ProjectInclusion.android.common_UI.RegistrationHeader
+import com.pi.ProjectInclusion.android.common_UI.SchoolListBottomSheet
 import com.pi.ProjectInclusion.android.common_UI.SmallBtnUi
-import com.pi.ProjectInclusion.android.common_UI.TermsAndPrivacyText
-import com.pi.ProjectInclusion.android.common_UI.TextFieldWithLeftIcon
 import com.pi.ProjectInclusion.android.common_UI.TextViewField
-import com.pi.ProjectInclusion.android.common_UI.showDatePickerDialog
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontMedium
-import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
-import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
-import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_FEMALE
-import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_MALE
-import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_OTHER
 import com.pi.ProjectInclusion.constants.CustomDialog
+import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
 import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun EnterUserScreen1(navController: NavHostController, viewModel: LoginViewModel) {
+fun EnterUserScreen2(navController: NavHostController, viewModel: LoginViewModel) {
     var isDialogVisible by remember { mutableStateOf(false) }
     val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
 
@@ -144,13 +130,14 @@ fun EnterUserScreen1(navController: NavHostController, viewModel: LoginViewModel
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            ProfileScreenUI(context, navController)
+            ProfileScreen2UI(context, navController)
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreenUI(
+fun ProfileScreen2UI(
     context: Context,
     navController: NavHostController
 ) {
@@ -168,8 +155,8 @@ fun ProfileScreenUI(
     val invalidMobNo = stringResource(id = R.string.text_enter_no)
 //  languageData[LanguageTranslationsResponse.KEY_INVALID_MOBILE_NO_ERROR].toString()
     val txtContinue = stringResource(id = R.string.text_continue)
-    val tvMobNo = stringResource(id = R.string.text_mobile_no_user)
-
+    val tvUdise = stringResource(id = R.string.txt_udise_number)
+    val schoolList = remember { mutableStateListOf<GetLanguageListResponse.Data.Result>() }
     var mobNo = rememberSaveable { mutableStateOf("") }
     var firstName = rememberSaveable { mutableStateOf("") }
     var lastName = rememberSaveable { mutableStateOf("") }
@@ -184,6 +171,13 @@ fun ProfileScreenUI(
     var showError by remember { mutableStateOf(false) }
     var inValidMobNo by remember { mutableStateOf(false) }
     var date by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+    var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+        confirmValueChange = { it != SheetValue.Hidden })
+
+    var selectedSchool = stringResource(R.string.choose_option)
 
     Box(
         modifier = Modifier
@@ -203,7 +197,7 @@ fun ProfileScreenUI(
         ) {
             RegistrationHeader(
                 stringResource(R.string.txt_create_profile), Black,
-                stringResource(R.string.txt_step_1), OrangeSubTitle, onBackButtonClick = {
+                stringResource(R.string.txt_step_2), OrangeSubTitle, onBackButtonClick = {
                     BackButtonPress(navController, AppRoute.UserTypeSelect.route)
                 })
             Column(
@@ -214,63 +208,9 @@ fun ProfileScreenUI(
                     .background(color = Bg_Gray1)
                     .padding(15.dp)
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .padding(vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        modifier = Modifier
-                            .size(90.dp), // adjust the size as needed,
-                        painter = painterResource(id = R.drawable.profile_user_icon),
-                        contentDescription = IMG_DESCRIPTION
-                    )
-                    Column(
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .wrapContentHeight()
-                            .padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
-                        verticalArrangement = Arrangement.spacedBy(5.dp),
-                    ) {
-                        Text(
-                            text = textUpload,
-                            fontSize = 12.sp,
-                            fontFamily = fontRegular,
-                            color = Black,
-                            modifier = Modifier
-                                .padding(start = 10.dp, bottom = 5.dp)
-                        )
-
-                        Button(
-                            onClick = { }, modifier = Modifier
-                                .wrapContentSize()
-                                .clip(RoundedCornerShape(4.dp)),
-                            shape = RoundedCornerShape(4.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = White,
-                                contentColor = PrimaryBlue
-                            ),
-                            border = BorderStroke(1.dp, color = PrimaryBlue)
-                        ) {
-                            Text(
-                                stringResource(R.string.txt_add_photo),
-                                modifier = Modifier
-                                    .wrapContentSize()
-                                    .padding(bottom = 2.dp, top = 2.dp),
-                                fontSize = 12.sp,
-                                fontFamily = fontMedium,
-                                color = PrimaryBlue,
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(10.dp))
 
                 Text(
-                    tvMobNo,
+                    tvUdise,
                     modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),
                     fontFamily = fontMedium,
                     fontSize = 14.sp,
@@ -282,7 +222,7 @@ fun ProfileScreenUI(
                 )
 
                 MobileTextField(
-                    isIcon = true,
+                    isIcon = false,
                     icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
                     colors = colors,
                     number = mobNo,
@@ -290,10 +230,10 @@ fun ProfileScreenUI(
                     hint = enterMobile.toString()
                 )
 
-                // first Name
+                // State
                 Text(
                     text = buildAnnotatedString {
-                        append(stringResource(R.string.txt_first_name))
+                        append(stringResource(R.string.txt_state))
                         pushStyle(SpanStyle(color = Color.Red))
                         append(ASTRICK)
                         pop()
@@ -312,13 +252,24 @@ fun ProfileScreenUI(
                         Bg_Gray
                     }
                 )
-                TextViewField(
-                    isIcon = false,
-                    icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
-                    colors = colors,
-                    text = firstName,
-                    trueFalse = true,
-                    hint = textNameEg.toString()
+                SchoolListBottomSheet(
+                    isBottomSheetVisible = isBottomSheetVisible,
+                    sheetState = sheetState,
+                    onDismiss = {
+                        scope.launch { sheetState.hide() }
+                            .invokeOnCompletion { isBottomSheetVisible = false }
+                    },
+                    onDecline = {
+
+                    },
+                    onTextSelected = { it ->
+                        /* selectedSchool = it
+                         schoolList.find { it.name == selectedSchool }?.id?.let {
+                             schoolSelectedId.value = it
+                         }*/
+                        "School"
+                    },
+                    schoolList.map { it.name }.toList()
                 )
 
                 // Last Name
@@ -351,75 +302,6 @@ fun ProfileScreenUI(
                     trueFalse = true,
                     hint = textLastNameEg.toString()
                 )
-
-                // Date of birth
-                Text(
-                    text = buildAnnotatedString {
-                        append(stringResource(R.string.txt_date_of_birth))
-                        pushStyle(SpanStyle(color = Color.Red))
-                        append(ASTRICK)
-                        pop()
-                    },
-                    modifier = Modifier.padding(
-                        top = 24.dp,
-                        bottom = 10.dp,
-                        start = 8.dp, end = 8.dp
-                    ),
-                    textAlign = TextAlign.Start,
-                    fontFamily = fontMedium,
-                    fontSize = 14.sp,
-                    color = if (isSystemInDarkTheme()) {
-                        DARK_BODY_TEXT
-                    } else {
-                        Bg_Gray
-                    }
-                )
-                TextFieldWithLeftIcon(
-                    modifier = Modifier.clickable {
-                        showDatePickerDialog(context) { year, month, dayOfMonth ->
-                            date = "$year-${
-                                month.toString().padStart(2, '0')
-                            }-${dayOfMonth.toString().padStart(2, '0')}"
-                        }
-                    },
-                    value = remember { mutableStateOf(date) },
-                    placeholder = if (date.isEmpty()) stringResource(R.string.select_date_of_birth) else date
-                )
-
-                // Gender
-                val selectedGender = remember { mutableStateOf("") }
-                val genderOptions = listOf(KEY_MALE, KEY_FEMALE, KEY_OTHER)
-
-                Text(
-                    text = buildAnnotatedString {
-                        append(stringResource(R.string.student_gender))
-                        pushStyle(SpanStyle(color = Color.Red))
-                        append(ASTRICK)
-                        pop()
-                    },
-                    modifier = Modifier.padding(
-                        top = 24.dp,
-                        bottom = 10.dp,
-                        start = 8.dp, end = 8.dp
-                    ),
-                    textAlign = TextAlign.Start,
-                    fontFamily = fontMedium,
-                    fontSize = 14.sp,
-                    color = if (isSystemInDarkTheme()) {
-                        DARK_BODY_TEXT
-                    } else {
-                        Bg_Gray
-                    }
-                )
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    genderOptions.forEach { gender ->
-                        GenderOption(
-                            gender = gender,
-                            isSelected = selectedGender.value == gender,
-                            onSelected = { selectedGender.value = gender }
-                        )
-                    }
-                }
 
                 // whatsapp
                 Text(
@@ -544,11 +426,10 @@ fun ProfileScreenUI(
     }
 }
 
-
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
-fun UserProfileUI() {
+fun UserProfile2UI() {
     val navController = rememberNavController()
     val context = LocalContext.current
-    ProfileScreenUI(context, navController)
+    ProfileScreen2UI(context, navController)
 }

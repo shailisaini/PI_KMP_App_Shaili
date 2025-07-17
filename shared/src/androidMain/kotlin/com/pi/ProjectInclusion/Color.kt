@@ -63,6 +63,7 @@ val LightPink = Color(0xFFF7AAED)
 val LightPink02 = Color(0xFFFDF2F8)
 
 val Orange = Color(0xFFEA973D)
+val OrangeSubTitle = Color(0xFFE99050)
 val LightOrange = Color(0xFFFFF7F2) // #FFF7F2
 val LightOrange1 = Color(0xFFF3D4D4) // #F3D4D4
 val LightOrange2 = Color(0xFFCD6C27) // #CD6C27
@@ -99,3 +100,4 @@ val GRAPH_YELLOW_LIGHT_01 = Color(0xFFFBDE9D)
 val INVITE_LIGHT_01 = Color(0xFF003C5A)
 val Dark_Selected_BG = Color(0xFF001E2B)
 val Auro_Light_Blue = Color(0xFFDFF4FF)
+val Male_selected = Color(0xFF175BCB)

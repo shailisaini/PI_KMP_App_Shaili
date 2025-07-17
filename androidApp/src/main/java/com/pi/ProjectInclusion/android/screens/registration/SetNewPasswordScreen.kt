@@ -48,6 +48,7 @@ import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import okhttp3.Route
 
@@ -121,7 +122,7 @@ fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewM
                     text = buildAnnotatedString {
                         append(stringResource(R.string.txt_New_Password))
                         pushStyle(SpanStyle(color = Color.Red))
-                        append("*")
+                        append(ASTRICK)
                         pop()
                     },
                     modifier = Modifier.padding(
