@@ -274,14 +274,15 @@ class StudentDashboardActivity : ComponentActivity() {
                                     composable(AppRoute.CourseScreen.route) {
                                         DashboardScreen(navController)
                                     }
-                                }
 
-                                composable(AppRoute.InterventionScreen.route) {
-                                    InterventionHomeScreen(navController)
-                                }
 
-                                composable(AppRoute.InterventionStudentDetails.route) {
-                                    InterventionStudentDetailsScreen(navController)
+                                    composable(AppRoute.InterventionScreen.route) {
+                                        InterventionHomeScreen(navController)
+                                    }
+
+                                    composable(AppRoute.InterventionStudentDetails.route) {
+                                        InterventionStudentDetailsScreen(navController)
+                                    }
                                 }
                             }
                         })
