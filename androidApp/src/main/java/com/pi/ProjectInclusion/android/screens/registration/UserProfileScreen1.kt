@@ -244,7 +244,7 @@ fun ProfileScreenUI(
                         )
 
                         Button(
-                            onClick = {  }, modifier = Modifier
+                            onClick = { }, modifier = Modifier
                                 .wrapContentSize()
                                 .clip(RoundedCornerShape(4.dp)),
                             shape = RoundedCornerShape(4.dp),
@@ -268,7 +268,7 @@ fun ProfileScreenUI(
                     }
                 }
                 Spacer(modifier = Modifier.height(10.dp))
-                
+
                 Text(
                     tvMobNo,
                     modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),

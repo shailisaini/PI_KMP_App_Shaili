@@ -45,7 +45,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.Transparent
-import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.screens.addStudentRegisterScreen.AddStudentRegisterScreen
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.DashboardScreen

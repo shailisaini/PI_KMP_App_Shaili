@@ -263,10 +263,10 @@ fun ProfileScreen2UI(
 
                     },
                     onTextSelected = { it ->
-                       /* selectedSchool = it
-                        schoolList.find { it.name == selectedSchool }?.id?.let {
-                            schoolSelectedId.value = it
-                        }*/
+                        /* selectedSchool = it
+                         schoolList.find { it.name == selectedSchool }?.id?.let {
+                             schoolSelectedId.value = it
+                         }*/
                         "School"
                     },
                     schoolList.map { it.name }.toList()
