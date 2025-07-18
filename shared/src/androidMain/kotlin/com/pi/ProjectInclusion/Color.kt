@@ -24,7 +24,7 @@ val PrimaryBlueLt1 = Color(0xFFE6E9FF) // #E6E9FF
 val DarkBlue = Color(0xFF101942) //#101942
 val LightBlue = Color(0xFF5E72E7) //#5E72E7
 val Black = Color(0xFF111111)
-val Gray = Color(0xFF808080) // gray // #9F9F9F
+val Gray = Color(0xFF808080) // gray // #808080
 val Bg_Gray = Color(0xFF6C6D72) // gray
 val Bg_Gray1 = Color(0xF0F5F9FE) // gray
 val GrayLight01 = Color(0xFFA0A0A0)
@@ -37,6 +37,7 @@ val BackgroundGray = Color(0xFF666666)
 val BlueBackground = Color(0x4DF6F4FE)
 val BlueBackground1 = Color(0xFFF5F9FE)
 val BlueBackground2 = Color(0xFF35383F) //#35383F   // CFD1D9
+val BlueBackground3 = Color(0xFFDADFFF) //#DADFFF
 
 val PurpleDark01 = Color(0xFF3B2C6E)
 val PurpleDark02 = Color(0xFF978FED)
