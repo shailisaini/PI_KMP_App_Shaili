@@ -28,6 +28,7 @@ val Gray = Color(0xFF808080) // gray // #9F9F9F
 val Bg_Gray = Color(0xFF6C6D72) // gray
 val Bg_Gray1 = Color(0xF0F5F9FE) // gray
 val GrayLight01 = Color(0xFFA0A0A0)
+val LightText = Color(0xFFA0A0A0)
 val GrayLight02 = Color(0xFFE6E6E6)
 val GrayLight03 = Color(0x9ACFD1D9)
 val White = Color(0xFFFFFFFF)

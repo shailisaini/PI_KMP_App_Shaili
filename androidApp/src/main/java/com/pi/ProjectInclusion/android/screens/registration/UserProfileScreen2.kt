@@ -77,9 +77,9 @@ import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun EnterUserScreen2(navController: NavHostController, viewModel: LoginViewModel) {
+fun EnterUserScreen2(navController: NavHostController) {
     var isDialogVisible by remember { mutableStateOf(false) }
-    val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
+//    val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val userType = remember { mutableStateListOf<GetUserTypeResponse.Data>() }
@@ -92,7 +92,10 @@ fun EnterUserScreen2(navController: NavHostController, viewModel: LoginViewModel
         BackButtonPress(navController, AppRoute.UserTypeSelect.route)
     }
     LoggerProvider.logger.d("Screen: " + "EnterUserNameScreen()")
-    LaunchedEffect(Unit) {
+
+    // it will user during API implementation
+
+   /* LaunchedEffect(Unit) {
         viewModel.getUserType()
     }
 
@@ -119,7 +122,7 @@ fun EnterUserScreen2(navController: NavHostController, viewModel: LoginViewModel
                 LoggerProvider.logger.d("Languages fetched: ${uiState.success!!.data}")
             }
         }
-    }
+    }*/
 
     Surface(
         modifier = Modifier.fillMaxWidth(), color = White
@@ -272,10 +275,10 @@ fun ProfileScreen2UI(
                     schoolList.map { it.name }.toList()
                 )
 
-                // Last Name
+                // District
                 Text(
                     text = buildAnnotatedString {
-                        append(stringResource(R.string.txt_last_name))
+                        append(stringResource(R.string.txt_district))
                         pushStyle(SpanStyle(color = Color.Red))
                         append(ASTRICK)
                         pop()

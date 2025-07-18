@@ -292,15 +292,15 @@ fun UserTypeCard(
                 onItemClicked.invoke()
                 navController.popBackStack()
 //                navController.navigate(AppRoute.UserNameScreen.route)
-                navController.navigate(AppRoute.EnterUserProfileScreen.route)
+//                navController.navigate(AppRoute.EnterUserProfileScreen.route)
 
                 // Aashish
-                /*context.startActivity(
+                context.startActivity(
                     Intent(
                         context,
                         StudentDashboardActivity::class.java
                     )
-                )*/
+                )
             }
             .padding(8.dp)
             .fillMaxWidth(),

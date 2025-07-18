@@ -79,6 +79,7 @@ fun UploadedDocumentsScreen(navHostController: NavHostController) {
     )
 
     DetailsNoImgBackgroundUi(
+        backgroundColor = DarkBlue,
         pageTitle = stringResource(R.string.txt_Documents),
         moreInfoIcon = painterResource(id = R.drawable.more_info_img),
         isShowBackButton = true,
