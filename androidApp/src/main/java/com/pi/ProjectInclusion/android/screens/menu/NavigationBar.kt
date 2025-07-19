@@ -75,9 +75,7 @@ fun DrawerHeader(
 
     Box(
         modifier = Modifier
-            .fillMaxWidth()/* .clickable {
-                onItemClick.invoke()
-            }*/
+            .fillMaxWidth()
 
             .wrapContentHeight()
             .padding(end = 50.dp),
@@ -86,7 +84,9 @@ fun DrawerHeader(
         Column(
             modifier = Modifier.fillMaxWidth()
                 .height(200.dp)
-
+                .clickable {
+                    onItemClick.invoke()
+                }
                 .background(
                     brush = Brush.linearGradient(
                         colors = listOf(Color(0xFF2C3EA2), Color(0xFF101942))
@@ -96,8 +96,8 @@ fun DrawerHeader(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 20.dp)
-                    .clickable { onItemClick.invoke() },
+                    .padding(top = 20.dp),
+//                    .clickable { onItemClick.invoke() },
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             )

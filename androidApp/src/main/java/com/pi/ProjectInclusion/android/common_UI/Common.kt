@@ -3,6 +3,8 @@ package com.pi.ProjectInclusion.android.common_UI
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.content.Context
+import android.graphics.RenderEffect
+import android.graphics.Shader
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -46,10 +48,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -84,9 +88,11 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -96,6 +102,8 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -108,6 +116,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
@@ -129,6 +139,7 @@ import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
@@ -172,8 +183,7 @@ fun ChooseOneBottomSheet(
     ModalBottomSheet(
         onDismissRequest = {
             onDismiss()
-        },
-        sheetState = sheetState
+        }, sheetState = sheetState
     ) {
         // Sheet content
         Column(
@@ -243,8 +253,7 @@ fun ChooseOneBottomSheet(
                             disabledContainerColor = com.pi.ProjectInclusion.White
                         )
                     },
-                    border = BorderStroke(1.dp, color = GrayLight01)
-                ) {
+                    border = BorderStroke(1.dp, color = GrayLight01)) {
                     TextWithIconOnLeft(
                         text = stringResource(R.string.txt_otp_whatsapp),
                         icon = ImageVector.vectorResource(id = R.drawable.ic_whatsapp_otp),
@@ -280,8 +289,7 @@ fun DefaultBackgroundUi(
                     } else {
                         White
                     }
-                ),
-            verticalArrangement = Arrangement.Top
+                ), verticalArrangement = Arrangement.Top
         ) {
 
             Box(
@@ -345,12 +353,12 @@ fun TextViewField(
     TextField(
         value = text.value,
         onValueChange = {
-                text.value = it
+            text.value = it
 
-                //  Hide keyboard on 20 digits
-                if (it.length == 20) {
-                    keyboardController?.hide()
-                }
+            //  Hide keyboard on 20 digits
+            if (it.length == 20) {
+                keyboardController?.hide()
+            }
         },
         enabled = trueFalse,
         placeholder = { Text(hint, color = GrayLight01, fontSize = 14.sp) },
@@ -382,8 +390,7 @@ fun TextViewField(
                 }
             }
             .border(
-                width = 1.dp,
-                color = when {
+                width = 1.dp, color = when {
                     isFocused -> LightBlue
                     isSystemInDarkTheme() -> Dark_02
                     else -> GrayLight02
@@ -416,8 +423,7 @@ fun TextViewField(
             },
             unfocusedIndicatorColor = Transparent,
             disabledContainerColor = GrayLight03
-        )
-    )
+        ))
 }
 
 @Composable
@@ -477,8 +483,7 @@ fun MobileTextField(
                 }
             }
             .border(
-                width = 1.dp,
-                color = when {
+                width = 1.dp, color = when {
                     isFocused -> LightBlue
                     isSystemInDarkTheme() -> Dark_02
                     else -> GrayLight02
@@ -486,9 +491,7 @@ fun MobileTextField(
             ),
         interactionSource = interactionSource,
         textStyle = TextStyle(
-            fontFamily = fontSemiBold,
-            fontSize = 14.sp,
-            color = if (isSystemInDarkTheme()) {
+            fontFamily = fontSemiBold, fontSize = 14.sp, color = if (isSystemInDarkTheme()) {
                 DARK_DEFAULT_BUTTON_TEXT
             } else {
                 Black
@@ -510,8 +513,7 @@ fun MobileTextField(
             },
             unfocusedIndicatorColor = Transparent,
             disabledContainerColor = GrayLight03
-        )
-    )
+        ))
 }
 
 @Preview
@@ -520,13 +522,13 @@ fun OTPBtnUi(
     title: String = "Continue", onClick: () -> Unit = {},
 ) {
     Button(
-        onClick = onClick, modifier = Modifier
+        onClick = onClick,
+        modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp)),
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = White,
-            contentColor = PrimaryBlue
+            containerColor = White, contentColor = PrimaryBlue
         ),
         border = BorderStroke(1.dp, color = PrimaryBlue)
     ) {
@@ -549,7 +551,7 @@ fun RegistrationHeader(
     colors: Color = Black,
     subtitle: String = "",
     subtitleColor: Color = OrangeSubTitle,
-    onBackButtonClick: () -> Unit = {}
+    onBackButtonClick: () -> Unit = {},
 ) {
 
     Box(
@@ -565,8 +567,7 @@ fun RegistrationHeader(
                     end = Offset(size.width, y),
                     strokeWidth = strokeWidth
                 )
-            }
-    ) {
+            }) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -594,8 +595,7 @@ fun RegistrationHeader(
                     fontSize = 18.sp,
                     fontFamily = fontBold,
                     color = colors,
-                    modifier = Modifier
-                        .padding(start = 10.dp)
+                    modifier = Modifier.padding(start = 10.dp)
                 )
                 Text(
                     subtitle,
@@ -603,8 +603,7 @@ fun RegistrationHeader(
                     fontSize = 12.sp,
                     fontFamily = fontMedium,
                     color = subtitleColor,
-                    modifier = Modifier
-                        .padding(start = 10.dp)
+                    modifier = Modifier.padding(start = 10.dp)
                 )
             }
         }
@@ -614,19 +613,18 @@ fun RegistrationHeader(
 @Preview
 @Composable
 fun SmallBtnUi(
-    title: String = "Continue", onClick: () -> Unit = {}, enabled: Boolean = false,
+    title: String = stringResource(R.string.text_continue),
+    onClick: () -> Unit = {},
+    enabled: Boolean = false,
 ) {
     Button(
-        onClick = onClick,
-        modifier = Modifier
+        onClick = onClick, modifier = Modifier
             .wrapContentSize()
             .clip(
                 RoundedCornerShape(
                     5.dp
                 )
-            ),
-        shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(
+            ), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(
             containerColor = if (enabled) {
                 if (isSystemInDarkTheme()) {
                     Dark_Selected_BG
@@ -639,8 +637,7 @@ fun SmallBtnUi(
                 } else {
                     GrayLight03
                 }
-            },
-            contentColor = if (enabled) {
+            }, contentColor = if (enabled) {
                 White
             } else {
                 White
@@ -669,16 +666,13 @@ fun BtnUi(
     title: String = "Continue", onClick: () -> Unit = {}, enabled: Boolean = false,
 ) {
     Button(
-        onClick = onClick,
-        modifier = Modifier
+        onClick = onClick, modifier = Modifier
             .fillMaxWidth()
             .clip(
                 RoundedCornerShape(
                     5.dp
                 )
-            ),
-        shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(
+            ), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(
             containerColor = if (enabled) {
                 if (isSystemInDarkTheme()) {
                     Dark_Selected_BG
@@ -691,8 +685,7 @@ fun BtnUi(
                 } else {
                     GrayLight03
                 }
-            },
-            contentColor = if (enabled) {
+            }, contentColor = if (enabled) {
                 White
             } else {
                 White
@@ -718,20 +711,17 @@ fun BtnUi(
 
 @Preview
 @Composable
-fun YesBtnUi(
+fun BtnWithRightIconUi(
     title: String = "Continue", onClick: () -> Unit = {}, enabled: Boolean = false,
 ) {
     Button(
-        onClick = onClick,
-        modifier = Modifier
-            .width(135.dp)
+        onClick = onClick, modifier = Modifier
+            .fillMaxWidth()
             .clip(
                 RoundedCornerShape(
                     5.dp
                 )
-            ),
-        shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(
+            ), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(
             containerColor = if (enabled) {
                 if (isSystemInDarkTheme()) {
                     Dark_Selected_BG
@@ -744,8 +734,66 @@ fun YesBtnUi(
                 } else {
                     GrayLight03
                 }
-            },
-            contentColor = if (enabled) {
+            }, contentColor = if (enabled) {
+                White
+            } else {
+                White
+            }
+        )
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = title,
+                modifier = Modifier.padding(bottom = 8.dp, top = 8.dp),
+                fontSize = 16.sp,
+                fontFamily = fontMedium,
+                color = if (enabled) {
+                    White
+                } else {
+                    White
+                },
+                textAlign = TextAlign.Center
+            )
+
+            Icon(
+                painter = painterResource(R.drawable.double_right_arrow_img),
+                contentDescription = IMG_DESCRIPTION,
+                modifier = Modifier.size(20.dp),
+                tint = White,
+            )
+        }
+    }
+}
+
+@Composable
+fun YesBtnUi(
+    title: String = "Continue",
+    modifier: Modifier,
+    onClick: () -> Unit = {},
+    enabled: Boolean = false,
+) {
+    Button(
+        onClick = onClick, modifier = modifier.clip(
+                RoundedCornerShape(
+                    5.dp
+                )
+            ), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(
+            containerColor = if (enabled) {
+                if (isSystemInDarkTheme()) {
+                    Dark_Selected_BG
+                } else {
+                    DarkBlue
+                }
+            } else {
+                if (isSystemInDarkTheme()) {
+                    GrayLight03
+                } else {
+                    GrayLight03
+                }
+            }, contentColor = if (enabled) {
                 White
             } else {
                 White
@@ -775,16 +823,13 @@ fun NoBtnUi(
     title: String = "No", onClick: () -> Unit = {}, enabled: Boolean = false,
 ) {
     Button(
-        onClick = onClick,
-        modifier = Modifier
+        onClick = onClick, modifier = Modifier
             .width(135.dp)
             .border(
                 width = 1.dp, color = PrimaryBlue, RoundedCornerShape(
                     8.dp
                 )
-            ),
-        shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(
+            ), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(
             containerColor = if (enabled) {
                 if (isSystemInDarkTheme()) {
                     White
@@ -797,8 +842,7 @@ fun NoBtnUi(
                 } else {
                     White
                 }
-            },
-            contentColor = if (enabled) {
+            }, contentColor = if (enabled) {
                 White
             } else {
                 White
@@ -899,9 +943,7 @@ fun TermsAndPrivacyText(
             pushStringAnnotation(tag = "TERMS", annotation = "terms")
             withStyle(
                 style = SpanStyle(
-                    color = PrimaryBlue,
-                    fontSize = 12.sp,
-                    fontFamily = fontRegular
+                    color = PrimaryBlue, fontSize = 12.sp, fontFamily = fontRegular
                 )
             ) {
                 append("Terms of Service")
@@ -914,8 +956,7 @@ fun TermsAndPrivacyText(
             pushStringAnnotation(tag = "PRIVACY", annotation = "privacy")
             withStyle(
                 style = SpanStyle(
-                    color = PrimaryBlue,
-                    fontFamily = fontRegular
+                    color = PrimaryBlue, fontFamily = fontRegular
                 )
             ) {
                 append("Privacy Policy")
@@ -932,21 +973,18 @@ fun TermsAndPrivacyText(
             contentAlignment = Alignment.Center
         ) {
             ClickableText(
-                text = annotatedText,
-                style = TextStyle(
+                text = annotatedText, style = TextStyle(
                     fontSize = 14.sp,
                     color = Gray,
                     textAlign = TextAlign.Center,
                     fontFamily = fontRegular
-                ),
-                onClick = { offset ->
-                    annotatedText.getStringAnnotations("TERMS", offset, offset)
-                        .firstOrNull()?.let { onTermsClick() }
+                ), onClick = { offset ->
+                    annotatedText.getStringAnnotations("TERMS", offset, offset).firstOrNull()
+                        ?.let { onTermsClick() }
 
-                    annotatedText.getStringAnnotations("PRIVACY", offset, offset)
-                        .firstOrNull()?.let { onPrivacyClick() }
-                }
-            )
+                    annotatedText.getStringAnnotations("PRIVACY", offset, offset).firstOrNull()
+                        ?.let { onPrivacyClick() }
+                })
         }
     }
 }
@@ -986,8 +1024,7 @@ internal fun CharacterContainer(
             modifier = Modifier
                 .size(45.dp) // Ensure this is wide enough
                 .border(
-                    width = if (isFocused) 2.dp else 1.dp,
-                    color = if (isFocused) {
+                    width = if (isFocused) 2.dp else 1.dp, color = if (isFocused) {
                         if (isSystemInDarkTheme()) {
                             Dark_03
                         } else {
@@ -1003,8 +1040,7 @@ internal fun CharacterContainer(
                         } else {
                             LightBlue
                         }
-                    },
-                    shape = RoundedCornerShape(6.dp)
+                    }, shape = RoundedCornerShape(6.dp)
                 )
                 .padding(2.dp)
         ) {
@@ -1051,6 +1087,7 @@ internal fun CharacterContainer(
 
 @Composable
 fun TextWithIconOnLeft(
+    moreSpace: Boolean = false,
     text: String,
     icon: ImageVector,
     textColor: Color,
@@ -1068,14 +1105,16 @@ fun TextWithIconOnLeft(
         )
 
         Spacer(modifier = Modifier.width(4.dp)) // Add space between text and icon
-
+        if (moreSpace) {
+            Spacer(modifier = Modifier.width(10.dp))
+        }
         Text(
             text = text,
             modifier = Modifier.padding(horizontal = 5.dp),
             style = MaterialTheme.typography.bodyMedium.copy(
                 color = textColor,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
+                fontSize = 15.sp,
+                fontFamily = fontMedium,
                 textAlign = TextAlign.Start
             )
         )
@@ -1092,8 +1131,7 @@ fun TextWithIconOnRight(
     onClick: () -> Unit = {},
 ) {
     Row(
-        modifier = modifier
-            .clickable { onClick() },
+        modifier = modifier.clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
@@ -1110,8 +1148,7 @@ fun TextWithIconOnRight(
 
         Icon(
             imageVector = icon, contentDescription = IMG_DESCRIPTION, // Decorative element
-            tint = iconColor,
-            modifier = Modifier.size(20.dp)
+            tint = iconColor, modifier = Modifier.size(20.dp)
         )
     }
 }
@@ -1160,28 +1197,23 @@ fun PasswordTextField(
                 Dark_03
             } else {
                 White
-            },
-            focusedTextColor = if (isSystemInDarkTheme()) {
+            }, focusedTextColor = if (isSystemInDarkTheme()) {
                 White
             } else {
                 Black
-            },
-            unfocusedTextColor = if (isSystemInDarkTheme()) {
+            }, unfocusedTextColor = if (isSystemInDarkTheme()) {
                 Dark_03
             } else {
                 White
-            },
-            focusedIndicatorColor = if (isSystemInDarkTheme()) {
+            }, focusedIndicatorColor = if (isSystemInDarkTheme()) {
                 Dark_03
             } else {
                 White
-            },
-            unfocusedContainerColor = if (isSystemInDarkTheme()) {
+            }, unfocusedContainerColor = if (isSystemInDarkTheme()) {
                 Dark_03
             } else {
                 White
-            },
-            unfocusedIndicatorColor = if (isSystemInDarkTheme()) {
+            }, unfocusedIndicatorColor = if (isSystemInDarkTheme()) {
                 Dark_03
             } else {
                 White
@@ -1210,12 +1242,10 @@ fun PasswordCheckField(
     padding: Modifier,
 ) {
     Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = padding
+        verticalAlignment = Alignment.CenterVertically, modifier = padding
     ) {
         Checkbox(
-            checked = isChecked,
-            onCheckedChange = { it }, // Disabled for display-only
+            checked = isChecked, onCheckedChange = { it }, // Disabled for display-only
             colors = if (isSystemInDarkTheme()) {
                 CheckboxDefaults.colors(
                     checkedColor = Transparent,     // Light purple-gray
@@ -1228,8 +1258,7 @@ fun PasswordCheckField(
                     uncheckedColor = Color.LightGray,   // Same for unchecked
                     checkmarkColor = PrimaryBlue
                 )
-            },
-            modifier = Modifier.size(20.dp)
+            }, modifier = Modifier.size(20.dp)
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -1261,13 +1290,11 @@ fun CustomProgressBar(
     val clampedPercentage = percentage.coerceIn(1f, 100f)
 
     val animatedPercentage by animateFloatAsState(
-        targetValue = clampedPercentage,
-        animationSpec = tween(durationMillis = 100)
+        targetValue = clampedPercentage, animationSpec = tween(durationMillis = 100)
     )
 
     Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
+        contentAlignment = Alignment.Center, modifier = modifier
     ) {
         Canvas(modifier = modifier) {
             val diameter = size.minDimension
@@ -1365,8 +1392,7 @@ fun DetailsBackgroundUi(
                     } else {
                         DarkBlue
                     }
-                ),
-            verticalArrangement = Arrangement.Top
+                ), verticalArrangement = Arrangement.Top
         ) {
             Row(
                 modifier = Modifier
@@ -1378,7 +1404,8 @@ fun DetailsBackgroundUi(
                         } else {
                             DarkBlue
                         }
-                    ), verticalAlignment = Alignment.CenterVertically,
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Absolute.SpaceBetween
             ) {
                 Box(
@@ -1418,8 +1445,7 @@ fun DetailsBackgroundUi(
                     }
 
                     Column(
-                        modifier = Modifier
-                            .background(
+                        modifier = Modifier.background(
                                 color = if (isSystemInDarkTheme()) {
                                     DarkBlue
                                 } else {
@@ -1429,8 +1455,7 @@ fun DetailsBackgroundUi(
                     ) {
                         Text(
                             text = studentName.toString(),
-                            modifier = Modifier
-                                .padding(start = 8.dp, end = 8.dp),
+                            modifier = Modifier.padding(start = 8.dp, end = 8.dp),
                             fontFamily = fontBold,
                             fontSize = 14.sp,
                             color = if (isSystemInDarkTheme()) {
@@ -1443,8 +1468,7 @@ fun DetailsBackgroundUi(
 
                         Text(
                             text = grade.toString(),
-                            modifier = Modifier
-                                .padding(start = 8.dp, end = 8.dp),
+                            modifier = Modifier.padding(start = 8.dp, end = 8.dp),
                             fontFamily = fontMedium,
                             fontSize = 12.sp,
                             color = if (isSystemInDarkTheme()) {
@@ -1510,16 +1534,19 @@ fun DetailsBackgroundUi(
     }
 }
 
+@Preview
 @Composable
 fun DetailsNoImgBackgroundUi(
-    pageTitle: String,
-    moreInfoIcon: Painter,
+    backgroundColor: Color = DarkBlue,
+    textColor : Color = White,
+    pageTitle: String = "",
+    moreInfoIcon: Painter = painterResource(R.drawable.close_img),
     modifier: Modifier = Modifier,
     isShowBackButton: Boolean = true,
     isShowMoreInfo: Boolean = true,
     onBackButtonClick: () -> Unit = {},
     onMoreInfoClick: () -> Unit = {},
-    content: @Composable (() -> Unit),
+    content: @Composable (() -> Unit) = {},
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(), color = White
@@ -1531,10 +1558,9 @@ fun DetailsNoImgBackgroundUi(
                     color = if (isSystemInDarkTheme()) {
                         DarkBlue
                     } else {
-                        DarkBlue
+                        backgroundColor
                     }
-                ),
-            verticalArrangement = Arrangement.Top
+                ), verticalArrangement = Arrangement.Top
         ) {
             Row(
                 modifier = Modifier
@@ -1544,9 +1570,10 @@ fun DetailsNoImgBackgroundUi(
                         color = if (isSystemInDarkTheme()) {
                             DarkBlue
                         } else {
-                            DarkBlue
+                            backgroundColor
                         }
-                    ), verticalAlignment = Alignment.CenterVertically,
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Absolute.SpaceBetween
             ) {
                 Box(
@@ -1561,21 +1588,20 @@ fun DetailsNoImgBackgroundUi(
                             modifier = Modifier
                                 .background(Color.Unspecified)
                                 .clickable(onClick = onBackButtonClick),
-                            colorFilter = ColorFilter.tint(White)
+                            colorFilter = ColorFilter.tint(textColor)
                         )
                     }
                 }
 
                 Text(
                     text = pageTitle.toString(),
-                    modifier = Modifier
-                        .padding(end = 16.dp, top = 8.dp, bottom = 8.dp),
+                    modifier = Modifier.padding(end = 16.dp, top = 8.dp, bottom = 8.dp),
                     fontFamily = fontBold,
-                    fontSize = 16.sp,
+                    fontSize = 18.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_TITLE_TEXT
                     } else {
-                        White
+                        textColor
                     },
                     textAlign = TextAlign.Start
                 )
@@ -1605,7 +1631,7 @@ fun DetailsNoImgBackgroundUi(
                                 .size(30.dp)
                                 .background(Color.Unspecified)
                                 .clickable(onClick = onMoreInfoClick),
-                            colorFilter = ColorFilter.tint(White)
+                            colorFilter = ColorFilter.tint(textColor)
                         )
                     }
                 }
@@ -1673,7 +1699,7 @@ fun CustomCircularImageViewWithBorder(
 fun TextFieldWithLeftIcon(
     modifier: Modifier = Modifier,
     value: MutableState<String> = remember { mutableStateOf("") },
-    placeholder: String = "Enter Here",
+    placeholder: String = stringResource(R.string.enter_here),
 ) {
     val colors = MaterialTheme.colorScheme
     val selectedBorder = BorderStroke(
@@ -1686,8 +1712,7 @@ fun TextFieldWithLeftIcon(
 
     Card(
         shape = RoundedCornerShape(12.dp),
-        modifier = Modifier
-            .wrapContentHeight(),
+        modifier = Modifier.wrapContentHeight(),
         colors = if (isSystemInDarkTheme()) {
             CardDefaults.cardColors(Dark_03)
         } else {
@@ -1715,7 +1740,8 @@ fun TextFieldWithLeftIcon(
                     .padding(start = 7.dp)
             )
             Text(
-                text = placeholder, modifier = Modifier
+                text = placeholder,
+                modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(10.dp),
@@ -1726,7 +1752,6 @@ fun TextFieldWithLeftIcon(
                 },
                 fontSize = 14.sp,
                 fontFamily = fontSemiBold
-
             )
         }
     }
@@ -1747,7 +1772,7 @@ fun getGenderIconState(state: String?): Int {
 fun GenderOption(
     gender: String = "",
     isSelected: Boolean = false,
-    onSelected: () -> Unit = {}
+    onSelected: () -> Unit = {},
 ) {
     val icon = when (gender) {
         KEY_MALE -> R.drawable.ic_male
@@ -1761,14 +1786,12 @@ fun GenderOption(
         else -> R.drawable.ic_other_selected
     }
 
-    Column(
-        modifier = Modifier
-            .clickable { onSelected() }
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    Column(modifier = Modifier
+        .clickable { onSelected() }
+        .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(
-            painter = if (isSelected)painterResource(id = selectedIcon) else painterResource(id = icon),
+            painter = if (isSelected) painterResource(id = selectedIcon) else painterResource(id = icon),
             contentDescription = gender,
             tint = Color.Unspecified,
             modifier = Modifier.size(80.dp)
@@ -1778,7 +1801,7 @@ fun GenderOption(
             text = gender,
             color = Black,
             fontSize = 14.sp,
-         fontFamily = if (isSelected) fontSemiBold else fontRegular
+            fontFamily = if (isSelected) fontSemiBold else fontRegular
         )
     }
 }
@@ -1839,7 +1862,7 @@ fun SchoolListBottomSheet(
             onDismissRequest = onDismiss,
             sheetState = sheetState,
             containerColor = if (isSystemInDarkTheme()) {
-               Black
+                Black
             } else {
                 White
             },
@@ -1894,11 +1917,9 @@ fun SchoolListBottomSheet(
                             .background(Color.Unspecified)
                     )
                     TextField(
-                        value = text,
-                        onValueChange = { newText ->
+                        value = text, onValueChange = { newText ->
                             text = newText
-                        },
-                        modifier = Modifier
+                        }, modifier = Modifier
                             .fillMaxWidth()
                             .background(
                                 color = if (isSystemInDarkTheme()) {
@@ -1909,9 +1930,7 @@ fun SchoolListBottomSheet(
                             ), // Set background color to white
                         placeholder = {
                             Text(
-                                text = searchHere,
-                                color = Color.Gray,
-                                fontFamily = fontRegular
+                                text = searchHere, color = Color.Gray, fontFamily = fontRegular
                             )
                         }, // Placeholder text color
                         colors = TextFieldDefaults.textFieldColors(
@@ -1923,20 +1942,17 @@ fun SchoolListBottomSheet(
                             cursorColor = Black,
                             focusedIndicatorColor = Transparent,
                             unfocusedIndicatorColor = Transparent
-                        ),
-                        singleLine = true
+                        ), singleLine = true
                     )
                 }
                 val selectedItem = remember { mutableStateOf<String?>(null) }
-                val filteredListWithOther =
-                    filteredList + listOf(otherOption)
+                val filteredListWithOther = filteredList + listOf(otherOption)
 
                 LazyColumn() {
                     items(filteredListWithOther) { item ->
                         val isSelected = selectedItem.value == item.toString()
                         Text(
-                            text = item,
-                            modifier = Modifier
+                            text = item, modifier = Modifier
                                 .background(
                                     color = if (isSelected) {
                                         if (isSystemInDarkTheme()) {
@@ -1958,8 +1974,7 @@ fun SchoolListBottomSheet(
                                     selectedItem.value = item
                                     onTextSelected.invoke(item)
                                     onDismiss.invoke()
-                                },
-                            style = MaterialTheme.typography.bodyLarge
+                                }, style = MaterialTheme.typography.bodyLarge
                         )
                     }
                 }
@@ -1973,3 +1988,191 @@ fun SchoolListBottomSheet(
         }
     }
 }
+
+@Preview
+@Composable
+fun ProfileWithProgress(
+    image: String = "",
+    painter: Painter = painterResource(id = R.drawable.round_back_key),
+    progress: Float = 0.0f, // 0.0f to 1.0f
+    modifier: Modifier = Modifier
+) {
+    Box(modifier = modifier.size(90.dp), contentAlignment = Alignment.Center) {
+        // Canvas for circular progress
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val strokeWidth = 6.dp.toPx()
+            val radius = 90.dp.toPx() / 2 - strokeWidth / 2
+
+            drawArc(
+                color = Color(0xFF4169E1), // royal blue
+                startAngle = -90f,
+                sweepAngle = 360 * progress,
+                useCenter = false,
+                style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+            )
+        }
+
+        // Profile image
+
+        Image(
+            painter = if (image.isNotEmpty()) {
+                rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current)
+                        .data(image)
+                        .placeholder(R.drawable.profile_user_icon)
+                        .error(R.drawable.profile_user_icon)
+                        .crossfade(true)
+                        .build()
+                )
+            } else {
+                painterResource(R.drawable.profile_user_icon)
+            },
+            contentDescription = IMG_DESCRIPTION,
+            modifier = Modifier
+                .size(100.dp) // Add size modifier to make the image visible
+                .clip(CircleShape) // Add clip modifier to make the image circular
+                .background(shape = CircleShape, color = White)
+                .border( // Add border modifier to make image stand out
+                    width = 1.dp, color = GrayLight02, shape = CircleShape
+                ),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+
+@Composable
+fun DropdownMenuUi(
+    options: List<String>,
+    onItemSelected: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    placeholder: String = "Select",
+    icon: Painter = painterResource(R.drawable.ic_dropdown),
+    onClick: () -> Unit,
+) {
+
+    var menuExpanded by remember { mutableStateOf(false) }
+    var selectedOption by remember { mutableStateOf<String?>(null) }
+    val colors = MaterialTheme.colorScheme
+    val selectedBorder = BorderStroke(
+        width = 0.5.dp, if (isSystemInDarkTheme()) {
+            Dark_03
+        } else {
+            GrayLight02
+        }
+    )
+
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier
+            .wrapContentHeight(),
+        colors = if (isSystemInDarkTheme()) {
+            CardDefaults.cardColors(Dark_03)
+        } else {
+            CardDefaults.cardColors(White)
+        },
+        border = selectedBorder,
+    ) {
+        Box(modifier = modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        if (options.isNotEmpty()) menuExpanded = true
+                        onClick()
+                    }
+                    .padding(vertical = 15.dp, horizontal = 10.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+
+                Text(
+                    text = selectedOption ?: placeholder,
+                    modifier = Modifier.weight(1f),
+                    color = if (selectedOption == null) {
+                        if (isSystemInDarkTheme()) {
+                            colors.onSurface
+                        } else {
+                            Color.Gray
+                        }
+                    } else {
+                        if (isSystemInDarkTheme()) {
+                            colors.onSurface
+                        } else {
+                            Black
+                        }
+                    },
+                    fontSize = 14.sp,
+                    fontFamily = if (selectedOption == null) {
+                       fontRegular
+                    } else {
+                       fontSemiBold
+                    }
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Image(
+                    painter = icon,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .padding(end = 7.dp)
+                        .clip(RoundedCornerShape(4.dp)),
+                    colorFilter = ColorFilter.tint(
+                        if (isSystemInDarkTheme()) {
+                            DARK_DEFAULT_BUTTON_TEXT
+                        } else {
+                            Black
+                        }
+                    )
+                )
+            }
+
+            DropdownMenu(
+                expanded = menuExpanded,
+                onDismissRequest = { menuExpanded = false },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(width = 1.dp, color = GrayLight01)
+                    .background(
+                        if (isSystemInDarkTheme()) {
+                            Dark_03
+                        } else {
+                            White
+                        }
+                    )
+            ) {
+                options.forEach { option ->
+                   /* androidx.compose.material.DropdownMenuItem(onClick = {
+                        onItemSelected(option)
+                        selectedOption = option
+                        menuExpanded = false
+                    }) {
+                        Text(
+                            text = option,
+//                        color = Color.Gray,
+                            color = colors.onSurface,
+                            fontSize = 16.sp,
+                            fontStyle = FontStyle.Normal,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }*/
+                }
+            }
+        }
+    }
+
+    // Update the selectedOption when options list is cleared
+    LaunchedEffect(options) {
+        if (options.isEmpty()) {
+            selectedOption = null
+        }
+    }
+}
+
+/*fun Modifier.blurIf(condition: Boolean, radius: Float): Modifier {
+    return if (condition) {
+        this.graphicsLayer {
+            renderEffect = RenderEffect
+                .createBlurEffect(radius, radius, Shader.TileMode.DECAL)
+        }
+    } else {
+        this
+    }
+}*/

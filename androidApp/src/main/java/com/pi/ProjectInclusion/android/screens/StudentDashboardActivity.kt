@@ -43,11 +43,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.Transparent
+import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentDetailsScreen
+import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen1
 import com.pi.ProjectInclusion.android.screens.addStudentRegisterScreen.AddStudentRegisterScreen
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.DashboardScreen
+import com.pi.ProjectInclusion.android.screens.dashboardScreen.ViewProfileScreen
 import com.pi.ProjectInclusion.android.screens.interventionScreens.InterventionAcceptLevelScreen
 import com.pi.ProjectInclusion.android.screens.interventionScreens.InterventionHomeScreen
 import com.pi.ProjectInclusion.android.screens.interventionScreens.InterventionStudentDetailsScreen
@@ -58,6 +61,9 @@ import com.pi.ProjectInclusion.android.screens.menu.BottomNavigationBar
 import com.pi.ProjectInclusion.android.screens.menu.DrawerBody
 import com.pi.ProjectInclusion.android.screens.menu.DrawerHeader
 import com.pi.ProjectInclusion.android.screens.menu.MenuItem
+import com.pi.ProjectInclusion.android.screens.registration.EnterUserScreen1
+import com.pi.ProjectInclusion.android.screens.registration.EnterUserScreen2
+import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningHomeScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -95,7 +101,7 @@ class StudentDashboardActivity : ComponentActivity() {
                             .background(Transparent)
                     ) {
                         DrawerHeader(drawerState, onItemClick = {
-                            navController.navigate(AppRoute.DashboardScreen.route) //AddStudentRegisterScreen
+                            navController.navigate(AppRoute.ProfileScreen.route) //AddStudentRegisterScreen
                         })
                         DrawerBody(
                             // List of Navigation Drawer
@@ -207,6 +213,12 @@ class StudentDashboardActivity : ComponentActivity() {
                             composable(AppRoute.DashboardScreen.route) {
                                 DashboardScreen(navController)
                             }
+                            composable(AppRoute.ProfileScreen.route) {
+                                ViewProfileScreen(navController)
+                            }
+                            composable(AppRoute.EditProfileScreen.route) {
+                                EditProfileScreen1(navController)
+                            }
 //                                    composable(
 //                                        AppRoute.DashboardScreen(-1).route,
 //                                        arguments = listOf(navArgument("index") {
@@ -216,14 +228,21 @@ class StudentDashboardActivity : ComponentActivity() {
 //                                        val index = backStackEntry.arguments?.getInt("index")!!
 //
 //                                    }
-                            composable(AppRoute.ScreeningScreen.route) {
-                                AddStudentRegisterScreen(navController)
-                            }
 
                             composable(AppRoute.CourseScreen.route) {
                                 DashboardScreen(navController)
                             }
 
+                            // This is use for screening
+                            composable(AppRoute.ScreeningScreen.route) {
+                                ScreeningHomeScreen(navController)
+                            }
+
+                            composable(AppRoute.AddStudentRegister.route) {
+                                AddNewStudentDetailsScreen(navController)
+                            }
+
+                            // This is use for intervention
                             composable(AppRoute.InterventionScreen.route) {
                                 InterventionHomeScreen(navController)
                             }

@@ -290,10 +290,10 @@ fun InterventionAcceptLevelScreen(navHostController: NavHostController) {
                                         )
                                     }, modifier = Modifier
                                         .size(20.dp)
-                                        /*.background(
-                                            color = White,
-                                            shape = RoundedCornerShape(8.dp)
-                                        )*/
+                                    /*.background(
+                                        color = White,
+                                        shape = RoundedCornerShape(8.dp)
+                                    )*/
                                 )
 
                                 Spacer(modifier = Modifier.width(4.dp))
@@ -492,7 +492,10 @@ fun LevelCheckDialog(onDismiss: () -> Unit) {
                     YesBtnUi(
                         onClick = {
                             onDismiss()
-                        }, title = stringResource(R.string.txt_Yes), enabled = true
+                        },
+                        title = stringResource(R.string.txt_Yes),
+                        modifier = Modifier.width(135.dp),
+                        enabled = true
                     )
                 }
             }

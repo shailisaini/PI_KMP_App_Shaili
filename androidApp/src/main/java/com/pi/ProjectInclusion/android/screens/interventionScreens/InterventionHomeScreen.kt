@@ -163,7 +163,8 @@ fun InterventionHomeScreen(navHostController: NavHostController) {
             }
         }
 
-        Column(
+        HorizontalPager(
+            state = pagerState,
             modifier = Modifier
                 .fillMaxSize()
                 .background(
@@ -172,33 +173,20 @@ fun InterventionHomeScreen(navHostController: NavHostController) {
                     } else {
                         White
                     }
-                )
-        ) {
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        if (isSystemInDarkTheme()) {
-                            Dark_01
-                        } else {
-                            White
-                        }
-                    ),
-                userScrollEnabled = false,
-            ) { index ->
-                when (index) {
-                    0 -> {
-                        PendingIntervention(navHostController)
-                    }
+                ),
+            userScrollEnabled = true,
+        ) { index ->
+            when (index) {
+                0 -> {
+                    PendingIntervention(navHostController)
+                }
 
-                    1 -> {
-                        InProgressIntervention(navHostController)
-                    }
+                1 -> {
+                    InProgressIntervention(navHostController)
+                }
 
-                    else -> {
-                        CompletedIntervention(navHostController)
-                    }
+                else -> {
+                    CompletedIntervention(navHostController)
                 }
             }
         }
@@ -294,28 +282,8 @@ fun PendingIntervention(navHostController: NavHostController) {
             painterResource(id = R.drawable.dummy_image)
         ),
         InterventionData(
-            "Abhishek Muthut",
-            "Class 5",
-            "Start Intervention",
-            "Continue Intervention",
-            "Completed Intervention",
-            "Progress achieved",
-            0,
-            painterResource(id = R.drawable.dummy_image)
-        ),
-        InterventionData(
             "Abhi Kothari",
             "Class 4",
-            "Start Intervention",
-            "Continue Intervention",
-            "Completed Intervention",
-            "Progress achieved",
-            0,
-            painterResource(id = R.drawable.dummy_image)
-        ),
-        InterventionData(
-            "Anup Dev",
-            "Class 3",
             "Start Intervention",
             "Continue Intervention",
             "Completed Intervention",
@@ -368,7 +336,7 @@ fun InterventionDataUI(interData: InterventionData, navHostController: NavHostCo
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 8.dp, bottom = 16.dp)
+            .padding(top = 8.dp, bottom = 32.dp)
             .background(
                 if (isSystemInDarkTheme()) {
                     Dark_01
@@ -534,7 +502,7 @@ fun InterventionDataUI(interData: InterventionData, navHostController: NavHostCo
         }
 
         Card(
-            shape = RoundedCornerShape(4.dp),
+            shape = RoundedCornerShape(8.dp),
             modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp)
                 .fillMaxWidth()
@@ -606,16 +574,6 @@ fun InProgressIntervention(navHostController: NavHostController) {
             painterResource(id = R.drawable.dummy_image)
         ),
         InterventionData(
-            "Abhishek Muthut",
-            "Class 5",
-            "Start Intervention",
-            "Continue Intervention",
-            "Completed Intervention",
-            "Progress achieved",
-            5,
-            painterResource(id = R.drawable.dummy_image)
-        ),
-        InterventionData(
             "Abhi Kothari",
             "Class 4",
             "Start Intervention",
@@ -623,16 +581,6 @@ fun InProgressIntervention(navHostController: NavHostController) {
             "Completed Intervention",
             "Progress achieved",
             4,
-            painterResource(id = R.drawable.dummy_image)
-        ),
-        InterventionData(
-            "Anup Dev",
-            "Class 3",
-            "Start Intervention",
-            "Continue Intervention",
-            "Completed Intervention",
-            "Progress achieved",
-            3,
             painterResource(id = R.drawable.dummy_image)
         ),
         InterventionData(
@@ -683,7 +631,7 @@ fun InterventionInProgressDataUI(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 8.dp, bottom = 16.dp)
+            .padding(top = 8.dp, bottom = 32.dp)
             .background(
                 if (isSystemInDarkTheme()) {
                     Dark_01
@@ -901,7 +849,7 @@ fun InterventionInProgressDataUI(
         }
 
         Card(
-            shape = RoundedCornerShape(4.dp),
+            shape = RoundedCornerShape(8.dp),
             modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp)
                 .fillMaxWidth()
@@ -967,31 +915,11 @@ fun CompletedIntervention(navHostController: NavHostController) {
             painterResource(id = R.drawable.dummy_image)
         ),
         InterventionData(
-            "Abhishek Muthut",
-            "Class 5",
-            "Start Intervention",
-            "Continue Intervention",
-            "Completed Intervention",
-            "Progress achieved",
-            100,
-            painterResource(id = R.drawable.dummy_image)
-        ),
-        InterventionData(
             "Abhi Kothari",
             "Class 4",
             "Start Intervention",
             "Continue Intervention",
             "Completed Intervention",
-            "Progress achieved",
-            100,
-            painterResource(id = R.drawable.dummy_image)
-        ),
-        InterventionData(
-            "Anup Dev",
-            "Class 3",
-            "Start Intervention",
-            "Continue Intervention",
-            "Continue Intervention",
             "Progress achieved",
             100,
             painterResource(id = R.drawable.dummy_image)
@@ -1041,7 +969,7 @@ fun InterventionCompletedDataUI(completedData: InterventionData, navigation: Nav
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 8.dp, bottom = 16.dp)
+            .padding(top = 8.dp, bottom = 32.dp)
             .background(
                 if (isSystemInDarkTheme()) {
                     Dark_01
@@ -1259,7 +1187,7 @@ fun InterventionCompletedDataUI(completedData: InterventionData, navigation: Nav
         }
 
         Card(
-            shape = RoundedCornerShape(4.dp),
+            shape = RoundedCornerShape(8.dp),
             modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp)
                 .fillMaxWidth()
@@ -1318,7 +1246,7 @@ fun InterventionHomeScreenPreview() {
     InterventionHomeScreen(navController)
 }
 
-data class InterventionData(
+data class  InterventionData(
     var name: String,
     var grade: String,
     var interventionStartStatus: String,

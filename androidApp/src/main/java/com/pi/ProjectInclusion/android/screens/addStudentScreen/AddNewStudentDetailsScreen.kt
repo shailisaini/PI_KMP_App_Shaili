@@ -1,4 +1,4 @@
-package com.pi.ProjectInclusion.android.screens.addStudentRegisterScreen
+package com.pi.ProjectInclusion.android.screens.addStudentScreen
 
 import android.Manifest
 import android.content.Context
@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
@@ -56,7 +55,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -64,12 +62,12 @@ import com.example.kmptemplate.logger.AppLoggerImpl
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.Transparent
-import com.pi.ProjectInclusion.android.R.*
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddStudentRegisterScreen(navHostController: NavHostController) {
+fun AddNewStudentDetailsScreen(navHostController: NavHostController) {
     var isDialogVisible by remember { mutableStateOf(false) }
     val logger = AppLoggerImpl()
     val query by rememberSaveable {
@@ -106,14 +104,16 @@ fun AddStudentRegisterScreen(navHostController: NavHostController) {
     }
 
     Surface(
-        modifier = Modifier.wrapContentSize()
+        modifier = Modifier
+            .wrapContentSize()
             .background(
                 color = Transparent
             )
             .padding(0.dp),
-        ) {
+    ) {
         Box(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .background(
                     color = Transparent
                 )
@@ -174,10 +174,12 @@ fun ProfileItem(context: Context) {
                 elevation = CardDefaults.cardElevation(4.dp)
 
                 // Do not set containerColor, let the Box inside handle the gradient
-            ){
-                Text ( modifier = Modifier.wrapContentWidth()
-                    .padding(start = 26.dp, end = 26.dp, top = 8.dp, bottom = 8.dp)
-                    .clickable {  },
+            ) {
+                Text(
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .padding(start = 26.dp, end = 26.dp, top = 8.dp, bottom = 8.dp)
+                        .clickable { },
                     text = stringResource(R.string.string_addphoto),
                     color = White,
                     fontSize = 16.sp// Make sure text is readable on gradient
@@ -189,7 +191,7 @@ fun ProfileItem(context: Context) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ItemAddStudentScreeningRegisterScreen(context: Context){
+fun ItemAddStudentScreeningRegisterScreen(context: Context) {
 
     var text by remember { mutableStateOf("") }
     Column(
@@ -198,7 +200,7 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context){
             .padding(16.dp)
     ) {
         Text(
-            text = stringResource(R.string.student_name),
+            text = stringResource(R.string.txt_Student_Name),
             fontSize = 16.sp,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -207,7 +209,7 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context){
             value = text,
             onValueChange = { text = it },
             shape = RoundedCornerShape(8.dp),
-            placeholder = { Text(stringResource(R.string.student_name_ex)) },
+            placeholder = { Text(stringResource(R.string.txt_eg_first_name)) },
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color(0xFFD0D5DD),
@@ -222,7 +224,6 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context){
         )
 
 
-
     }
 
     Column(
@@ -235,10 +236,6 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context){
             fontSize = 16.sp,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-
-
-
-
 
 
     }
@@ -278,8 +275,6 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context){
         )
 
 
-
-
     }
     Column(
         modifier = Modifier
@@ -309,8 +304,6 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context){
             textStyle = TextStyle(fontSize = 16.sp, color = Black)
 
         )
-
-
 
 
     }
@@ -359,10 +352,12 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context){
             elevation = CardDefaults.cardElevation(4.dp)
 
             // Do not set containerColor, let the Box inside handle the gradient
-        ){
-            Text ( modifier = Modifier.wrapContentWidth()
-                .padding(start = 26.dp, end = 26.dp, top = 8.dp, bottom = 8.dp)
-                .clickable {  },
+        ) {
+            Text(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .padding(start = 26.dp, end = 26.dp, top = 8.dp, bottom = 8.dp)
+                    .clickable { },
                 text = stringResource(R.string.string_next),
                 color = White,
                 fontSize = 16.sp// Make sure text is readable on gradient
@@ -370,11 +365,7 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context){
         }
 
 
-
-
     }
-
-
 
 
 }
@@ -382,7 +373,7 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
+fun ItemAddStudentScreeningStep2RegisterScreen(context: Context) {
 
     var text by remember { mutableStateOf("") }
     Column(
@@ -449,8 +440,6 @@ fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
         )
 
 
-
-
     }
 
     Column(
@@ -488,7 +477,6 @@ fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
         )
 
 
-
     }
     Column(
         modifier = Modifier
@@ -518,8 +506,6 @@ fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
             textStyle = TextStyle(fontSize = 16.sp, color = Black)
 
         )
-
-
 
 
     }
@@ -558,7 +544,6 @@ fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
         )
 
 
-
     }
     Column(
         modifier = Modifier
@@ -593,7 +578,6 @@ fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
             textStyle = TextStyle(fontSize = 16.sp, color = Black)
 
         )
-
 
 
     }
@@ -632,7 +616,6 @@ fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
         )
 
 
-
     }
     Column(
         modifier = Modifier
@@ -651,10 +634,12 @@ fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
             elevation = CardDefaults.cardElevation(4.dp)
 
             // Do not set containerColor, let the Box inside handle the gradient
-        ){
-            Text ( modifier = Modifier.wrapContentWidth()
-                .padding(start = 26.dp, end = 26.dp, top = 8.dp, bottom = 8.dp)
-                .clickable {  },
+        ) {
+            Text(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .padding(start = 26.dp, end = 26.dp, top = 8.dp, bottom = 8.dp)
+                    .clickable { },
                 text = stringResource(R.string.add_student),
                 color = White,
                 fontSize = 16.sp// Make sure text is readable on gradient
@@ -662,11 +647,7 @@ fun ItemAddStudentScreeningStep2RegisterScreen(context: Context){
         }
 
 
-
-
     }
-
-
 
 
 }
