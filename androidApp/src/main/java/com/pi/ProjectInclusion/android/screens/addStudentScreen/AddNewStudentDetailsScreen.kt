@@ -200,7 +200,7 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context) {
             .padding(16.dp)
     ) {
         Text(
-            text = stringResource(R.string.student_name),
+            text = stringResource(R.string.txt_Student_Name),
             fontSize = 16.sp,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -209,7 +209,7 @@ fun ItemAddStudentScreeningRegisterScreen(context: Context) {
             value = text,
             onValueChange = { text = it },
             shape = RoundedCornerShape(8.dp),
-            placeholder = { Text(stringResource(R.string.student_name_ex)) },
+            placeholder = { Text(stringResource(R.string.txt_eg_first_name)) },
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color(0xFFD0D5DD),

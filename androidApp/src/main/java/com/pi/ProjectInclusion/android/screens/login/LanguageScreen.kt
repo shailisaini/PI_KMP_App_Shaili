@@ -279,8 +279,6 @@ fun ItemLanguageCard(
                     onItemClicked.invoke()
                     navController.popBackStack()
                     navController.navigate(AppRoute.UserTypeSelect.route)
-                    // by manju
-//                    navController.navigate(AppRoute.StudentDashboardActivity.route)
                 } else {
                     LoggerProvider.logger.d("Languages fetched: ${languageIndex.status}")
                     context.toast(errorToast)

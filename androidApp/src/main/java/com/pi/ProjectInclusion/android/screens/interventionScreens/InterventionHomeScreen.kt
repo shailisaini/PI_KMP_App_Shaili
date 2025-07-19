@@ -1246,7 +1246,7 @@ fun InterventionHomeScreenPreview() {
     InterventionHomeScreen(navController)
 }
 
-data class InterventionData(
+data class  InterventionData(
     var name: String,
     var grade: String,
     var interventionStartStatus: String,

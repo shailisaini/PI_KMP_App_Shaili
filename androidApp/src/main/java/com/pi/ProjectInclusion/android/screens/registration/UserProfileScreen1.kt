@@ -91,9 +91,9 @@ import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 
 @Composable
-fun EnterUserScreen1(navController: NavHostController, viewModel: LoginViewModel) {
+fun EnterUserScreen1(navController: NavHostController) {
     var isDialogVisible by remember { mutableStateOf(false) }
-    val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
+//    val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val userType = remember { mutableStateListOf<GetUserTypeResponse.Data>() }
@@ -106,7 +106,10 @@ fun EnterUserScreen1(navController: NavHostController, viewModel: LoginViewModel
         BackButtonPress(navController, AppRoute.UserTypeSelect.route)
     }
     LoggerProvider.logger.d("Screen: " + "EnterUserNameScreen()")
-    LaunchedEffect(Unit) {
+
+    // commenting it for now it will use after API
+
+    /*LaunchedEffect(Unit) {
         viewModel.getUserType()
     }
 
@@ -133,7 +136,7 @@ fun EnterUserScreen1(navController: NavHostController, viewModel: LoginViewModel
                 LoggerProvider.logger.d("Languages fetched: ${uiState.success!!.data}")
             }
         }
-    }
+    }*/
 
     Surface(
         modifier = Modifier.fillMaxWidth(), color = White
@@ -243,26 +246,40 @@ fun ProfileScreenUI(
                                 .padding(start = 10.dp, bottom = 5.dp)
                         )
 
-                        Button(
-                            onClick = { }, modifier = Modifier
-                                .wrapContentSize()
-                                .clip(RoundedCornerShape(4.dp)),
-                            shape = RoundedCornerShape(4.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = White,
-                                contentColor = PrimaryBlue
-                            ),
-                            border = BorderStroke(1.dp, color = PrimaryBlue)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                stringResource(R.string.txt_add_photo),
-                                modifier = Modifier
+                            Button(
+                                onClick = { }, modifier = Modifier
                                     .wrapContentSize()
-                                    .padding(bottom = 2.dp, top = 2.dp),
-                                fontSize = 12.sp,
-                                fontFamily = fontMedium,
-                                color = PrimaryBlue,
-                                textAlign = TextAlign.Center
+                                    .clip(RoundedCornerShape(4.dp)),
+                                shape = RoundedCornerShape(4.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = White,
+                                    contentColor = PrimaryBlue
+                                ),
+                                border = BorderStroke(1.dp, color = PrimaryBlue)
+                            ) {
+                                Text(
+                                    stringResource(R.string.txt_add_photo),
+                                    modifier = Modifier
+                                        .wrapContentSize()
+                                        .padding(bottom = 2.dp, top = 2.dp),
+                                    fontSize = 12.sp,
+                                    fontFamily = fontMedium,
+                                    color = PrimaryBlue,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                            Image(
+                                modifier = Modifier
+                                    .size(35.dp)
+                                    .padding(start = 10.dp),
+                                painter = painterResource(id = R.drawable.ic_delete_red),
+                                contentDescription = IMG_DESCRIPTION
                             )
                         }
                     }
@@ -531,7 +548,7 @@ fun ProfileScreenUI(
                                     } else {
                                         isDialogVisible = true
                                         navController.popBackStack()
-                                        navController.navigate(AppRoute.UserPasswordScreen.route)
+                                        navController.navigate(AppRoute.EnterUserProfessionalScreen.route)
 
                                     }
                                 }

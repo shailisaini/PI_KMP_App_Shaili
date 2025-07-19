@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.pi.ProjectInclusion.android.MyApplicationTheme
 import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.screens.dashboardScreen.ViewProfileScreen
 import com.pi.ProjectInclusion.android.screens.login.EnterPasswordScreen
 import com.pi.ProjectInclusion.android.screens.login.ForgetPasswordScreen
 import com.pi.ProjectInclusion.android.screens.login.EnterUserNameScreen
@@ -20,6 +21,7 @@ import com.pi.ProjectInclusion.android.screens.registration.SetNewPasswordScreen
 import com.pi.ProjectInclusion.android.screens.login.UserTypeScreen
 import com.pi.ProjectInclusion.android.screens.registration.CreateNewPasswordScreen
 import com.pi.ProjectInclusion.android.screens.registration.EnterUserScreen1
+import com.pi.ProjectInclusion.android.screens.registration.EnterUserScreen2
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -59,7 +61,10 @@ class LoginNavigationScreen : ComponentActivity() {
                         CreateNewPasswordScreen(navController, viewModel)
                     }
                     composable(AppRoute.EnterUserProfileScreen.route) {
-                        EnterUserScreen1(navController, viewModel)
+                        EnterUserScreen1(navController)
+                    }
+                    composable(AppRoute.EnterUserProfessionalScreen.route) {
+                        EnterUserScreen2(navController)
                     }
                     composable(AppRoute.ForgetPasswordUI.route) {
                         ForgetPasswordScreen(navController, viewModel)

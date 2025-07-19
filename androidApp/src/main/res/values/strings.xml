@@ -10,8 +10,6 @@
     <string name="select_userType_subtitle">Select your user type to continue. This helps us tailor your experience</string>
     <string name="txt_loading">Loading your data..</string>
     <string name="txt_oops_no_data_found">Oops!!, No data found</string>
-    <string name="student_name">Student Name</string>
-    <string name="student_name_ex">eg: Ramesh</string>
     <string name="student_gender">Gender</string>
     <string name="student_dob">DOB</string>
     <string name="dob_format">MM DD YY</string>
@@ -36,6 +34,7 @@
     <string name="student_screen">Add Student for screening</string>
     <string name="student_screen_detail">No students have been added yet. Start by adding your first student to begin the screening process.</string>
     <string name="student_screen_add">+ Add Student</string>
+    <string name="text_add">+ Add</string>
 
     <string name="welcome_name">Hi, Aman Sharma</string>
     <string name="welcome_desc">Learn, act, and create impact—one course at a time.</string>
@@ -176,6 +175,15 @@ and make a difference together!</string>
     <string name="txt_Start_training_fewer_gradually">Start training a fewer steps and gradually increase the numbers of steps as the child gains confidence.</string>
     <string name="txt_Camera">Camera</string>
     <string name="txt_Gallery">Gallery</string>
+    <string name="txt_teacher">Teacher</string>
+    <string name="txt_udise">UDISE</string>
+    <string name="txt_district">District</string>
+    <string name="txt_block_zone">Block/KVS Region/Zone</string>
+    <string name="txt_school_name">School Name</string>
+    <string name="txt_profile">Profile</string>
+    <string name="txt_change_request">Change Request</string>
+    <string name="txt_update_name_school">You can request to update your name and school details from here. </string>
+    <string name="txt_complete_email">Complete your profile by adding email.</string>
     <string name="txt_Choose_option">Choose an option</string>
     <string name="txt_All_screening">All (0)</string>
     <string name="txt_screening_1">Screening 1 (01)</string>
@@ -201,4 +209,9 @@ and make a difference together!</string>
     <string name="txt_Screening_observed_period">The student should be observed closely over a reasonable period of time before the screening.</string>
     <string name="txt_Get_Started">Get Started</string>
     <string name="txt_I_hereby_mentioned">I hereby agree with all the points mentioned above.</string>
+    <string name="txt_track_request">Track request</string>
+    <string name="txt_deactivate">Deactivate account</string>
+    <string name="txt_basic_information">Basic Information</string>
+    <string name="txt_professional_information">Professional Information</string>
+    <string name="txt_logout">Logout</string>
 </resources>
