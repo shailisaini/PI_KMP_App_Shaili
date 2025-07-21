@@ -86,7 +86,7 @@ import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
 
 @Composable
-fun ViewProfileScreen(navHostController: NavHostController) {
+fun ViewProfileScreen(navController: NavHostController) {
 
     var isDialogVisible by remember { mutableStateOf(false) }
 
@@ -103,7 +103,6 @@ fun ViewProfileScreen(navHostController: NavHostController) {
         onDismiss = { isDialogVisible = false },
         message = "Loading your data..."
     )
-    val navController = NavHostController(context)
     val selectedLanguage = remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
     var hasCameraPermission by remember { mutableStateOf(false) }
@@ -214,12 +213,12 @@ fun ProfileViewUI(
                     )
 
                     Button(
-                        onClick = { }, modifier = Modifier
+                        onClick = {
+                            navController.navigate(AppRoute.EditProfileScreen.route)
+                        }, modifier = Modifier
                             .wrapContentSize()
-                            .clickable{
-                                navController.navigate(AppRoute.EditProfileScreen.route)
-                            }
                             .clip(RoundedCornerShape(4.dp)),
+
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = White,
@@ -233,7 +232,7 @@ fun ProfileViewUI(
                             textColor = Black,
                             iconColor = Color.Unspecified,
                             onClick = {
-
+                                navController.navigate(AppRoute.EditProfileScreen.route)
                             })
                     }
                 }
