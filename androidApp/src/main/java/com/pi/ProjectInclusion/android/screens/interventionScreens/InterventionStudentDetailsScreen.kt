@@ -109,6 +109,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
     var showCognitiveUI by remember { mutableStateOf(false) }
     var showBehavioralUI by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
+    var underProcessingStr = stringResource(R.string.txt_Under_Processing)
 
     val scope = rememberCoroutineScope()
     var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
@@ -804,7 +805,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                     modifier = Modifier
                                         .background(Color.Unspecified)
                                         .clickable {
-                                            context.toast("Under processing for preview documents...")
+                                            context.toast(underProcessingStr)
                                         }
                                 ) {
                                     Image(
@@ -886,7 +887,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                     modifier = Modifier
                                         .background(Color.Unspecified)
                                         .clickable {
-                                            context.toast("Under processing for preview documents...")
+                                            context.toast(underProcessingStr)
                                         }
                                 ) {
                                     Image(
@@ -1544,6 +1545,8 @@ fun BottomSheetCamGalScreen(
 ) {
 
     val context: Context = LocalContext.current
+    val cameraString = stringResource(R.string.txt_Under_Processing_camera)
+    val galleryString = stringResource(R.string.txt_Under_Processing_gallery)
 
     if (isBottomSheetVisible) {
         ModalBottomSheet(
@@ -1667,7 +1670,7 @@ fun BottomSheetCamGalScreen(
                                         .size(35.dp)
                                         .clickable {
                                             onDismiss.invoke()
-                                            context.toast("Under processing for use camera...")
+                                            context.toast(cameraString)
                                         },
                                 )
                             }
@@ -1711,7 +1714,7 @@ fun BottomSheetCamGalScreen(
                                         .size(35.dp)
                                         .clickable {
                                             onDismiss.invoke()
-                                            context.toast("Under processing for use gallery...")
+                                            context.toast(galleryString)
                                         },
                                 )
                             }

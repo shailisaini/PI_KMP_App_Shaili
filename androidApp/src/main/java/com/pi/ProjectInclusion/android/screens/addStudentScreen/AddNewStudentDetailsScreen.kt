@@ -1,39 +1,38 @@
 package com.pi.ProjectInclusion.android.screens.addStudentScreen
 
 import android.Manifest
-import android.content.Context
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.material3.Card
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -47,47 +46,82 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.kmptemplate.logger.AppLoggerImpl
+import com.pi.ProjectInclusion.Bg_Gray
+import com.pi.ProjectInclusion.Bg_Gray2
 import com.pi.ProjectInclusion.Black
-import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.DARK_BODY_TEXT
+import com.pi.ProjectInclusion.Dark_01
+import com.pi.ProjectInclusion.Dark_03
+import com.pi.ProjectInclusion.GrayLight02
+import com.pi.ProjectInclusion.OrangeSubTitle
+import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.Transparent
+import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
+import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
+import com.pi.ProjectInclusion.android.common_UI.DropdownMenuUi
+import com.pi.ProjectInclusion.android.common_UI.GenderOption
+import com.pi.ProjectInclusion.android.common_UI.SchoolListBottomSheet
+import com.pi.ProjectInclusion.android.common_UI.SmallBtnUi
+import com.pi.ProjectInclusion.android.common_UI.TextFieldWithRightIcon
+import com.pi.ProjectInclusion.android.common_UI.TextViewField
+import com.pi.ProjectInclusion.android.common_UI.showDatePickerDialog
+import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.utils.fontMedium
+import com.pi.ProjectInclusion.android.utils.fontRegular
+import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
+import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_FEMALE
+import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_MALE
+import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_OTHER
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddNewStudentDetailsScreen(navHostController: NavHostController) {
+
     var isDialogVisible by remember { mutableStateOf(false) }
-    val logger = AppLoggerImpl()
-    val query by rememberSaveable {
-        mutableStateOf("")
-    }
-    var selectedIndex by remember { mutableStateOf<Int?>(null) }
-    val scrollState = rememberLazyGridState()
+    val colors = MaterialTheme.colorScheme
+    val scrollState = rememberScrollState()
     val context = LocalContext.current
-    val languageData = remember { mutableStateListOf<GetLanguageListResponse.Data.Result>() }
+
+    var studentsName = rememberSaveable { mutableStateOf("") }
+    var fathersName = rememberSaveable { mutableStateOf("") }
+    val textNameEg = stringResource(R.string.txt_Student_Name)
+    val textFatherNameEg = stringResource(R.string.f_name)
+    val selectedGender = remember { mutableStateOf("") }
+    val genderOptions = listOf(KEY_MALE, KEY_FEMALE, KEY_OTHER)
+    var date by remember { mutableStateOf("") }
+    var selectedSchool = stringResource(R.string.choose_option)
+    val scope = rememberCoroutineScope()
+    var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+        confirmValueChange = { it != SheetValue.Hidden })
+    val schoolList = remember { mutableStateListOf<GetLanguageListResponse.Data.Result>() }
+
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
         message = "Loading your data..."
     )
-    val navController = NavHostController(context)
-    val selectedLanguage = remember { mutableStateOf<String?>(null) }
-    val coroutineScope = rememberCoroutineScope()
+
     var hasCameraPermission by remember { mutableStateOf(false) }
 
-    var showDialog by remember { mutableStateOf(false) }
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
@@ -100,558 +134,419 @@ fun AddNewStudentDetailsScreen(navHostController: NavHostController) {
             cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         } catch (exc: Exception) {
             // Handle exception
+            println("Handle exception :- ${exc.message}")
         }
     }
 
-    Surface(
-        modifier = Modifier
-            .wrapContentSize()
-            .background(
-                color = Transparent
+    DetailsNoImgBackgroundUi(
+        backgroundColor = White,
+        textColor = Black,
+        pageTitle = stringResource(R.string.txt_Add_student_screening),
+        moreInfoIcon = painterResource(id = R.drawable.vertical_dot),
+        isShowBackButton = true,
+        isShowMoreInfo = false,
+        onBackButtonClick = {
+            BackButtonPress(navHostController, AppRoute.ScreeningScreen.route)
+        },
+        onMoreInfoClick = {},
+        content = {
+            Divider(
+                color = GrayLight02,
+                thickness = 1.dp,
+                modifier = Modifier.padding(horizontal = 0.dp)
             )
-            .padding(0.dp),
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    color = Transparent
-                )
-                .padding(10.dp),
-        )
-        {
+
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally // Center rows inside the column
-            )
-            {
-                ProfileItem(context)
-                ItemAddStudentScreeningRegisterScreen(context)
-            }
-        }
-    }
-}
-
-@Composable
-fun ProfileItem(context: Context) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically // Aligns image & text vertically
-    )
-    {
-        // Profile Image
-        Image(
-            painter = painterResource(id = R.drawable.upload_profile_ic), // your image
-            contentDescription = "Profile Image",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(64.dp)
-                .clip(RectangleShape)
-                .border(1.dp, Color.Gray, RectangleShape)
-        )
-
-        Spacer(modifier = Modifier.width(16.dp)) // Space between image and text
-
-        // Text on the right
-        Column {
-            Text(
-                text = "Upload a profile photo of the student.",
-                fontSize = 16.sp,
-                fontFamily = FontFamily(
-                    Font(R.font.roboto_regular)
-                )
-            )
-            Card(
                 modifier = Modifier
-                    .wrapContentWidth()
-                    .wrapContentHeight(),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFFFFFFF)
-                ),
-                shape = RoundedCornerShape(8.dp),
-                border = BorderStroke(1.dp, Color(0xFF2C3EA2)),
-                elevation = CardDefaults.cardElevation(4.dp)
-
-                // Do not set containerColor, let the Box inside handle the gradient
+                    .fillMaxWidth()
+                    .background(
+                        color = if (isSystemInDarkTheme()) {
+                            Dark_01
+                        } else {
+                            White
+                        }
+                    )
             ) {
-                Text(
+                Column(
                     modifier = Modifier
-                        .wrapContentWidth()
-                        .padding(start = 26.dp, end = 26.dp, top = 8.dp, bottom = 8.dp)
-                        .clickable { },
-                    text = stringResource(R.string.string_addphoto),
-                    color = White,
-                    fontSize = 16.sp// Make sure text is readable on gradient
-                )
+                        .fillMaxWidth()
+                        .verticalScroll(scrollState)
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(R.string.txt_Students_Details),
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Start,
+                        fontFamily = fontMedium,
+                        color = OrangeSubTitle,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp)
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Card(
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier
+                                .width(100.dp)
+                                .height(100.dp),
+                            colors = if (isSystemInDarkTheme()) {
+                                CardDefaults.cardColors(Dark_03)
+                            } else {
+                                CardDefaults.cardColors(
+                                    containerColor = Bg_Gray2,
+                                    contentColor = Bg_Gray2,
+                                    disabledContentColor = Bg_Gray2,
+                                    disabledContainerColor = Bg_Gray2
+                                )
+                            }
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .width(100.dp)
+                                    .height(100.dp)
+                                    .background(Color.Unspecified)
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.user_img),
+                                    contentDescription = IMG_DESCRIPTION,
+                                    modifier = Modifier
+                                        .width(52.dp)
+                                        .height(52.dp)
+                                        .align(Alignment.Center)
+                                        .background(Color.Unspecified),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+                        }
+
+                        Column(
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .wrapContentHeight()
+                                .padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(5.dp),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.txt_Upload_profile_photo),
+                                fontSize = 12.sp,
+                                fontFamily = fontRegular,
+                                color = Black,
+                                modifier = Modifier
+                                    .padding(start = 8.dp, bottom = 8.dp)
+                            )
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 8.dp, bottom = 8.dp)
+                                    .wrapContentHeight(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Button(
+                                    onClick = { }, modifier = Modifier
+                                        .wrapContentSize()
+                                        .clip(RoundedCornerShape(8.dp)),
+                                    shape = RoundedCornerShape(8.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = White,
+                                        contentColor = PrimaryBlue
+                                    ),
+                                    border = BorderStroke(1.dp, color = PrimaryBlue)
+                                ) {
+                                    Text(
+                                        stringResource(R.string.txt_add_photo),
+                                        modifier = Modifier
+                                            .wrapContentSize()
+                                            .padding(bottom = 2.dp, top = 2.dp),
+                                        fontSize = 14.sp,
+                                        fontFamily = fontMedium,
+                                        color = PrimaryBlue,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = buildAnnotatedString {
+                            append(stringResource(R.string.txt_Student_Name))
+                            pushStyle(SpanStyle(color = Color.Red))
+                            append(ASTRICK)
+                            pop()
+                        },
+                        modifier = Modifier
+                            .padding(
+                                top = 24.dp,
+                                bottom = 8.dp, end = 8.dp
+                            )
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Start,
+                        fontFamily = fontMedium,
+                        fontSize = 14.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_BODY_TEXT
+                        } else {
+                            Bg_Gray
+                        }
+                    )
+
+                    TextViewField(
+                        isIcon = false,
+                        icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
+                        colors = colors,
+                        text = studentsName,
+                        trueFalse = true,
+                        hint = textNameEg.toString()
+                    )
+
+                    Text(
+                        text = buildAnnotatedString {
+                            append(stringResource(R.string.student_gender))
+                            pushStyle(SpanStyle(color = Color.Red))
+                            append(ASTRICK)
+                            pop()
+                        },
+                        modifier = Modifier
+                            .padding(
+                                top = 16.dp,
+                                bottom = 8.dp, end = 8.dp
+                            )
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Start,
+                        fontFamily = fontMedium,
+                        fontSize = 14.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_BODY_TEXT
+                        } else {
+                            Bg_Gray
+                        }
+                    )
+
+                    Row(horizontalArrangement = Arrangement.Start) {
+                        genderOptions.forEach { gender ->
+                            GenderOption(
+                                gender = gender,
+                                isSelected = selectedGender.value == gender,
+                                onSelected = { selectedGender.value = gender }
+                            )
+                        }
+                    }
+
+                    Text(
+                        text = buildAnnotatedString {
+                            append(stringResource(R.string.txt_date_of_birth))
+                            pushStyle(SpanStyle(color = Color.Red))
+                            append(ASTRICK)
+                            pop()
+                        },
+                        modifier = Modifier
+                            .padding(
+                                top = 16.dp,
+                                bottom = 8.dp, end = 8.dp
+                            )
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Start,
+                        fontFamily = fontMedium,
+                        fontSize = 14.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_BODY_TEXT
+                        } else {
+                            Bg_Gray
+                        }
+                    )
+
+                    TextFieldWithRightIcon(
+                        modifier = Modifier.clickable {
+                            showDatePickerDialog(context) { year, month, dayOfMonth ->
+                                date = "$year-${
+                                    month.toString().padStart(2, '0')
+                                }-${dayOfMonth.toString().padStart(2, '0')}"
+                            }
+                        },
+                        value = remember { mutableStateOf(date) },
+                        placeholder = if (date.isEmpty()) stringResource(R.string.select_date_of_birth) else date
+                    )
+
+                    Text(
+                        text = buildAnnotatedString {
+                            append(stringResource(R.string.f_name))
+                            pushStyle(SpanStyle(color = Color.Red))
+                            append(ASTRICK)
+                            pop()
+                        },
+                        modifier = Modifier
+                            .padding(
+                                top = 16.dp,
+                                bottom = 8.dp, end = 8.dp
+                            )
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Start,
+                        fontFamily = fontMedium,
+                        fontSize = 14.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_BODY_TEXT
+                        } else {
+                            Bg_Gray
+                        }
+                    )
+
+                    TextViewField(
+                        isIcon = false,
+                        icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
+                        colors = colors,
+                        text = fathersName,
+                        trueFalse = true,
+                        hint = textFatherNameEg.toString()
+                    )
+
+                    Text(
+                        text = buildAnnotatedString {
+                            append(stringResource(R.string.txt_School))
+                            pushStyle(SpanStyle(color = Color.Red))
+                            append(ASTRICK)
+                            pop()
+                        },
+                        modifier = Modifier
+                            .padding(
+                                top = 16.dp,
+                                bottom = 8.dp, end = 8.dp
+                            )
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Start,
+                        fontFamily = fontMedium,
+                        fontSize = 14.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_BODY_TEXT
+                        } else {
+                            Bg_Gray
+                        }
+                    )
+
+                    DropdownMenuUi(listOf(), onItemSelected = {}, modifier = Modifier.clickable {
+                        Log.e("TAG", "SchoolName ")
+                    }, placeholder = selectedSchool, onClick = {
+//                            schoolListOpen = true
+                        scope.launch {
+                            isBottomSheetVisible = true // true under development code
+                            sheetState.expand()
+                        }
+                    })
+
+                    SchoolListBottomSheet(
+                        isBottomSheetVisible = isBottomSheetVisible,
+                        sheetState = sheetState,
+                        onDismiss = {
+                            scope.launch { sheetState.hide() }
+                                .invokeOnCompletion { isBottomSheetVisible = false }
+                        },
+                        onDecline = {
+
+                        },
+                        onTextSelected = { it ->
+                            /* selectedSchool = it
+                     schoolList.find { it.name == selectedSchool }?.id?.let {
+                         schoolSelectedId.value = it
+                     }*/
+                            "School"
+                        },
+                        schoolList.map { it.name }.toList()
+                    )
+
+                    Text(
+                        text = buildAnnotatedString {
+                            append(stringResource(R.string.student_class))
+                            pushStyle(SpanStyle(color = Color.Red))
+                            append(ASTRICK)
+                            pop()
+                        },
+                        modifier = Modifier
+                            .padding(
+                                top = 16.dp,
+                                bottom = 8.dp, end = 8.dp
+                            )
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Start,
+                        fontFamily = fontMedium,
+                        fontSize = 14.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_BODY_TEXT
+                        } else {
+                            Bg_Gray
+                        }
+                    )
+
+                    DropdownMenuUi(listOf(), onItemSelected = {}, modifier = Modifier.clickable {
+                        Log.e("TAG", "Class Name ")
+                    }, placeholder = selectedSchool, onClick = {
+//                            schoolListOpen = true
+                        scope.launch {
+                            isBottomSheetVisible = true // true under development code
+                            sheetState.expand()
+                        }
+                    })
+
+                    SchoolListBottomSheet(
+                        isBottomSheetVisible = isBottomSheetVisible,
+                        sheetState = sheetState,
+                        onDismiss = {
+                            scope.launch { sheetState.hide() }
+                                .invokeOnCompletion { isBottomSheetVisible = false }
+                        },
+                        onDecline = {
+
+                        },
+                        onTextSelected = { it ->
+                            /* selectedSchool = it
+                     schoolList.find { it.name == selectedSchool }?.id?.let {
+                         schoolSelectedId.value = it
+                     }*/
+                            "Class"
+                        },
+                        schoolList.map { it.name }.toList()
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 16.dp)
+                            .wrapContentSize(Alignment.Center)
+                            .background(
+                                color = if (isSystemInDarkTheme()) {
+                                    Dark_01
+                                } else {
+                                    Transparent
+                                }
+                            )
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(color = White)
+                                .wrapContentHeight(),
+                            horizontalAlignment = Alignment.End
+                        ) {
+                            SmallBtnUi(
+                                enabled = true,
+                                title = stringResource(R.string.string_next),
+                                onClick = {
+                                    navHostController.popBackStack()
+                                    navHostController.navigate(AppRoute.AddNewStudentMoreDetails.route)
+                                }
+                            )
+                        }
+                    }
+                }
             }
         }
-    }
+    )
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ItemAddStudentScreeningRegisterScreen(context: Context) {
-
-    var text by remember { mutableStateOf("") }
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.txt_Student_Name),
-            fontSize = 16.sp,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        OutlinedTextField(
-            value = text,
-            onValueChange = { text = it },
-            shape = RoundedCornerShape(8.dp),
-            placeholder = { Text(stringResource(R.string.txt_eg_first_name)) },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFD0D5DD),
-                unfocusedBorderColor = Color(0xFFD0D5DD),
-                cursorColor = Color.Black,
-                containerColor = Color(0xFFFFFFFF)
-
-            ),
-
-            textStyle = TextStyle(fontSize = 16.sp, color = Black)
-
-        )
-
-
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.student_gender),
-            fontSize = 16.sp,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.student_dob),
-            fontSize = 16.sp,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        OutlinedTextField(
-            value = text,
-            onValueChange = { text = it },
-            shape = RoundedCornerShape(8.dp),
-            placeholder = { Text(stringResource(R.string.dob_format)) },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFD0D5DD),
-                unfocusedBorderColor = Color(0xFFD0D5DD),
-                cursorColor = Color.Black,
-                containerColor = Color(0xFFFFFFFF)
-
-            ),
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.DateRange, // or any icon you like
-                    contentDescription = stringResource(R.string.search_ic)
-                )
-            },
-            textStyle = TextStyle(fontSize = 16.sp, color = Black)
-
-        )
-
-
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.f_name),
-            fontSize = 16.sp,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        OutlinedTextField(
-            value = text,
-            onValueChange = { text = it },
-            shape = RoundedCornerShape(8.dp),
-            placeholder = { Text(stringResource(R.string.f_name_ex)) },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFD0D5DD),
-                unfocusedBorderColor = Color(0xFFD0D5DD),
-                cursorColor = Color.Black,
-                containerColor = Color(0xFFFFFFFF)
-
-            ),
-
-            textStyle = TextStyle(fontSize = 16.sp, color = Black)
-
-        )
-
-
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.student_class),
-            fontSize = 16.sp,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        OutlinedTextField(
-            value = text,
-            onValueChange = { text = it },
-            shape = RoundedCornerShape(8.dp),
-            placeholder = { Text(stringResource(R.string.choose_option)) },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFD0D5DD),
-                unfocusedBorderColor = Color(0xFFD0D5DD),
-                cursorColor = Color.Black,
-                containerColor = Color(0xFFFFFFFF)
-
-            ),
-
-            textStyle = TextStyle(fontSize = 16.sp, color = Black)
-        )
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Card(
-            modifier = Modifier
-                .wrapContentWidth()
-                .wrapContentHeight(),
-
-            colors = CardDefaults.cardColors(
-                containerColor = Color(0xFF101942)
-            ),
-            shape = RoundedCornerShape(8.dp),
-            elevation = CardDefaults.cardElevation(4.dp)
-
-            // Do not set containerColor, let the Box inside handle the gradient
-        ) {
-            Text(
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .padding(start = 26.dp, end = 26.dp, top = 8.dp, bottom = 8.dp)
-                    .clickable { },
-                text = stringResource(R.string.string_next),
-                color = White,
-                fontSize = 16.sp// Make sure text is readable on gradient
-            )
-        }
-
-
-    }
-
-
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ItemAddStudentScreeningStep2RegisterScreen(context: Context) {
-
-    var text by remember { mutableStateOf("") }
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.f_occupation),
-            fontSize = 16.sp,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        OutlinedTextField(
-            value = text,
-            onValueChange = { text = it },
-            shape = RoundedCornerShape(8.dp),
-            placeholder = { Text(stringResource(R.string.choose_option)) },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFD0D5DD),
-                unfocusedBorderColor = Color(0xFFD0D5DD),
-                cursorColor = Color.Black,
-                containerColor = Color(0xFFFFFFFF)
-
-            ),
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown, // or any icon you like
-                    contentDescription = stringResource(R.string.search_ic)
-                )
-            },
-            textStyle = TextStyle(fontSize = 16.sp, color = Black)
-
-        )
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.m_name),
-            fontSize = 16.sp,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        OutlinedTextField(
-            value = text,
-            onValueChange = { text = it },
-            shape = RoundedCornerShape(8.dp),
-            placeholder = { Text(stringResource(R.string.m_name_ex)) },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFD0D5DD),
-                unfocusedBorderColor = Color(0xFFD0D5DD),
-                cursorColor = Color.Black,
-                containerColor = Color(0xFFFFFFFF)
-
-            ),
-
-            textStyle = TextStyle(fontSize = 16.sp, color = Black)
-
-        )
-
-
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.m_occupation),
-            fontSize = 16.sp,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        OutlinedTextField(
-            value = text,
-            onValueChange = { text = it },
-            shape = RoundedCornerShape(8.dp),
-            placeholder = { Text(stringResource(R.string.choose_option)) },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFD0D5DD),
-                unfocusedBorderColor = Color(0xFFD0D5DD),
-                cursorColor = Color.Black,
-                containerColor = Color(0xFFFFFFFF)
-
-            ),
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown, // or any icon you like
-                    contentDescription = stringResource(R.string.search_ic)
-                )
-            },
-            textStyle = TextStyle(fontSize = 16.sp, color = Black)
-
-        )
-
-
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.parent_mobile),
-            fontSize = 16.sp,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        OutlinedTextField(
-            value = text,
-            onValueChange = { text = it },
-            shape = RoundedCornerShape(8.dp),
-            placeholder = { Text(stringResource(R.string.enter_here)) },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFD0D5DD),
-                unfocusedBorderColor = Color(0xFFD0D5DD),
-                cursorColor = Color.Black,
-                containerColor = Color(0xFFFFFFFF)
-
-            ),
-
-            textStyle = TextStyle(fontSize = 16.sp, color = Black)
-
-        )
-
-
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.education_status),
-            fontSize = 16.sp,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        OutlinedTextField(
-            value = text,
-            onValueChange = { text = it },
-            shape = RoundedCornerShape(8.dp),
-            placeholder = { Text(stringResource(R.string.choose_option)) },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFD0D5DD),
-                unfocusedBorderColor = Color(0xFFD0D5DD),
-                cursorColor = Color.Black,
-                containerColor = Color(0xFFFFFFFF)
-
-            ),
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown, // or any icon you like
-                    contentDescription = stringResource(R.string.search_ic)
-                )
-            },
-            textStyle = TextStyle(fontSize = 16.sp, color = Black)
-
-        )
-
-
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.student_board),
-            fontSize = 16.sp,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        OutlinedTextField(
-            value = text,
-            onValueChange = { text = it },
-            shape = RoundedCornerShape(8.dp),
-            placeholder = { Text(stringResource(R.string.choose_option)) },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFD0D5DD),
-                unfocusedBorderColor = Color(0xFFD0D5DD),
-                cursorColor = Color.Black,
-                containerColor = Color(0xFFFFFFFF)
-
-            ),
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown, // or any icon you like
-                    contentDescription = stringResource(R.string.search_ic)
-                )
-            },
-            textStyle = TextStyle(fontSize = 16.sp, color = Black)
-
-        )
-
-
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.type_school),
-            fontSize = 16.sp,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        OutlinedTextField(
-            value = text,
-            onValueChange = { text = it },
-            shape = RoundedCornerShape(8.dp),
-            placeholder = { Text(stringResource(R.string.choose_option)) },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFD0D5DD),
-                unfocusedBorderColor = Color(0xFFD0D5DD),
-                cursorColor = Color.Black,
-                containerColor = Color(0xFFFFFFFF)
-
-            ),
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown, // or any icon you like
-                    contentDescription = stringResource(R.string.search_ic)
-                )
-            },
-            textStyle = TextStyle(fontSize = 16.sp, color = Black)
-
-        )
-
-
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Card(
-            modifier = Modifier
-                .wrapContentWidth()
-                .wrapContentHeight(),
-
-            colors = CardDefaults.cardColors(
-                containerColor = Color(0xFF101942)
-            ),
-            shape = RoundedCornerShape(8.dp),
-            elevation = CardDefaults.cardElevation(4.dp)
-
-            // Do not set containerColor, let the Box inside handle the gradient
-        ) {
-            Text(
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .padding(start = 26.dp, end = 26.dp, top = 8.dp, bottom = 8.dp)
-                    .clickable { },
-                text = stringResource(R.string.add_student),
-                color = White,
-                fontSize = 16.sp// Make sure text is readable on gradient
-            )
-        }
-
-
-    }
-
-
-}
-
-
-
-

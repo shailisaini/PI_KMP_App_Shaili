@@ -85,6 +85,7 @@ fun ForgetPasswordScreen(navController: NavHostController, viewModel: LoginViewM
     val enterMobile = stringResource(R.string.txt_enter_mobile_no_)
     val txtContinue = stringResource(R.string.txt_Send_OTP)
     val invalidMobNo = stringResource(R.string.txt_Enter_valid_mobile_number)
+    val enterMobileNoStr = stringResource(R.string.txt_Please_enter_mobile)
     var showError by remember { mutableStateOf(false) }
     var inValidMobNo by remember { mutableStateOf(false) }
     var isDialogVisible by remember { mutableStateOf(false) }
@@ -210,7 +211,7 @@ fun ForgetPasswordScreen(navController: NavHostController, viewModel: LoginViewM
                                      isBottomSheetVisible = true
                                      sheetState.expand()
                                  }*/
-                                context.toast("Please enter mobile number.")
+                                context.toast(enterMobileNoStr)
 
                                 /*context.startActivity(
                                     Intent(

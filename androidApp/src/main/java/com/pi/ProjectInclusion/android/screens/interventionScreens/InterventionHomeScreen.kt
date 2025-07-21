@@ -272,32 +272,32 @@ fun InterventionIntroDialog(onDismiss: () -> Unit) {
 fun PendingIntervention(navHostController: NavHostController) {
     val interventionListData = listOf(
         InterventionData(
-            "Abhisheki Muthuswami",
-            "Class 6",
-            "Start Intervention",
-            "Continue Intervention",
-            "Completed Intervention",
-            "Progress achieved",
+            stringResource(R.string.txt_Abhisheki_Muthuswami),
+            stringResource(R.string.txt_Class_6),
+            stringResource(R.string.txt_Start_Intervention),
+            stringResource(R.string.txt_Continue_Intervention),
+            stringResource(R.string.txt_Completed_Intervention),
+            stringResource(R.string.txt_Progress_achieved),
             0,
             painterResource(id = R.drawable.dummy_image)
         ),
         InterventionData(
-            "Abhi Kothari",
-            "Class 4",
-            "Start Intervention",
-            "Continue Intervention",
-            "Completed Intervention",
-            "Progress achieved",
+            stringResource(R.string.txt_Abhi_Kothari),
+            stringResource(R.string.txt_Class_4),
+            stringResource(R.string.txt_Start_Intervention),
+            stringResource(R.string.txt_Continue_Intervention),
+            stringResource(R.string.txt_Completed_Intervention),
+            stringResource(R.string.txt_Progress_achieved),
             0,
             painterResource(id = R.drawable.dummy_image)
         ),
         InterventionData(
-            "Hare Krishna",
-            "Class 2",
-            "Start Intervention",
-            "Continue Intervention",
-            "Completed Intervention",
-            "Progress achieved",
+            stringResource(R.string.txt_Hare_Krishna),
+            stringResource(R.string.txt_Class_2),
+            stringResource(R.string.txt_Start_Intervention),
+            stringResource(R.string.txt_Continue_Intervention),
+            stringResource(R.string.txt_Completed_Intervention),
+            stringResource(R.string.txt_Progress_achieved),
             0,
             painterResource(id = R.drawable.dummy_image)
         )
@@ -564,32 +564,32 @@ fun InterventionDataUI(interData: InterventionData, navHostController: NavHostCo
 fun InProgressIntervention(navHostController: NavHostController) {
     val interventionListData = listOf(
         InterventionData(
-            "Abhisheki Muthuswami",
-            "Class 6",
-            "Start Intervention",
-            "Continue Intervention",
-            "Completed Intervention",
-            "Progress achieved",
+            stringResource(R.string.txt_Abhisheki_Muthuswami),
+            stringResource(R.string.txt_Class_6),
+            stringResource(R.string.txt_Start_Intervention),
+            stringResource(R.string.txt_Continue_Intervention),
+            stringResource(R.string.txt_Completed_Intervention),
+            stringResource(R.string.txt_Progress_achieved),
             6,
             painterResource(id = R.drawable.dummy_image)
         ),
         InterventionData(
-            "Abhi Kothari",
-            "Class 4",
-            "Start Intervention",
-            "Continue Intervention",
-            "Completed Intervention",
-            "Progress achieved",
+            stringResource(R.string.txt_Abhi_Kothari),
+            stringResource(R.string.txt_Class_4),
+            stringResource(R.string.txt_Start_Intervention),
+            stringResource(R.string.txt_Continue_Intervention),
+            stringResource(R.string.txt_Completed_Intervention),
+            stringResource(R.string.txt_Progress_achieved),
             4,
             painterResource(id = R.drawable.dummy_image)
         ),
         InterventionData(
-            "Hare Krishna",
-            "Class 2",
-            "Start Intervention",
-            "Continue Intervention",
-            "Completed Intervention",
-            "Progress achieved",
+            stringResource(R.string.txt_Hare_Krishna),
+            stringResource(R.string.txt_Class_2),
+            stringResource(R.string.txt_Start_Intervention),
+            stringResource(R.string.txt_Continue_Intervention),
+            stringResource(R.string.txt_Completed_Intervention),
+            stringResource(R.string.txt_Progress_achieved),
             2,
             painterResource(id = R.drawable.dummy_image)
         )
@@ -905,32 +905,32 @@ fun InterventionInProgressDataUI(
 fun CompletedIntervention(navHostController: NavHostController) {
     val interventionListData = listOf(
         InterventionData(
-            "Abhisheki Muthuswami",
-            "Class 6",
-            "Start Intervention",
-            "Continue Intervention",
-            "Completed Intervention",
-            "Progress achieved",
+            stringResource(R.string.txt_Abhisheki_Muthuswami),
+            stringResource(R.string.txt_Class_6),
+            stringResource(R.string.txt_Start_Intervention),
+            stringResource(R.string.txt_Continue_Intervention),
+            stringResource(R.string.txt_Completed_Intervention),
+            stringResource(R.string.txt_Progress_achieved),
             100,
             painterResource(id = R.drawable.dummy_image)
         ),
         InterventionData(
-            "Abhi Kothari",
-            "Class 4",
-            "Start Intervention",
-            "Continue Intervention",
-            "Completed Intervention",
-            "Progress achieved",
+            stringResource(R.string.txt_Abhi_Kothari),
+            stringResource(R.string.txt_Class_4),
+            stringResource(R.string.txt_Start_Intervention),
+            stringResource(R.string.txt_Continue_Intervention),
+            stringResource(R.string.txt_Completed_Intervention),
+            stringResource(R.string.txt_Progress_achieved),
             100,
             painterResource(id = R.drawable.dummy_image)
         ),
         InterventionData(
-            "Hare Krishna",
-            "Class 2",
-            "Start Intervention",
-            "Continue Intervention",
-            "Continue Intervention",
-            "Progress achieved",
+            stringResource(R.string.txt_Hare_Krishna),
+            stringResource(R.string.txt_Class_2),
+            stringResource(R.string.txt_Start_Intervention),
+            stringResource(R.string.txt_Continue_Intervention),
+            stringResource(R.string.txt_Completed_Intervention),
+            stringResource(R.string.txt_Progress_achieved),
             100,
             painterResource(id = R.drawable.dummy_image)
         )
@@ -1246,7 +1246,7 @@ fun InterventionHomeScreenPreview() {
     InterventionHomeScreen(navController)
 }
 
-data class  InterventionData(
+data class InterventionData(
     var name: String,
     var grade: String,
     var interventionStartStatus: String,
