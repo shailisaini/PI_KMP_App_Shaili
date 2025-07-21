@@ -5,6 +5,8 @@ import android.app.DatePickerDialog
 import android.content.Context
 import android.graphics.RenderEffect
 import android.graphics.Shader
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -1806,6 +1808,8 @@ fun GenderOption(
     }
 }
 
+@SuppressLint("NewApi")
+@RequiresApi(Build.VERSION_CODES.HONEYCOMB)
 fun showDatePickerDialog(
     context: Context, onDateSelected: (year: Int, month: Int, dayOfMonth: Int) -> Unit,
 ) {
