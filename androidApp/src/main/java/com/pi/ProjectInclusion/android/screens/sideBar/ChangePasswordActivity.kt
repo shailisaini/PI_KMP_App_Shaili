@@ -91,6 +91,12 @@ class ChangePasswordActivity : ComponentActivity() {
                 val txtAtleastOne = stringResource(R.string.txt_Must_include_at_least_one_number)
                 val txtSpecialCharacter =
                     stringResource(R.string.txt_Must_include_one_special_characters)
+                val passwordOldMsgStr = stringResource(R.string.txt_Please_enter_old_Password)
+                val passwordNewMsgStr = stringResource(R.string.txt_Please_enter_your_New_Password)
+                val passwordConfirmMsgStr =
+                    stringResource(R.string.txt_Please_enter_confirm_your_New_Password)
+                val confirmPasswordSameMsgStr =
+                    stringResource(R.string.txt_Please_enter_confirm_Password_same)
                 var isCheckedCharacter by remember { mutableStateOf(false) }
                 var isCheckedUppercase by remember { mutableStateOf(false) }
                 var isCheckedAtleastOne by remember { mutableStateOf(false) }
@@ -394,13 +400,13 @@ class ChangePasswordActivity : ComponentActivity() {
                                     txtContinue, onClick = {
                                         showDialog = true
                                         if (enterOldPasswordStr.value.isEmpty()) {
-                                            context.toast("Please enter old password.")
+                                            context.toast(passwordOldMsgStr)
                                         } else if (enterPasswordStr.value.isEmpty()) {
-                                            context.toast("Please enter your new password.")
+                                            context.toast(passwordNewMsgStr)
                                         } else if (enterConfirmPasswordStr.value.isEmpty()) {
-                                            context.toast("Please enter confirm your new password.")
+                                            context.toast(passwordConfirmMsgStr)
                                         } else if (enterConfirmPasswordStr.value.isEmpty() != enterPasswordStr.value.isEmpty()) {
-                                            context.toast("Password and confirm password should be same.")
+                                            context.toast(confirmPasswordSameMsgStr)
                                         } else {
                                             showError = enterConfirmPasswordStr.value.isEmpty()
                                             val firstDigitChar =

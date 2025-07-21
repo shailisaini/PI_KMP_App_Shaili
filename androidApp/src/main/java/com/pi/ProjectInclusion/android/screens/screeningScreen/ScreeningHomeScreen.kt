@@ -161,7 +161,7 @@ fun ScreeningHomeScreen(navHostController: NavHostController) {
             )
     ) {
         // This is used for add new students while come for first time screening
-        Column(
+        /*Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
@@ -246,10 +246,10 @@ fun ScreeningHomeScreen(navHostController: NavHostController) {
                     }
                 }
             }
-        }
+        }*/
 
         // This is used for tab and student list for all, screening, profiler and advanced screening
-        /*Column(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
@@ -337,12 +337,14 @@ fun ScreeningHomeScreen(navHostController: NavHostController) {
                     }
                 }
             }
-        }*/
+        }
 
         // This is used for add new students for screening
         if (selectedTabIndex == 1) {
             FloatingActionButton(
-                onClick = { },
+                onClick = {
+                    showTermDialog = true
+                },
                 containerColor = LightOrange2,
                 shape = CircleShape,
                 elevation = FloatingActionButtonDefaults.elevation(),
@@ -370,32 +372,32 @@ fun AllScreening(navController: NavHostController) {
 fun ScreeningFirst(navController: NavHostController) {
     val screeningListData = listOf(
         ScreeningData(
-            "Abhisheki Muthuswami",
-            "Class 6",
-            "Start screening",
-            "Continue with screening 1",
-            "Completed screening",
-            "Inprogress",
+            stringResource(R.string.txt_Abhisheki_Muthuswami),
+            stringResource(R.string.txt_Class_6),
+            stringResource(R.string.txt_Start_screening),
+            stringResource(R.string.txt_Continue_with_screening_1),
+            stringResource(R.string.txt_Completed_screening),
+            stringResource(R.string.txt_Inprogress),
             6,
             painterResource(id = R.drawable.dummy_image)
         ),
         ScreeningData(
-            "Abhi Kothari",
-            "Class 4",
-            "Start screening",
-            "Continue with screening 1",
-            "Completed screening",
-            "Inprogress",
+            stringResource(R.string.txt_Abhi_Kothari),
+            stringResource(R.string.txt_Class_4),
+            stringResource(R.string.txt_Start_screening),
+            stringResource(R.string.txt_Continue_with_screening_1),
+            stringResource(R.string.txt_Completed_screening),
+            stringResource(R.string.txt_Inprogress),
             4,
             painterResource(id = R.drawable.dummy_image)
         ),
         ScreeningData(
-            "Hare Krishna",
-            "Class 2",
-            "Start screening",
-            "Continue with screening 1",
-            "Completed screening",
-            "Inprogress",
+            stringResource(R.string.txt_Hare_Krishna),
+            stringResource(R.string.txt_Class_2),
+            stringResource(R.string.txt_Start_screening),
+            stringResource(R.string.txt_Continue_with_screening_1),
+            stringResource(R.string.txt_Completed_screening),
+            stringResource(R.string.txt_Inprogress),
             2,
             painterResource(id = R.drawable.dummy_image)
         )
@@ -869,6 +871,7 @@ fun ScreeningIntroDialog(onDismiss: () -> Unit) {
 fun ScreeningTermsDialog(navHostController: NavHostController, onDismiss: () -> Unit) {
 
     var isCheckedTermsAccept by remember { mutableStateOf(false) }
+    var termsAcceptStr = stringResource(R.string.txt_Please_Check)
     val context = LocalContext.current
 
     Dialog(onDismissRequest = { onDismiss() }) {
@@ -1087,7 +1090,7 @@ fun ScreeningTermsDialog(navHostController: NavHostController, onDismiss: () -> 
                         BtnWithRightIconUi(
                             onClick = {
                                 if (isCheckedTermsAccept == false) {
-                                    context.toast("Please check for accept terms and condition.")
+                                    context.toast(termsAcceptStr)
                                 } else {
                                     navHostController.navigate(AppRoute.AddStudentRegister.route)
                                     onDismiss()

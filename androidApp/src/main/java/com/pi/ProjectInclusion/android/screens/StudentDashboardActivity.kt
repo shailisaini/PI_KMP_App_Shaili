@@ -46,9 +46,9 @@ import androidx.navigation.compose.rememberNavController
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.navigation.AppRoute
-import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentDetailsScreen
 import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen1
-import com.pi.ProjectInclusion.android.screens.addStudentRegisterScreen.AddStudentRegisterScreen
+import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentDetailsScreen
+import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentMoreDetailsScreen
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.DashboardScreen
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.ViewProfileScreen
 import com.pi.ProjectInclusion.android.screens.interventionScreens.InterventionAcceptLevelScreen
@@ -61,8 +61,6 @@ import com.pi.ProjectInclusion.android.screens.menu.BottomNavigationBar
 import com.pi.ProjectInclusion.android.screens.menu.DrawerBody
 import com.pi.ProjectInclusion.android.screens.menu.DrawerHeader
 import com.pi.ProjectInclusion.android.screens.menu.MenuItem
-import com.pi.ProjectInclusion.android.screens.registration.EnterUserScreen1
-import com.pi.ProjectInclusion.android.screens.registration.EnterUserScreen2
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningHomeScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -240,6 +238,10 @@ class StudentDashboardActivity : ComponentActivity() {
 
                             composable(AppRoute.AddStudentRegister.route) {
                                 AddNewStudentDetailsScreen(navController)
+                            }
+
+                            composable(AppRoute.AddNewStudentMoreDetails.route) {
+                                AddNewStudentMoreDetailsScreen(navController)
                             }
 
                             // This is use for intervention

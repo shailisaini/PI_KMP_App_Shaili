@@ -1757,6 +1757,69 @@ fun TextFieldWithLeftIcon(
     }
 }
 
+@Composable
+fun TextFieldWithRightIcon(
+    modifier: Modifier = Modifier,
+    value: MutableState<String> = remember { mutableStateOf("") },
+    placeholder: String = stringResource(R.string.enter_here),
+) {
+    val colors = MaterialTheme.colorScheme
+    val selectedBorder = BorderStroke(
+        width = 0.5.dp, if (isSystemInDarkTheme()) {
+            Dark_03
+        } else {
+            GrayLight02
+        }
+    )
+
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.wrapContentHeight(),
+        colors = if (isSystemInDarkTheme()) {
+            CardDefaults.cardColors(Dark_03)
+        } else {
+            CardDefaults.cardColors(White)
+        },
+        border = selectedBorder,
+    ) {
+        Row(
+            modifier = modifier
+                .background(
+                    if (isSystemInDarkTheme()) {
+                        Dark_03
+                    } else {
+                        White
+                    }
+                )
+                .height(50.dp)
+                .fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = placeholder,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(10.dp),
+                color = if (isSystemInDarkTheme()) {
+                    DARK_DEFAULT_BUTTON_TEXT
+                } else {
+                    Black
+                },
+                fontSize = 14.sp,
+                fontFamily = fontSemiBold
+            )
+
+            Image(
+                painter = painterResource(R.drawable.calendar),
+                contentDescription = IMG_DESCRIPTION,
+                modifier = Modifier
+                    .size(30.dp)
+                    .padding(end = 12.dp)
+            )
+        }
+    }
+}
+
 fun getGenderIconState(state: String?): Int {
     return when (state) {
         KEY_FEMALE -> R.drawable.dummy_image
@@ -1788,7 +1851,7 @@ fun GenderOption(
 
     Column(modifier = Modifier
         .clickable { onSelected() }
-        .padding(16.dp),
+        .padding(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(
             painter = if (isSelected) painterResource(id = selectedIcon) else painterResource(id = icon),

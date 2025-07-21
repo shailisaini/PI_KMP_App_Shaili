@@ -71,6 +71,10 @@ fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewM
     val txtUppercase = stringResource(R.string.txt_Including_one_uppercase_letter)
     val txtAtleastOne = stringResource(R.string.txt_Must_include_at_least_one_number)
     val txtSpecialCharacter = stringResource(R.string.txt_Must_include_one_special_characters)
+    val enterPasswordMsgStr = stringResource(R.string.txt_Please_enter_Password)
+    val enterConfirmPasswordMsgStr = stringResource(R.string.txt_Please_enter_confirm_Password)
+    val enterConfirmPasswordSameMsgStr =
+        stringResource(R.string.txt_Please_enter_confirm_Password_same)
     var isCheckedCharacter by remember { mutableStateOf(false) }
     var isCheckedUppercase by remember { mutableStateOf(false) }
     var isCheckedAtleastOne by remember { mutableStateOf(false) }
@@ -126,9 +130,7 @@ fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewM
                         pop()
                     },
                     modifier = Modifier.padding(
-                        top = 24.dp,
-                        bottom = 10.dp,
-                        start = 8.dp, end = 8.dp
+                        top = 24.dp, bottom = 10.dp, start = 8.dp, end = 8.dp
                     ),
                     textAlign = TextAlign.Start,
                     fontStyle = FontStyle.Normal,
@@ -142,9 +144,7 @@ fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewM
                 )
 
                 PasswordTextField(
-                    password = enterPasswordStr,
-                    showPassword = showPassword,
-                    hint = enterPassword
+                    password = enterPasswordStr, showPassword = showPassword, hint = enterPassword
                 )
 
 
@@ -156,9 +156,7 @@ fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewM
                         pop()
                     },
                     modifier = Modifier.padding(
-                        top = 24.dp,
-                        bottom = 10.dp,
-                        start = 8.dp, end = 8.dp
+                        top = 24.dp, bottom = 10.dp, start = 8.dp, end = 8.dp
                     ),
                     textAlign = TextAlign.Start,
                     fontStyle = FontStyle.Normal,
@@ -185,12 +183,8 @@ fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewM
                 ))*/
 
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(
-                        top = 16.dp,
-                        start = 12.dp,
-                        end = 12.dp,
-                        bottom = 8.dp
+                    verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(
+                        top = 16.dp, start = 12.dp, end = 12.dp, bottom = 8.dp
                     )
                 ) {
                     Checkbox(
@@ -296,8 +290,7 @@ fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewM
 
                     Text(
                         text = txtAtleastOne,
-                        modifier = Modifier
-                            .padding(start = 8.dp, end = 8.dp),
+                        modifier = Modifier.padding(start = 8.dp, end = 8.dp),
                         textAlign = TextAlign.Center,
                         fontStyle = FontStyle.Normal,
                         fontWeight = FontWeight.Normal,
@@ -315,8 +308,7 @@ fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewM
                     modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
                 ) {
                     Checkbox(
-                        checked = isCheckedSpecialCharacter,
-                        onCheckedChange = {
+                        checked = isCheckedSpecialCharacter, onCheckedChange = {
                             isCheckedSpecialCharacter = it
                         }, // Disabled for display-only
                         colors = if (isSystemInDarkTheme()) {
@@ -331,8 +323,7 @@ fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewM
                                 uncheckedColor = Color.LightGray,   // Same for unchecked
                                 checkmarkColor = PrimaryBlue
                             )
-                        },
-                        modifier = Modifier.size(20.dp)
+                        }, modifier = Modifier.size(20.dp)
                     )
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -365,8 +356,7 @@ fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewM
                         } else {
                             Color.White
                         }
-                    ),
-                contentAlignment = Alignment.CenterEnd
+                    ), contentAlignment = Alignment.CenterEnd
             ) {
                 Box(
                     modifier = Modifier
@@ -377,11 +367,11 @@ fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewM
                     BtnUi(
                         txtContinue, onClick = {
                             if (enterPasswordStr.value.isEmpty()) {
-                                context.toast("Please enter password.")
+                                context.toast(enterPasswordMsgStr)
                             } else if (enterConfirmPasswordStr.value.isEmpty()) {
-                                context.toast("Please enter confirm password.")
+                                context.toast(enterConfirmPasswordMsgStr)
                             } else if (enterConfirmPasswordStr.value.isEmpty() != enterPasswordStr.value.isEmpty()) {
-                                context.toast("Password and confirm password should be same.")
+                                context.toast(enterConfirmPasswordSameMsgStr)
                             } else {
                                 showError = enterConfirmPasswordStr.value.isEmpty()
 //                                val firstDigitChar = enterConfirmPasswordStr.value.toString().first()
