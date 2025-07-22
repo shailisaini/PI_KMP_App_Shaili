@@ -2301,10 +2301,13 @@ fun Modifier.drawDashedBorder(
 )
 
 // Create a file to store image
-fun createImageUri(context : Context): Uri? {
+fun createImageUri(context: Context): Uri? {
     val contentValues = ContentValues().apply {
         put(MediaStore.Images.Media.DISPLAY_NAME, "camera_image_${System.currentTimeMillis()}.jpg")
         put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
     }
-    return context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+    return context.contentResolver.insert(
+        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+        contentValues
+    )
 }
