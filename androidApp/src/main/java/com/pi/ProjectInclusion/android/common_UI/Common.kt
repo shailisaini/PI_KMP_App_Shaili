@@ -65,6 +65,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -787,10 +788,10 @@ fun YesBtnUi(
 ) {
     Button(
         onClick = onClick, modifier = modifier.clip(
-                RoundedCornerShape(
-                    5.dp
-                )
-            ), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(
+            RoundedCornerShape(
+                5.dp
+            )
+        ), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(
             containerColor = if (enabled) {
                 if (isSystemInDarkTheme()) {
                     Dark_Selected_BG
@@ -1119,6 +1120,7 @@ fun TextWithIconOnLeft(
         if (moreSpace) {
             Spacer(modifier = Modifier.width(10.dp))
         }
+
         Text(
             text = text,
             modifier = Modifier.padding(horizontal = 5.dp),
@@ -1457,12 +1459,12 @@ fun DetailsBackgroundUi(
 
                     Column(
                         modifier = Modifier.background(
-                                color = if (isSystemInDarkTheme()) {
-                                    DarkBlue
-                                } else {
-                                    DarkBlue
-                                }
-                            )
+                            color = if (isSystemInDarkTheme()) {
+                                DarkBlue
+                            } else {
+                                DarkBlue
+                            }
+                        )
                     ) {
                         Text(
                             text = studentName.toString(),
@@ -1549,7 +1551,7 @@ fun DetailsBackgroundUi(
 @Composable
 fun DetailsNoImgBackgroundUi(
     backgroundColor: Color = DarkBlue,
-    textColor : Color = White,
+    textColor: Color = White,
     pageTitle: String = "",
     moreInfoIcon: Painter = painterResource(R.drawable.close_img),
     modifier: Modifier = Modifier,
@@ -1768,6 +1770,69 @@ fun TextFieldWithLeftIcon(
     }
 }
 
+@Composable
+fun TextFieldWithRightIcon(
+    modifier: Modifier = Modifier,
+    value: MutableState<String> = remember { mutableStateOf("") },
+    placeholder: String = stringResource(R.string.enter_here),
+) {
+    val colors = MaterialTheme.colorScheme
+    val selectedBorder = BorderStroke(
+        width = 0.5.dp, if (isSystemInDarkTheme()) {
+            Dark_03
+        } else {
+            GrayLight02
+        }
+    )
+
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.wrapContentHeight(),
+        colors = if (isSystemInDarkTheme()) {
+            CardDefaults.cardColors(Dark_03)
+        } else {
+            CardDefaults.cardColors(White)
+        },
+        border = selectedBorder,
+    ) {
+        Row(
+            modifier = modifier
+                .background(
+                    if (isSystemInDarkTheme()) {
+                        Dark_03
+                    } else {
+                        White
+                    }
+                )
+                .height(50.dp)
+                .fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = placeholder,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(10.dp),
+                color = if (isSystemInDarkTheme()) {
+                    DARK_DEFAULT_BUTTON_TEXT
+                } else {
+                    Black
+                },
+                fontSize = 14.sp,
+                fontFamily = fontSemiBold
+            )
+
+            Image(
+                painter = painterResource(R.drawable.calendar),
+                contentDescription = IMG_DESCRIPTION,
+                modifier = Modifier
+                    .size(30.dp)
+                    .padding(end = 12.dp)
+            )
+        }
+    }
+}
+
 fun getGenderIconState(state: String?): Int {
     return when (state) {
         KEY_FEMALE -> R.drawable.dummy_image
@@ -1797,9 +1862,10 @@ fun GenderOption(
         else -> R.drawable.ic_other_selected
     }
 
-    Column(modifier = Modifier
-        .clickable { onSelected() }
-        .padding(16.dp),
+    Column(
+        modifier = Modifier
+            .clickable { onSelected() }
+            .padding(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(
             painter = if (isSelected) painterResource(id = selectedIcon) else painterResource(id = icon),
@@ -1810,6 +1876,37 @@ fun GenderOption(
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = gender,
+            color = Black,
+            fontSize = 14.sp,
+            fontFamily = if (isSelected) fontSemiBold else fontRegular
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ResidenceOption(
+    residence: String = "",
+    isSelected: Boolean = false,
+    onSelected: () -> Unit = {},
+) {
+    Row(
+        modifier = Modifier
+            .padding(end = 16.dp)
+            .wrapContentWidth()
+            .clickable { onSelected() },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        RadioButton(
+            selected = isSelected,
+            onClick = {
+                onSelected()
+            },
+        )
+
+        Text(
+            text = residence,
             color = Black,
             fontSize = 14.sp,
             fontFamily = if (isSelected) fontSemiBold else fontRegular
@@ -2008,7 +2105,7 @@ fun ProfileWithProgress(
     image: String = "",
     painter: Painter = painterResource(id = R.drawable.round_back_key),
     progress: Float = 0.0f, // 0.0f to 1.0f
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.size(90.dp), contentAlignment = Alignment.Center) {
         // Canvas for circular progress
@@ -2030,12 +2127,9 @@ fun ProfileWithProgress(
         Image(
             painter = if (image.isNotEmpty()) {
                 rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current)
-                        .data(image)
+                    ImageRequest.Builder(LocalContext.current).data(image)
                         .placeholder(R.drawable.profile_user_icon)
-                        .error(R.drawable.profile_user_icon)
-                        .crossfade(true)
-                        .build()
+                        .error(R.drawable.profile_user_icon).crossfade(true).build()
                 )
             } else {
                 painterResource(R.drawable.profile_user_icon)
@@ -2076,8 +2170,7 @@ fun DropdownMenuUi(
 
     Card(
         shape = RoundedCornerShape(12.dp),
-        modifier = Modifier
-            .wrapContentHeight(),
+        modifier = Modifier.wrapContentHeight(),
         colors = if (isSystemInDarkTheme()) {
             CardDefaults.cardColors(Dark_03)
         } else {
@@ -2114,9 +2207,9 @@ fun DropdownMenuUi(
                     },
                     fontSize = 14.sp,
                     fontFamily = if (selectedOption == null) {
-                       fontRegular
+                        fontRegular
                     } else {
-                       fontSemiBold
+                        fontSemiBold
                     }
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -2152,20 +2245,20 @@ fun DropdownMenuUi(
                     )
             ) {
                 options.forEach { option ->
-                   /* androidx.compose.material.DropdownMenuItem(onClick = {
-                        onItemSelected(option)
-                        selectedOption = option
-                        menuExpanded = false
-                    }) {
-                        Text(
-                            text = option,
-//                        color = Color.Gray,
-                            color = colors.onSurface,
-                            fontSize = 16.sp,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }*/
+                    /* androidx.compose.material.DropdownMenuItem(onClick = {
+                         onItemSelected(option)
+                         selectedOption = option
+                         menuExpanded = false
+                     }) {
+                         Text(
+                             text = option,
+ //                        color = Color.Gray,
+                             color = colors.onSurface,
+                             fontSize = 16.sp,
+                             fontStyle = FontStyle.Normal,
+                             fontWeight = FontWeight.SemiBold
+                         )
+                     }*/
                 }
             }
         }

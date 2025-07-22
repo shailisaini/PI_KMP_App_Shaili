@@ -120,6 +120,10 @@ fun CreateNewPasswordUI(navController: NavHostController) {
     val txtUppercase = stringResource(R.string.txt_Including_one_uppercase_letter)
     val txtAtleastOne = stringResource(R.string.txt_Must_include_at_least_one_number)
     val txtSpecialCharacter = stringResource(R.string.txt_Must_include_one_special_characters)
+    val enterPasswordMsgStr = stringResource(R.string.txt_Please_enter_Password)
+    val enterConfirmPasswordMsgStr = stringResource(R.string.txt_Please_enter_confirm_Password)
+    val enterConfirmPasswordSameMsgStr =
+        stringResource(R.string.txt_Please_enter_confirm_Password_same)
     var isCheckedCharacter by remember { mutableStateOf(false) }
     var isCheckedUppercase by remember { mutableStateOf(false) }
     var isCheckedAtleastOne by remember { mutableStateOf(false) }
@@ -224,7 +228,7 @@ fun CreateNewPasswordUI(navController: NavHostController) {
                         modifier = Modifier
                             .wrapContentHeight()
                             .clickable {
-                                 showBottomSheet = true
+                                showBottomSheet = true
                             },
                         colors = if (isSystemInDarkTheme()) {
                             CardDefaults.cardColors(Dark_01)
@@ -509,11 +513,11 @@ fun CreateNewPasswordUI(navController: NavHostController) {
                     txtContinue,
                     onClick = {
                         if (enterPasswordStr.value.isEmpty()) {
-                            context.toast("Please enter password.")
+                            context.toast(enterPasswordMsgStr)
                         } else if (enterConfirmPasswordStr.value.isEmpty()) {
-                            context.toast("Please enter confirm password.")
+                            context.toast(enterConfirmPasswordMsgStr)
                         } else if (enterConfirmPasswordStr.value.isEmpty() != enterPasswordStr.value.isEmpty()) {
-                            context.toast("Password and confirm password should be same.")
+                            context.toast(enterConfirmPasswordSameMsgStr)
                         } else {
                             showError = enterConfirmPasswordStr.value.isEmpty()
 //                                val firstDigitChar = enterConfirmPasswordStr.value.toString().first()
@@ -521,10 +525,10 @@ fun CreateNewPasswordUI(navController: NavHostController) {
                             if (showError || enterConfirmPasswordStr.value.length < 8) {
                                 inValidPassword = true
                             } else { // if first digit of mobile is less than 6 then error will show
-                                    isDialogVisible = true
-                                    buttonClicked = true
-                                    navController.navigate(AppRoute.EnterUserProfileScreen.route)
-                                }
+                                isDialogVisible = true
+                                buttonClicked = true
+                                navController.navigate(AppRoute.EnterUserProfileScreen.route)
+                            }
                         }
                     }, true
                 )

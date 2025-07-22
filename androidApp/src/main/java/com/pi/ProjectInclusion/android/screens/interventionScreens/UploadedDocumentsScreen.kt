@@ -115,6 +115,7 @@ fun UploadedDocumentsScreen(navHostController: NavHostController) {
 fun UploadedDocumentsDataUI(data: DocumentsData, controller: NavHostController) {
 
     val context = LocalContext.current
+    var underProcessingStr = stringResource(R.string.txt_Under_Processing)
 
     Card(
         modifier = Modifier
@@ -194,7 +195,7 @@ fun UploadedDocumentsDataUI(data: DocumentsData, controller: NavHostController) 
                 modifier = Modifier
                     .background(Color.Unspecified)
                     .clickable {
-                        context.toast("Under processing for preview documents...")
+                        context.toast(underProcessingStr)
                     }
             ) {
                 Image(
