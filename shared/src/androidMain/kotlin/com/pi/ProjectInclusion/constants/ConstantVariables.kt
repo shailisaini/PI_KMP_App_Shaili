@@ -22,4 +22,6 @@ object ConstantVariables {
     var PAGE_LENGTH: String = "1"
     var PAGE_LIMIT: String = "20"
     var ASTRICK: String = "*"
+    var RURAL: String = "Rural"
+    var URBAN: String = "Urban"
 }
