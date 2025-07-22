@@ -20,16 +20,17 @@
     <string name="choose_option">Select an option</string>
     <string name="choose_an_option">Choose an option</string>
     <string name="string_next">Next</string>
-    <string name="string_addphoto">Add Photo</string>
-    <string name="f_occupation">Father’s profession*</string>
+    <string name="string_addPhoto">Add Photo</string>
+    <string name="f_occupation">Father’s profession</string>
     <string name="m_name">Mother\'s Name</string>
     <string name="m_name_ex">eg: Sita</string>
-    <string name="m_occupation">Mother’s profession*</string>
-    <string name="parent_mobile">Mobile number of parents*</string>
+    <string name="m_occupation">Mother’s profession</string>
+    <string name="parent_mobile">Mobile number of parents</string>
     <string name="enter_here">Enter here</string>
-    <string name="education_status">Education Status*</string>
-    <string name="student_board">Board*</string>
-    <string name="type_school">Type of school*</string>
+    <string name="select_Residence">Residence</string>
+    <string name="education_status">Education Status</string>
+    <string name="student_board">Board</string>
+    <string name="type_school">Type of school</string>
     <string name="add_student">Add Student</string>
     <string name="student_screen">Add Student for screening</string>
     <string name="student_screen_detail">No students have been added yet. Start by adding your first student to begin the screening process.</string>
@@ -243,4 +244,5 @@ and make a difference together!</string>
     <string name="txt_Upload_profile_photo">Upload a profile photo of the student.</string>
     <string name="txt_School">School</string>
     <string name="txt_More_About_Student">More About Your Student</string>
+    <string name="txt_Previous">Previous</string>
 </resources>
