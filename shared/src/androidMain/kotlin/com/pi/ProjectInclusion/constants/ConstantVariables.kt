@@ -22,4 +22,8 @@ object ConstantVariables {
     var PAGE_LENGTH: String = "1"
     var PAGE_LIMIT: String = "20"
     var ASTRICK: String = "*"
+    var PI_DOCUMENT: String = "PI_DOCUMENT"
+    var JPG: String = ".jpg"
+    var IMAGE_MIME: String = "image/jpeg"
+    var IMAGE_ALL_TYPE: String = "image/*"
 }

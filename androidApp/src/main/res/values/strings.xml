@@ -214,4 +214,16 @@ and make a difference together!</string>
     <string name="txt_basic_information">Basic Information</string>
     <string name="txt_professional_information">Professional Information</string>
     <string name="txt_logout">Logout</string>
+    <string name="txt_school_change">School change request</string>
+    <string name="txt_name_change">Name change request</string>
+    <string name="txt_change_desc">Select one option to continue</string>
+    <string name="txt_upload_id">Upload Id Card</string>
+    <string name="txt_cancel">Cancel</string>
+    <string name="txt_submit">Submit</string>
+    <string name="txt_remove">Remove</string>
+    <string name="txt_choose_to_upload">Choose option to upload file</string>
+    <string name="txt_choose_supported_format">Supported format: JPG, PNG, PDF &amp; Max Size: 2mb</string>
+    <string name="txt_school_id_front">School ID card (front only) \nAuthorization letter from the school</string>
+    <string name="txt_upload_clear_id_school">Please upload a clear image of the front side of any one valid ID for school verification</string>
+    <string name="txt_upload_clear_id_name">Please upload a clear image of the front side of any one valid ID for name verification</string>
 </resources>
