@@ -2,9 +2,15 @@ package com.pi.ProjectInclusion.android.common_UI
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.content.ContentValues
 import android.content.Context
-import android.graphics.RenderEffect
-import android.graphics.Shader
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -45,10 +51,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
@@ -59,6 +65,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -71,6 +78,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -80,15 +88,16 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -102,8 +111,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -113,10 +120,14 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
@@ -133,13 +144,11 @@ import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.GrayLight03
 import com.pi.ProjectInclusion.LightBlue
 import com.pi.ProjectInclusion.LightPurple04
-import com.pi.ProjectInclusion.LightGreen06
 import com.pi.ProjectInclusion.OrangeSubTitle
 import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.android.R
-import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
@@ -148,6 +157,7 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import kotlinx.coroutines.delay
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_FEMALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_MALE
+import java.io.File
 import java.util.Calendar
 
 fun BackButtonPress(navController: NavHostController, route: String) {
@@ -650,6 +660,7 @@ fun SmallBtnUi(
                 .wrapContentSize()
                 .padding(bottom = 8.dp, top = 8.dp),
             fontSize = 16.sp,
+            fontFamily = fontMedium,
             color = if (enabled) {
                 White
             } else {
@@ -777,10 +788,10 @@ fun YesBtnUi(
 ) {
     Button(
         onClick = onClick, modifier = modifier.clip(
-                RoundedCornerShape(
-                    5.dp
-                )
-            ), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(
+            RoundedCornerShape(
+                5.dp
+            )
+        ), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(
             containerColor = if (enabled) {
                 if (isSystemInDarkTheme()) {
                     Dark_Selected_BG
@@ -1089,6 +1100,7 @@ internal fun CharacterContainer(
 fun TextWithIconOnLeft(
     moreSpace: Boolean = false,
     text: String,
+    textSize: TextUnit = 15.sp,
     icon: ImageVector,
     textColor: Color,
     iconColor: Color,
@@ -1108,12 +1120,13 @@ fun TextWithIconOnLeft(
         if (moreSpace) {
             Spacer(modifier = Modifier.width(10.dp))
         }
+
         Text(
             text = text,
             modifier = Modifier.padding(horizontal = 5.dp),
             style = MaterialTheme.typography.bodyMedium.copy(
                 color = textColor,
-                fontSize = 15.sp,
+                fontSize = textSize,
                 fontFamily = fontMedium,
                 textAlign = TextAlign.Start
             )
@@ -1446,12 +1459,12 @@ fun DetailsBackgroundUi(
 
                     Column(
                         modifier = Modifier.background(
-                                color = if (isSystemInDarkTheme()) {
-                                    DarkBlue
-                                } else {
-                                    DarkBlue
-                                }
-                            )
+                            color = if (isSystemInDarkTheme()) {
+                                DarkBlue
+                            } else {
+                                DarkBlue
+                            }
+                        )
                     ) {
                         Text(
                             text = studentName.toString(),
@@ -1538,7 +1551,7 @@ fun DetailsBackgroundUi(
 @Composable
 fun DetailsNoImgBackgroundUi(
     backgroundColor: Color = DarkBlue,
-    textColor : Color = White,
+    textColor: Color = White,
     pageTitle: String = "",
     moreInfoIcon: Painter = painterResource(R.drawable.close_img),
     modifier: Modifier = Modifier,
@@ -1757,6 +1770,69 @@ fun TextFieldWithLeftIcon(
     }
 }
 
+@Composable
+fun TextFieldWithRightIcon(
+    modifier: Modifier = Modifier,
+    value: MutableState<String> = remember { mutableStateOf("") },
+    placeholder: String = stringResource(R.string.enter_here),
+) {
+    val colors = MaterialTheme.colorScheme
+    val selectedBorder = BorderStroke(
+        width = 0.5.dp, if (isSystemInDarkTheme()) {
+            Dark_03
+        } else {
+            GrayLight02
+        }
+    )
+
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.wrapContentHeight(),
+        colors = if (isSystemInDarkTheme()) {
+            CardDefaults.cardColors(Dark_03)
+        } else {
+            CardDefaults.cardColors(White)
+        },
+        border = selectedBorder,
+    ) {
+        Row(
+            modifier = modifier
+                .background(
+                    if (isSystemInDarkTheme()) {
+                        Dark_03
+                    } else {
+                        White
+                    }
+                )
+                .height(50.dp)
+                .fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = placeholder,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(10.dp),
+                color = if (isSystemInDarkTheme()) {
+                    DARK_DEFAULT_BUTTON_TEXT
+                } else {
+                    Black
+                },
+                fontSize = 14.sp,
+                fontFamily = fontSemiBold
+            )
+
+            Image(
+                painter = painterResource(R.drawable.calendar),
+                contentDescription = IMG_DESCRIPTION,
+                modifier = Modifier
+                    .size(30.dp)
+                    .padding(end = 12.dp)
+            )
+        }
+    }
+}
+
 fun getGenderIconState(state: String?): Int {
     return when (state) {
         KEY_FEMALE -> R.drawable.dummy_image
@@ -1786,9 +1862,10 @@ fun GenderOption(
         else -> R.drawable.ic_other_selected
     }
 
-    Column(modifier = Modifier
-        .clickable { onSelected() }
-        .padding(16.dp),
+    Column(
+        modifier = Modifier
+            .clickable { onSelected() }
+            .padding(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(
             painter = if (isSelected) painterResource(id = selectedIcon) else painterResource(id = icon),
@@ -1806,6 +1883,39 @@ fun GenderOption(
     }
 }
 
+@Preview
+@Composable
+fun ResidenceOption(
+    residence: String = "",
+    isSelected: Boolean = false,
+    onSelected: () -> Unit = {},
+) {
+    Row(
+        modifier = Modifier
+            .padding(end = 16.dp)
+            .wrapContentWidth()
+            .clickable { onSelected() },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        RadioButton(
+            selected = isSelected,
+            onClick = {
+                onSelected()
+            },
+        )
+
+        Text(
+            text = residence,
+            color = Black,
+            fontSize = 14.sp,
+            fontFamily = if (isSelected) fontSemiBold else fontRegular
+        )
+    }
+}
+
+@SuppressLint("NewApi")
+@RequiresApi(Build.VERSION_CODES.HONEYCOMB)
 fun showDatePickerDialog(
     context: Context, onDateSelected: (year: Int, month: Int, dayOfMonth: Int) -> Unit,
 ) {
@@ -1995,7 +2105,7 @@ fun ProfileWithProgress(
     image: String = "",
     painter: Painter = painterResource(id = R.drawable.round_back_key),
     progress: Float = 0.0f, // 0.0f to 1.0f
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.size(90.dp), contentAlignment = Alignment.Center) {
         // Canvas for circular progress
@@ -2017,12 +2127,9 @@ fun ProfileWithProgress(
         Image(
             painter = if (image.isNotEmpty()) {
                 rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current)
-                        .data(image)
+                    ImageRequest.Builder(LocalContext.current).data(image)
                         .placeholder(R.drawable.profile_user_icon)
-                        .error(R.drawable.profile_user_icon)
-                        .crossfade(true)
-                        .build()
+                        .error(R.drawable.profile_user_icon).crossfade(true).build()
                 )
             } else {
                 painterResource(R.drawable.profile_user_icon)
@@ -2063,8 +2170,7 @@ fun DropdownMenuUi(
 
     Card(
         shape = RoundedCornerShape(12.dp),
-        modifier = Modifier
-            .wrapContentHeight(),
+        modifier = Modifier.wrapContentHeight(),
         colors = if (isSystemInDarkTheme()) {
             CardDefaults.cardColors(Dark_03)
         } else {
@@ -2101,9 +2207,9 @@ fun DropdownMenuUi(
                     },
                     fontSize = 14.sp,
                     fontFamily = if (selectedOption == null) {
-                       fontRegular
+                        fontRegular
                     } else {
-                       fontSemiBold
+                        fontSemiBold
                     }
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -2139,20 +2245,20 @@ fun DropdownMenuUi(
                     )
             ) {
                 options.forEach { option ->
-                   /* androidx.compose.material.DropdownMenuItem(onClick = {
-                        onItemSelected(option)
-                        selectedOption = option
-                        menuExpanded = false
-                    }) {
-                        Text(
-                            text = option,
-//                        color = Color.Gray,
-                            color = colors.onSurface,
-                            fontSize = 16.sp,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }*/
+                    /* androidx.compose.material.DropdownMenuItem(onClick = {
+                         onItemSelected(option)
+                         selectedOption = option
+                         menuExpanded = false
+                     }) {
+                         Text(
+                             text = option,
+ //                        color = Color.Gray,
+                             color = colors.onSurface,
+                             fontSize = 16.sp,
+                             fontStyle = FontStyle.Normal,
+                             fontWeight = FontWeight.SemiBold
+                         )
+                     }*/
                 }
             }
         }
@@ -2166,13 +2272,42 @@ fun DropdownMenuUi(
     }
 }
 
-/*fun Modifier.blurIf(condition: Boolean, radius: Float): Modifier {
-    return if (condition) {
-        this.graphicsLayer {
-            renderEffect = RenderEffect
-                .createBlurEffect(radius, radius, Shader.TileMode.DECAL)
-        }
-    } else {
-        this
+fun Modifier.drawDashedBorder(
+    color: Color,
+    strokeWidth: Dp,
+    dashLength: Dp,
+    gapLength: Dp,
+    cornerRadius: Dp = 0.dp
+) = this.then(
+    Modifier.drawBehind {
+        val stroke = Stroke(
+            width = strokeWidth.toPx(),
+            pathEffect = PathEffect.dashPathEffect(
+                floatArrayOf(dashLength.toPx(), gapLength.toPx()), 0f
+            )
+        )
+
+        val corner = cornerRadius.toPx()
+        val rect = Rect(0f, 0f, size.width, size.height)
+
+        drawRoundRect(
+            color = color,
+            topLeft = Offset.Zero,
+            size = size,
+            cornerRadius = CornerRadius(corner, corner),
+            style = stroke
+        )
     }
-}*/
+)
+
+// Create a file to store image
+fun createImageUri(context: Context): Uri? {
+    val contentValues = ContentValues().apply {
+        put(MediaStore.Images.Media.DISPLAY_NAME, "camera_image_${System.currentTimeMillis()}.jpg")
+        put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+    }
+    return context.contentResolver.insert(
+        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+        contentValues
+    )
+}

@@ -1,11 +1,6 @@
 package com.pi.ProjectInclusion.android.screens.addStudentScreen
 
-import android.Manifest
 import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -17,19 +12,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -43,11 +33,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -59,11 +47,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.pi.ProjectInclusion.Bg_Gray
-import com.pi.ProjectInclusion.Bg_Gray2
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.Dark_01
-import com.pi.ProjectInclusion.Dark_03
 import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.OrangeSubTitle
 import com.pi.ProjectInclusion.PrimaryBlue
@@ -73,70 +59,50 @@ import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.DropdownMenuUi
 import com.pi.ProjectInclusion.android.common_UI.GenderOption
+import com.pi.ProjectInclusion.android.common_UI.MobileTextField
+import com.pi.ProjectInclusion.android.common_UI.ResidenceOption
 import com.pi.ProjectInclusion.android.common_UI.SchoolListBottomSheet
 import com.pi.ProjectInclusion.android.common_UI.SmallBtnUi
-import com.pi.ProjectInclusion.android.common_UI.TextFieldWithRightIcon
 import com.pi.ProjectInclusion.android.common_UI.TextViewField
-import com.pi.ProjectInclusion.android.common_UI.showDatePickerDialog
+import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
+import com.pi.ProjectInclusion.android.utils.fontSemiBold
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
-import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_FEMALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_MALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_OTHER
-import com.pi.ProjectInclusion.constants.CustomDialog
+import com.pi.ProjectInclusion.constants.ConstantVariables.RURAL
+import com.pi.ProjectInclusion.constants.ConstantVariables.URBAN
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddNewStudentDetailsScreen(navHostController: NavHostController) {
+fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
 
-    var isDialogVisible by remember { mutableStateOf(false) }
     val colors = MaterialTheme.colorScheme
-    val scrollState = rememberScrollState()
     val context = LocalContext.current
-
-    var studentsName = rememberSaveable { mutableStateOf("") }
-    var fathersName = rememberSaveable { mutableStateOf("") }
-    val textNameEg = stringResource(R.string.txt_Student_Name)
-    val textFatherNameEg = stringResource(R.string.f_name)
-    val selectedGender = remember { mutableStateOf("") }
-    val genderOptions = listOf(KEY_MALE, KEY_FEMALE, KEY_OTHER)
-    var date by remember { mutableStateOf("") }
-    var selectedSchool = stringResource(R.string.choose_option)
+    val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
     var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true,
         confirmValueChange = { it != SheetValue.Hidden })
-    val schoolList = remember { mutableStateListOf<GetLanguageListResponse.Data.Result>() }
-
-    CustomDialog(
-        isVisible = isDialogVisible,
-        onDismiss = { isDialogVisible = false },
-        message = "Loading your data..."
-    )
-
-    var hasCameraPermission by remember { mutableStateOf(false) }
-
-    val cameraPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        hasCameraPermission = isGranted
-    }
-    if (hasCameraPermission) {
-
-    } else {
-        try {
-            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-        } catch (exc: Exception) {
-            // Handle exception
-            println("Handle exception :- ${exc.message}")
-        }
-    }
+    val professionList = remember { mutableStateListOf<GetLanguageListResponse.Data.Result>() }
+    val educationList = remember { mutableStateListOf<GetLanguageListResponse.Data.Result>() }
+    val boardList = remember { mutableStateListOf<GetLanguageListResponse.Data.Result>() }
+    var mothersName = rememberSaveable { mutableStateOf("") }
+    val textNameEg = stringResource(R.string.m_name)
+    var mobNo = rememberSaveable { mutableStateOf("") }
+    val enterMobile = stringResource(R.string.enter_here)
+    val selectedResidence = remember { mutableStateOf("") }
+    val residenceOptions = listOf(URBAN, RURAL)
+    var selectedProfession = stringResource(R.string.choose_option)
+    var selectedEducation = stringResource(R.string.choose_option)
+    var selectedBoard = stringResource(R.string.choose_option)
+    var selectedSchoolType = stringResource(R.string.choose_option)
 
     DetailsNoImgBackgroundUi(
         backgroundColor = White,
@@ -175,7 +141,7 @@ fun AddNewStudentDetailsScreen(navHostController: NavHostController) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = stringResource(R.string.txt_Students_Details),
+                        text = stringResource(R.string.txt_More_About_Student),
                         fontSize = 16.sp,
                         textAlign = TextAlign.Start,
                         fontFamily = fontMedium,
@@ -185,98 +151,58 @@ fun AddNewStudentDetailsScreen(navHostController: NavHostController) {
                             .padding(bottom = 8.dp)
                     )
 
-                    Row(
+                    Text(
+                        text = buildAnnotatedString {
+                            append(stringResource(R.string.f_occupation))
+                            pushStyle(SpanStyle(color = Color.Red))
+                            append(ASTRICK)
+                            pop()
+                        },
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight()
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Card(
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier
-                                .width(100.dp)
-                                .height(100.dp),
-                            colors = if (isSystemInDarkTheme()) {
-                                CardDefaults.cardColors(Dark_03)
-                            } else {
-                                CardDefaults.cardColors(
-                                    containerColor = Bg_Gray2,
-                                    contentColor = Bg_Gray2,
-                                    disabledContentColor = Bg_Gray2,
-                                    disabledContainerColor = Bg_Gray2
-                                )
-                            }
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .width(100.dp)
-                                    .height(100.dp)
-                                    .background(Color.Unspecified)
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.user_img),
-                                    contentDescription = IMG_DESCRIPTION,
-                                    modifier = Modifier
-                                        .width(52.dp)
-                                        .height(52.dp)
-                                        .align(Alignment.Center)
-                                        .background(Color.Unspecified),
-                                    contentScale = ContentScale.Crop
-                                )
-                            }
-                        }
-
-                        Column(
-                            modifier = Modifier
-                                .wrapContentSize()
-                                .wrapContentHeight()
-                                .padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
-                            verticalArrangement = Arrangement.spacedBy(5.dp),
-                        ) {
-                            Text(
-                                text = stringResource(R.string.txt_Upload_profile_photo),
-                                fontSize = 12.sp,
-                                fontFamily = fontRegular,
-                                color = Black,
-                                modifier = Modifier
-                                    .padding(start = 8.dp, bottom = 8.dp)
+                            .padding(
+                                top = 16.dp,
+                                bottom = 8.dp, end = 8.dp
                             )
-
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(start = 8.dp, bottom = 8.dp)
-                                    .wrapContentHeight(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Button(
-                                    onClick = { }, modifier = Modifier
-                                        .wrapContentSize()
-                                        .clip(RoundedCornerShape(8.dp)),
-                                    shape = RoundedCornerShape(8.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = White,
-                                        contentColor = PrimaryBlue
-                                    ),
-                                    border = BorderStroke(1.dp, color = PrimaryBlue)
-                                ) {
-                                    Text(
-                                        stringResource(R.string.txt_add_photo),
-                                        modifier = Modifier
-                                            .wrapContentSize()
-                                            .padding(bottom = 2.dp, top = 2.dp),
-                                        fontSize = 14.sp,
-                                        fontFamily = fontMedium,
-                                        color = PrimaryBlue,
-                                        textAlign = TextAlign.Center
-                                    )
-                                }
-                            }
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Start,
+                        fontFamily = fontMedium,
+                        fontSize = 14.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_BODY_TEXT
+                        } else {
+                            Bg_Gray
                         }
-                    }
+                    )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    DropdownMenuUi(listOf(), onItemSelected = {}, modifier = Modifier.clickable {
+                        Log.e("TAG", "Father's Profession ")
+                    }, placeholder = selectedProfession, onClick = {
+//                            schoolListOpen = true
+                        scope.launch {
+                            isBottomSheetVisible = true // true under development code
+                            sheetState.expand()
+                        }
+                    })
+
+                    SchoolListBottomSheet(
+                        isBottomSheetVisible = isBottomSheetVisible,
+                        sheetState = sheetState,
+                        onDismiss = {
+                            scope.launch { sheetState.hide() }
+                                .invokeOnCompletion { isBottomSheetVisible = false }
+                        },
+                        onDecline = {
+
+                        },
+                        onTextSelected = { it ->
+                            /* selectedProfession = it
+                     schoolList.find { it.name == selectedProfession }?.id?.let {
+                         schoolSelectedId.value = it
+                     }*/
+                            "Profession"
+                        },
+                        professionList.map { it.name }.toList()
+                    )
 
                     Text(
                         text = buildAnnotatedString {
@@ -287,7 +213,7 @@ fun AddNewStudentDetailsScreen(navHostController: NavHostController) {
                         },
                         modifier = Modifier
                             .padding(
-                                top = 24.dp,
+                                top = 16.dp,
                                 bottom = 8.dp, end = 8.dp
                             )
                             .fillMaxWidth(),
@@ -305,14 +231,14 @@ fun AddNewStudentDetailsScreen(navHostController: NavHostController) {
                         isIcon = false,
                         icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
                         colors = colors,
-                        text = studentsName,
+                        text = mothersName,
                         trueFalse = true,
                         hint = textNameEg.toString()
                     )
 
                     Text(
                         text = buildAnnotatedString {
-                            append(stringResource(R.string.student_gender))
+                            append(stringResource(R.string.m_occupation))
                             pushStyle(SpanStyle(color = Color.Red))
                             append(ASTRICK)
                             pop()
@@ -333,86 +259,110 @@ fun AddNewStudentDetailsScreen(navHostController: NavHostController) {
                         }
                     )
 
-                    Row(horizontalArrangement = Arrangement.Start) {
-                        genderOptions.forEach { gender ->
-                            GenderOption(
-                                gender = gender,
-                                isSelected = selectedGender.value == gender,
-                                onSelected = { selectedGender.value = gender }
+                    DropdownMenuUi(listOf(), onItemSelected = {}, modifier = Modifier.clickable {
+                        Log.e("TAG", "Mother's Profession ")
+                    }, placeholder = selectedProfession, onClick = {
+//                            schoolListOpen = true
+                        scope.launch {
+                            isBottomSheetVisible = true // true under development code
+                            sheetState.expand()
+                        }
+                    })
+
+                    SchoolListBottomSheet(
+                        isBottomSheetVisible = isBottomSheetVisible,
+                        sheetState = sheetState,
+                        onDismiss = {
+                            scope.launch { sheetState.hide() }
+                                .invokeOnCompletion { isBottomSheetVisible = false }
+                        },
+                        onDecline = {
+
+                        },
+                        onTextSelected = { it ->
+                            /* selectedProfession = it
+                     schoolList.find { it.name == selectedProfession }?.id?.let {
+                         schoolSelectedId.value = it
+                     }*/
+                            "Profession"
+                        },
+                        professionList.map { it.name }.toList()
+                    )
+
+                    Text(
+                        text = buildAnnotatedString {
+                            append(stringResource(R.string.parent_mobile))
+                            pushStyle(SpanStyle(color = Color.Red))
+                            append(ASTRICK)
+                            pop()
+                        },
+                        modifier = Modifier
+                            .padding(
+                                top = 16.dp,
+                                bottom = 8.dp, end = 8.dp
                             )
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Start,
+                        fontFamily = fontMedium,
+                        fontSize = 14.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_BODY_TEXT
+                        } else {
+                            Bg_Gray
+                        }
+                    )
+
+                    MobileTextField(
+                        isIcon = false,
+                        icon = null,
+                        colors = colors,
+                        number = mobNo,
+                        trueFalse = true,
+                        hint = enterMobile.toString()
+                    )
+
+                    Text(
+                        text = buildAnnotatedString {
+                            append(stringResource(R.string.select_Residence))
+                            pushStyle(SpanStyle(color = Color.Red))
+                            append(ASTRICK)
+                            pop()
+                        },
+                        modifier = Modifier
+                            .padding(
+                                top = 16.dp,
+                                bottom = 8.dp, end = 8.dp
+                            )
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Start,
+                        fontFamily = fontMedium,
+                        fontSize = 14.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_BODY_TEXT
+                        } else {
+                            Bg_Gray
+                        }
+                    )
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.Start),
+                    ) {
+                        Row {
+                            residenceOptions.forEach { residence ->
+                                ResidenceOption(
+                                    residence = residence,
+                                    isSelected = selectedResidence.value == residence,
+                                    onSelected = { selectedResidence.value = residence }
+                                )
+                            }
                         }
                     }
 
                     Text(
                         text = buildAnnotatedString {
-                            append(stringResource(R.string.txt_date_of_birth))
-                            pushStyle(SpanStyle(color = Color.Red))
-                            append(ASTRICK)
-                            pop()
-                        },
-                        modifier = Modifier
-                            .padding(
-                                top = 16.dp,
-                                bottom = 8.dp, end = 8.dp
-                            )
-                            .fillMaxWidth(),
-                        textAlign = TextAlign.Start,
-                        fontFamily = fontMedium,
-                        fontSize = 14.sp,
-                        color = if (isSystemInDarkTheme()) {
-                            DARK_BODY_TEXT
-                        } else {
-                            Bg_Gray
-                        }
-                    )
-
-                    TextFieldWithRightIcon(
-                        modifier = Modifier.clickable {
-                            showDatePickerDialog(context) { year, month, dayOfMonth ->
-                                date = "$year-${
-                                    month.toString().padStart(2, '0')
-                                }-${dayOfMonth.toString().padStart(2, '0')}"
-                            }
-                        },
-                        value = remember { mutableStateOf(date) },
-                        placeholder = if (date.isEmpty()) stringResource(R.string.select_date_of_birth) else date
-                    )
-
-                    Text(
-                        text = buildAnnotatedString {
-                            append(stringResource(R.string.f_name))
-                            pushStyle(SpanStyle(color = Color.Red))
-                            append(ASTRICK)
-                            pop()
-                        },
-                        modifier = Modifier
-                            .padding(
-                                top = 16.dp,
-                                bottom = 8.dp, end = 8.dp
-                            )
-                            .fillMaxWidth(),
-                        textAlign = TextAlign.Start,
-                        fontFamily = fontMedium,
-                        fontSize = 14.sp,
-                        color = if (isSystemInDarkTheme()) {
-                            DARK_BODY_TEXT
-                        } else {
-                            Bg_Gray
-                        }
-                    )
-
-                    TextViewField(
-                        isIcon = false,
-                        icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
-                        colors = colors,
-                        text = fathersName,
-                        trueFalse = true,
-                        hint = textFatherNameEg.toString()
-                    )
-
-                    Text(
-                        text = buildAnnotatedString {
-                            append(stringResource(R.string.txt_School))
+                            append(stringResource(R.string.education_status))
                             pushStyle(SpanStyle(color = Color.Red))
                             append(ASTRICK)
                             pop()
@@ -434,8 +384,8 @@ fun AddNewStudentDetailsScreen(navHostController: NavHostController) {
                     )
 
                     DropdownMenuUi(listOf(), onItemSelected = {}, modifier = Modifier.clickable {
-                        Log.e("TAG", "SchoolName ")
-                    }, placeholder = selectedSchool, onClick = {
+                        Log.e("TAG", "Education Status")
+                    }, placeholder = selectedEducation, onClick = {
 //                            schoolListOpen = true
                         scope.launch {
                             isBottomSheetVisible = true // true under development code
@@ -454,18 +404,18 @@ fun AddNewStudentDetailsScreen(navHostController: NavHostController) {
 
                         },
                         onTextSelected = { it ->
-                            /* selectedSchool = it
-                     schoolList.find { it.name == selectedSchool }?.id?.let {
-                         schoolSelectedId.value = it
-                     }*/
-                            "School"
+                            /* selectedEducation = it
+                            schoolList.find { it.name == selectedEducation }?.id?.let {
+                                schoolSelectedId.value = it
+                            } */
+                            "Education Status"
                         },
-                        schoolList.map { it.name }.toList()
+                        educationList.map { it.name }.toList()
                     )
 
                     Text(
                         text = buildAnnotatedString {
-                            append(stringResource(R.string.student_class))
+                            append(stringResource(R.string.student_board))
                             pushStyle(SpanStyle(color = Color.Red))
                             append(ASTRICK)
                             pop()
@@ -487,8 +437,8 @@ fun AddNewStudentDetailsScreen(navHostController: NavHostController) {
                     )
 
                     DropdownMenuUi(listOf(), onItemSelected = {}, modifier = Modifier.clickable {
-                        Log.e("TAG", "Class Name ")
-                    }, placeholder = selectedSchool, onClick = {
+                        Log.e("TAG", "Board")
+                    }, placeholder = selectedBoard, onClick = {
 //                            schoolListOpen = true
                         scope.launch {
                             isBottomSheetVisible = true // true under development code
@@ -507,13 +457,66 @@ fun AddNewStudentDetailsScreen(navHostController: NavHostController) {
 
                         },
                         onTextSelected = { it ->
-                            /* selectedSchool = it
-                     schoolList.find { it.name == selectedSchool }?.id?.let {
-                         schoolSelectedId.value = it
-                     }*/
-                            "Class"
+                            /* selectedBoard = it
+                            schoolList.find { it.name == selectedBoard }?.id?.let {
+                                schoolSelectedId.value = it
+                            } */
+                            "Board"
                         },
-                        schoolList.map { it.name }.toList()
+                        boardList.map { it.name }.toList()
+                    )
+
+                    Text(
+                        text = buildAnnotatedString {
+                            append(stringResource(R.string.type_school))
+                            pushStyle(SpanStyle(color = Color.Red))
+                            append(ASTRICK)
+                            pop()
+                        },
+                        modifier = Modifier
+                            .padding(
+                                top = 16.dp,
+                                bottom = 8.dp, end = 8.dp
+                            )
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Start,
+                        fontFamily = fontMedium,
+                        fontSize = 14.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_BODY_TEXT
+                        } else {
+                            Bg_Gray
+                        }
+                    )
+
+                    DropdownMenuUi(listOf(), onItemSelected = {}, modifier = Modifier.clickable {
+                        Log.e("TAG", "Type of School")
+                    }, placeholder = selectedSchoolType, onClick = {
+//                            schoolListOpen = true
+                        scope.launch {
+                            isBottomSheetVisible = true // true under development code
+                            sheetState.expand()
+                        }
+                    })
+
+                    SchoolListBottomSheet(
+                        isBottomSheetVisible = isBottomSheetVisible,
+                        sheetState = sheetState,
+                        onDismiss = {
+                            scope.launch { sheetState.hide() }
+                                .invokeOnCompletion { isBottomSheetVisible = false }
+                        },
+                        onDecline = {
+
+                        },
+                        onTextSelected = { it ->
+                            /* selectedSchoolType = it
+                            schoolList.find { it.name == selectedSchoolType }?.id?.let {
+                                schoolSelectedId.value = it
+                            } */
+                            "Type of School"
+                        },
+                        boardList.map { it.name }.toList()
                     )
 
                     Box(
@@ -528,25 +531,37 @@ fun AddNewStudentDetailsScreen(navHostController: NavHostController) {
                                 }
                             )
                     ) {
-                        Column(
+                        Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(color = White)
                                 .wrapContentHeight(),
-                            horizontalAlignment = Alignment.End
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            SmallBtnUi(
-                                enabled = true,
-                                title = stringResource(R.string.string_next),
+                            TextWithIconOnLeft(
+                                text = stringResource(R.string.txt_Previous),
+                                icon = ImageVector.vectorResource(id = R.drawable.left_back_arrow),
+                                textColor = PrimaryBlue,
+                                iconColor = PrimaryBlue,
                                 onClick = {
                                     navHostController.popBackStack()
-                                    navHostController.navigate(AppRoute.AddNewStudentMoreDetails.route)
+                                    navHostController.navigate(AppRoute.AddStudentRegister.route)
+                                },
+                            )
+
+                            Spacer(modifier = Modifier.weight(1f))
+
+                            SmallBtnUi(
+                                enabled = true,
+                                title = stringResource(R.string.add_student),
+                                onClick = {
+                                    navHostController.popBackStack()
+                                    navHostController.navigate(AppRoute.ScreeningScreen.route)
                                 }
                             )
                         }
                     }
                 }
             }
-        }
-    )
+        })
 }

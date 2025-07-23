@@ -2,6 +2,7 @@ package com.pi.ProjectInclusion.android.screens.registration
 
 import android.content.Context
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -60,6 +61,7 @@ import com.pi.ProjectInclusion.OrangeSubTitle
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
+import com.pi.ProjectInclusion.android.common_UI.DropdownMenuUi
 import com.pi.ProjectInclusion.android.common_UI.MobileTextField
 import com.pi.ProjectInclusion.android.common_UI.RegistrationHeader
 import com.pi.ProjectInclusion.android.common_UI.SchoolListBottomSheet
@@ -255,6 +257,18 @@ fun ProfileScreen2UI(
                         Bg_Gray
                     }
                 )
+
+                DropdownMenuUi(listOf(), onItemSelected = {
+
+                }, modifier = Modifier.clickable {
+
+                }, placeholder = selectedSchool, onClick = {
+//                            schoolListOpen = true
+                    scope.launch {
+                        isBottomSheetVisible = true // true under development code
+                        sheetState.expand()
+                    }
+                })
                 SchoolListBottomSheet(
                     isBottomSheetVisible = isBottomSheetVisible,
                     sheetState = sheetState,
@@ -267,9 +281,9 @@ fun ProfileScreen2UI(
                     },
                     onTextSelected = { it ->
                         /* selectedSchool = it
-                         schoolList.find { it.name == selectedSchool }?.id?.let {
-                             schoolSelectedId.value = it
-                         }*/
+                 schoolList.find { it.name == selectedSchool }?.id?.let {
+                     schoolSelectedId.value = it
+                 }*/
                         "School"
                     },
                     schoolList.map { it.name }.toList()
@@ -297,19 +311,40 @@ fun ProfileScreen2UI(
                         Bg_Gray
                     }
                 )
-                TextViewField(
-                    isIcon = false,
-                    icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
-                    colors = colors,
-                    text = lastName,
-                    trueFalse = true,
-                    hint = textLastNameEg.toString()
+                DropdownMenuUi(listOf(), onItemSelected = {
+
+                }, modifier = Modifier.clickable {
+                }, placeholder = selectedSchool, onClick = {
+//                            schoolListOpen = true
+                    scope.launch {
+                        isBottomSheetVisible = true // true under development code
+                        sheetState.expand()
+                    }
+                })
+                SchoolListBottomSheet(
+                    isBottomSheetVisible = isBottomSheetVisible,
+                    sheetState = sheetState,
+                    onDismiss = {
+                        scope.launch { sheetState.hide() }
+                            .invokeOnCompletion { isBottomSheetVisible = false }
+                    },
+                    onDecline = {
+
+                    },
+                    onTextSelected = { it ->
+                        /* selectedSchool = it
+                 schoolList.find { it.name == selectedSchool }?.id?.let {
+                     schoolSelectedId.value = it
+                 }*/
+                        "School"
+                    },
+                    schoolList.map { it.name }.toList()
                 )
 
-                // whatsapp
+                // Block
                 Text(
                     text = buildAnnotatedString {
-                        append(stringResource(R.string.txt_whatsapp))
+                        append(stringResource(R.string.txt_block_zone))
                         pushStyle(SpanStyle(color = Color.Red))
                         append(ASTRICK)
                         pop()
@@ -328,19 +363,40 @@ fun ProfileScreen2UI(
                         Bg_Gray
                     }
                 )
-                MobileTextField(
-                    isIcon = true,
-                    icon = ImageVector.vectorResource(id = R.drawable.ic_whatsapp_otp),
-                    colors = colors,
-                    number = whatsappNo,
-                    trueFalse = true,
-                    hint = textWhatsappEg.toString()
+                DropdownMenuUi(listOf(), onItemSelected = {
+
+                }, modifier = Modifier.clickable {
+                }, placeholder = selectedSchool, onClick = {
+//                            schoolListOpen = true
+                    scope.launch {
+                        isBottomSheetVisible = true // true under development code
+                        sheetState.expand()
+                    }
+                })
+                SchoolListBottomSheet(
+                    isBottomSheetVisible = isBottomSheetVisible,
+                    sheetState = sheetState,
+                    onDismiss = {
+                        scope.launch { sheetState.hide() }
+                            .invokeOnCompletion { isBottomSheetVisible = false }
+                    },
+                    onDecline = {
+
+                    },
+                    onTextSelected = { it ->
+                        /* selectedSchool = it
+                 schoolList.find { it.name == selectedSchool }?.id?.let {
+                     schoolSelectedId.value = it
+                 }*/
+                        "School"
+                    },
+                    schoolList.map { it.name }.toList()
                 )
 
-                // Email
+                // School
                 Text(
                     text = buildAnnotatedString {
-                        append(stringResource(R.string.txt_email))
+                        append(stringResource(R.string.txt_school_name))
                         pushStyle(SpanStyle(color = Color.Red))
                         append(ASTRICK)
                         pop()
@@ -359,13 +415,34 @@ fun ProfileScreen2UI(
                         Bg_Gray
                     }
                 )
-                TextViewField(
-                    isIcon = true,
-                    icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
-                    colors = colors,
-                    text = email,
-                    trueFalse = true,
-                    hint = textEmailEg.toString()
+                DropdownMenuUi(listOf(), onItemSelected = {
+
+                }, modifier = Modifier.clickable {
+                }, placeholder = selectedSchool, onClick = {
+//                            schoolListOpen = true
+                    scope.launch {
+                        isBottomSheetVisible = true // true under development code
+                        sheetState.expand()
+                    }
+                })
+                SchoolListBottomSheet(
+                    isBottomSheetVisible = isBottomSheetVisible,
+                    sheetState = sheetState,
+                    onDismiss = {
+                        scope.launch { sheetState.hide() }
+                            .invokeOnCompletion { isBottomSheetVisible = false }
+                    },
+                    onDecline = {
+
+                    },
+                    onTextSelected = { it ->
+                        /* selectedSchool = it
+                 schoolList.find { it.name == selectedSchool }?.id?.let {
+                     schoolSelectedId.value = it
+                 }*/
+                        "School"
+                    },
+                    schoolList.map { it.name }.toList()
                 )
 
                 if (inValidMobNo) {

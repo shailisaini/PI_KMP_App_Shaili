@@ -81,7 +81,7 @@ import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun EnterUserScreen2(navController: NavHostController) {
+fun EditProfileScreen2(navController: NavHostController) {
     var isDialogVisible by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
@@ -260,7 +260,7 @@ fun EditProfileScreen2UI(
                         DropdownMenuUi(listOf(), onItemSelected = {
 
                         }, modifier = Modifier.clickable {
-                            Log.e("TAG", "SchoolName ")
+
                         }, placeholder = selectedSchool, onClick = {
 //                            schoolListOpen = true
                             scope.launch {
@@ -288,9 +288,10 @@ fun EditProfileScreen2UI(
                             schoolList.map { it.name }.toList()
                         )
 
+                        // District
                         Text(
                             text = buildAnnotatedString {
-                                append(stringResource(R.string.txt_last_name))
+                                append(stringResource(R.string.txt_district))
                                 pushStyle(SpanStyle(color = Color.Red))
                                 append(ASTRICK)
                                 pop()
@@ -309,19 +310,40 @@ fun EditProfileScreen2UI(
                                 Bg_Gray
                             }
                         )
-                        TextViewField(
-                            isIcon = false,
-                            icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
-                            colors = colors,
-                            text = lastName,
-                            trueFalse = true,
-                            hint = textLastNameEg.toString()
+                        DropdownMenuUi(listOf(), onItemSelected = {
+
+                        }, modifier = Modifier.clickable {
+                        }, placeholder = selectedSchool, onClick = {
+//                            schoolListOpen = true
+                            scope.launch {
+                                isBottomSheetVisible = true // true under development code
+                                sheetState.expand()
+                            }
+                        })
+                        SchoolListBottomSheet(
+                            isBottomSheetVisible = isBottomSheetVisible,
+                            sheetState = sheetState,
+                            onDismiss = {
+                                scope.launch { sheetState.hide() }
+                                    .invokeOnCompletion { isBottomSheetVisible = false }
+                            },
+                            onDecline = {
+
+                            },
+                            onTextSelected = { it ->
+                                /* selectedSchool = it
+                         schoolList.find { it.name == selectedSchool }?.id?.let {
+                             schoolSelectedId.value = it
+                         }*/
+                                "School"
+                            },
+                            schoolList.map { it.name }.toList()
                         )
 
-                        // whatsapp
+                        // Block
                         Text(
                             text = buildAnnotatedString {
-                                append(stringResource(R.string.txt_whatsapp))
+                                append(stringResource(R.string.txt_block_zone))
                                 pushStyle(SpanStyle(color = Color.Red))
                                 append(ASTRICK)
                                 pop()
@@ -340,19 +362,40 @@ fun EditProfileScreen2UI(
                                 Bg_Gray
                             }
                         )
-                        MobileTextField(
-                            isIcon = true,
-                            icon = ImageVector.vectorResource(id = R.drawable.ic_whatsapp_otp),
-                            colors = colors,
-                            number = whatsappNo,
-                            trueFalse = true,
-                            hint = textWhatsappEg.toString()
+                        DropdownMenuUi(listOf(), onItemSelected = {
+
+                        }, modifier = Modifier.clickable {
+                        }, placeholder = selectedSchool, onClick = {
+//                            schoolListOpen = true
+                            scope.launch {
+                                isBottomSheetVisible = true // true under development code
+                                sheetState.expand()
+                            }
+                        })
+                        SchoolListBottomSheet(
+                            isBottomSheetVisible = isBottomSheetVisible,
+                            sheetState = sheetState,
+                            onDismiss = {
+                                scope.launch { sheetState.hide() }
+                                    .invokeOnCompletion { isBottomSheetVisible = false }
+                            },
+                            onDecline = {
+
+                            },
+                            onTextSelected = { it ->
+                                /* selectedSchool = it
+                         schoolList.find { it.name == selectedSchool }?.id?.let {
+                             schoolSelectedId.value = it
+                         }*/
+                                "School"
+                            },
+                            schoolList.map { it.name }.toList()
                         )
 
-                        // Email
+                        // School
                         Text(
                             text = buildAnnotatedString {
-                                append(stringResource(R.string.txt_email))
+                                append(stringResource(R.string.txt_school_name))
                                 pushStyle(SpanStyle(color = Color.Red))
                                 append(ASTRICK)
                                 pop()
@@ -371,13 +414,34 @@ fun EditProfileScreen2UI(
                                 Bg_Gray
                             }
                         )
-                        TextViewField(
-                            isIcon = true,
-                            icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
-                            colors = colors,
-                            text = email,
-                            trueFalse = true,
-                            hint = textEmailEg.toString()
+                        DropdownMenuUi(listOf(), onItemSelected = {
+
+                        }, modifier = Modifier.clickable {
+                        }, placeholder = selectedSchool, onClick = {
+//                            schoolListOpen = true
+                            scope.launch {
+                                isBottomSheetVisible = true // true under development code
+                                sheetState.expand()
+                            }
+                        })
+                        SchoolListBottomSheet(
+                            isBottomSheetVisible = isBottomSheetVisible,
+                            sheetState = sheetState,
+                            onDismiss = {
+                                scope.launch { sheetState.hide() }
+                                    .invokeOnCompletion { isBottomSheetVisible = false }
+                            },
+                            onDecline = {
+
+                            },
+                            onTextSelected = { it ->
+                                /* selectedSchool = it
+                         schoolList.find { it.name == selectedSchool }?.id?.let {
+                             schoolSelectedId.value = it
+                         }*/
+                                "School"
+                            },
+                            schoolList.map { it.name }.toList()
                         )
 
                         if (inValidMobNo) {

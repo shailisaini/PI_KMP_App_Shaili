@@ -3,27 +3,39 @@
 package com.pi.ProjectInclusion.android.screens.dashboardScreen
 
 import android.Manifest
+import android.R.attr.maxWidth
+import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.Context
+import android.net.Uri
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetDefaults
@@ -33,11 +45,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -48,45 +62,73 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import co.touchlab.kermit.Logger
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.kmptemplate.logger.AppLoggerImpl
 import com.pi.ProjectInclusion.Bg_Gray1
 import com.pi.ProjectInclusion.Black
+import com.pi.ProjectInclusion.BlueBackground2
+import com.pi.ProjectInclusion.DARK_TITLE_TEXT
 import com.pi.ProjectInclusion.DarkBlue
 import com.pi.ProjectInclusion.Dark_01
+import com.pi.ProjectInclusion.Dark_02
 import com.pi.ProjectInclusion.Dark_03
+import com.pi.ProjectInclusion.Gray
+import com.pi.ProjectInclusion.GrayLight01
 import com.pi.ProjectInclusion.GrayLight02
+import com.pi.ProjectInclusion.GrayLight03
+import com.pi.ProjectInclusion.GrayLight04
 import com.pi.ProjectInclusion.LightText
+import com.pi.ProjectInclusion.LightYellow02
 import com.pi.ProjectInclusion.OrangeSubTitle
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlue3
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
+import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.ProfileWithProgress
+import com.pi.ProjectInclusion.android.common_UI.SmallBtnUi
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
+import com.pi.ProjectInclusion.android.common_UI.createImageUri
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
+import com.pi.ProjectInclusion.constants.ConstantVariables.IMAGE_ALL_TYPE
+import com.pi.ProjectInclusion.constants.ConstantVariables.IMAGE_MIME
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.JPG
+import com.pi.ProjectInclusion.constants.ConstantVariables.PI_DOCUMENT
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
 
 @Composable
-fun ViewProfileScreen(navHostController: NavHostController) {
+fun ViewProfileScreen(navController: NavHostController) {
 
     var isDialogVisible by remember { mutableStateOf(false) }
 
@@ -103,7 +145,6 @@ fun ViewProfileScreen(navHostController: NavHostController) {
         onDismiss = { isDialogVisible = false },
         message = "Loading your data..."
     )
-    val navController = NavHostController(context)
     val selectedLanguage = remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
     var hasCameraPermission by remember { mutableStateOf(false) }
@@ -158,10 +199,17 @@ fun ProfileViewUI(
     var firstName = rememberSaveable { mutableStateOf("") }
     val textNameEg = stringResource(R.string.txt_eg_first_name)
     var showSheetMenu by remember { mutableStateOf(false) }
+    var isChangeRequestBottomSheet by remember { mutableStateOf(false) }
 
     if (showSheetMenu) {
         ProfileBottomSheetMenu() {
             showSheetMenu = false
+        }
+    }
+
+    if (isChangeRequestBottomSheet) {
+        ChangeRequestSheet() {
+            isChangeRequestBottomSheet = false
         }
     }
 
@@ -214,12 +262,12 @@ fun ProfileViewUI(
                     )
 
                     Button(
-                        onClick = { }, modifier = Modifier
+                        onClick = {
+                            navController.navigate(AppRoute.EditProfileScreen.route)
+                        }, modifier = Modifier
                             .wrapContentSize()
-                            .clickable{
-                                navController.navigate(AppRoute.EditProfileScreen.route)
-                            }
                             .clip(RoundedCornerShape(4.dp)),
+
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = White,
@@ -233,7 +281,7 @@ fun ProfileViewUI(
                             textColor = Black,
                             iconColor = Color.Unspecified,
                             onClick = {
-
+                                navController.navigate(AppRoute.EditProfileScreen.route)
                             })
                     }
                 }
@@ -528,7 +576,9 @@ fun ProfileViewUI(
                                         .padding(5.dp)
                                 )
                                 Button(
-                                    onClick = { }, modifier = Modifier
+                                    onClick = {
+                                        isChangeRequestBottomSheet = true
+                                    }, modifier = Modifier
                                         .wrapContentSize()
                                         .clip(RoundedCornerShape(4.dp)),
                                     shape = RoundedCornerShape(8.dp),
@@ -569,9 +619,6 @@ fun ProfileBottomSheetMenu(
     onDismiss: () -> Unit = {},
 ) {
     val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
-    val colors = MaterialTheme.colorScheme
 
     var logOutSheet by remember { mutableStateOf(false) }
     // show logout sheet while click on logout
@@ -679,6 +726,485 @@ fun ProfileBottomSheetMenu(
             }
 
             Spacer(modifier = Modifier.height(10.dp))
+        }
+    }
+}
+
+@Preview
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ChangeRequestSheet(
+    onDismiss: () -> Unit = {},
+) {
+    val sheetState = rememberModalBottomSheetState()
+    var isSelectedSchool by remember { mutableStateOf(false) }
+    var isSelectedName by remember { mutableStateOf(false) }
+    var txtContinue = stringResource(id = R.string.text_continue)
+    var uploadShowDialog by remember { mutableStateOf(false) }
+    if (uploadShowDialog) {
+        if (isSelectedSchool) {
+            UploadIdDialog(stringResource(R.string.txt_upload_clear_id_school)) {
+                uploadShowDialog = false
+            }
+        } else {
+            UploadIdDialog(stringResource(R.string.txt_upload_clear_id_name)) {
+                uploadShowDialog = false
+            }
+        }
+    }
+
+    ModalBottomSheet(
+        onDismissRequest = {
+            onDismiss()
+        },
+        sheetState = sheetState,
+        dragHandle = { BottomSheetDefaults.DragHandle() },
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(start = 15.dp, end = 15.dp, bottom = 20.dp)
+                .fillMaxWidth(),
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(start = 15.dp, end = 15.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(R.string.txt_change_request),
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        color = Black,
+                        fontSize = 18.sp,
+                        fontFamily = fontBold
+                    )
+                )
+                Text(
+                    text = stringResource(R.string.txt_change_desc),
+                    color = Gray,
+                    fontSize = 15.sp,
+                    fontFamily = fontRegular
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 10.dp, bottom = 5.dp, top = 10.dp)
+                    .clickable {
+                        isSelectedSchool = true
+                        isSelectedName = false
+                        // If it's a single choice question
+//                        answersState.value = listOf(answerId)
+                    },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                TextWithIconOnLeft(
+                    text = stringResource(R.string.txt_school_change),
+                    icon = ImageVector.vectorResource(id = R.drawable.ic_school_request),
+                    textColor = Black,
+                    iconColor = Color.Unspecified,
+                    textSize = 17.sp,
+                    onClick = {
+                        isSelectedSchool = true
+                        isSelectedName = false
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+
+                RadioButton(
+                    selected = isSelectedSchool,
+                    onClick = {
+                        isSelectedSchool = true
+                        isSelectedName = false
+                    },
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 10.dp, bottom = 10.dp)
+                    .clickable {
+                        isSelectedSchool = false
+                        isSelectedName = true
+                        // If it's a single choice question
+//                        answersState.value = listOf(answerId)
+                    },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextWithIconOnLeft(
+                    text = stringResource(R.string.txt_name_change),
+                    icon = ImageVector.vectorResource(id = R.drawable.ic_name_request),
+                    textColor = Black,
+                    iconColor = Color.Unspecified,
+                    textSize = 17.sp,
+                    onClick = {
+                        isSelectedSchool = false
+                        isSelectedName = true
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+
+                RadioButton(
+                    selected = isSelectedName,
+                    onClick = {
+                        isSelectedSchool = false
+                        isSelectedName = true
+                    }
+                )
+            }
+
+            BtnUi(
+                enabled = isSelectedSchool || isSelectedName,
+                title = txtContinue,
+                onClick = {
+                    if (isSelectedSchool || isSelectedName) {
+                        uploadShowDialog = true
+                    }
+                },
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+        }
+    }
+}
+
+@SuppressLint("UnusedBoxWithConstraintsScope")
+@Preview
+@Composable
+fun UploadIdDialog(subText: String = "", onDismiss: () -> Unit = {}) {
+    val context = LocalContext.current
+
+    Dialog(onDismissRequest = { onDismiss() }) {
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            var selectedUri = remember { mutableStateOf<Uri?>(null) }
+
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(if (isSystemInDarkTheme()) Dark_02 else White)
+                    .fillMaxWidth()
+
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(bottom = 16.dp, start = 8.dp, end = 8.dp)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(R.string.txt_upload_id),
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .padding(top = 16.dp, start = 8.dp, end = 8.dp),
+                        fontFamily = fontBold,
+                        fontSize = 18.sp,
+                        color = Black,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = subText,
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .padding(start = 8.dp, end = 8.dp),
+                        fontFamily = fontRegular,
+                        fontSize = 14.sp,
+                        color = Gray,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Column(
+                        modifier = Modifier
+                            .padding(bottom = 8.dp)
+                            .fillMaxWidth()
+                            .background(color = LightYellow02),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = stringResource(R.string.txt_school_id_front),
+                            modifier = Modifier
+                                .wrapContentWidth()
+                                .padding(8.dp),
+                            fontFamily = fontRegular,
+                            fontSize = 13.sp,
+                            color = Gray,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .padding(vertical = 15.dp, horizontal = 5.dp)
+                            .fillMaxWidth()
+                            .drawDashedBorder(
+                                color = LightText,
+                                strokeWidth = 1.dp,
+                                dashLength = 4.dp,
+                                gapLength = 5.dp,
+                                cornerRadius = 12.dp
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (selectedUri.value == null) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.padding(vertical = 10.dp)
+                            ) {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_upload_icon),
+                                    contentDescription = IMG_DESCRIPTION,
+                                    modifier = Modifier.size(60.dp),
+                                    tint = Color.Unspecified
+                                )
+
+                                Text(
+                                    text = stringResource(R.string.txt_choose_to_upload),
+                                    modifier = Modifier
+                                        .wrapContentWidth()
+                                        .padding(top = 16.dp, start = 8.dp, end = 8.dp),
+                                    fontFamily = fontMedium,
+                                    fontSize = 17.sp,
+                                    color = Black,
+                                    textAlign = TextAlign.Center
+                                )
+                                Text(
+                                    text = stringResource(R.string.txt_choose_supported_format),
+                                    modifier = Modifier
+                                        .wrapContentWidth()
+                                        .padding(top = 3.dp, start = 8.dp, end = 8.dp),
+                                    fontFamily = fontMedium,
+                                    fontSize = 13.sp,
+                                    color = GrayLight04,
+                                    textAlign = TextAlign.Center
+                                )
+
+                                // gallery & camera button
+                                CameraGalleryButtons { selectedImageUri ->
+                                    if (selectedImageUri != null) {
+//                                        Logger.d("SelectedURI: $selectedImageUri")
+                                        selectedUri.value = selectedImageUri
+                                        // Use the URI as needed (e.g., upload, display, etc.)
+                                    } else {
+//                                        Logger.d("SelectedURI:$selectedImageUri")
+                                    }
+                                }
+                            }
+                        } else {
+                            Box(
+                                modifier = Modifier.padding(10.dp) // Add padding to the outer box
+                            ) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier.padding(vertical = 10.dp)
+                                ) {
+                                    Image(
+                                        painter =
+                                            rememberAsyncImagePainter(
+                                                ImageRequest.Builder(LocalContext.current)
+                                                    .data(selectedUri.value)
+                                                    .placeholder(R.drawable.profile_user_icon)
+                                                    .crossfade(true) // Optional: Add a fade transition
+                                                    .build()
+                                            ),
+                                        contentDescription = IMG_DESCRIPTION,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(bottom = 10.dp)
+                                            .height(200.dp)
+                                    )
+                                    TextWithIconOnLeft(
+                                        text = stringResource(R.string.txt_remove),
+                                        icon = ImageVector.vectorResource(id = R.drawable.ic_delete),
+                                        textColor = PrimaryBlue,
+                                        iconColor = PrimaryBlue,
+                                        onClick = {
+                                            selectedUri.value = null
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .padding(vertical = 15.dp, horizontal = 10.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Button(
+                            onClick = { },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .padding(end = 8.dp)
+                                .clip(RoundedCornerShape(8.dp)),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = White,
+                                contentColor = PrimaryBlue
+                            ),
+                            border = BorderStroke(1.dp, PrimaryBlue)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.txt_cancel),
+                                fontSize = 16.sp,
+                                fontFamily = fontMedium,
+                                color = PrimaryBlue
+                            )
+                        }
+                        Button(
+                            onClick = { },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .padding(end = 8.dp)
+                                .clip(RoundedCornerShape(8.dp)),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = PrimaryBlue,
+                                contentColor = com.pi.ProjectInclusion.White
+                            ),
+                            border = BorderStroke(1.dp, PrimaryBlue)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.txt_submit),
+                                fontSize = 16.sp,
+                                fontFamily = fontMedium,
+                                color = White
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+fun Modifier.drawDashedBorder(
+    color: Color,
+    strokeWidth: Dp,
+    dashLength: Dp,
+    gapLength: Dp,
+    cornerRadius: Dp = 0.dp
+) = this.then(
+    Modifier.drawBehind {
+        val stroke = Stroke(
+            width = strokeWidth.toPx(),
+            pathEffect = PathEffect.dashPathEffect(
+                floatArrayOf(dashLength.toPx(), gapLength.toPx()), 0f
+            )
+        )
+
+        val corner = cornerRadius.toPx()
+        val rect = Rect(0f, 0f, size.width, size.height)
+
+        drawRoundRect(
+            color = color,
+            topLeft = Offset.Zero,
+            size = size,
+            cornerRadius = CornerRadius(corner, corner),
+            style = stroke
+        )
+    }
+)
+
+@Composable
+fun CameraGalleryButtons(
+    onImageUri: (Uri?) -> Unit
+) {
+    val context = LocalContext.current
+
+    // For Camera
+    val cameraImageUri = remember { mutableStateOf<Uri?>(null) }
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
+        onImageUri(cameraImageUri.value)
+    }
+
+    // For Gallery
+    val galleryLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            onImageUri(uri)
+        }
+
+    // Create a file to store image
+    fun createImageUri(): Uri? {
+        val contentValues = ContentValues().apply {
+            put(
+                MediaStore.Images.Media.DISPLAY_NAME,
+                PI_DOCUMENT+System.currentTimeMillis()+JPG
+            )
+            put(MediaStore.Images.Media.MIME_TYPE, IMAGE_MIME)
+        }
+        return context.contentResolver.insert(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            contentValues
+        )
+    }
+
+    Row(
+        modifier = Modifier
+            .padding(top = 16.dp)
+            .wrapContentWidth(),
+    ) {
+        Button(
+            onClick = {
+                val uri = createImageUri()
+                cameraImageUri.value = uri
+                uri?.let { cameraLauncher.launch(it) }
+            },
+            modifier = Modifier
+                .wrapContentWidth()
+                .padding(end = 8.dp)
+                .clip(RoundedCornerShape(8.dp)),
+            shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = White,
+                contentColor = PrimaryBlue
+            ),
+            border = BorderStroke(1.dp, GrayLight01)
+        ) {
+            TextWithIconOnLeft(
+                text = stringResource(R.string.txt_Camera),
+                icon = ImageVector.vectorResource(id = R.drawable.camera_img),
+                textColor = BlueBackground2,
+                iconColor = Color.Unspecified,
+                onClick = {
+                    val uri = createImageUri()
+                    cameraImageUri.value = uri
+                    uri?.let { cameraLauncher.launch(it) }
+                }
+            )
+        }
+
+        Button(
+            onClick = {
+                galleryLauncher.launch(IMAGE_ALL_TYPE)
+            },
+            modifier = Modifier
+                .wrapContentWidth()
+                .clip(RoundedCornerShape(8.dp)),
+            shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = White,
+                contentColor = PrimaryBlue
+            ),
+            border = BorderStroke(1.dp, GrayLight01)
+        ) {
+            TextWithIconOnLeft(
+                text = stringResource(R.string.txt_Gallery),
+                icon = ImageVector.vectorResource(id = R.drawable.gallery_img),
+                textColor = BlueBackground2,
+                iconColor = Color.Unspecified,
+                onClick = {
+                    galleryLauncher.launch(IMAGE_ALL_TYPE)
+                }
+            )
         }
     }
 }
