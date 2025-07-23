@@ -539,7 +539,7 @@ fun EditProfileScreenUI(
                                             } else {
                                                 isDialogVisible = true
                                                 navController.popBackStack()
-                                                navController.navigate(AppRoute.EnterUserProfessionalScreen.route)
+                                                navController.navigate(AppRoute.EditProfileScreen2.route)
 
                                             }
                                         }

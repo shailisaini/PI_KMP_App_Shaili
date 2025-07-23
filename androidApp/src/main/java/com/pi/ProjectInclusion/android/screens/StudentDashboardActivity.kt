@@ -49,6 +49,7 @@ import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen1
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentDetailsScreen
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentMoreDetailsScreen
+import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen2
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.DashboardScreen
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.ViewProfileScreen
 import com.pi.ProjectInclusion.android.screens.interventionScreens.InterventionAcceptLevelScreen
@@ -216,6 +217,9 @@ class StudentDashboardActivity : ComponentActivity() {
                             }
                             composable(AppRoute.EditProfileScreen.route) {
                                 EditProfileScreen1(navController)
+                            }
+                            composable(AppRoute.EditProfileScreen2.route) {
+                                EditProfileScreen2(navController)
                             }
 //                                    composable(
 //                                        AppRoute.DashboardScreen(-1).route,

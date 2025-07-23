@@ -32,6 +32,7 @@ val GrayLight01 = Color(0xFFA0A0A0)
 val LightText = Color(0xFFA0A0A0)
 val GrayLight02 = Color(0xFFE6E6E6)
 val GrayLight03 = Color(0x9ACFD1D9)
+val GrayLight04 = Color(0xFF9F9F9F)
 val White = Color(0xFFFFFFFF)
 val WhiteA = Color(0xFFFFF5DE)
 val BackgroundGray = Color(0xFF666666)
@@ -58,7 +59,7 @@ val LightGreen06 = Color(0xFF56A42F) // #56A42F
 
 val Yellow = Color(0xFFFFDD00) // #FFDD00
 val LightYellow = Color(0xFFFBDE9D)
-val LightYellow02 = Color(0xFFFFFBF3)
+val LightYellow02 = Color(0xFFFFFCEB)
 val LightYellow03 = Color(0xFFFCF6EC)
 
 val Pink = Color(0xFFEE89DF)

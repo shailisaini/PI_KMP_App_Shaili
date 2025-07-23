@@ -19,6 +19,7 @@ sealed class AppRoute(val route: String) {
     data object DashboardScreen : AppRoute("dashboard_screen")
     data object ProfileScreen : AppRoute("profile_screen")     // user profile after Dashboard
     data object EditProfileScreen : AppRoute("edit_profile_screen")     // edit profile after Dashboard
+    data object EditProfileScreen2 : AppRoute("edit_profile_screen_2")     // edit profile after Dashboard
 
     data object CourseScreen : AppRoute("course_screen")
 

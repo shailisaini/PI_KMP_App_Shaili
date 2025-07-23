@@ -24,4 +24,8 @@ object ConstantVariables {
     var ASTRICK: String = "*"
     var RURAL: String = "Rural"
     var URBAN: String = "Urban"
+    var PI_DOCUMENT: String = "PI_DOCUMENT"
+    var JPG: String = ".jpg"
+    var IMAGE_MIME: String = "image/jpeg"
+    var IMAGE_ALL_TYPE: String = "image/*"
 }
