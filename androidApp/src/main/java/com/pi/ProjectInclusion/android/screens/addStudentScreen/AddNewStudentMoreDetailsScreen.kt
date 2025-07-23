@@ -1,16 +1,13 @@
 package com.pi.ProjectInclusion.android.screens.addStudentScreen
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
@@ -19,13 +16,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -46,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Bg_Gray
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
@@ -58,7 +54,6 @@ import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.DropdownMenuUi
-import com.pi.ProjectInclusion.android.common_UI.GenderOption
 import com.pi.ProjectInclusion.android.common_UI.MobileTextField
 import com.pi.ProjectInclusion.android.common_UI.ResidenceOption
 import com.pi.ProjectInclusion.android.common_UI.SchoolListBottomSheet
@@ -67,15 +62,10 @@ import com.pi.ProjectInclusion.android.common_UI.TextViewField
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontMedium
-import com.pi.ProjectInclusion.android.utils.fontRegular
-import com.pi.ProjectInclusion.android.utils.fontSemiBold
+import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
-import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_FEMALE
-import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_MALE
-import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_OTHER
 import com.pi.ProjectInclusion.constants.ConstantVariables.RURAL
 import com.pi.ProjectInclusion.constants.ConstantVariables.URBAN
-import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,23 +76,61 @@ fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
-    var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
+    var isBottomSheetFVisible by rememberSaveable { mutableStateOf(false) }
+    var isBottomSheetMVisible by rememberSaveable { mutableStateOf(false) }
+    var isBottomSheetEdVisible by rememberSaveable { mutableStateOf(false) }
+    var isBottomSheetBoardVisible by rememberSaveable { mutableStateOf(false) }
+    var isBottomSheetSchoolTypeVisible by rememberSaveable { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true,
-        confirmValueChange = { it != SheetValue.Hidden })
-    val professionList = remember { mutableStateListOf<GetLanguageListResponse.Data.Result>() }
-    val educationList = remember { mutableStateListOf<GetLanguageListResponse.Data.Result>() }
-    val boardList = remember { mutableStateListOf<GetLanguageListResponse.Data.Result>() }
+        skipPartiallyExpanded = true, confirmValueChange = { it != SheetValue.Hidden })
     var mothersName = rememberSaveable { mutableStateOf("") }
     val textNameEg = stringResource(R.string.m_name)
     var mobNo = rememberSaveable { mutableStateOf("") }
     val enterMobile = stringResource(R.string.enter_here)
     val selectedResidence = remember { mutableStateOf("") }
     val residenceOptions = listOf(URBAN, RURAL)
-    var selectedProfession = stringResource(R.string.choose_option)
+    var selectedFProfession = stringResource(R.string.choose_option)
+    var selectedMProfession = stringResource(R.string.choose_option)
+    var loggerProfessionMsg = stringResource(R.string.f_occupation)
+    var loggerMProfessionMsg = stringResource(R.string.m_occupation)
+    var professionFName by remember { mutableStateOf("") }
+    var professionMName by remember { mutableStateOf("") }
     var selectedEducation = stringResource(R.string.choose_option)
+    var loggerEducationStsMsg = stringResource(R.string.education_status)
+    var educationStsMName by remember { mutableStateOf("") }
     var selectedBoard = stringResource(R.string.choose_option)
+    var loggerBoardMsg = stringResource(R.string.student_board)
+    var boardName by remember { mutableStateOf("") }
     var selectedSchoolType = stringResource(R.string.choose_option)
+    var loggerTypeMsg = stringResource(R.string.type_school)
+    var schoolTypeName by remember { mutableStateOf("") }
+    val professionList = listOf(
+        "Government", "Professional", "Private", "Business"
+    )
+    val educationList = listOf(
+        "Continuous Education",
+        "Pending Education",
+        "Drop Education",
+    )
+    val boardList = listOf(
+        "CBSC",
+        "ICSC",
+        "UP Board",
+    )
+    val schoolTypeList = listOf(
+        "Private",
+        "Government",
+        "State Governments",
+    )
+
+    var fatherProfessionMsg = stringResource(R.string.txt_select_your_father_profession_msg)
+    var motherNameMsg = stringResource(R.string.txt_enter_your_mother_name_msg)
+    var motherProfessionMsg = stringResource(R.string.txt_select_your_mother_profession_msg)
+    var parentMobileNoMsg = stringResource(R.string.txt_enter_your_parent_number_msg)
+    var residenceMsg = stringResource(R.string.txt_select_your_residence_msg)
+    var educationStatusMsg = stringResource(R.string.txt_select_your_education_status_msg)
+    var boardMsg = stringResource(R.string.txt_select_your_board_msg)
+    var schoolTypeMsg = stringResource(R.string.txt_select_your_school_type_msg)
 
     DetailsNoImgBackgroundUi(
         backgroundColor = White,
@@ -160,8 +188,7 @@ fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
                         },
                         modifier = Modifier
                             .padding(
-                                top = 16.dp,
-                                bottom = 8.dp, end = 8.dp
+                                top = 16.dp, bottom = 8.dp, end = 8.dp
                             )
                             .fillMaxWidth(),
                         textAlign = TextAlign.Start,
@@ -175,33 +202,27 @@ fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
                     )
 
                     DropdownMenuUi(listOf(), onItemSelected = {}, modifier = Modifier.clickable {
-                        Log.e("TAG", "Father's Profession ")
-                    }, placeholder = selectedProfession, onClick = {
-//                            schoolListOpen = true
+                        logger.e(loggerProfessionMsg)
+                    }, placeholder = selectedFProfession, onClick = {
                         scope.launch {
-                            isBottomSheetVisible = true // true under development code
+                            isBottomSheetFVisible = true // true under development code
                             sheetState.expand()
                         }
                     })
 
                     SchoolListBottomSheet(
-                        isBottomSheetVisible = isBottomSheetVisible,
+                        isBottomSheetVisible = isBottomSheetFVisible,
                         sheetState = sheetState,
                         onDismiss = {
                             scope.launch { sheetState.hide() }
-                                .invokeOnCompletion { isBottomSheetVisible = false }
+                                .invokeOnCompletion { isBottomSheetFVisible = false }
                         },
-                        onDecline = {
-
-                        },
+                        onDecline = {},
                         onTextSelected = { it ->
-                            /* selectedProfession = it
-                     schoolList.find { it.name == selectedProfession }?.id?.let {
-                         schoolSelectedId.value = it
-                     }*/
-                            "Profession"
+                            selectedFProfession = it
+                            professionFName = selectedFProfession
                         },
-                        professionList.map { it.name }.toList()
+                        professionList.toList()
                     )
 
                     Text(
@@ -213,8 +234,7 @@ fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
                         },
                         modifier = Modifier
                             .padding(
-                                top = 16.dp,
-                                bottom = 8.dp, end = 8.dp
+                                top = 16.dp, bottom = 8.dp, end = 8.dp
                             )
                             .fillMaxWidth(),
                         textAlign = TextAlign.Start,
@@ -245,8 +265,7 @@ fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
                         },
                         modifier = Modifier
                             .padding(
-                                top = 16.dp,
-                                bottom = 8.dp, end = 8.dp
+                                top = 16.dp, bottom = 8.dp, end = 8.dp
                             )
                             .fillMaxWidth(),
                         textAlign = TextAlign.Start,
@@ -260,33 +279,27 @@ fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
                     )
 
                     DropdownMenuUi(listOf(), onItemSelected = {}, modifier = Modifier.clickable {
-                        Log.e("TAG", "Mother's Profession ")
-                    }, placeholder = selectedProfession, onClick = {
-//                            schoolListOpen = true
+                        logger.e(loggerMProfessionMsg)
+                    }, placeholder = selectedMProfession, onClick = {
                         scope.launch {
-                            isBottomSheetVisible = true // true under development code
+                            isBottomSheetMVisible = true // true under development code
                             sheetState.expand()
                         }
                     })
 
                     SchoolListBottomSheet(
-                        isBottomSheetVisible = isBottomSheetVisible,
+                        isBottomSheetVisible = isBottomSheetMVisible,
                         sheetState = sheetState,
                         onDismiss = {
                             scope.launch { sheetState.hide() }
-                                .invokeOnCompletion { isBottomSheetVisible = false }
+                                .invokeOnCompletion { isBottomSheetMVisible = false }
                         },
-                        onDecline = {
-
-                        },
+                        onDecline = {},
                         onTextSelected = { it ->
-                            /* selectedProfession = it
-                     schoolList.find { it.name == selectedProfession }?.id?.let {
-                         schoolSelectedId.value = it
-                     }*/
-                            "Profession"
+                            selectedMProfession = it
+                            professionMName = selectedMProfession
                         },
-                        professionList.map { it.name }.toList()
+                        professionList.toList()
                     )
 
                     Text(
@@ -298,8 +311,7 @@ fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
                         },
                         modifier = Modifier
                             .padding(
-                                top = 16.dp,
-                                bottom = 8.dp, end = 8.dp
+                                top = 16.dp, bottom = 8.dp, end = 8.dp
                             )
                             .fillMaxWidth(),
                         textAlign = TextAlign.Start,
@@ -330,8 +342,7 @@ fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
                         },
                         modifier = Modifier
                             .padding(
-                                top = 16.dp,
-                                bottom = 8.dp, end = 8.dp
+                                top = 16.dp, bottom = 8.dp, end = 8.dp
                             )
                             .fillMaxWidth(),
                         textAlign = TextAlign.Start,
@@ -354,8 +365,7 @@ fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
                                 ResidenceOption(
                                     residence = residence,
                                     isSelected = selectedResidence.value == residence,
-                                    onSelected = { selectedResidence.value = residence }
-                                )
+                                    onSelected = { selectedResidence.value = residence })
                             }
                         }
                     }
@@ -369,8 +379,7 @@ fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
                         },
                         modifier = Modifier
                             .padding(
-                                top = 16.dp,
-                                bottom = 8.dp, end = 8.dp
+                                top = 16.dp, bottom = 8.dp, end = 8.dp
                             )
                             .fillMaxWidth(),
                         textAlign = TextAlign.Start,
@@ -384,33 +393,27 @@ fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
                     )
 
                     DropdownMenuUi(listOf(), onItemSelected = {}, modifier = Modifier.clickable {
-                        Log.e("TAG", "Education Status")
+                        logger.e(loggerEducationStsMsg)
                     }, placeholder = selectedEducation, onClick = {
-//                            schoolListOpen = true
                         scope.launch {
-                            isBottomSheetVisible = true // true under development code
+                            isBottomSheetEdVisible = true // true under development code
                             sheetState.expand()
                         }
                     })
 
                     SchoolListBottomSheet(
-                        isBottomSheetVisible = isBottomSheetVisible,
+                        isBottomSheetVisible = isBottomSheetEdVisible,
                         sheetState = sheetState,
                         onDismiss = {
                             scope.launch { sheetState.hide() }
-                                .invokeOnCompletion { isBottomSheetVisible = false }
+                                .invokeOnCompletion { isBottomSheetEdVisible = false }
                         },
-                        onDecline = {
-
-                        },
+                        onDecline = {},
                         onTextSelected = { it ->
-                            /* selectedEducation = it
-                            schoolList.find { it.name == selectedEducation }?.id?.let {
-                                schoolSelectedId.value = it
-                            } */
-                            "Education Status"
+                            selectedEducation = it
+                            educationStsMName = selectedEducation
                         },
-                        educationList.map { it.name }.toList()
+                        educationList.toList()
                     )
 
                     Text(
@@ -422,8 +425,7 @@ fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
                         },
                         modifier = Modifier
                             .padding(
-                                top = 16.dp,
-                                bottom = 8.dp, end = 8.dp
+                                top = 16.dp, bottom = 8.dp, end = 8.dp
                             )
                             .fillMaxWidth(),
                         textAlign = TextAlign.Start,
@@ -437,33 +439,29 @@ fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
                     )
 
                     DropdownMenuUi(listOf(), onItemSelected = {}, modifier = Modifier.clickable {
-                        Log.e("TAG", "Board")
+                        logger.e(loggerBoardMsg)
                     }, placeholder = selectedBoard, onClick = {
-//                            schoolListOpen = true
                         scope.launch {
-                            isBottomSheetVisible = true // true under development code
+                            isBottomSheetBoardVisible = true // true under development code
                             sheetState.expand()
                         }
                     })
 
                     SchoolListBottomSheet(
-                        isBottomSheetVisible = isBottomSheetVisible,
+                        isBottomSheetVisible = isBottomSheetBoardVisible,
                         sheetState = sheetState,
                         onDismiss = {
                             scope.launch { sheetState.hide() }
-                                .invokeOnCompletion { isBottomSheetVisible = false }
+                                .invokeOnCompletion { isBottomSheetBoardVisible = false }
                         },
                         onDecline = {
 
                         },
                         onTextSelected = { it ->
-                            /* selectedBoard = it
-                            schoolList.find { it.name == selectedBoard }?.id?.let {
-                                schoolSelectedId.value = it
-                            } */
-                            "Board"
+                            selectedBoard = it
+                            boardName = selectedBoard
                         },
-                        boardList.map { it.name }.toList()
+                        boardList.toList()
                     )
 
                     Text(
@@ -475,8 +473,7 @@ fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
                         },
                         modifier = Modifier
                             .padding(
-                                top = 16.dp,
-                                bottom = 8.dp, end = 8.dp
+                                top = 16.dp, bottom = 8.dp, end = 8.dp
                             )
                             .fillMaxWidth(),
                         textAlign = TextAlign.Start,
@@ -490,38 +487,36 @@ fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
                     )
 
                     DropdownMenuUi(listOf(), onItemSelected = {}, modifier = Modifier.clickable {
-                        Log.e("TAG", "Type of School")
+                        logger.e(loggerTypeMsg)
                     }, placeholder = selectedSchoolType, onClick = {
-//                            schoolListOpen = true
                         scope.launch {
-                            isBottomSheetVisible = true // true under development code
+                            isBottomSheetSchoolTypeVisible = true // true under development code
                             sheetState.expand()
                         }
                     })
 
                     SchoolListBottomSheet(
-                        isBottomSheetVisible = isBottomSheetVisible,
+                        isBottomSheetVisible = isBottomSheetSchoolTypeVisible,
                         sheetState = sheetState,
                         onDismiss = {
                             scope.launch { sheetState.hide() }
-                                .invokeOnCompletion { isBottomSheetVisible = false }
+                                .invokeOnCompletion { isBottomSheetSchoolTypeVisible = false }
                         },
                         onDecline = {
 
                         },
                         onTextSelected = { it ->
-                            /* selectedSchoolType = it
-                            schoolList.find { it.name == selectedSchoolType }?.id?.let {
-                                schoolSelectedId.value = it
-                            } */
-                            "Type of School"
+                            selectedSchoolType = it
+                            schoolTypeName = selectedSchoolType
                         },
-                        boardList.map { it.name }.toList()
+                        schoolTypeList.toList()
                     )
 
                     Box(
                         modifier = Modifier
-                            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 16.dp)
+                            .padding(
+                                start = 16.dp, end = 16.dp, top = 16.dp, bottom = 16.dp
+                            )
                             .wrapContentSize(Alignment.Center)
                             .background(
                                 color = if (isSystemInDarkTheme()) {
@@ -535,8 +530,7 @@ fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(color = White)
-                                .wrapContentHeight(),
-                            verticalAlignment = Alignment.CenterVertically
+                                .wrapContentHeight(), verticalAlignment = Alignment.CenterVertically
                         ) {
                             TextWithIconOnLeft(
                                 text = stringResource(R.string.txt_Previous),
@@ -555,10 +549,27 @@ fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
                                 enabled = true,
                                 title = stringResource(R.string.add_student),
                                 onClick = {
-                                    navHostController.popBackStack()
-                                    navHostController.navigate(AppRoute.ScreeningScreen.route)
-                                }
-                            )
+                                    if (professionFName.toString().isEmpty()) {
+                                        context.toast(fatherProfessionMsg)
+                                    } else if (mothersName.value.toString().isEmpty()) {
+                                        context.toast(motherNameMsg)
+                                    } else if (professionMName.toString().isEmpty()) {
+                                        context.toast(motherProfessionMsg)
+                                    } else if (mobNo.value.toString().isEmpty()) {
+                                        context.toast(parentMobileNoMsg)
+                                    } else if (selectedResidence.value.toString().isEmpty()) {
+                                        context.toast(residenceMsg)
+                                    } else if (educationStsMName.toString().isEmpty()) {
+                                        context.toast(educationStatusMsg)
+                                    } else if (boardName.toString().isEmpty()) {
+                                        context.toast(boardMsg)
+                                    } else if (schoolTypeName.toString().isEmpty()) {
+                                        context.toast(schoolTypeMsg)
+                                    } else {
+                                        navHostController.popBackStack()
+                                        navHostController.navigate(AppRoute.ScreeningScreen.route)
+                                    }
+                                })
                         }
                     }
                 }
