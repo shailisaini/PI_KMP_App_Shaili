@@ -60,7 +60,6 @@ import androidx.navigation.NavHostController
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_TITLE_TEXT
-import com.pi.ProjectInclusion.DarkBlue
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight02
@@ -641,13 +640,13 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                 shape = RoundedCornerShape(8.dp),
                                 elevation = CardDefaults.cardElevation(4.dp),
                                 colors = if (isSystemInDarkTheme()) {
-                                    CardDefaults.cardColors(DarkBlue)
+                                    CardDefaults.cardColors(PrimaryBlue)
                                 } else {
                                     CardDefaults.cardColors(
-                                        containerColor = DarkBlue,
-                                        contentColor = DarkBlue,
-                                        disabledContentColor = DarkBlue,
-                                        disabledContainerColor = DarkBlue
+                                        containerColor = PrimaryBlue,
+                                        contentColor = PrimaryBlue,
+                                        disabledContentColor = PrimaryBlue,
+                                        disabledContainerColor = PrimaryBlue
                                     )
                                 }
                             ) {

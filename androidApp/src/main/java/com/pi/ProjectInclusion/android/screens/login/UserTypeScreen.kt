@@ -68,8 +68,7 @@ import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
-import com.pi.ProjectInclusion.PrimaryBlue1
-import com.pi.ProjectInclusion.PrimaryBlueLt
+import com.pi.ProjectInclusion.PrimaryBlueLt1
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
@@ -276,7 +275,7 @@ fun UserTypeCard(
         if (isSystemInDarkTheme()) {
             Dark_Selected_BG
         } else {
-            PrimaryBlueLt
+            PrimaryBlueLt1
         }
     } else {
         if (isSystemInDarkTheme()) {
