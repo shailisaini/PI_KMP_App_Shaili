@@ -15,13 +15,13 @@ val Transparent = Color(0x00000000)
 val SemiTransparent = Color(0xAA000000)
 
 
-val PrimaryBlue = Color(0xFF2C3EA2) // #2C3EA2
+val PrimaryBlue = Color(0xFF101942)
+val BorderBlue = Color(0xFF2C3EA2)
 val PrimaryBlue1 = Color(0xFF75CDFA)
 val PrimaryBlue2 = Color(0xFFDFF4FF)
 val PrimaryBlue3 = Color(0xFFF0F9FF) //#F0F9FF
 val PrimaryBlueLt = Color(0xFFF2FBFF)
 val PrimaryBlueLt1 = Color(0xFFE6E9FF) // #E6E9FF
-val DarkBlue = Color(0xFF101942) //#101942
 val LightBlue = Color(0xFF5E72E7) //#5E72E7
 val Black = Color(0xFF111111)
 val Gray = Color(0xFF808080) // gray // #808080
@@ -72,7 +72,8 @@ val LightOrange = Color(0xFFFFF7F2) // #FFF7F2
 val LightOrange1 = Color(0xFFF3D4D4) // #F3D4D4
 val LightOrange2 = Color(0xFFCD6C27) // #CD6C27
 
-val DarkRed1 = Color(0xFFB12F30)
+val RedText = Color(0xFFFF1A1A)
+val RedBgColor = Color(0xFFFFE9E9)
 val DarkRed2 = Color(0xFFD76B66)
 val LightRed01 = Color(0xFFF2566D)
 val LightRed02 = Color(0xFFFEECEB)

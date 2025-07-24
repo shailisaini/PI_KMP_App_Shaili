@@ -24,7 +24,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -64,13 +63,11 @@ import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Dark_02
 import com.pi.ProjectInclusion.Gray
-import com.pi.ProjectInclusion.GrayLight01
 import com.pi.ProjectInclusion.PrimaryBlue
-import com.pi.ProjectInclusion.PrimaryBlueLt
+import com.pi.ProjectInclusion.PrimaryBlueLt1
 import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
-import com.pi.ProjectInclusion.android.common_UI.ChooseOneBottomSheet
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
@@ -158,14 +155,14 @@ fun CreateNewPasswordUI(navController: NavHostController) {
                 Card(
                     modifier = Modifier
                         .padding(8.dp)
-                        .background(color = PrimaryBlueLt)
+                        .background(color = PrimaryBlueLt1)
                         .wrapContentSize(),
                     elevation = CardDefaults.cardElevation(1.dp),
                     colors = CardDefaults.cardColors(
                         if (isSystemInDarkTheme()) {
                             Dark_02
                         } else {
-                            PrimaryBlueLt
+                            PrimaryBlueLt1
                         }
                     ),
                     border = BorderStroke(width = 1.dp, PrimaryBlue),
@@ -596,7 +593,7 @@ fun SelectUserBottomSheet(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(color = PrimaryBlueLt),
+                            .background(color = PrimaryBlueLt1),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Column(

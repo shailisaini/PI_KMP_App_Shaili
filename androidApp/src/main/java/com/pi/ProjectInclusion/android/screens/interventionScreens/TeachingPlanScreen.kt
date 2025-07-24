@@ -32,10 +32,10 @@ import androidx.navigation.NavHostController
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_TITLE_TEXT
-import com.pi.ProjectInclusion.DarkBlue
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight02
+import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
@@ -50,7 +50,7 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 fun TeachingPlanScreen(navHostController: NavHostController) {
 
     DetailsNoImgBackgroundUi(
-        backgroundColor = DarkBlue,
+        backgroundColor = PrimaryBlue,
         pageTitle = stringResource(R.string.txt_Teaching_Plan),
         moreInfoIcon = painterResource(id = R.drawable.close_img),
         isShowBackButton = true,

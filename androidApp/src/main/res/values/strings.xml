@@ -252,7 +252,14 @@ and make a difference together!</string>
     <string name="txt_cancel">Cancel</string>
     <string name="txt_submit">Submit</string>
     <string name="txt_remove">Remove</string>
+    <string name="txt_request_submitted">Request submitted</string>
+    <string name="txt_close">Close</string>
+    <string name="txt_name_change_desc">You can request a name change if your current name is incorrect or needs to be updated. Our team will review and verify your request before making any changes.</string>
+    <string name="txt_check_status">Check Status</string>
+    <string name="txt_yes_proceed">Yes! Proceed</string>
     <string name="txt_choose_to_upload">Choose option to upload file</string>
+    <string name="txt_request_note">Note : You can change your name only once.</string>
+    <string name="txt_submit_review">Your request has been submitted for review. You will be notified within 2–3 days.</string>
     <string name="txt_choose_supported_format">Supported format: JPG, PNG, PDF &amp; Max Size: 2mb</string>
     <string name="txt_school_id_front">School ID card (front only) \nAuthorization letter from the school</string>
     <string name="txt_upload_clear_id_school">Please upload a clear image of the front side of any one valid ID for school verification</string>
