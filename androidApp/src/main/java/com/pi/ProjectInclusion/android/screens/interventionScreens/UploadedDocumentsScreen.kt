@@ -35,9 +35,9 @@ import androidx.navigation.NavHostController
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_TITLE_TEXT
-import com.pi.ProjectInclusion.DarkBlue
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Gray
+import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
@@ -79,7 +79,7 @@ fun UploadedDocumentsScreen(navHostController: NavHostController) {
     )
 
     DetailsNoImgBackgroundUi(
-        backgroundColor = DarkBlue,
+        backgroundColor = PrimaryBlue,
         pageTitle = stringResource(R.string.txt_Documents),
         moreInfoIcon = painterResource(id = R.drawable.more_info_img),
         isShowBackButton = true,
@@ -125,7 +125,7 @@ fun UploadedDocumentsDataUI(data: DocumentsData, controller: NavHostController) 
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(1.dp),
         colors = if (isSystemInDarkTheme()) {
-            CardDefaults.cardColors(DarkBlue)
+            CardDefaults.cardColors(PrimaryBlue)
         } else {
             CardDefaults.cardColors(
                 containerColor = White,

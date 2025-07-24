@@ -62,14 +62,14 @@ import coil.size.Size
 import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Bg_Gray1
 import com.pi.ProjectInclusion.Black
+import com.pi.ProjectInclusion.BorderBlue
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Dark_02
 import com.pi.ProjectInclusion.Dark_Selected_BG
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
-import com.pi.ProjectInclusion.PrimaryBlue
-import com.pi.ProjectInclusion.PrimaryBlueLt
+import com.pi.ProjectInclusion.PrimaryBlueLt1
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.navigation.AppRoute
@@ -249,7 +249,7 @@ fun ItemLanguageCard(
         if (isSystemInDarkTheme()) {
             PRIMARY_AURO_BLUE
         } else {
-            PrimaryBlue
+            BorderBlue
         }
     ) else BorderStroke(
         width = 0.5.dp, if (isSystemInDarkTheme()) {
@@ -262,7 +262,7 @@ fun ItemLanguageCard(
         if (isSystemInDarkTheme()) {
             Dark_Selected_BG
         } else {
-            PrimaryBlueLt
+            PrimaryBlueLt1
         }
     } else {
         if (isSystemInDarkTheme()) {

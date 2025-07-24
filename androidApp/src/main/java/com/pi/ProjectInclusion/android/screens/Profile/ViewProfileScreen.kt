@@ -3,10 +3,10 @@
 package com.pi.ProjectInclusion.android.screens.dashboardScreen
 
 import android.Manifest
-import android.R.attr.maxWidth
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -23,19 +23,15 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetDefaults
@@ -51,7 +47,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -71,7 +66,6 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -82,40 +76,38 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import co.touchlab.kermit.Logger
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.kmptemplate.logger.AppLoggerImpl
+import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Bg_Gray1
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.BlueBackground2
-import com.pi.ProjectInclusion.DARK_TITLE_TEXT
-import com.pi.ProjectInclusion.DarkBlue
+import com.pi.ProjectInclusion.BorderBlue
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Dark_02
 import com.pi.ProjectInclusion.Dark_03
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight01
 import com.pi.ProjectInclusion.GrayLight02
-import com.pi.ProjectInclusion.GrayLight03
 import com.pi.ProjectInclusion.GrayLight04
 import com.pi.ProjectInclusion.LightText
 import com.pi.ProjectInclusion.LightYellow02
 import com.pi.ProjectInclusion.OrangeSubTitle
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlue3
+import com.pi.ProjectInclusion.RedBgColor
+import com.pi.ProjectInclusion.RedText
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.ProfileWithProgress
-import com.pi.ProjectInclusion.android.common_UI.SmallBtnUi
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
-import com.pi.ProjectInclusion.android.common_UI.createImageUri
 import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
@@ -132,7 +124,6 @@ fun ViewProfileScreen(navController: NavHostController) {
 
     var isDialogVisible by remember { mutableStateOf(false) }
 
-    val logger = AppLoggerImpl()
     val query by rememberSaveable {
         mutableStateOf("")
     }
@@ -164,6 +155,8 @@ fun ViewProfileScreen(navController: NavHostController) {
             // Handle exception
         }
     }
+
+    LoggerProvider.logger.d("Screen: " + "ViewProfileScreen()")
     Surface(
         modifier = Modifier.fillMaxWidth(), color = White
     ) {
@@ -271,14 +264,14 @@ fun ProfileViewUI(
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = White,
-                            contentColor = PrimaryBlue
+                            contentColor = BorderBlue
                         ),
-                        border = BorderStroke(1.dp, color = PrimaryBlue)
+                        border = BorderStroke(1.dp, color = BorderBlue)
                     ) {
                         TextWithIconOnLeft(
                             text = stringResource(R.string.edit_profile),
                             icon = ImageVector.vectorResource(id = R.drawable.ic_edit_profile),
-                            textColor = Black,
+                            textColor = BorderBlue,
                             iconColor = Color.Unspecified,
                             onClick = {
                                 navController.navigate(AppRoute.EditProfileScreen.route)
@@ -324,7 +317,7 @@ fun ProfileViewUI(
                                     moreSpace = true,
                                     text = stringResource(R.string.txt_eg_whatsapp_name),
                                     icon = ImageVector.vectorResource(id = R.drawable.calendar_blue),
-                                    textColor = DarkBlue,
+                                    textColor = PrimaryBlue,
                                     iconColor = Color.Unspecified,
                                     onClick = {
 
@@ -334,7 +327,7 @@ fun ProfileViewUI(
                                     moreSpace = true,
                                     text = stringResource(R.string.txt_eg_whatsapp_name),
                                     icon = ImageVector.vectorResource(id = R.drawable.ic_call_blue),
-                                    textColor = DarkBlue,
+                                    textColor = PrimaryBlue,
                                     iconColor = Color.Unspecified,
                                     onClick = {
 
@@ -344,7 +337,7 @@ fun ProfileViewUI(
                                     moreSpace = true,
                                     text = stringResource(R.string.txt_eg_whatsapp_name),
                                     icon = ImageVector.vectorResource(id = R.drawable.ic_whatsapp_blue),
-                                    textColor = DarkBlue,
+                                    textColor = PrimaryBlue,
                                     iconColor = Color.Unspecified,
                                     onClick = {
 
@@ -421,7 +414,7 @@ fun ProfileViewUI(
                                     textAlign = TextAlign.End,
                                     fontSize = 14.sp,
                                     fontFamily = fontMedium,
-                                    color = DarkBlue
+                                    color = PrimaryBlue
                                 )
                             }
                         }
@@ -465,7 +458,7 @@ fun ProfileViewUI(
                                     textAlign = TextAlign.End,
                                     fontSize = 15.sp,
                                     fontFamily = fontMedium,
-                                    color = DarkBlue
+                                    color = PrimaryBlue
                                 )
                             }
                             Row(
@@ -489,7 +482,7 @@ fun ProfileViewUI(
                                     textAlign = TextAlign.End,
                                     fontSize = 15.sp,
                                     fontFamily = fontMedium,
-                                    color = DarkBlue
+                                    color = PrimaryBlue
                                 )
                             }
                             Row(
@@ -513,7 +506,7 @@ fun ProfileViewUI(
                                     textAlign = TextAlign.End,
                                     fontSize = 15.sp,
                                     fontFamily = fontMedium,
-                                    color = DarkBlue
+                                    color = PrimaryBlue
                                 )
                             }
                             Row(
@@ -542,7 +535,7 @@ fun ProfileViewUI(
                                     textAlign = TextAlign.End,
                                     fontSize = 15.sp,
                                     fontFamily = fontMedium,
-                                    color = DarkBlue
+                                    color = PrimaryBlue
                                 )
                             }
 
@@ -584,16 +577,16 @@ fun ProfileViewUI(
                                     shape = RoundedCornerShape(8.dp),
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = White,
-                                        contentColor = PrimaryBlue
+                                        contentColor = BorderBlue
                                     ),
-                                    border = BorderStroke(1.dp, color = PrimaryBlue)
+                                    border = BorderStroke(1.dp, color = BorderBlue)
                                 ) {
                                     Text(
                                         stringResource(R.string.txt_change_request),
                                         textAlign = TextAlign.Start,
                                         fontSize = 13.sp,
                                         fontFamily = fontMedium,
-                                        color = PrimaryBlue
+                                        color = BorderBlue
                                     )
                                 }
                             }
@@ -747,7 +740,7 @@ fun ChangeRequestSheet(
                 uploadShowDialog = false
             }
         } else {
-            UploadIdDialog(stringResource(R.string.txt_upload_clear_id_name)) {
+            NameRequestDialog(stringResource(R.string.txt_name_change)) {
                 uploadShowDialog = false
             }
         }
@@ -874,6 +867,16 @@ fun ChangeRequestSheet(
 @Composable
 fun UploadIdDialog(subText: String = "", onDismiss: () -> Unit = {}) {
     val context = LocalContext.current
+
+    var isSubmitted by remember { mutableStateOf(false) }
+    if (isSubmitted) {
+        RequestSubmittedDialog(
+            stringResource(R.string.txt_request_submitted),
+            stringResource(R.string.txt_submit_review)
+        ) {
+            isSubmitted = false
+        }
+    }
 
     Dialog(onDismissRequest = { onDismiss() }) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
@@ -1020,8 +1023,8 @@ fun UploadIdDialog(subText: String = "", onDismiss: () -> Unit = {}) {
                                     TextWithIconOnLeft(
                                         text = stringResource(R.string.txt_remove),
                                         icon = ImageVector.vectorResource(id = R.drawable.ic_delete),
-                                        textColor = PrimaryBlue,
-                                        iconColor = PrimaryBlue,
+                                        textColor = BorderBlue,
+                                        iconColor = BorderBlue,
                                         onClick = {
                                             selectedUri.value = null
                                         }
@@ -1038,7 +1041,7 @@ fun UploadIdDialog(subText: String = "", onDismiss: () -> Unit = {}) {
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Button(
-                            onClick = { },
+                            onClick = { onDismiss },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f)
@@ -1047,30 +1050,41 @@ fun UploadIdDialog(subText: String = "", onDismiss: () -> Unit = {}) {
                             shape = RoundedCornerShape(8.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = White,
-                                contentColor = PrimaryBlue
+                                contentColor = BorderBlue
                             ),
-                            border = BorderStroke(1.dp, PrimaryBlue)
+                            border = BorderStroke(1.dp, BorderBlue)
                         ) {
                             Text(
                                 text = stringResource(R.string.txt_cancel),
                                 fontSize = 16.sp,
                                 fontFamily = fontMedium,
-                                color = PrimaryBlue
+                                color = BorderBlue
                             )
                         }
                         Button(
-                            onClick = { },
+                            onClick = {
+                                if (selectedUri.value != null) {
+                                    isSubmitted = false
+                                }
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f)
                                 .padding(end = 8.dp)
                                 .clip(RoundedCornerShape(8.dp)),
                             shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue,
-                                contentColor = com.pi.ProjectInclusion.White
-                            ),
-                            border = BorderStroke(1.dp, PrimaryBlue)
+                            colors = if (selectedUri.value != null) {
+                                ButtonDefaults.buttonColors(
+                                    containerColor = PrimaryBlue,
+                                    contentColor = com.pi.ProjectInclusion.White
+                                )
+                            } else {
+                                ButtonDefaults.buttonColors(
+                                    containerColor = Gray,
+                                    contentColor = White
+                                )
+                            },
+                            enabled = selectedUri.value != null
                         ) {
                             Text(
                                 text = stringResource(R.string.txt_submit),
@@ -1137,7 +1151,7 @@ fun CameraGalleryButtons(
         val contentValues = ContentValues().apply {
             put(
                 MediaStore.Images.Media.DISPLAY_NAME,
-                PI_DOCUMENT+System.currentTimeMillis()+JPG
+                PI_DOCUMENT + System.currentTimeMillis() + JPG
             )
             put(MediaStore.Images.Media.MIME_TYPE, IMAGE_MIME)
         }
@@ -1205,6 +1219,253 @@ fun CameraGalleryButtons(
                     galleryLauncher.launch(IMAGE_ALL_TYPE)
                 }
             )
+        }
+    }
+}
+
+@SuppressLint("UnusedBoxWithConstraintsScope")
+@Preview
+@Composable
+fun RequestSubmittedDialog(title: String = "", subText: String = "", onDismiss: () -> Unit = {}) {
+    val context = LocalContext.current
+
+    Dialog(onDismissRequest = { onDismiss() }) {
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            var selectedUri = remember { mutableStateOf<Uri?>(null) }
+
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(if (isSystemInDarkTheme()) Dark_02 else White)
+                    .fillMaxWidth()
+
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(vertical = 15.dp, horizontal = 8.dp)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_request_submitted),
+                        contentDescription = IMG_DESCRIPTION,
+                        modifier = Modifier.size(60.dp),
+                        tint = Color.Unspecified
+                    )
+
+                    Text(
+                        text = title,
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .padding(top = 16.dp, start = 8.dp, end = 8.dp),
+                        fontFamily = fontBold,
+                        fontSize = 19.sp,
+                        color = Black,
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        text = subText,
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .padding(top = 3.dp, start = 8.dp, end = 8.dp),
+                        fontFamily = fontRegular,
+                        fontSize = 15.sp,
+                        color = GrayLight04,
+                        textAlign = TextAlign.Center
+                    )
+                    Row(
+                        modifier = Modifier
+                            .padding(vertical = 15.dp, horizontal = 5.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+
+                    ) {
+                        Button(
+                            onClick = {
+                                onDismiss()
+                                context.startActivity(
+                                    Intent(
+                                        context,
+                                        StudentDashboardActivity::class.java
+                                    )
+                                )
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .padding(end = 8.dp)
+                                .clip(RoundedCornerShape(8.dp)),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = White,
+                                contentColor = BorderBlue
+                            ),
+                            border = BorderStroke(1.dp, BorderBlue)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.txt_close),
+                                fontSize = 16.sp,
+                                fontFamily = fontMedium,
+                                color = BorderBlue
+                            )
+                        }
+                        // check Status
+                        Button(
+                            onClick = { },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .padding(end = 8.dp)
+                                .clip(RoundedCornerShape(8.dp)),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = PrimaryBlue,
+                                contentColor = White
+                            ),
+                            border = BorderStroke(1.dp, BorderBlue)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.txt_check_status),
+                                fontSize = 16.sp,
+                                fontFamily = fontMedium,
+                                color = White,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun NameRequestDialog(title: String = "", onDismiss: () -> Unit = {}) {
+    val context = LocalContext.current
+    var uploadShowDialog by remember { mutableStateOf(false) }
+    if (uploadShowDialog) {
+        UploadIdDialog(stringResource(R.string.txt_upload_clear_id_school)) {
+            uploadShowDialog = false
+        }
+    }
+
+    Dialog(onDismissRequest = { onDismiss() }) {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(20.dp))
+                .background(if (isSystemInDarkTheme()) Dark_02 else White)
+                .fillMaxWidth()
+
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(vertical = 15.dp, horizontal = 8.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = title,
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .padding(top = 16.dp, start = 8.dp, end = 8.dp),
+                    fontFamily = fontBold,
+                    fontSize = 19.sp,
+                    color = Black,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = stringResource(R.string.txt_name_change_desc),
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .padding(top = 3.dp, start = 8.dp, end = 8.dp),
+                    fontFamily = fontRegular,
+                    fontSize = 15.sp,
+                    color = Gray,
+                    textAlign = TextAlign.Center
+                )
+
+                Column(
+                    modifier = Modifier
+                        .padding(15.dp)
+                        .fillMaxWidth()
+                        .background(color = RedBgColor)
+                        .clip(RoundedCornerShape(8.dp)),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(R.string.txt_request_note),
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .padding(5.dp),
+                        fontFamily = fontRegular,
+                        fontSize = 12.sp,
+                        color = RedText,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .padding(vertical = 15.dp, horizontal = 5.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(
+                        onClick = {
+                            onDismiss()
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .padding(end = 8.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = White,
+                            contentColor = PrimaryBlue
+                        ),
+                        border = BorderStroke(1.dp, BorderBlue)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.txt_close),
+                            fontSize = 16.sp,
+                            fontFamily = fontMedium,
+                            color = BorderBlue,
+                        )
+                    }
+
+                    // check Status
+                    Button(
+                        onClick = {
+                            uploadShowDialog = true
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .padding(end = 8.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = PrimaryBlue,
+                            contentColor = White
+                        ),
+                        border = BorderStroke(1.dp, BorderBlue)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.txt_yes_proceed),
+                            fontSize = 16.sp,
+                            fontFamily = fontMedium,
+                            color = White,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
         }
     }
 }

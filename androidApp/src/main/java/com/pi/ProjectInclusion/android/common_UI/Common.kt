@@ -6,10 +6,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
 import android.provider.MediaStore
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -51,7 +48,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -78,7 +74,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -124,16 +119,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
 import com.pi.ProjectInclusion.DARK_TITLE_TEXT
-import com.pi.ProjectInclusion.DarkBlue
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Dark_02
 import com.pi.ProjectInclusion.Dark_03
@@ -157,7 +149,6 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import kotlinx.coroutines.delay
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_FEMALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_MALE
-import java.io.File
 import java.util.Calendar
 
 fun BackButtonPress(navController: NavHostController, route: String) {
@@ -639,7 +630,7 @@ fun SmallBtnUi(
                 if (isSystemInDarkTheme()) {
                     Dark_Selected_BG
                 } else {
-                    DarkBlue
+                    PrimaryBlue
                 }
             } else {
                 if (isSystemInDarkTheme()) {
@@ -688,7 +679,7 @@ fun BtnUi(
                 if (isSystemInDarkTheme()) {
                     Dark_Selected_BG
                 } else {
-                    DarkBlue
+                    PrimaryBlue
                 }
             } else {
                 if (isSystemInDarkTheme()) {
@@ -737,7 +728,7 @@ fun BtnWithRightIconUi(
                 if (isSystemInDarkTheme()) {
                     Dark_Selected_BG
                 } else {
-                    DarkBlue
+                    PrimaryBlue
                 }
             } else {
                 if (isSystemInDarkTheme()) {
@@ -796,7 +787,7 @@ fun YesBtnUi(
                 if (isSystemInDarkTheme()) {
                     Dark_Selected_BG
                 } else {
-                    DarkBlue
+                    PrimaryBlue
                 }
             } else {
                 if (isSystemInDarkTheme()) {
@@ -1401,9 +1392,9 @@ fun DetailsBackgroundUi(
                 .fillMaxSize()
                 .background(
                     color = if (isSystemInDarkTheme()) {
-                        DarkBlue
+                        PrimaryBlue
                     } else {
-                        DarkBlue
+                        PrimaryBlue
                     }
                 ), verticalArrangement = Arrangement.Top
         ) {
@@ -1413,9 +1404,9 @@ fun DetailsBackgroundUi(
                     .fillMaxWidth()
                     .background(
                         color = if (isSystemInDarkTheme()) {
-                            DarkBlue
+                            PrimaryBlue
                         } else {
-                            DarkBlue
+                            PrimaryBlue
                         }
                     ),
                 verticalAlignment = Alignment.CenterVertically,
@@ -1460,9 +1451,9 @@ fun DetailsBackgroundUi(
                     Column(
                         modifier = Modifier.background(
                             color = if (isSystemInDarkTheme()) {
-                                DarkBlue
+                                PrimaryBlue
                             } else {
-                                DarkBlue
+                                PrimaryBlue
                             }
                         )
                     ) {
@@ -1550,7 +1541,7 @@ fun DetailsBackgroundUi(
 @Preview
 @Composable
 fun DetailsNoImgBackgroundUi(
-    backgroundColor: Color = DarkBlue,
+    backgroundColor: Color = PrimaryBlue,
     textColor: Color = White,
     pageTitle: String = "",
     moreInfoIcon: Painter = painterResource(R.drawable.close_img),
@@ -1569,7 +1560,7 @@ fun DetailsNoImgBackgroundUi(
                 .fillMaxSize()
                 .background(
                     color = if (isSystemInDarkTheme()) {
-                        DarkBlue
+                        PrimaryBlue
                     } else {
                         backgroundColor
                     }
@@ -1581,7 +1572,7 @@ fun DetailsNoImgBackgroundUi(
                     .fillMaxWidth()
                     .background(
                         color = if (isSystemInDarkTheme()) {
-                            DarkBlue
+                            PrimaryBlue
                         } else {
                             backgroundColor
                         }
