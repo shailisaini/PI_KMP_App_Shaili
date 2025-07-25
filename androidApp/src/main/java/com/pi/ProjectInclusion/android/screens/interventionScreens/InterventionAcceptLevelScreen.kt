@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_TITLE_TEXT
@@ -70,6 +71,8 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 
 @Composable
 fun InterventionAcceptLevelScreen(navHostController: NavHostController) {
+
+    logger.d("Screen: " + "InterventionAcceptLevelScreen()")
 
     val selectedBorder = BorderStroke(
         width = 1.dp, if (isSystemInDarkTheme()) {

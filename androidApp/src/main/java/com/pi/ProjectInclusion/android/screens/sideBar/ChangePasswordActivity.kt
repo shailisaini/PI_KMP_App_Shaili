@@ -49,6 +49,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.compose.rememberNavController
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Bg_Gray
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
@@ -70,6 +71,8 @@ class ChangePasswordActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme {
+                logger.d("Screen: " + "ChangePasswordActivity()")
+
                 val navController = rememberNavController()
                 val context = LocalContext.current
                 var enterOldPasswordStr = rememberSaveable { mutableStateOf("") }
