@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.kmptemplate.logger.LoggerProvider
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Bg_Gray
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
@@ -54,6 +55,8 @@ import okhttp3.Route
 
 @Composable
 fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewModel) {
+
+    logger.d("Screen: " + "SetNewPasswordScreen()")
 
     val context = LocalContext.current
     var enterPasswordStr = rememberSaveable { mutableStateOf("") }

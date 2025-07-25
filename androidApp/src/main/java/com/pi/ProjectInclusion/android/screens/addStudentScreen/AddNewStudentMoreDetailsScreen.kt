@@ -52,6 +52,7 @@ import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
+import com.pi.ProjectInclusion.android.common_UI.CustomToastMessage
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.DropdownMenuUi
 import com.pi.ProjectInclusion.android.common_UI.MobileTextField
@@ -71,6 +72,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
+
+    logger.d("Screen: " + "AddNewStudentMoreDetailsScreen()")
 
     val colors = MaterialTheme.colorScheme
     val context = LocalContext.current
@@ -105,22 +108,25 @@ fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
     var loggerTypeMsg = stringResource(R.string.type_school)
     var schoolTypeName by remember { mutableStateOf("") }
     val professionList = listOf(
-        "Government", "Professional", "Private", "Business"
+        stringResource(R.string.txt_Government),
+        stringResource(R.string.txt_Professional),
+        stringResource(R.string.txt_Private),
+        stringResource(R.string.txt_Business)
     )
     val educationList = listOf(
-        "Continuous Education",
-        "Pending Education",
-        "Drop Education",
+        stringResource(R.string.txt_Continuous_Education),
+        stringResource(R.string.txt_Pending_Education),
+        stringResource(R.string.txt_Drop_Education),
     )
     val boardList = listOf(
-        "CBSC",
-        "ICSC",
-        "UP Board",
+        stringResource(R.string.txt_CBSE),
+        stringResource(R.string.txt_ICSE),
+        stringResource(R.string.txt_UP_Board),
     )
     val schoolTypeList = listOf(
-        "Private",
-        "Government",
-        "State Governments",
+        stringResource(R.string.txt_Private),
+        stringResource(R.string.txt_Government),
+        stringResource(R.string.txt_State_Governments),
     )
 
     var fatherProfessionMsg = stringResource(R.string.txt_select_your_father_profession_msg)
@@ -131,6 +137,7 @@ fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
     var educationStatusMsg = stringResource(R.string.txt_select_your_education_status_msg)
     var boardMsg = stringResource(R.string.txt_select_your_board_msg)
     var schoolTypeMsg = stringResource(R.string.txt_select_your_school_type_msg)
+    var showToast by remember { mutableStateOf(false) }
 
     DetailsNoImgBackgroundUi(
         backgroundColor = White,
@@ -566,6 +573,7 @@ fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
                                     } else if (schoolTypeName.toString().isEmpty()) {
                                         context.toast(schoolTypeMsg)
                                     } else {
+                                        showToast = true
                                         navHostController.popBackStack()
                                         navHostController.navigate(AppRoute.ScreeningScreen.route)
                                     }
@@ -575,4 +583,12 @@ fun AddNewStudentMoreDetailsScreen(navHostController: NavHostController) {
                 }
             }
         })
+
+    if (showToast) {
+        CustomToastMessage(
+            titleStr = stringResource(R.string.txt_Student_added),
+            messageStr = stringResource(R.string.txt_Begin_Screening_process),
+            visible = showToast,
+            onClose = { showToast = false })
+    }
 }

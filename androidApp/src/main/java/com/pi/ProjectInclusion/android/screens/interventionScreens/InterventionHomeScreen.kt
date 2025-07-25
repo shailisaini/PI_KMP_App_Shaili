@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.BannerColor03
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
@@ -84,6 +85,8 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun InterventionHomeScreen(navHostController: NavHostController) {
+
+    logger.d("Screen: " + "InterventionHomeScreen()")
 
     val tabItems = listOf(
         TabItem(
