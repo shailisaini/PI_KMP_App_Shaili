@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.BannerColor03
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.BlueBackground3
@@ -100,6 +101,8 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ScreeningHomeScreen(navHostController: NavHostController) {
+
+    logger.d("Screen: " + "ScreeningHomeScreen()")
 
     val selectedBorder = BorderStroke(
         width = 0.5.dp, if (isSystemInDarkTheme()) {

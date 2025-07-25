@@ -40,6 +40,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_TITLE_TEXT
@@ -59,6 +60,8 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun OtpSendVerifyScreen(navController: NavHostController, viewModel: LoginViewModel) {
+
+    logger.d("Screen: " + "OtpSendVerifyScreen()")
 
     var otpValue by remember { mutableStateOf("") }
     var phoneNo by remember { mutableStateOf("") }

@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_TITLE_TEXT
@@ -51,28 +52,30 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 @Composable
 fun UploadedDocumentsScreen(navHostController: NavHostController) {
 
+    logger.d("Screen: " + "UploadedDocumentsScreen()")
+
     val documentsListData = listOf(
         DocumentsData(
-            "ScreeningReport.doc",
-            "28 Jun 2024",
+            stringResource(R.string.txt_ScreeningReport_doc),
+            stringResource(R.string.txt_date),
             painterResource(id = R.drawable.docs_docs_img),
             painterResource(id = R.drawable.docs_preview_img)
         ),
         DocumentsData(
-            "ScreeningReport.pdf",
-            "28 Jun 2024",
+            stringResource(R.string.txt_ScreeningReport_pdf),
+            stringResource(R.string.txt_date),
             painterResource(id = R.drawable.docs_pdf_img),
             painterResource(id = R.drawable.docs_preview_img)
         ),
         DocumentsData(
-            "ScreeningReport.jpg",
-            "28 Jun 2024",
+            stringResource(R.string.txt_ScreeningReport_jpg),
+            stringResource(R.string.txt_date),
             painterResource(id = R.drawable.doc_jpg_img),
             painterResource(id = R.drawable.docs_preview_img)
         ),
         DocumentsData(
-            "ScreeningReport.mp4",
-            "28 Jun 2024",
+            stringResource(R.string.txt_ScreeningReport_mp4),
+            stringResource(R.string.txt_date),
             painterResource(id = R.drawable.doc_video_img),
             painterResource(id = R.drawable.docs_preview_img)
         )
