@@ -1041,7 +1041,7 @@ fun UploadIdDialog(subText: String = "", onDismiss: () -> Unit = {}) {
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Button(
-                            onClick = { onDismiss },
+                            onClick = { onDismiss() },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f)
@@ -1064,7 +1064,7 @@ fun UploadIdDialog(subText: String = "", onDismiss: () -> Unit = {}) {
                         Button(
                             onClick = {
                                 if (selectedUri.value != null) {
-                                    isSubmitted = false
+                                    isSubmitted = true
                                 }
                             },
                             modifier = Modifier

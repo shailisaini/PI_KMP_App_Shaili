@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -14,13 +13,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.getValue
@@ -34,7 +31,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat.startActivity
@@ -43,6 +39,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.navigation.AppRoute
@@ -50,6 +47,7 @@ import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen1
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentDetailsScreen
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentMoreDetailsScreen
 import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen2
+import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.CertificateListActivity
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.DashboardScreen
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.ViewProfileScreen
 import com.pi.ProjectInclusion.android.screens.interventionScreens.InterventionAcceptLevelScreen
@@ -65,6 +63,7 @@ import com.pi.ProjectInclusion.android.screens.menu.MenuItem
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningHomeScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.koin.core.logger.Logger
 
 class StudentDashboardActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -82,8 +81,6 @@ class StudentDashboardActivity : ComponentActivity() {
             val bottomSheetState = rememberStandardBottomSheetState(
                 skipHiddenState = false  // Allow transitioning to hidden state
             )
-            val bottomSheetScaffoldState =
-                rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetState)
             val coroutineScope = rememberCoroutineScope()
             val screenHeight = LocalConfiguration.current.screenHeightDp.dp
             val halfScreenHeight = screenHeight / 2
@@ -106,7 +103,7 @@ class StudentDashboardActivity : ComponentActivity() {
                             // List of Navigation Drawer
                             items = listOf(
                                 MenuItem(
-                                    id = AppRoute.CourseScreen.route,
+                                    id = AppRoute.CertificateScreen.route,
                                     title = stringResource(R.string.certificate_txt),
                                     contentDescription = "",
                                     icon = ImageVector.vectorResource(id = R.drawable.certificate_ic)
@@ -158,16 +155,8 @@ class StudentDashboardActivity : ComponentActivity() {
                                     itemId,
                                     navController,
                                     this@StudentDashboardActivity,
-                                    bottomSheetScaffoldState,
                                     coroutineScope,
-                                    halfScreenHeight,
-                                    sheetPeekHeight
-                                ) {
-                                    sheetPeekHeight = it
-                                    scope.launch {
-                                        drawerState.close()
-                                    }
-                                }
+                                )
                             })
                     }
                 },
@@ -283,33 +272,22 @@ fun onMenuItemClick(
     itemId: String,
     navController: NavHostController,
     studentDashboardActivity: StudentDashboardActivity,
-    bottomSheetScaffoldState: BottomSheetScaffoldState,
-    coroutineScope: CoroutineScope,
-    halfScreenHeight: Dp,
-    currentPeekHeight: Dp,
-    updatePeekHeight: (Dp) -> Unit,
+    coroutineScope: CoroutineScope
 ) {
     // Handle the click event here
     val context = studentDashboardActivity as Context
     when (itemId) {
         AppRoute.CourseScreen.route -> {
-            Log.e("TAG", "Calling   " + "StudentAuthenticationActivity")
             startActivity(
                 context, Intent(context, StudentDashboardActivity::class.java), null
             ).apply { (context as? Activity)?.finish() }
         }
 
-        AppRoute.CourseScreen.route -> {
-            startActivity(
-                context, Intent(context, StudentDashboardActivity::class.java), null
-            ).apply { (context as? Activity)?.finish() }
+        AppRoute.CertificateScreen.route -> {
+            LoggerProvider.logger.d("Screen: CertificateListActivity()" )
+             startActivity(
+                 context, Intent(context, CertificateListActivity::class.java), null
+             ).apply { (context as? Activity)?.finish() }
         }
-
-
     }
 }
-
-
-
-
-

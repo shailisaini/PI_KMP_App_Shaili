@@ -28,4 +28,9 @@ object ConstantVariables {
     var JPG: String = ".jpg"
     var IMAGE_MIME: String = "image/jpeg"
     var IMAGE_ALL_TYPE: String = "image/*"
+
+    // Tabs
+    var ALL: String = "All"
+    var MODULE: String = "Module"
+    var COURSE: String = "Course"
 }

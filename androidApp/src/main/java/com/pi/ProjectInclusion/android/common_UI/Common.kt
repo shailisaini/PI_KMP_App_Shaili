@@ -62,6 +62,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -133,6 +134,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.pi.ProjectInclusion.Bg_Gray2
 import com.pi.ProjectInclusion.Bg_Gray3
 import com.pi.ProjectInclusion.Bg_Gray4
 import com.pi.ProjectInclusion.Black
@@ -1115,29 +1117,33 @@ fun TextWithIconOnLeft(
     onClick: () -> Unit = {},
 ) {
     Row(
-        modifier = modifier.clickable { onClick() },
+        modifier = modifier.clickable { onClick() }
+            .wrapContentSize(),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
     ) {
         Icon(
             imageVector = icon, contentDescription = null, // Decorative element
             tint = iconColor
         )
 
-        Spacer(modifier = Modifier.width(4.dp)) // Add space between text and icon
         if (moreSpace) {
             Spacer(modifier = Modifier.width(10.dp))
         }
 
-        Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = 5.dp),
-            style = MaterialTheme.typography.bodyMedium.copy(
-                color = textColor,
-                fontSize = textSize,
-                fontFamily = fontMedium,
-                textAlign = TextAlign.Start
+        if (text != ""){
+            Spacer(modifier = Modifier.width(4.dp)) // Add space between text and icon
+            Text(
+                text = text,
+                modifier = Modifier.padding(horizontal = 5.dp),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = textColor,
+                    fontSize = textSize,
+                    fontFamily = fontMedium,
+                    textAlign = TextAlign.Start
+                )
             )
-        )
+            }
     }
 }
 
@@ -2306,6 +2312,14 @@ fun Modifier.drawDashedBorder(
         )
     }
 )
+
+@Composable
+fun SectionDivider() {
+    Divider(
+        thickness = 1.dp,
+        color = Bg_Gray2
+    )
+}
 
 // Create a file to store image
 fun createImageUri(context: Context): Uri? {
