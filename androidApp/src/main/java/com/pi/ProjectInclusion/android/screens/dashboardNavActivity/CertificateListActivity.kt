@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,18 +19,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -67,11 +60,9 @@ import com.pi.ProjectInclusion.TextPurple
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.MyApplicationTheme
 import com.pi.ProjectInclusion.android.R
-import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.SectionDivider
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
-import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontRegular
@@ -88,6 +79,13 @@ class CertificateListActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
+            val context = LocalContext.current
+
+            BackHandler{
+                startActivity(
+                    context, Intent(context, StudentDashboardActivity::class.java), null
+                ).apply { (context as? Activity)?.finish() }
+            }
             MyApplicationTheme {
                 LoggerProvider.logger.d("Screen: CertificateListActivity()")
                 Column(
@@ -96,7 +94,7 @@ class CertificateListActivity : ComponentActivity() {
                         .background(color = White),
                     verticalArrangement = Arrangement.Top
                 ) {
-                    ShowCertificateData(navController)
+                    ShowCertificateData(navController, context)
                 }
             }
         }
@@ -104,12 +102,12 @@ class CertificateListActivity : ComponentActivity() {
 }
 
 @Composable
-fun ShowCertificateData(navController: NavHostController) {
-
-    val context = LocalContext.current
+fun ShowCertificateData(navController: NavHostController, context : Context) {
 
     BackHandler{
-        MoveToDashboard(context)
+        startActivity(
+            context, Intent(context, StudentDashboardActivity::class.java), null
+        ).apply { (context as? Activity)?.finish() }
     }
 
     Column(
@@ -127,7 +125,9 @@ fun ShowCertificateData(navController: NavHostController) {
             isShowBackButton = true,
             isShowMoreInfo = false,
             onBackButtonClick = {
-                MoveToDashboard(context)
+                startActivity(
+                    context, Intent(context, StudentDashboardActivity::class.java), null
+                ).apply { (context as? Activity)?.finish() }
             },
             onMoreInfoClick = {
 
@@ -188,12 +188,6 @@ fun ShowCertificateData(navController: NavHostController) {
                 }
             })
     }
-}
-
-fun MoveToDashboard(context: Context) {
-    startActivity(
-        context, Intent(context, StudentDashboardActivity::class.java), null
-    ).apply { (context as? Activity)?.finish() }
 }
 
 @Composable
@@ -436,5 +430,6 @@ fun TabContent(selectedTabIndex: Int, tabName: String) {
 @Preview(showBackground = true, showSystemUi = true)
 fun UserCertificatesUI() {
     val navController = rememberNavController()
-    ShowCertificateData(navController)
+    val context = LocalContext.current
+    ShowCertificateData(navController, context)
 }
