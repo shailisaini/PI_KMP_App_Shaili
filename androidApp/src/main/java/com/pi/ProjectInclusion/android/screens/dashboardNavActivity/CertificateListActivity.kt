@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,6 +49,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.kmptemplate.logger.LoggerProvider
@@ -68,6 +70,7 @@ import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontRegular
+import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.ConstantVariables.ALL
 import com.pi.ProjectInclusion.constants.ConstantVariables.COURSE
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
@@ -98,7 +101,6 @@ class CertificateListActivity : ComponentActivity() {
 fun ShowCertificateData(navController: NavHostController) {
 
     val scrollState = rememberScrollState()
-    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -131,40 +133,45 @@ fun ShowCertificateData(navController: NavHostController) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(15.dp)
                     ) {
-                        Row(
+                        Column(
                             modifier = Modifier
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
+                                .fillMaxWidth()
+                                .padding(15.dp)
                         ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.txt_congratulations),
+                                    fontSize = 19.sp,
+                                    fontFamily = fontBold,
+                                    color = Gray,
+                                    modifier = Modifier
+                                        .padding(top = 10.dp)
+                                )
+
+                                Text(
+                                    text = stringResource(R.string.txt_you_have_earned_it),
+                                    fontSize = 19.sp,
+                                    fontFamily = fontBold,
+                                    color = BorderBlue,
+                                    modifier = Modifier
+                                        .padding(top = 10.dp, start = 5.dp)
+                                )
+                            }
+
                             Text(
-                                text = stringResource(R.string.txt_congratulations),
-                                fontSize = 19.sp,
-                                fontFamily = fontBold,
+                                text = stringResource(R.string.txt_cert_desc),
+                                fontSize = 13.sp,
+                                fontFamily = fontRegular,
                                 color = Gray,
                                 modifier = Modifier
-                                    .padding(top = 10.dp)
-                            )
-
-                            Text(
-                                text = stringResource(R.string.txt_you_have_earned_it),
-                                fontSize = 19.sp,
-                                fontFamily = fontBold,
-                                color = BorderBlue,
-                                modifier = Modifier
-                                    .padding(top = 10.dp, start = 5.dp)
+                                    .padding(vertical = 5.dp)
                             )
                         }
-
-                        Text(
-                            text = stringResource(R.string.txt_cert_desc),
-                            fontSize = 13.sp,
-                            fontFamily = fontRegular,
-                            color = Gray,
-                            modifier = Modifier
-                                .padding(vertical = 5.dp)
-                        )
                         // Module/Courses Tab
                         ThreeTabButtons()
                     }
@@ -185,7 +192,7 @@ fun ThreeTabButtons() {
     ) {
         // Tab buttons
         Row(
-            modifier = Modifier.wrapContentSize()
+            modifier = Modifier.wrapContentSize().padding(horizontal = 15.dp)
         ) {
             tabTitles.forEachIndexed { index, title ->
                 Button(
@@ -221,125 +228,184 @@ fun ThreeTabButtons() {
 
 @Composable
 fun TabContent(selectedTabIndex: Int, tabName: String) {
+    var showFullScreen by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    var textComingSoon = stringResource(R.string.txt_coming_soon)
 
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(3) { index ->
-            Column(
+    // Full Screen Image Dialog
+    if (showFullScreen) {
+        Dialog(onDismissRequest = { showFullScreen = false }) {
+            Box(
                 modifier = Modifier
-                    .padding(vertical = 15.dp)
                     .fillMaxWidth()
+                    .background(Color.Black),
+                contentAlignment = Alignment.Center
             ) {
-
-                Text(
-                    tabName, modifier = Modifier.padding(5.dp),
-                    color = if (selectedTabIndex == 2 || tabName == COURSE) {
-                        LightOrange2
-                    } else {
-                        TextPurple
-                    },
-                    fontSize = 15.sp,
-                    fontFamily = fontRegular
+                Image(
+                    modifier = Modifier.wrapContentSize()
+                        .padding(20.dp)
+                        .clickable{
+                            showFullScreen = false
+                        }
+                        .align(Alignment.TopEnd),
+                    painter = painterResource(id = R.drawable.close_img),
+                    contentDescription = IMG_DESCRIPTION
+                )
+                Image(
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.FillWidth,
+                    painter = painterResource(id = R.drawable.certificate),
+                    contentDescription = IMG_DESCRIPTION
                 )
 
-                Text(
-                    stringResource(R.string.txt_learning_difficulties),
-                    modifier = Modifier.padding(5.dp),
-                    color = Black,
-                    fontFamily = fontBold,
-                    fontSize = 19.sp
-                )
+                Button(
+                    onClick = {
+                        context.toast(textComingSoon)
+                    }, modifier = Modifier
+                        .wrapContentWidth()
+                        .padding(20.dp)
+                        .align(Alignment.BottomCenter)
+                        .clip(RoundedCornerShape(4.dp)),
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(RoundedCornerShape(8.dp))
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = White,
+                        contentColor = BorderBlue
+                    )
                 ) {
-                    Image(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .height(220.dp),
-                        contentScale = ContentScale.FillWidth,
-                        painter = painterResource(id = R.drawable.certificate),
-                        contentDescription = IMG_DESCRIPTION
+                    TextWithIconOnLeft(
+                        text = stringResource(R.string.txt_download),
+                        icon = ImageVector.vectorResource(id = R.drawable.ic_download),
+                        textColor = Black,
+                        textSize = 14.sp,
+                        iconColor = Color.Unspecified,
+                        onClick = {
+                            context.toast(textComingSoon)
+                        })
+                }
+            }
+        }
+    }
+    else {
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            items(3) { index ->
+                Column(
+                    modifier = Modifier
+                        .padding(15.dp)
+                        .fillMaxWidth()
+                ) {
+
+                    Text(
+                        tabName, modifier = Modifier.padding(5.dp),
+                        color = if (selectedTabIndex == 2 || tabName == COURSE) {
+                            LightOrange2
+                        } else {
+                            TextPurple
+                        },
+                        fontSize = 15.sp,
+                        fontFamily = fontRegular
                     )
 
-                    Row(
+                    Text(
+                        stringResource(R.string.txt_learning_difficulties),
+                        modifier = Modifier.padding(5.dp),
+                        color = Black,
+                        fontFamily = fontBold,
+                        fontSize = 19.sp
+                    )
+
+                    Box(
                         modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .background(Transparent)
-                            .fillMaxWidth()
-                            .padding(4.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.Bottom
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(8.dp))
                     ) {
-                        Button(
-                            onClick = {
-//                                navController.navigate(AppRoute.EditProfileScreen.route)
-                            }, modifier = Modifier
-                                .wrapContentSize()
-                                .padding(end = 2.dp)
-                                .clip(RoundedCornerShape(8.dp)),
+                        Image(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .height(220.dp),
+                            contentScale = ContentScale.FillWidth,
+                            painter = painterResource(id = R.drawable.certificate),
+                            contentDescription = IMG_DESCRIPTION
+                        )
 
-                            shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = White,
-                                contentColor = BorderBlue
-                            )
+                        Row(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .background(Transparent)
+                                .fillMaxWidth()
+                                .padding(4.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.Bottom
                         ) {
-                            TextWithIconOnLeft(
-                                text = stringResource(R.string.txt_view),
-                                icon = ImageVector.vectorResource(id = R.drawable.ic_expand),
-                                textColor = Black,
-                                textSize = 14.sp,
-                                iconColor = Color.Unspecified,
+                            Button(
                                 onClick = {
-//                                    navController.navigate(AppRoute.EditProfileScreen.route)
-                                })
-                        }
-                        Button(
-                            onClick = {
-//                                navController.navigate(AppRoute.EditProfileScreen.route)
-                            }, modifier = Modifier
-                                .wrapContentWidth()
-                                .padding(end = 2.dp)
-                                .clip(RoundedCornerShape(4.dp)),
+                                    showFullScreen = true
+                                }, modifier = Modifier
+                                    .wrapContentSize()
+                                    .padding(end = 2.dp)
+                                    .clip(RoundedCornerShape(8.dp)),
 
-                            shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = White,
-                                contentColor = BorderBlue
-                            )
-                        ) {
-                            TextWithIconOnLeft(
-                                text = stringResource(R.string.txt_download),
-                                icon = ImageVector.vectorResource(id = R.drawable.ic_download),
-                                textColor = Black,
-                                textSize = 14.sp,
-                                iconColor = Color.Unspecified,
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = White,
+                                    contentColor = BorderBlue
+                                )
+                            ) {
+                                TextWithIconOnLeft(
+                                    text = stringResource(R.string.txt_view),
+                                    icon = ImageVector.vectorResource(id = R.drawable.ic_expand),
+                                    textColor = Black,
+                                    textSize = 14.sp,
+                                    iconColor = Color.Unspecified,
+                                    onClick = {
+                                        showFullScreen = true
+                                    })
+                            }
+                            Button(
                                 onClick = {
-//
-                                })
-                        }
-                        Button(
-                            onClick = {
+                                    context.toast(textComingSoon)
+                                }, modifier = Modifier
+                                    .wrapContentWidth()
+                                    .padding(end = 2.dp)
+                                    .clip(RoundedCornerShape(4.dp)),
 
-                            }, modifier = Modifier
-                                .width(50.dp)
-                                .clip(RoundedCornerShape(8.dp)),
-                            shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = White,
-                                contentColor = Black
-                            )
-                        ) {
-                            TextWithIconOnLeft(
-                                text = "",
-                                icon = ImageVector.vectorResource(id = R.drawable.ic_share),
-                                textColor = BorderBlue,
-                                iconColor = Black,
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = White,
+                                    contentColor = BorderBlue
+                                )
+                            ) {
+                                TextWithIconOnLeft(
+                                    text = stringResource(R.string.txt_download),
+                                    icon = ImageVector.vectorResource(id = R.drawable.ic_download),
+                                    textColor = Black,
+                                    textSize = 14.sp,
+                                    iconColor = Color.Unspecified,
+                                    onClick = {
+                                        context.toast(textComingSoon)
+                                    })
+                            }
+                            Button(
                                 onClick = {
-//                                    navController.navigate(AppRoute.EditProfileScreen.route)
-                                })
+                                    context.toast(textComingSoon)
+                                }, modifier = Modifier
+                                    .wrapContentSize()
+                                    .clip(RoundedCornerShape(8.dp)),
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = White,
+                                    contentColor = Black
+                                )
+                            ) {
+                                TextWithIconOnLeft(
+                                    text = "",
+                                    icon = ImageVector.vectorResource(id = R.drawable.ic_share),
+                                    textColor = BorderBlue,
+                                    iconColor = Black,
+                                    onClick = {
+                                        context.toast(textComingSoon)
+                                    })
+                            }
                         }
                     }
                 }
