@@ -254,6 +254,7 @@ and make a difference together!</string>
     <string name="txt_cancel">Cancel</string>
     <string name="txt_submit">Submit</string>
     <string name="txt_remove">Remove</string>
+    <string name="txt_leave">Leave</string>
     <string name="txt_request_submitted">Request submitted</string>
     <string name="txt_close">Close</string>
     <string name="txt_name_change_desc">You can request a name change if your current name is incorrect or needs to be updated. Our team will review and verify your request before making any changes.</string>
@@ -281,6 +282,8 @@ and make a difference together!</string>
     <string name="txt_select_your_education_status_msg">Please select your education status.</string>
     <string name="txt_select_your_board_msg">Please select your board.</string>
     <string name="txt_select_your_school_type_msg">Please select your school type.</string>
+    <string name="head_leave">Want to leave?</string>
+    <string name="body_leave">Your progress will be saved. You can continue from where you left off</string>
     <string name="txt_Student_added">Student added!</string>
     <string name="txt_Begin_Screening_process">Begin Screening 1 to continue the process.</string>
     <string name="txt_Kendriya_Vidhyalya_Delhi">Kendriya Vidhyalya 1, Delhi</string>

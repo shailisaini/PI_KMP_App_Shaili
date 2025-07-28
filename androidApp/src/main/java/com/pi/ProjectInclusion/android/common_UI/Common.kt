@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -23,6 +24,7 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -43,12 +45,14 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
@@ -125,12 +129,14 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.pi.ProjectInclusion.Bg_Gray3
 import com.pi.ProjectInclusion.Bg_Gray4
 import com.pi.ProjectInclusion.Black
+import com.pi.ProjectInclusion.BorderBlue
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
 import com.pi.ProjectInclusion.DARK_TITLE_TEXT
@@ -142,6 +148,7 @@ import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight01
 import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.GrayLight03
+import com.pi.ProjectInclusion.GrayLight04
 import com.pi.ProjectInclusion.LightBlue
 import com.pi.ProjectInclusion.LightPurple04
 import com.pi.ProjectInclusion.OrangeSubTitle
@@ -149,6 +156,7 @@ import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
@@ -2310,6 +2318,121 @@ fun createImageUri(context: Context): Uri? {
         contentValues
     )
 }
+
+@SuppressLint("UnusedBoxWithConstraintsScope")
+@Preview
+@Composable
+fun LeavingDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit={}) {
+    val context = LocalContext.current
+
+    Dialog(onDismissRequest = { onDismiss() }) {
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            var selectedUri = remember { mutableStateOf<Uri?>(null) }
+
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(if (isSystemInDarkTheme()) Dark_02 else White)
+                    .fillMaxWidth()
+
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(vertical = 15.dp, horizontal = 8.dp)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.sad_emoji),
+                        contentDescription = IMG_DESCRIPTION,
+                        modifier = Modifier.size(60.dp),
+                        tint = Color.Unspecified
+                    )
+
+                    Text(
+                        text = stringResource(R.string.head_leave),
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .padding(top = 16.dp, start = 8.dp, end = 8.dp),
+                        fontFamily = fontBold,
+                        fontSize = 19.sp,
+                        color = Black,
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        text = stringResource(R.string.body_leave),
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .padding(top = 3.dp, start = 8.dp, end = 8.dp),
+                        fontFamily = fontRegular,
+                        fontSize = 15.sp,
+                        color = GrayLight04,
+                        textAlign = TextAlign.Center
+                    )
+                    Row(
+                        modifier = Modifier
+                            .padding(vertical = 15.dp, horizontal = 5.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+
+                        ) {
+                        Button(
+                            onClick = {
+                                onDismiss()
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .padding(end = 8.dp)
+                                .clip(RoundedCornerShape(8.dp)),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = White,
+                                contentColor = BorderBlue
+                            ),
+                            border = BorderStroke(1.dp, BorderBlue)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.txt_cancel),
+                                fontSize = 16.sp,
+                                fontFamily = fontMedium,
+                                color = BorderBlue
+                            )
+                        }
+                        // check Status
+                        Button(
+                            onClick = {
+                                onClick()
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .padding(end = 8.dp)
+                                .clip(RoundedCornerShape(8.dp)),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = PrimaryBlue,
+                                contentColor = White
+                            ),
+                            border = BorderStroke(1.dp, BorderBlue)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.txt_leave),
+                                fontSize = 16.sp,
+                                fontFamily = fontMedium,
+                                color = White,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 @Composable
 fun CustomToastMessage(
