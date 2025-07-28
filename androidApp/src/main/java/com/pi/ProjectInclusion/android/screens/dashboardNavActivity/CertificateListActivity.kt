@@ -1,5 +1,8 @@
 package com.pi.ProjectInclusion.android.screens.dashboardNavActivity
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -50,6 +53,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.kmptemplate.logger.LoggerProvider
@@ -68,9 +72,11 @@ import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.SectionDivider
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
 import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.ALL
 import com.pi.ProjectInclusion.constants.ConstantVariables.COURSE
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
@@ -100,7 +106,11 @@ class CertificateListActivity : ComponentActivity() {
 @Composable
 fun ShowCertificateData(navController: NavHostController) {
 
-    val scrollState = rememberScrollState()
+    val context = LocalContext.current
+
+    BackHandler{
+        MoveToDashboard(context)
+    }
 
     Column(
         modifier = Modifier
@@ -117,7 +127,7 @@ fun ShowCertificateData(navController: NavHostController) {
             isShowBackButton = true,
             isShowMoreInfo = false,
             onBackButtonClick = {
-                BackButtonPress(navController, AppRoute.InterventionAcceptLevel.route)
+                MoveToDashboard(context)
             },
             onMoreInfoClick = {
 
@@ -180,6 +190,12 @@ fun ShowCertificateData(navController: NavHostController) {
     }
 }
 
+fun MoveToDashboard(context: Context) {
+    startActivity(
+        context, Intent(context, StudentDashboardActivity::class.java), null
+    ).apply { (context as? Activity)?.finish() }
+}
+
 @Composable
 fun ThreeTabButtons() {
     val tabTitles = listOf(ALL, MODULE, COURSE)
@@ -192,7 +208,9 @@ fun ThreeTabButtons() {
     ) {
         // Tab buttons
         Row(
-            modifier = Modifier.wrapContentSize().padding(horizontal = 15.dp)
+            modifier = Modifier
+                .wrapContentSize()
+                .padding(horizontal = 15.dp)
         ) {
             tabTitles.forEachIndexed { index, title ->
                 Button(
@@ -242,9 +260,10 @@ fun TabContent(selectedTabIndex: Int, tabName: String) {
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    modifier = Modifier.wrapContentSize()
+                    modifier = Modifier
+                        .wrapContentSize()
                         .padding(20.dp)
-                        .clickable{
+                        .clickable {
                             showFullScreen = false
                         }
                         .align(Alignment.TopEnd),
@@ -285,8 +304,7 @@ fun TabContent(selectedTabIndex: Int, tabName: String) {
                 }
             }
         }
-    }
-    else {
+    } else {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             items(3) { index ->
                 Column(
