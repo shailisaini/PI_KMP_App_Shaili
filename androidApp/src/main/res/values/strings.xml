@@ -321,4 +321,10 @@ and make a difference together!</string>
     <string name="txt_CBSE">CBSE</string>
     <string name="txt_ICSE">ICSE</string>
     <string name="txt_UP_Board">UP Board</string>
+    <string name="txt_congratulations">Congratulations!</string>
+    <string name="txt_learning_difficulties">Learning Difficulties</string>
+    <string name="txt_you_have_earned_it"> You\'ve Earned It.</string>
+    <string name="txt_view">View</string>
+    <string name="txt_download">Download</string>
+    <string name="txt_cert_desc">Every certificate here is proof of your dedication and expertise. Keep learning, keep growing!</string>
 </resources>

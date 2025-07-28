@@ -87,6 +87,7 @@ val BannerColor03 = Color(0xFFEFF0F5) //#EFF0F5
 
 
 val contactUsTxt = Color(0xFF1B244D)
+val TextPurple = Color(0xFF5A4AAB)
 
 // Use only dark mode purpose
 val Dark_01 = Color(0xFF181A20)

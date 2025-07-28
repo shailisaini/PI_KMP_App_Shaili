@@ -32,6 +32,7 @@
             android:exported="true">
         </activity>
         <activity android:name=".screens.LoginNavigationScreen"/>
+        <activity android:name=".screens.dashboardNavActivity.CertificateListActivity"/>
         <activity
             android:name=".screens.SplashActivity"
             android:exported="true">
