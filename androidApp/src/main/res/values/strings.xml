@@ -326,5 +326,6 @@ and make a difference together!</string>
     <string name="txt_you_have_earned_it"> You\'ve Earned It.</string>
     <string name="txt_view">View</string>
     <string name="txt_download">Download</string>
+    <string name="txt_coming_soon">Coming Soon…</string>
     <string name="txt_cert_desc">Every certificate here is proof of your dedication and expertise. Keep learning, keep growing!</string>
 </resources>
