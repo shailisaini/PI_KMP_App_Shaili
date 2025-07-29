@@ -1117,7 +1117,8 @@ fun TextWithIconOnLeft(
     onClick: () -> Unit = {},
 ) {
     Row(
-        modifier = modifier.clickable { onClick() }
+        modifier = modifier
+            .clickable { onClick() }
             .wrapContentSize(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
@@ -1131,7 +1132,7 @@ fun TextWithIconOnLeft(
             Spacer(modifier = Modifier.width(10.dp))
         }
 
-        if (text != ""){
+        if (text != "") {
             Spacer(modifier = Modifier.width(4.dp)) // Add space between text and icon
             Text(
                 text = text,
@@ -1143,7 +1144,7 @@ fun TextWithIconOnLeft(
                     textAlign = TextAlign.Start
                 )
             )
-            }
+        }
     }
 }
 
@@ -2290,7 +2291,7 @@ fun Modifier.drawDashedBorder(
     strokeWidth: Dp,
     dashLength: Dp,
     gapLength: Dp,
-    cornerRadius: Dp = 0.dp
+    cornerRadius: Dp = 0.dp,
 ) = this.then(
     Modifier.drawBehind {
         val stroke = Stroke(
@@ -2336,7 +2337,7 @@ fun createImageUri(context: Context): Uri? {
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Preview
 @Composable
-fun LeavingDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit={}) {
+fun LeavingDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
     val context = LocalContext.current
 
     Dialog(onDismissRequest = { onDismiss() }) {
@@ -2447,7 +2448,6 @@ fun LeavingDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit={}) {
     }
 }
 
-
 @Composable
 fun CustomToastMessage(
     titleStr: String,
@@ -2525,6 +2525,160 @@ fun CustomToastMessage(
                             .height(6.dp)
                             .animateContentSize()
                     )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ScreeningDetailsBackgroundUi(
+    studentName: String,
+    grade: String,
+    modifier: Modifier = Modifier,
+    isShowBackButton: Boolean = true,
+    isShowMoreInfo: Boolean = true,
+    onBackButtonClick: () -> Unit = {},
+    onMoreInfoClick: () -> Unit = {},
+    content: @Composable (() -> Unit),
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(), color = White
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    color = if (isSystemInDarkTheme()) {
+                        PrimaryBlue
+                    } else {
+                        PrimaryBlue
+                    }
+                ), verticalArrangement = Arrangement.Top
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .background(
+                        color = if (isSystemInDarkTheme()) {
+                            PrimaryBlue
+                        } else {
+                            PrimaryBlue
+                        }
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Absolute.SpaceBetween
+            ) {
+                Row(
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .padding(start = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(
+                        modifier = Modifier.background(
+                            color = if (isSystemInDarkTheme()) {
+                                PrimaryBlue
+                            } else {
+                                PrimaryBlue
+                            }
+                        )
+                    ) {
+                        Text(
+                            text = studentName.toString(),
+                            modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                            fontFamily = fontBold,
+                            fontSize = 16.sp,
+                            color = if (isSystemInDarkTheme()) {
+                                DARK_TITLE_TEXT
+                            } else {
+                                White
+                            },
+                            textAlign = TextAlign.Start
+                        )
+
+                        Text(
+                            text = grade.toString(),
+                            modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                            fontFamily = fontRegular,
+                            fontSize = 14.sp,
+                            color = if (isSystemInDarkTheme()) {
+                                LightPurple04
+                            } else {
+                                LightPurple04
+                            },
+                            textAlign = TextAlign.Start
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .background(Color.Unspecified)
+                ) {
+                    if (isShowMoreInfo && !LocalInspectionMode.current) {
+                        Image(
+                            painter = painterResource(R.drawable.more_info_img),
+                            contentDescription = IMG_DESCRIPTION,
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .padding(start = 10.dp)
+                                .background(Color.Unspecified)
+                                .clickable(onClick = onMoreInfoClick),
+                            colorFilter = ColorFilter.tint(White)
+                        )
+                    }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .background(Color.Unspecified)
+                ) {
+                    if (isShowBackButton && !LocalInspectionMode.current) {
+                        Image(
+                            painter = painterResource(R.drawable.close_img),
+                            contentDescription = IMG_DESCRIPTION,
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .padding(end = 10.dp)
+                                .background(Color.Unspecified)
+                                .clickable(onClick = onBackButtonClick),
+                            colorFilter = ColorFilter.tint(White)
+                        )
+                    }
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .background(
+                        if (isSystemInDarkTheme()) {
+                            Dark_01
+                        } else {
+                            White
+                        }
+                    )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                ) {
+                    content()
                 }
             }
         }

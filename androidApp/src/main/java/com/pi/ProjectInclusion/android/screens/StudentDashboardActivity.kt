@@ -61,6 +61,7 @@ import com.pi.ProjectInclusion.android.screens.menu.DrawerBody
 import com.pi.ProjectInclusion.android.screens.menu.DrawerHeader
 import com.pi.ProjectInclusion.android.screens.menu.MenuItem
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningHomeScreen
+import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.core.logger.Logger
@@ -227,6 +228,10 @@ class StudentDashboardActivity : ComponentActivity() {
                             // This is use for screening
                             composable(AppRoute.ScreeningScreen.route) {
                                 ScreeningHomeScreen(navController)
+                            }
+
+                            composable(AppRoute.ScreeningOne.route) {
+                                ScreeningOneScreen(navController)
                             }
 
                             composable(AppRoute.AddStudentRegister.route) {
