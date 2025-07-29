@@ -134,10 +134,12 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.pi.ProjectInclusion.BannerColor02
 import com.pi.ProjectInclusion.Bg_Gray2
 import com.pi.ProjectInclusion.Bg_Gray3
 import com.pi.ProjectInclusion.Bg_Gray4
 import com.pi.ProjectInclusion.Black
+import com.pi.ProjectInclusion.BodyTextLight
 import com.pi.ProjectInclusion.BorderBlue
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
@@ -151,12 +153,15 @@ import com.pi.ProjectInclusion.GrayLight01
 import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.GrayLight03
 import com.pi.ProjectInclusion.GrayLight04
+import com.pi.ProjectInclusion.GrayLight05
 import com.pi.ProjectInclusion.LightBlue
 import com.pi.ProjectInclusion.LightPurple04
 import com.pi.ProjectInclusion.OrangeSubTitle
 import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
+import com.pi.ProjectInclusion.PrimaryBlue3
 import com.pi.ProjectInclusion.PrimaryBlueLt
+import com.pi.ProjectInclusion.PrimaryBlueLt1
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.fontBold
@@ -2674,7 +2679,6 @@ fun ScreeningDetailsBackgroundUi(
             ) {
                 Column(
                     modifier = Modifier
-                        .padding(top = 8.dp)
                         .fillMaxWidth()
                         .fillMaxHeight()
                 ) {
@@ -2682,5 +2686,76 @@ fun ScreeningDetailsBackgroundUi(
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun YesNoBtnUi(
+    title: String = "No", onClick: () -> Unit = {}, enabled: Boolean = false,
+) {
+    val selectedBorder = BorderStroke(
+        width = 1.dp, if (isSystemInDarkTheme()) {
+            if (enabled) {
+                BannerColor02
+            } else {
+                GrayLight05
+            }
+        } else {
+            if (enabled) {
+                BannerColor02
+            } else {
+                GrayLight05
+            }
+        }
+    )
+
+    Card(
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier
+            .width(100.dp)
+            .wrapContentHeight()
+            .clickable {
+                onClick()
+            },
+        colors = if (isSystemInDarkTheme()) {
+            if (enabled) {
+                CardDefaults.cardColors(PrimaryBlueLt1)
+            } else {
+                CardDefaults.cardColors(White)
+            }
+        } else {
+            if (enabled) {
+                CardDefaults.cardColors(
+                    containerColor = PrimaryBlueLt1,
+                    contentColor = PrimaryBlueLt1,
+                    disabledContentColor = PrimaryBlueLt1,
+                    disabledContainerColor = PrimaryBlueLt1
+                )
+            } else {
+                CardDefaults.cardColors(
+                    containerColor = White,
+                    contentColor = White,
+                    disabledContentColor = White,
+                    disabledContainerColor = White
+                )
+            }
+        },
+        border = selectedBorder
+    ) {
+        Text(
+            text = title,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp, top = 8.dp, start = 8.dp, end = 8.dp),
+            fontSize = 14.sp,
+            color = if (enabled) {
+                PrimaryBlue
+            } else {
+                BodyTextLight
+            },
+            textAlign = TextAlign.Center,
+            fontFamily = fontMedium,
+        )
     }
 }

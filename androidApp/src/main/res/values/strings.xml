@@ -328,4 +328,6 @@ and make a difference together!</string>
     <string name="txt_download">Download</string>
     <string name="txt_coming_soon">Coming Soon…</string>
     <string name="txt_cert_desc">Every certificate here is proof of your dedication and expertise. Keep learning, keep growing!</string>
+    <string name="txt_Question">Questions</string>
+    <string name="txt_Question_Constant">Constant drooping of eyelid(s)/ artificial eye(s)/ misaligned eye(s)/ asymmetrical or squinting/had any eye surgery</string>
 </resources>
