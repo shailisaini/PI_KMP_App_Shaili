@@ -100,7 +100,7 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ScreeningHomeScreen(navHostController: NavHostController) {
+fun ScreeningHomeScreen(addStudent: () -> Unit, onBack: () -> Unit) {
 
     logger.d("Screen: " + "ScreeningHomeScreen()")
 
@@ -147,7 +147,7 @@ fun ScreeningHomeScreen(navHostController: NavHostController) {
     }
 
     if (showTermDialog) {
-        ScreeningTermsDialog(navHostController) {
+        ScreeningTermsDialog(addStudent) {
             showTermDialog = false
         }
     }
@@ -323,19 +323,19 @@ fun ScreeningHomeScreen(navHostController: NavHostController) {
                 ) { index ->
                     when (index) {
                         0 -> {
-                            AllScreening(navHostController)
+                            AllScreening()
                         }
 
                         1 -> {
-                            ScreeningFirst(navHostController)
+                            ScreeningFirst()
                         }
 
                         2 -> {
-                            ProfilerScreening(navHostController)
+                            ProfilerScreening()
                         }
 
                         else -> {
-                            AdvanceScreening(navHostController)
+                            AdvanceScreening()
                         }
                     }
                 }
@@ -367,12 +367,12 @@ fun ScreeningHomeScreen(navHostController: NavHostController) {
 }
 
 @Composable
-fun AllScreening(navController: NavHostController) {
+fun AllScreening() {
     println("Not yet implemented :- AllScreening")
 }
 
 @Composable
-fun ScreeningFirst(navController: NavHostController) {
+fun ScreeningFirst() {
     val screeningListData = listOf(
         ScreeningData(
             stringResource(R.string.txt_Abhisheki_Muthuswami),
@@ -420,7 +420,7 @@ fun ScreeningFirst(navController: NavHostController) {
     ) {
         LazyColumn {
             items(screeningListData) { screeningData ->
-                ScreeningFirstDataUI(screeningData, navController)
+                ScreeningFirstDataUI(screeningData)
             }
         }
     }
@@ -428,8 +428,7 @@ fun ScreeningFirst(navController: NavHostController) {
 
 @Composable
 fun ScreeningFirstDataUI(
-    screeningData: ScreeningData,
-    navHostController: NavHostController,
+    screeningData: ScreeningData
 ) {
     val selectedBorder = BorderStroke(
         width = 0.5.dp, if (isSystemInDarkTheme()) {
@@ -713,12 +712,12 @@ fun ScreeningFirstDataUI(
 }
 
 @Composable
-fun ProfilerScreening(navController: NavHostController) {
+fun ProfilerScreening() {
     println("Not yet implemented :- ProfilerScreening")
 }
 
 @Composable
-fun AdvanceScreening(navController: NavHostController) {
+fun AdvanceScreening() {
     println("Not yet implemented :- AdvanceScreening")
 }
 
@@ -871,7 +870,7 @@ fun ScreeningIntroDialog(onDismiss: () -> Unit) {
 }
 
 @Composable
-fun ScreeningTermsDialog(navHostController: NavHostController, onDismiss: () -> Unit) {
+fun ScreeningTermsDialog(addStudent: () -> Unit,onDismiss: () -> Unit) {
 
     var isCheckedTermsAccept by remember { mutableStateOf(false) }
     var termsAcceptStr = stringResource(R.string.txt_Please_Check)
@@ -1095,7 +1094,7 @@ fun ScreeningTermsDialog(navHostController: NavHostController, onDismiss: () -> 
                                 if (isCheckedTermsAccept == false) {
                                     context.toast(termsAcceptStr)
                                 } else {
-                                    navHostController.navigate(AppRoute.AddStudentRegister.route)
+                                    addStudent()
                                     onDismiss()
                                 }
                             }, title = stringResource(R.string.txt_Get_Started), enabled = true

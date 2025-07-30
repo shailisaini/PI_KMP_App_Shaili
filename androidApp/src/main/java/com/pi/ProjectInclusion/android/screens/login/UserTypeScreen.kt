@@ -75,6 +75,7 @@ import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
 import com.pi.ProjectInclusion.constants.CommonFunction.NoDataFound
 import com.pi.ProjectInclusion.constants.CommonFunction.ShowError
@@ -85,7 +86,11 @@ import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun UserTypeScreen(navController: NavHostController, viewModel: LoginViewModel) {
+fun UserTypeScreen(
+    viewModel: LoginViewModel,
+    onNext: () -> Unit,
+    onBack: () -> Unit
+) {
     var isDialogVisible by remember { mutableStateOf(false) }
     val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
 
@@ -136,7 +141,7 @@ fun UserTypeScreen(navController: NavHostController, viewModel: LoginViewModel) 
                 .background(color = Bg_Gray1),
             verticalArrangement = Arrangement.Top
         ) {
-            UserTypeResponseUI(context, userType, navController)
+            UserTypeResponseUI(context, userType, onNext, onBack)
         }
     }
 }
@@ -146,7 +151,8 @@ fun UserTypeScreen(navController: NavHostController, viewModel: LoginViewModel) 
 fun UserTypeResponseUI(
     context: Context,
     userTypeData: MutableList<GetUserTypeResponse.Data>,
-    navController: NavHostController
+    onNext: () -> Unit,
+    onBack: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberLazyGridState()
@@ -163,8 +169,7 @@ fun UserTypeResponseUI(
     val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
-        navController.popBackStack()
-        navController.navigate(AppRoute.LanguageSelect.route)
+     onBack()
     }, content = {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -217,7 +222,7 @@ fun UserTypeResponseUI(
                             ) {
                                 items(userTypeData.size) { index ->
                                     UserTypeCard(
-                                        navController,
+                                        onNext,
                                         context,
                                         isSelected = selectedIndex == index,
                                         index,
@@ -243,11 +248,15 @@ fun UserTypeResponseUI(
             }
         }
     })
+
+    BackHandler {
+        onBack()
+    }
 }
 
 @Composable
 fun UserTypeCard(
-    navController: NavHostController,
+    onNext: () -> Unit,
     context: Context,
     isSelected: Boolean = true,
     index: Int,
@@ -289,17 +298,18 @@ fun UserTypeCard(
         modifier = Modifier
             .clickable {
                 onItemClicked.invoke()
-                navController.popBackStack()
+//                navController.popBackStack()
 //                navController.navigate(AppRoute.UserNameScreen.route)
 //                navController.navigate(AppRoute.EnterUserProfileScreen.route)
+                onNext()
 
                 // Aashish
-                context.startActivity(
+               /* context.startActivity(
                     Intent(
                         context,
                         StudentDashboardActivity::class.java
                     )
-                )
+                )*/
             }
             .padding(8.dp)
             .fillMaxWidth(),

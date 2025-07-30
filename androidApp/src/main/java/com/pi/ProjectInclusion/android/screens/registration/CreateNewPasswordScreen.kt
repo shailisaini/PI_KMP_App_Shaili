@@ -49,7 +49,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
@@ -71,7 +70,6 @@ import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
-import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
@@ -79,7 +77,10 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 
 @Composable
-fun CreateNewPasswordScreen(navController: NavHostController, viewModel: LoginViewModel) {
+fun CreateNewPasswordScreen(onNext: () -> Unit,  //EnterUserProfileScreen
+                            onBack: () -> Unit,
+                            otpSendVerify: () -> Unit, // OtpSendVerifyUI
+                            viewModel: LoginViewModel) {
 
     LoggerProvider.logger.d("Screen: " + "CreateNewPasswordScreen()")
 
@@ -90,16 +91,17 @@ fun CreateNewPasswordScreen(navController: NavHostController, viewModel: LoginVi
         verticalArrangement = Arrangement.Top
     ) {
         DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
-            navController.popBackStack()
-            navController.navigate(AppRoute.ForgetPasswordUI.route)
+            onBack()
         }, content = {
-            CreateNewPasswordUI(navController)
+            CreateNewPasswordUI(onNext = onNext, onBack = onBack, otpSendVerify= otpSendVerify)
         })
     }
 }
 
 @Composable
-fun CreateNewPasswordUI(navController: NavHostController) {
+fun CreateNewPasswordUI(onBack: () -> Unit,
+                        otpSendVerify: () -> Unit,
+                        onNext: () -> Unit ) {
     val context = LocalContext.current
     var showBottomSheet by remember { mutableStateOf(false) }
     var enterPasswordStr = rememberSaveable { mutableStateOf("") }
@@ -128,8 +130,7 @@ fun CreateNewPasswordUI(navController: NavHostController) {
 
     if (showBottomSheet) {
         SelectUserBottomSheet(onClick = {
-            navController.popBackStack()
-            navController.navigate(AppRoute.OtpSendVerifyUI.route)
+            otpSendVerify()
         }, onDismiss = {
             showBottomSheet = false
         })
@@ -524,7 +525,7 @@ fun CreateNewPasswordUI(navController: NavHostController) {
                             } else { // if first digit of mobile is less than 6 then error will show
                                 isDialogVisible = true
                                 buttonClicked = true
-                                navController.navigate(AppRoute.EnterUserProfileScreen.route)
+                               onNext()
                             }
                         }
                     }, true
@@ -644,6 +645,8 @@ fun SelectUserBottomSheet(
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
 fun NewPasswordScreen() {
-    val navController = rememberNavController()
-    CreateNewPasswordUI(navController)
+    val onNext: () -> Unit = {}
+    val onBack: () -> Unit = {}
+    val isForgetPassword: () -> Unit = {}
+    CreateNewPasswordUI(onNext, onBack, isForgetPassword)
 }

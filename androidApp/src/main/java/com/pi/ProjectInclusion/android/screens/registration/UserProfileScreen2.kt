@@ -79,7 +79,10 @@ import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun EnterUserScreen2(navController: NavHostController) {
+fun EnterUserScreen2(
+    onNext: () -> Unit, // Dashboard
+    onBack: () -> Unit,
+) {
     var isDialogVisible by remember { mutableStateOf(false) }
 //    val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
 
@@ -91,40 +94,41 @@ fun EnterUserScreen2(navController: NavHostController) {
         message = stringResource(R.string.txt_loading)
     )
     BackHandler {
-        BackButtonPress(navController, AppRoute.UserTypeSelect.route)
+//        BackButtonPress(navController, AppRoute.UserTypeSelect.route)
+        onBack()
     }
     LoggerProvider.logger.d("Screen: " + "EnterUserNameScreen()")
 
     // it will user during API implementation
 
-   /* LaunchedEffect(Unit) {
-        viewModel.getUserType()
-    }
+    /* LaunchedEffect(Unit) {
+         viewModel.getUserType()
+     }
 
-    LaunchedEffect(uiState) {
-        when {
-            uiState.isLoading -> {
-                userType.clear()
-                isDialogVisible = true
-            }
+     LaunchedEffect(uiState) {
+         when {
+             uiState.isLoading -> {
+                 userType.clear()
+                 isDialogVisible = true
+             }
 
-            uiState.error.isNotEmpty() -> {
-                userType.clear()
-                isDialogVisible = false
-                LoggerProvider.logger.d("Error: ${uiState.error}")
-                context.toast(uiState.error)
-            }
+             uiState.error.isNotEmpty() -> {
+                 userType.clear()
+                 isDialogVisible = false
+                 LoggerProvider.logger.d("Error: ${uiState.error}")
+                 context.toast(uiState.error)
+             }
 
-            uiState.success != null -> {
-                isDialogVisible = false
-                uiState.success!!.data.let {
-                    userType.clear()
-                    userType.addAll(it)
-                }
-                LoggerProvider.logger.d("Languages fetched: ${uiState.success!!.data}")
-            }
-        }
-    }*/
+             uiState.success != null -> {
+                 isDialogVisible = false
+                 uiState.success!!.data.let {
+                     userType.clear()
+                     userType.addAll(it)
+                 }
+                 LoggerProvider.logger.d("Languages fetched: ${uiState.success!!.data}")
+             }
+         }
+     }*/
 
     Surface(
         modifier = Modifier.fillMaxWidth(), color = White
@@ -135,7 +139,7 @@ fun EnterUserScreen2(navController: NavHostController) {
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            ProfileScreen2UI(context, navController)
+            ProfileScreen2UI(context, onBack = onBack, onNext = onNext)
         }
     }
 }
@@ -144,7 +148,8 @@ fun EnterUserScreen2(navController: NavHostController) {
 @Composable
 fun ProfileScreen2UI(
     context: Context,
-    navController: NavHostController
+    onNext: () -> Unit,
+    onBack: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
@@ -203,7 +208,7 @@ fun ProfileScreen2UI(
             RegistrationHeader(
                 stringResource(R.string.txt_create_profile), Black,
                 stringResource(R.string.txt_step_2), OrangeSubTitle, onBackButtonClick = {
-                    BackButtonPress(navController, AppRoute.UserTypeSelect.route)
+                    onBack()
                 })
             Column(
                 modifier = Modifier
@@ -492,8 +497,7 @@ fun ProfileScreen2UI(
                                         inValidMobNo = true
                                     } else {
                                         isDialogVisible = true
-                                        navController.popBackStack()
-                                        navController.navigate(AppRoute.UserPasswordScreen.route)
+                                        onNext()
 
                                     }
                                 }
@@ -511,5 +515,7 @@ fun ProfileScreen2UI(
 fun UserProfile2UI() {
     val navController = rememberNavController()
     val context = LocalContext.current
-    ProfileScreen2UI(context, navController)
+    val onNext: () -> Unit = {}
+    val onBack: () -> Unit = {}
+    ProfileScreen2UI(context, onNext, onBack)
 }

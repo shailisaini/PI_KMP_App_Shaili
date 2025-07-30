@@ -87,7 +87,8 @@ import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
 
 @Composable
-fun EditProfileScreen1(navController: NavHostController) {
+fun EditProfileScreen1(onNext: () -> Unit,  //EditProfileScreen2
+                       onBack: () -> Unit) {
     var isDialogVisible by remember { mutableStateOf(false) }
 //    val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
 
@@ -99,7 +100,7 @@ fun EditProfileScreen1(navController: NavHostController) {
         message = stringResource(R.string.txt_loading)
     )
     BackHandler {
-        BackButtonPress(navController, AppRoute.UserTypeSelect.route)
+        onBack()
     }
     LoggerProvider.logger.d("Screen: " + "EnterUserNameScreen()")
 
@@ -112,7 +113,7 @@ fun EditProfileScreen1(navController: NavHostController) {
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            EditProfileScreenUI(context, navController)
+            EditProfileScreenUI(context, onBack = onBack, onNext = onNext)
         }
     }
 }
@@ -120,7 +121,8 @@ fun EditProfileScreen1(navController: NavHostController) {
 @Composable
 fun EditProfileScreenUI(
     context: Context,
-    navController: NavHostController
+    onBack: () -> Unit,
+    onNext: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
@@ -161,7 +163,7 @@ fun EditProfileScreenUI(
         isShowBackButton = true,
         isShowMoreInfo = false,
         onBackButtonClick = {
-            BackButtonPress(navController, AppRoute.InterventionAcceptLevel.route)
+           onBack()
         },
         onMoreInfoClick = {
 //            showSheetMenu = true
@@ -538,8 +540,7 @@ fun EditProfileScreenUI(
                                                 inValidMobNo = true
                                             } else {
                                                 isDialogVisible = true
-                                                navController.popBackStack()
-                                                navController.navigate(AppRoute.EditProfileScreen2.route)
+                                               onNext()
 
                                             }
                                         }
@@ -556,7 +557,8 @@ fun EditProfileScreenUI(
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
 fun EditProfileUI() {
-    val navController = rememberNavController()
     val context = LocalContext.current
-    EditProfileScreenUI(context, navController)
+    val onNext: () -> Unit = {}
+    val onBack: () -> Unit = {}
+    EditProfileScreenUI(context, onNext, onBack)
 }

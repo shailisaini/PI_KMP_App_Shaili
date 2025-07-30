@@ -81,7 +81,8 @@ import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun EditProfileScreen2(navController: NavHostController) {
+fun EditProfileScreen2(onNext: () -> Unit,  //EditProfileScreen2
+                       onBack: () -> Unit) {
     var isDialogVisible by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
@@ -92,7 +93,7 @@ fun EditProfileScreen2(navController: NavHostController) {
         message = stringResource(R.string.txt_loading)
     )
     BackHandler {
-        BackButtonPress(navController, AppRoute.UserTypeSelect.route)
+       onBack()
     }
     LoggerProvider.logger.d("Screen: " + "EnterUserNameScreen()")
 
@@ -105,7 +106,7 @@ fun EditProfileScreen2(navController: NavHostController) {
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            EditProfileScreen2UI(context, navController)
+            EditProfileScreen2UI(context, onNext = onNext, onBack = onBack)
         }
     }
 }
@@ -114,7 +115,8 @@ fun EditProfileScreen2(navController: NavHostController) {
 @Composable
 fun EditProfileScreen2UI(
     context: Context,
-    navController: NavHostController
+    onBack: () -> Unit,
+    onNext: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
@@ -162,7 +164,7 @@ fun EditProfileScreen2UI(
         isShowBackButton = true,
         isShowMoreInfo = false,
         onBackButtonClick = {
-            BackButtonPress(navController, AppRoute.InterventionAcceptLevel.route)
+           onBack()
         },
         onMoreInfoClick = {
 //            showSheetMenu = true
@@ -491,8 +493,7 @@ fun EditProfileScreen2UI(
                                                 inValidMobNo = true
                                             } else {
                                                 isDialogVisible = true
-                                                navController.popBackStack()
-                                                navController.navigate(AppRoute.UserPasswordScreen.route)
+                                               onNext()
 
                                             }
                                         }
@@ -509,7 +510,8 @@ fun EditProfileScreen2UI(
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
 fun EditUserProfile2UI() {
-    val navController = rememberNavController()
     val context = LocalContext.current
-    EditProfileScreen2UI(context, navController)
+    val onNext: () -> Unit = {}
+    val onBack: () -> Unit = {}
+    EditProfileScreen2UI(context, onNext, onBack)
 }
