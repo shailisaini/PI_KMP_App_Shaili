@@ -100,7 +100,7 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ScreeningHomeScreen(addStudent: () -> Unit, onBack: () -> Unit) {
+fun ScreeningHomeScreen(addStudent: () -> Unit, onBack: () -> Unit, screeningOne: () -> Unit) {
 
     logger.d("Screen: " + "ScreeningHomeScreen()")
 
@@ -327,7 +327,7 @@ fun ScreeningHomeScreen(addStudent: () -> Unit, onBack: () -> Unit) {
                         }
 
                         1 -> {
-                            ScreeningFirst()
+                            ScreeningFirst(screeningOne = screeningOne)
                         }
 
                         2 -> {
@@ -372,7 +372,7 @@ fun AllScreening() {
 }
 
 @Composable
-fun ScreeningFirst() {
+fun ScreeningFirst(screeningOne: () -> Unit) {
     val screeningListData = listOf(
         ScreeningData(
             stringResource(R.string.txt_Abhisheki_Muthuswami),
@@ -418,7 +418,7 @@ fun ScreeningFirst() {
     ) {
         LazyColumn {
             items(screeningListData) { screeningData ->
-                ScreeningFirstDataUI(screeningData)
+                ScreeningFirstDataUI(screeningData, screeningOne)
             }
         }
     }
@@ -426,7 +426,8 @@ fun ScreeningFirst() {
 
 @Composable
 fun ScreeningFirstDataUI(
-    screeningData: ScreeningData
+    screeningData: ScreeningData,
+    screeningOne: () -> Unit
 ) {
     val selectedBorder = BorderStroke(
         width = 0.5.dp, if (isSystemInDarkTheme()) {
@@ -703,7 +704,7 @@ fun ScreeningFirstDataUI(
                         .padding(start = 8.dp, end = 16.dp)
                         .background(Color.Unspecified)
                         .clickable {
-                            navHostController.navigate(AppRoute.ScreeningOne.route)
+                            screeningOne()
                         })
             }
         }

@@ -116,7 +116,8 @@ class StudentDashboardActivity : ComponentActivity() {
                         DrawerHeader(drawerState, onItemClick = {
                             scope.launch {
                                 drawerState.close()
-                                navigateTo(AppRoute.ProfileScreen.route)}
+                                navigateTo(AppRoute.ProfileScreen.route)
+                            }
                         })
                         DrawerBody(
                             // List of Navigation Drawer
@@ -294,7 +295,12 @@ class StudentDashboardActivity : ComponentActivity() {
 
                                 AppRoute.EditProfileScreen2.route -> EditProfileScreen2(
                                     onNext = {
-                                        context.startActivity(Intent(context, StudentDashboardActivity::class.java))
+                                        context.startActivity(
+                                            Intent(
+                                                context,
+                                                StudentDashboardActivity::class.java
+                                            )
+                                        )
                                         (context as? Activity)?.finish()
                                     },
                                     onBack = { navigateBack(AppRoute.ProfileScreen.route) })
@@ -302,9 +308,48 @@ class StudentDashboardActivity : ComponentActivity() {
                                 // Screening
                                 AppRoute.ScreeningScreen.route -> ScreeningHomeScreen(
                                     addStudent = { navigateTo(AppRoute.AddStudentRegister.route) },
+                                    screeningOne = { navigateTo(AppRoute.ScreeningOne.route) },
                                     /*onNext = { navigateTo(AppRoute.EditProfileScreen2.route) },*/
                                     onBack = { navigateBack(AppRoute.ProfileScreen.route) }
                                 )
+
+                                AppRoute.ScreeningOne.route -> ScreeningOneScreen(
+                                    onNext = { navigateTo(AppRoute.AddStudentRegister.route) },
+                                    onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
+                                )
+
+                                AppRoute.AddStudentRegister.route -> AddNewStudentDetailsScreen(
+                                    addNewStudentMore = { navigateTo(AppRoute.AddNewStudentMoreDetails.route) },
+                                    onNext = { navigateTo(AppRoute.AddStudentRegister.route) },
+                                    onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
+                                )
+
+                                AppRoute.AddNewStudentMoreDetails.route -> AddNewStudentMoreDetailsScreen(
+                                    addStudentReg = { navigateTo(AppRoute.AddStudentRegister.route) },
+                                    onNext = { navigateTo(AppRoute.ScreeningScreen.route) },
+                                    onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
+                                )
+
+                                // This is for intervention
+                               /* composable(AppRoute.InterventionScreen.route) {
+                                    InterventionHomeScreen(navController)
+                                }
+
+                                        composable(AppRoute.InterventionStudentDetails.route) {
+                                    InterventionStudentDetailsScreen(navController)
+                                }
+
+                                        composable(AppRoute.InterventionAcceptLevel.route) {
+                                    InterventionAcceptLevelScreen(navController)
+                                }
+
+                                        composable(AppRoute.UploadedDocuments.route) {
+                                    UploadedDocumentsScreen(navController)
+                                }
+
+                                        composable(AppRoute.TeachingPlan.route) {
+                                    TeachingPlanScreen(navController)
+                                }*/
                             }
                         }
                     }
