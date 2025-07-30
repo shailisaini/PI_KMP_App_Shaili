@@ -35,6 +35,7 @@ val LightText = Color(0xFFA0A0A0)
 val GrayLight02 = Color(0xFFE6E6E6)
 val GrayLight03 = Color(0x9ACFD1D9)
 val GrayLight04 = Color(0xFF9F9F9F)
+val GrayLight05 = Color(0xFFD0D5DD)  //#D0D5DD
 val White = Color(0xFFFFFFFF)
 val WhiteA = Color(0xFFFFF5DE)
 val BackgroundGray = Color(0xFF666666)
@@ -48,7 +49,8 @@ val PurpleDark02 = Color(0xFF978FED)
 val LightPurple01 = Color(0xFFB6B0FB)
 val LightPurple02 = Color(0xFFE3DDF8)
 val LightPurple03 = Color(0xFFF6F4FE)
-val LightPurple04 = Color(0xFF9EABF5)  // #9EABF5  //
+val LightPurple04 = Color(0xFF9EABF5)  // #9EABF5
+val LightPurple05 = Color(0xFFF4F5F9)  // #F4F5F9
 
 val GreenDark01 = Color(0xFF2D6F36)
 val GreenDark02 = Color(0xFF57A861)
@@ -79,11 +81,15 @@ val RedBgColor = Color(0xFFFFE9E9)
 val DarkRed2 = Color(0xFFD76B66)
 val LightRed01 = Color(0xFFF2566D)
 val LightRed02 = Color(0xFFFEECEB)
+val LightRed03 = Color(0xFFF2F2F2) // #F2F2F2
 
 val BannerColor00 = Color(0xFFF6E4D0)
 val BannerColor01 = Color(0xFFFAD6AE)
-val BannerColor02 = Color(0xFFFAB364)  //#101942
+val BannerColor02 = Color(0xFF101942)  //#101942
 val BannerColor03 = Color(0xFFEFF0F5) //#EFF0F5
+
+
+val BodyTextLight = Color(0xFFB0B3C0) //#B0B3C0
 
 
 val contactUsTxt = Color(0xFF1B244D)

@@ -383,8 +383,7 @@ fun ScreeningFirst() {
             stringResource(R.string.txt_Inprogress),
             6,
             painterResource(id = R.drawable.dummy_image)
-        ),
-        ScreeningData(
+        ), ScreeningData(
             stringResource(R.string.txt_Abhi_Kothari),
             stringResource(R.string.txt_Class_4),
             stringResource(R.string.txt_Start_screening),
@@ -393,8 +392,7 @@ fun ScreeningFirst() {
             stringResource(R.string.txt_Inprogress),
             4,
             painterResource(id = R.drawable.dummy_image)
-        ),
-        ScreeningData(
+        ), ScreeningData(
             stringResource(R.string.txt_Hare_Krishna),
             stringResource(R.string.txt_Class_2),
             stringResource(R.string.txt_Start_screening),
@@ -491,8 +489,7 @@ fun ScreeningFirstDataUI(
                     ), horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Row(
-                        modifier = Modifier
-                            .padding(horizontal = 6.dp, vertical = 6.dp),
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 6.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -568,7 +565,8 @@ fun ScreeningFirstDataUI(
                                 .padding(
                                     start = 6.dp, end = 6.dp, top = 6.dp, bottom = 6.dp
                                 )
-                                .weight(1f), horizontalAlignment = Alignment.Start,
+                                .weight(1f),
+                            horizontalAlignment = Alignment.Start,
                             verticalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
@@ -611,8 +609,7 @@ fun ScreeningFirstDataUI(
                             ) {
                                 Text(
                                     text = screeningData.inProgressAchieved,
-                                    modifier = Modifier
-                                        .wrapContentWidth(),
+                                    modifier = Modifier.wrapContentWidth(),
                                     fontFamily = fontRegular,
                                     fontSize = 14.sp,
                                     color = if (isSystemInDarkTheme()) {
@@ -625,8 +622,7 @@ fun ScreeningFirstDataUI(
 
                                 Text(
                                     text = "${screeningData.inProgressNum}%",
-                                    modifier = Modifier
-                                        .wrapContentWidth(),
+                                    modifier = Modifier.wrapContentWidth(),
                                     fontFamily = fontMedium,
                                     fontSize = 14.sp,
                                     color = if (isSystemInDarkTheme()) {
@@ -642,7 +638,8 @@ fun ScreeningFirstDataUI(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 8.dp)
-                                    .wrapContentHeight(), horizontalAlignment = Alignment.Start,
+                                    .wrapContentHeight(),
+                                horizontalAlignment = Alignment.Start,
                                 verticalArrangement = Arrangement.SpaceBetween
                             ) {
                                 if (screeningData.inProgressNum != null) {
@@ -705,7 +702,9 @@ fun ScreeningFirstDataUI(
                         .size(50.dp)
                         .padding(start = 8.dp, end = 16.dp)
                         .background(Color.Unspecified)
-                )
+                        .clickable {
+                            navHostController.navigate(AppRoute.ScreeningOne.route)
+                        })
             }
         }
     }

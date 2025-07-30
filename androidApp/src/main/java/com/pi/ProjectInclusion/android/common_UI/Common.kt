@@ -134,10 +134,12 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.pi.ProjectInclusion.BannerColor02
 import com.pi.ProjectInclusion.Bg_Gray2
 import com.pi.ProjectInclusion.Bg_Gray3
 import com.pi.ProjectInclusion.Bg_Gray4
 import com.pi.ProjectInclusion.Black
+import com.pi.ProjectInclusion.BodyTextLight
 import com.pi.ProjectInclusion.BorderBlue
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
@@ -151,12 +153,15 @@ import com.pi.ProjectInclusion.GrayLight01
 import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.GrayLight03
 import com.pi.ProjectInclusion.GrayLight04
+import com.pi.ProjectInclusion.GrayLight05
 import com.pi.ProjectInclusion.LightBlue
 import com.pi.ProjectInclusion.LightPurple04
 import com.pi.ProjectInclusion.OrangeSubTitle
 import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
+import com.pi.ProjectInclusion.PrimaryBlue3
 import com.pi.ProjectInclusion.PrimaryBlueLt
+import com.pi.ProjectInclusion.PrimaryBlueLt1
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.fontBold
@@ -1117,7 +1122,8 @@ fun TextWithIconOnLeft(
     onClick: () -> Unit = {},
 ) {
     Row(
-        modifier = modifier.clickable { onClick() }
+        modifier = modifier
+            .clickable { onClick() }
             .wrapContentSize(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
@@ -1131,7 +1137,7 @@ fun TextWithIconOnLeft(
             Spacer(modifier = Modifier.width(10.dp))
         }
 
-        if (text != ""){
+        if (text != "") {
             Spacer(modifier = Modifier.width(4.dp)) // Add space between text and icon
             Text(
                 text = text,
@@ -1143,7 +1149,7 @@ fun TextWithIconOnLeft(
                     textAlign = TextAlign.Start
                 )
             )
-            }
+        }
     }
 }
 
@@ -2290,7 +2296,7 @@ fun Modifier.drawDashedBorder(
     strokeWidth: Dp,
     dashLength: Dp,
     gapLength: Dp,
-    cornerRadius: Dp = 0.dp
+    cornerRadius: Dp = 0.dp,
 ) = this.then(
     Modifier.drawBehind {
         val stroke = Stroke(
@@ -2336,7 +2342,7 @@ fun createImageUri(context: Context): Uri? {
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Preview
 @Composable
-fun LeavingDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit={}) {
+fun LeavingDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
     val context = LocalContext.current
 
     Dialog(onDismissRequest = { onDismiss() }) {
@@ -2447,7 +2453,6 @@ fun LeavingDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit={}) {
     }
 }
 
-
 @Composable
 fun CustomToastMessage(
     titleStr: String,
@@ -2528,5 +2533,229 @@ fun CustomToastMessage(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun ScreeningDetailsBackgroundUi(
+    studentName: String,
+    grade: String,
+    modifier: Modifier = Modifier,
+    isShowBackButton: Boolean = true,
+    isShowMoreInfo: Boolean = true,
+    onBackButtonClick: () -> Unit = {},
+    onMoreInfoClick: () -> Unit = {},
+    content: @Composable (() -> Unit),
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(), color = White
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    color = if (isSystemInDarkTheme()) {
+                        PrimaryBlue
+                    } else {
+                        PrimaryBlue
+                    }
+                ), verticalArrangement = Arrangement.Top
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .background(
+                        color = if (isSystemInDarkTheme()) {
+                            PrimaryBlue
+                        } else {
+                            PrimaryBlue
+                        }
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Absolute.SpaceBetween
+            ) {
+                Row(
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .padding(start = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(
+                        modifier = Modifier.background(
+                            color = if (isSystemInDarkTheme()) {
+                                PrimaryBlue
+                            } else {
+                                PrimaryBlue
+                            }
+                        )
+                    ) {
+                        Text(
+                            text = studentName.toString(),
+                            modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                            fontFamily = fontBold,
+                            fontSize = 16.sp,
+                            color = if (isSystemInDarkTheme()) {
+                                DARK_TITLE_TEXT
+                            } else {
+                                White
+                            },
+                            textAlign = TextAlign.Start
+                        )
+
+                        Text(
+                            text = grade.toString(),
+                            modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                            fontFamily = fontRegular,
+                            fontSize = 14.sp,
+                            color = if (isSystemInDarkTheme()) {
+                                LightPurple04
+                            } else {
+                                LightPurple04
+                            },
+                            textAlign = TextAlign.Start
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .background(Color.Unspecified)
+                ) {
+                    if (isShowMoreInfo && !LocalInspectionMode.current) {
+                        Image(
+                            painter = painterResource(R.drawable.more_info_img),
+                            contentDescription = IMG_DESCRIPTION,
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .padding(start = 10.dp)
+                                .background(Color.Unspecified)
+                                .clickable(onClick = onMoreInfoClick),
+                            colorFilter = ColorFilter.tint(White)
+                        )
+                    }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .background(Color.Unspecified)
+                ) {
+                    if (isShowBackButton && !LocalInspectionMode.current) {
+                        Image(
+                            painter = painterResource(R.drawable.close_img),
+                            contentDescription = IMG_DESCRIPTION,
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .padding(end = 10.dp)
+                                .background(Color.Unspecified)
+                                .clickable(onClick = onBackButtonClick),
+                            colorFilter = ColorFilter.tint(White)
+                        )
+                    }
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .background(
+                        if (isSystemInDarkTheme()) {
+                            Dark_01
+                        } else {
+                            White
+                        }
+                    )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                ) {
+                    content()
+                }
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun YesNoBtnUi(
+    title: String = "No", onClick: () -> Unit = {}, enabled: Boolean = false,
+) {
+    val selectedBorder = BorderStroke(
+        width = 1.dp, if (isSystemInDarkTheme()) {
+            if (enabled) {
+                BannerColor02
+            } else {
+                GrayLight05
+            }
+        } else {
+            if (enabled) {
+                BannerColor02
+            } else {
+                GrayLight05
+            }
+        }
+    )
+
+    Card(
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier
+            .width(100.dp)
+            .wrapContentHeight()
+            .clickable {
+                onClick()
+            },
+        colors = if (isSystemInDarkTheme()) {
+            if (enabled) {
+                CardDefaults.cardColors(PrimaryBlueLt1)
+            } else {
+                CardDefaults.cardColors(White)
+            }
+        } else {
+            if (enabled) {
+                CardDefaults.cardColors(
+                    containerColor = PrimaryBlueLt1,
+                    contentColor = PrimaryBlueLt1,
+                    disabledContentColor = PrimaryBlueLt1,
+                    disabledContainerColor = PrimaryBlueLt1
+                )
+            } else {
+                CardDefaults.cardColors(
+                    containerColor = White,
+                    contentColor = White,
+                    disabledContentColor = White,
+                    disabledContainerColor = White
+                )
+            }
+        },
+        border = selectedBorder
+    ) {
+        Text(
+            text = title,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp, top = 8.dp, start = 8.dp, end = 8.dp),
+            fontSize = 14.sp,
+            color = if (enabled) {
+                PrimaryBlue
+            } else {
+                BodyTextLight
+            },
+            textAlign = TextAlign.Center,
+            fontFamily = fontMedium,
+        )
     }
 }
