@@ -1,6 +1,5 @@
 package com.pi.ProjectInclusion.android.screens.screeningScreen
 
-import android.widget.GridLayout
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -29,39 +28,30 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Dark_02
 import com.pi.ProjectInclusion.Dark_03
-import com.pi.ProjectInclusion.GrayLight03
 import com.pi.ProjectInclusion.GrayLight06
 import com.pi.ProjectInclusion.LightOrange2
-import com.pi.ProjectInclusion.LightPurple04
 import com.pi.ProjectInclusion.LightPurple05
 import com.pi.ProjectInclusion.LightRed03
 import com.pi.ProjectInclusion.PrimaryBlue
-import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.R
-import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
 import com.pi.ProjectInclusion.android.common_UI.CustomHorizontalProgressBar
 import com.pi.ProjectInclusion.android.common_UI.ScreeningDetailsBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.SmallBtnUi
 import com.pi.ProjectInclusion.android.common_UI.YesNoBtnUi
-import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
-import com.pi.ProjectInclusion.android.utils.toast
 
 
 @Composable
@@ -112,7 +102,7 @@ fun ScreeningOneScreen(onNext: () -> Unit, onBack: () -> Unit) {
         isShowBackButton = true,
         isShowMoreInfo = true,
         onBackButtonClick = {
-          onBack()
+            onBack()
         },
         onMoreInfoClick = {
             showDialog = true
@@ -249,7 +239,9 @@ fun ScreeningOneScreen(onNext: () -> Unit, onBack: () -> Unit) {
                         SmallBtnUi(
                             enabled = true,
                             title = stringResource(R.string.txt_submit),
-                            onClick = {})
+                            onClick = {
+                                onNext() // this change according to condition
+                            })
                     }
                 }
             }
@@ -380,9 +372,10 @@ data class ScreeningQuestionData(
     var ansNo: String,
 )
 
-@Preview(showSystemUi = true)
+@Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun ScreeningOneScreenPreview() {
-    val navController = rememberNavController()
-    ScreeningOneScreen(navController)
+    val onNext: () -> Unit = {}
+    val onBack: () -> Unit = {}
+    ScreeningOneScreen(onNext, onBack)
 }

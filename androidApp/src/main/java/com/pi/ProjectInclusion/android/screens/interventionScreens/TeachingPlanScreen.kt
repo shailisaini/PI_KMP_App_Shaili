@@ -26,9 +26,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
@@ -39,16 +39,14 @@ import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.R
-import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
-import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TeachingPlanScreen(navHostController: NavHostController) {
+fun TeachingPlanScreen(onBack: () -> Unit) {
 
     logger.d("Screen: " + "TeachingPlanScreen()")
 
@@ -59,10 +57,12 @@ fun TeachingPlanScreen(navHostController: NavHostController) {
         isShowBackButton = true,
         isShowMoreInfo = true,
         onBackButtonClick = {
-            BackButtonPress(navHostController, AppRoute.InterventionAcceptLevel.route)
+//            BackButtonPress(navHostController, AppRoute.InterventionAcceptLevel.route)
+            onBack()
         },
         onMoreInfoClick = {
-            BackButtonPress(navHostController, AppRoute.InterventionAcceptLevel.route)
+//            BackButtonPress(navHostController, AppRoute.InterventionAcceptLevel.route)
+            onBack()
         },
         content = {
             LazyColumn(
@@ -391,4 +391,11 @@ fun TeachingPlanScreen(navHostController: NavHostController) {
                 }
             }
         })
+}
+
+@Preview(showSystemUi = true, showBackground = true)
+@Composable
+fun TeachingPlanScreenPreview() {
+    val onBack: () -> Unit = {}
+    TeachingPlanScreen(onBack)
 }

@@ -52,8 +52,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.BannerColor03
 import com.pi.ProjectInclusion.Black
@@ -74,7 +72,6 @@ import com.pi.ProjectInclusion.Yellow
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.CustomHorizontalProgressBar
-import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.screens.menu.TabItem
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
@@ -84,7 +81,7 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun InterventionHomeScreen(navHostController: NavHostController) {
+fun InterventionHomeScreen(onNext: () -> Unit, onBack: () -> Unit) {
 
     logger.d("Screen: " + "InterventionHomeScreen()")
 
@@ -181,15 +178,15 @@ fun InterventionHomeScreen(navHostController: NavHostController) {
         ) { index ->
             when (index) {
                 0 -> {
-                    PendingIntervention(navHostController)
+                    PendingIntervention(onNext)
                 }
 
                 1 -> {
-                    InProgressIntervention(navHostController)
+                    InProgressIntervention(onNext)
                 }
 
                 else -> {
-                    CompletedIntervention(navHostController)
+                    CompletedIntervention(onNext)
                 }
             }
         }
@@ -272,7 +269,7 @@ fun InterventionIntroDialog(onDismiss: () -> Unit) {
 }
 
 @Composable
-fun PendingIntervention(navHostController: NavHostController) {
+fun PendingIntervention(onNext: () -> Unit) {
     val interventionListData = listOf(
         InterventionData(
             stringResource(R.string.txt_Abhisheki_Muthuswami),
@@ -320,14 +317,14 @@ fun PendingIntervention(navHostController: NavHostController) {
     ) {
         LazyColumn {
             items(interventionListData) { interventionData ->
-                InterventionDataUI(interventionData, navHostController)
+                InterventionDataUI(interventionData, onNext)
             }
         }
     }
 }
 
 @Composable
-fun InterventionDataUI(interData: InterventionData, navHostController: NavHostController) {
+fun InterventionDataUI(interData: InterventionData, onNext: () -> Unit) {
     val selectedBorder = BorderStroke(
         width = 0.5.dp, if (isSystemInDarkTheme()) {
             Dark_02
@@ -526,7 +523,8 @@ fun InterventionDataUI(interData: InterventionData, navHostController: NavHostCo
                     .fillMaxWidth()
                     .height(45.dp)
                     .clickable {
-                        navHostController.navigate(AppRoute.InterventionStudentDetails.route)
+//                        navHostController.navigate(AppRoute.InterventionStudentDetails.route)
+                        onNext()
                     }
                     .background(PrimaryBlue3),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -555,7 +553,8 @@ fun InterventionDataUI(interData: InterventionData, navHostController: NavHostCo
                         .padding(start = 8.dp, end = 16.dp)
                         .background(Color.Unspecified)
                         .clickable {
-                            navHostController.navigate(AppRoute.InterventionStudentDetails.route)
+//                            navHostController.navigate(AppRoute.InterventionStudentDetails.route)
+                            onNext()
                         }
                 )
             }
@@ -564,7 +563,7 @@ fun InterventionDataUI(interData: InterventionData, navHostController: NavHostCo
 }
 
 @Composable
-fun InProgressIntervention(navHostController: NavHostController) {
+fun InProgressIntervention(onNext: () -> Unit) {
     val interventionListData = listOf(
         InterventionData(
             stringResource(R.string.txt_Abhisheki_Muthuswami),
@@ -612,7 +611,7 @@ fun InProgressIntervention(navHostController: NavHostController) {
     ) {
         LazyColumn {
             items(interventionListData) { interventionData ->
-                InterventionInProgressDataUI(interventionData, navHostController)
+                InterventionInProgressDataUI(interventionData, onNext)
             }
         }
     }
@@ -621,7 +620,7 @@ fun InProgressIntervention(navHostController: NavHostController) {
 @Composable
 fun InterventionInProgressDataUI(
     inProgress: InterventionData,
-    navHostController: NavHostController,
+    onNext: () -> Unit,
 ) {
     val selectedBorder = BorderStroke(
         width = 0.5.dp, if (isSystemInDarkTheme()) {
@@ -905,7 +904,7 @@ fun InterventionInProgressDataUI(
 }
 
 @Composable
-fun CompletedIntervention(navHostController: NavHostController) {
+fun CompletedIntervention(onNext: () -> Unit) {
     val interventionListData = listOf(
         InterventionData(
             stringResource(R.string.txt_Abhisheki_Muthuswami),
@@ -953,14 +952,14 @@ fun CompletedIntervention(navHostController: NavHostController) {
     ) {
         LazyColumn {
             items(interventionListData) { interventionData ->
-                InterventionCompletedDataUI(interventionData, navHostController)
+                InterventionCompletedDataUI(interventionData, onNext)
             }
         }
     }
 }
 
 @Composable
-fun InterventionCompletedDataUI(completedData: InterventionData, navigation: NavHostController) {
+fun InterventionCompletedDataUI(completedData: InterventionData, onNext: () -> Unit) {
     val selectedBorder = BorderStroke(
         width = 0.5.dp, if (isSystemInDarkTheme()) {
             Dark_02
@@ -1242,13 +1241,6 @@ fun InterventionCompletedDataUI(completedData: InterventionData, navigation: Nav
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun InterventionHomeScreenPreview() {
-    val navController = rememberNavController()
-    InterventionHomeScreen(navController)
-}
-
 data class InterventionData(
     var name: String,
     var grade: String,
@@ -1259,3 +1251,11 @@ data class InterventionData(
     var inProgressNum: Int,
     var image: Painter,
 )
+
+@Preview(showSystemUi = true, showBackground = true)
+@Composable
+fun InterventionHomeScreenPreview() {
+    val onNext: () -> Unit = {}
+    val onBack: () -> Unit = {}
+    InterventionHomeScreen(onNext, onBack)
+}
