@@ -284,6 +284,9 @@ and make a difference together!</string>
     <string name="txt_select_your_school_type_msg">Please select your school type.</string>
     <string name="head_leave">Want to leave?</string>
     <string name="body_leave">Your progress will be saved. You can continue from where you left off</string>
+    <string name="head_screening">Screening 1</string>
+    <string name="body_screening">You are about to submit the screening 1 form for “#student name”, do you want to check again before submitting it. </string>
+    <string name="txt_check_again">Check Again</string>
     <string name="txt_Student_added">Student added!</string>
     <string name="txt_Begin_Screening_process">Begin Screening 1 to continue the process.</string>
     <string name="txt_Kendriya_Vidhyalya_Delhi">Kendriya Vidhyalya 1, Delhi</string>

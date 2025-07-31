@@ -2347,8 +2347,6 @@ fun LeavingDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
 
     Dialog(onDismissRequest = { onDismiss() }) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-            var selectedUri = remember { mutableStateOf<Uri?>(null) }
-
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(20.dp))
@@ -2439,7 +2437,7 @@ fun LeavingDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
                         ) {
                             Text(
                                 text = stringResource(R.string.txt_leave),
-                                fontSize = 16.sp,
+                                fontSize = 17.sp,
                                 fontFamily = fontMedium,
                                 color = White,
                                 textAlign = TextAlign.Center,
@@ -2757,5 +2755,117 @@ fun YesNoBtnUi(
             textAlign = TextAlign.Center,
             fontFamily = fontMedium,
         )
+    }
+}
+
+@SuppressLint("UnusedBoxWithConstraintsScope")
+@Preview
+@Composable
+fun SubmissionDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
+    val context = LocalContext.current
+
+    Dialog(onDismissRequest = { onDismiss() }) {
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(21.dp))
+                    .background(if (isSystemInDarkTheme()) Dark_02 else White)
+                    .fillMaxWidth()
+
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(vertical = 15.dp, horizontal = 9.dp)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.screening_img),
+                        contentDescription = IMG_DESCRIPTION,
+                        modifier = Modifier.size(61.dp),
+                        tint = Color.Unspecified
+                    )
+
+                    Text(
+                        text = stringResource(R.string.head_screening),
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .padding(top = 17.dp, start = 9.dp, end = 9.dp),
+                        fontFamily = fontBold,
+                        fontSize = 19.sp,
+                        color = Black,
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        text = stringResource(R.string.body_screening),
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .padding(top = 3.dp, start = 9.dp, end = 9.dp),
+                        fontFamily = fontRegular,
+                        fontSize = 15.sp,
+                        color = GrayLight04,
+                        textAlign = TextAlign.Center
+                    )
+                    Row(
+                        modifier = Modifier
+                            .padding(vertical = 15.dp, horizontal = 5.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+
+                        ) {
+                        Button(
+                            onClick = {
+                                onDismiss()
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .padding(end = 9.dp)
+                                .clip(RoundedCornerShape(9.dp)),
+                            shape = RoundedCornerShape(9.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = White,
+                                contentColor = BorderBlue
+                            ),
+                            border = BorderStroke(1.dp, BorderBlue)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.txt_check_again),
+                                fontSize = 15.sp,
+                                fontFamily = fontMedium,
+                                color = BorderBlue
+                            )
+                        }
+                        // check Status
+                        Button(
+                            onClick = {
+                                onClick()
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .padding(end = 9.dp)
+                                .clip(RoundedCornerShape(9.dp)),
+                            shape = RoundedCornerShape(9.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = PrimaryBlue,
+                                contentColor = White
+                            ),
+                            border = BorderStroke(1.dp, BorderBlue)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.txt_submit),
+                                fontSize = 15.sp,
+                                fontFamily = fontMedium,
+                                color = White,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }
