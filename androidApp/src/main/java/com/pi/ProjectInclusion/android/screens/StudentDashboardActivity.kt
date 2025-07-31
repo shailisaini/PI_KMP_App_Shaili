@@ -112,7 +112,9 @@ class StudentDashboardActivity : ComponentActivity() {
                             .padding(end = 30.dp)
                             .background(Transparent)
                     ) {
-                        DrawerHeader(drawerState, onItemClick = {
+                        DrawerHeader(drawerState,
+                            closeMenu ={scope.launch {drawerState.close()}},
+                            onItemClick = {
                             scope.launch {
                                 drawerState.close()
                                 navigateTo(AppRoute.ProfileScreen.route)

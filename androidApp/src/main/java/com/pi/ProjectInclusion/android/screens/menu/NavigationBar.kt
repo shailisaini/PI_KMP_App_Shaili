@@ -32,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -54,64 +55,68 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.pi.ProjectInclusion.Black
+import com.pi.ProjectInclusion.BorderBlue
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight01
 import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.GreenDark01
+import com.pi.ProjectInclusion.LightPurple04
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.MyApplicationTheme
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.utils.fontMedium
+import com.pi.ProjectInclusion.android.utils.fontRegular
 
 
+@Preview
 @Composable
 fun DrawerHeader(
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Open),
     onItemClick: () -> Unit = {},
+    closeMenu: () -> Unit = {},
 ) {
-    val colors = MaterialTheme.colorScheme
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
-
             .wrapContentHeight()
             .padding(end = 50.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth()
-                .height(200.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(230.dp)
                 .clickable {
                     onItemClick.invoke()
                 }
                 .background(
                     brush = Brush.linearGradient(
-                        colors = listOf(Color(0xFF2C3EA2), Color(0xFF101942))
+                        colors = listOf(
+                            BorderBlue, // #2C3EA2
+                            PrimaryBlue  // #101942
+                        ),
+                        start = Offset(0f, Float.POSITIVE_INFINITY),
+                        end = Offset(0f, 0f)
                     )
                 )
         ) {
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 20.dp),
-//                    .clickable { onItemClick.invoke() },
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(15.dp)
             )
             {
                 Box(
-                    modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp, top = 20.dp)
-
+                    modifier = Modifier.padding(5.dp)
                 )
                 {
                     Column(
                         modifier = Modifier
                             .wrapContentSize()
                             .align(Alignment.Center)
-
                     ) {
                         Image(
                             painter = painterResource(R.drawable.profile_user_icon),
@@ -120,7 +125,7 @@ fun DrawerHeader(
                                 .clip(CircleShape) // Add clip modifier to make the image circular
                                 .background(shape = CircleShape, color = Transparent)
                                 .border( // Add border modifier to make image stand out
-                                    width = 1.dp, color = GreenDark01, shape = CircleShape
+                                    width = 1.dp, color = White, shape = CircleShape
                                 ),
                             contentScale = ContentScale.Crop // Clip the image to a circular shape
                         )
@@ -139,42 +144,46 @@ fun DrawerHeader(
                     //  email
                     textEmail = stringResource(R.string.user_profile)
                     Text(
-                        text = textName, style = MaterialTheme.typography.bodyMedium.copy(
-                            /* color = Black,*/  color = colors.onSurface,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
+                        text = textName,
+                        color = White,
+                        fontSize = 19.sp,
+                        fontFamily = fontMedium
                     )
                     Text(
-                        text = textEmail, style = MaterialTheme.typography.bodyMedium.copy(
-                            color = Gray, fontSize = 12.sp, fontWeight = FontWeight.Normal
-                        )
+                        text = textEmail,
+                        color = LightPurple04, fontSize = 13.sp, fontFamily = fontRegular
                     )
+                    Column(
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .padding(vertical = 10.dp)
+                    ) {
+                        Card(
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .border(
+                                    width = 1.dp,
+                                    color = White,
+                                    shape = RoundedCornerShape(8.dp)
+                                ),
+                            colors = CardDefaults.cardColors(
+                                containerColor = White.copy(alpha = 0.2f) // Set semi-transparent background here
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                            // Do not set containerColor, let the Box inside handle the gradient
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .wrapContentWidth()
+                                    .padding(10.dp),
+                                text = stringResource(R.string.edit_profile),
+                                color = White,
+                                fontSize = 13.sp// Make sure text is readable on gradient
+                            )
+                        }
+                    }
                 }
 
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 10.dp,bottom = 20.dp, top = 20.dp)
-                    .height(35.dp)
-
-            ) {
-                Card(
-                    modifier = Modifier
-                        .wrapContentWidth()
-                        .wrapContentHeight(),
-                    shape = RoundedCornerShape(4.dp),
-                    elevation = CardDefaults.cardElevation(4.dp)
-                    // Do not set containerColor, let the Box inside handle the gradient
-                ){
-                    Text ( modifier = Modifier.wrapContentWidth()
-                        .padding(10.dp),
-                        text = stringResource(R.string.edit_profile),
-                        color = Black,
-                        fontSize = 12.sp// Make sure text is readable on gradient
-                    )
-                }
             }
         }
     }
@@ -210,24 +219,23 @@ fun DrawerBody(
                     .clickable {
                         onItemClick(item.id)
                     }
-                    .padding(start = 15.dp, end = 15.dp, top = 15.dp, bottom = 15.dp),
+                    .padding(horizontal = 20.dp, vertical = 15.dp),
                 verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = item.icon,
                     contentDescription = "",
                     tint = Color.Unspecified,
                 )
-                Spacer(modifier = Modifier.width(10.dp))
+                Spacer(modifier = Modifier.width(5.dp))
 
                 Text(
                     text = item.title,
                     modifier = Modifier
                         .padding(horizontal = 10.dp, vertical = 10.dp)
                         .weight(1f),
-                    style = MaterialTheme.typography.headlineSmall.copy(
                         color = Black,
-                        fontSize = 14.sp,
-                    ),
+                    fontFamily = fontMedium,
+                        fontSize = 16.sp,
                 )
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.arrow_nxt_ic),
@@ -317,6 +325,7 @@ fun BottomNavigationBar(
                             tint = if (currentDestination == screen.appRoute) activeColor else inactiveColor,
                             modifier = Modifier.size(30.dp)
                         )
+
                         else -> {
                             Icon(
                                 imageVector = screen.selectedIcon,
@@ -354,5 +363,5 @@ fun BottomNavigationBar(
 @Preview(showBackground = true)
 @Composable
 fun NavigationPreview() {
-    MyApplicationTheme {  }
+    MyApplicationTheme { }
 }

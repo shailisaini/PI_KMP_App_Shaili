@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.content.ContentValues
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -134,7 +133,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.pi.ProjectInclusion.BannerColor02
 import com.pi.ProjectInclusion.Bg_Gray2
 import com.pi.ProjectInclusion.Bg_Gray3
 import com.pi.ProjectInclusion.Bg_Gray4
@@ -2697,13 +2695,13 @@ fun YesNoBtnUi(
     val selectedBorder = BorderStroke(
         width = 1.dp, if (isSystemInDarkTheme()) {
             if (enabled) {
-                BannerColor02
+                PrimaryBlue
             } else {
                 GrayLight05
             }
         } else {
             if (enabled) {
-                BannerColor02
+                PrimaryBlue
             } else {
                 GrayLight05
             }

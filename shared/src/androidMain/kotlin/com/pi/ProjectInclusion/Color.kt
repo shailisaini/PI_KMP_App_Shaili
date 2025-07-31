@@ -86,7 +86,6 @@ val LightRed03 = Color(0xFFF2F2F2) // #F2F2F2
 
 val BannerColor00 = Color(0xFFF6E4D0)
 val BannerColor01 = Color(0xFFFAD6AE)
-val BannerColor02 = Color(0xFF101942)  //#101942
 val BannerColor03 = Color(0xFFEFF0F5) //#EFF0F5
 
 
