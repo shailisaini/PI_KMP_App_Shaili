@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -85,6 +86,7 @@ import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.BtnWithRightIconUi
 import com.pi.ProjectInclusion.android.common_UI.CustomHorizontalProgressBar
+import com.pi.ProjectInclusion.android.common_UI.YesBtnUi
 import com.pi.ProjectInclusion.android.screens.menu.TabItem
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
@@ -159,7 +161,7 @@ fun ScreeningHomeScreen(addStudent: () -> Unit, onBack: () -> Unit, screeningOne
             )
     ) {
         // This is used for add new students while come for first time screening
-        /*Column(
+       /* Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()

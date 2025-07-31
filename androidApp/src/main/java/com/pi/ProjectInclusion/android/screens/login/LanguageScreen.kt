@@ -147,7 +147,7 @@ fun LanguageScreen(viewModel: LoginViewModel, onNext: () -> Unit) {
 fun LanguageResponseUI(
     context: Context,
     languageData: MutableList<GetLanguageListResponse.Data.Result>,
-    onNext: () -> Unit
+    onNext: () -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberLazyGridState()
@@ -180,7 +180,7 @@ fun LanguageResponseUI(
                 .padding(vertical = 10.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            LoginScreenTitle(title, Black, Gray, "")
+            LoginScreenTitle(title, Black, Gray, Transparent, "")
             if (languageData.isNotEmpty()) {
                 Column(
                     modifier = Modifier
@@ -277,8 +277,8 @@ fun ItemLanguageCard(
                 if (languageIndex.status == KEY_ACTIVE) {
                     onItemClicked.invoke()
                     onNext()
-                   /* navController.popBackStack()
-                    navController.navigate(AppRoute.UserTypeSelect.route)*/
+                    /* navController.popBackStack()
+                     navController.navigate(AppRoute.UserTypeSelect.route)*/
                 } else {
                     LoggerProvider.logger.d("Languages fetched: ${languageIndex.status}")
                     context.toast(errorToast)

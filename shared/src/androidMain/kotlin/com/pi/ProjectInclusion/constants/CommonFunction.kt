@@ -75,12 +75,18 @@ object CommonFunction {
     }
 
     @Composable
-    fun LoginScreenTitle(title: String, colors: Color,
-                         subtitleColor: Color, subtitle: String) {
+    fun LoginScreenTitle(
+        title: String,
+        colors: Color,
+        subtitleColor: Color,
+        backgroundColor: Color,
+        subtitle: String,
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
+                .background(backgroundColor)
                 .padding(vertical = 10.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
