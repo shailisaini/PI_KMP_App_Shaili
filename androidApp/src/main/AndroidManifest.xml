@@ -25,7 +25,7 @@
         android:windowSoftInputMode="adjustResize"
         tools:targetApi="tiramisu">
         <activity
-            android:name=".screens.sideBar.ChangePasswordActivity"
+            android:name=".screens.dashboardNavActivity.ChangePasswordActivity"
             android:exported="false" />
         <activity
             android:name=".screens.StudentDashboardActivity"

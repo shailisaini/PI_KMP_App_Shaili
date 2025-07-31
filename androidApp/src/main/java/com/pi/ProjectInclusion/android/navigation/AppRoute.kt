@@ -24,19 +24,24 @@ sealed class AppRoute(val route: String) {
 
     data object CourseScreen : AppRoute("course_screen")
     data object CertificateScreen : AppRoute("certificate_screen")
+    data object JoinMeetingScreen : AppRoute("join_meeting_screen")
+    data object ChangePasswordScreen : AppRoute("change_password_screen")
+    data object LanguageScreen : AppRoute("language_screen")
+    data object ReferScreen : AppRoute("refer_screen")
+    data object ContactUsScreen : AppRoute("contact_us_screen")
+    data object FaqScreen : AppRoute("f_a_q_screen")
 
     data object ScreeningScreen : AppRoute("screening_screen")
     data object AddStudentRegister : AppRoute("add_student_register")
     data object AddNewStudentMoreDetails : AppRoute("add_new_student_more_details")
     data object ScreeningOne : AppRoute("screening_one")
+    data object ScreeningOneReport : AppRoute("screening_one_report")
 
     data object InterventionScreen : AppRoute("intervention_screen")
     data object InterventionStudentDetails : AppRoute("intervention_student_details")
     data object InterventionAcceptLevel : AppRoute("intervention_accept_level")
     data object UploadedDocuments : AppRoute("intervention_uploaded_documents")
     data object TeachingPlan : AppRoute("intervention_teaching_plan")
-
-    data object ChangePasswordActivity : AppRoute("change_password_screen")
 
     data object StudentDashboardActivity : AppRoute("student_screen")
 }

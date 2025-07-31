@@ -70,11 +70,10 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
-import androidx.navigation.NavHostController
-import com.example.kmptemplate.logger.LoggerProvider
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.BannerColor03
 import com.pi.ProjectInclusion.Bg_Gray
@@ -90,7 +89,6 @@ import com.pi.ProjectInclusion.OrangeSubTitle
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
-import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.DropdownMenuUi
 import com.pi.ProjectInclusion.android.common_UI.GenderOption
@@ -99,7 +97,6 @@ import com.pi.ProjectInclusion.android.common_UI.SmallBtnUi
 import com.pi.ProjectInclusion.android.common_UI.TextFieldWithRightIcon
 import com.pi.ProjectInclusion.android.common_UI.TextViewField
 import com.pi.ProjectInclusion.android.common_UI.showDatePickerDialog
-import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
@@ -114,7 +111,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddNewStudentDetailsScreen(onNext: () -> Unit, onBack: () -> Unit, addNewStudentMore: () -> Unit) {
+fun AddNewStudentDetailsScreen(onNext: () -> Unit, onBack: () -> Unit) {
 
     logger.d("Screen: " + "AddNewStudentDetailsScreen()")
 
@@ -202,7 +199,7 @@ fun AddNewStudentDetailsScreen(onNext: () -> Unit, onBack: () -> Unit, addNewStu
         isShowBackButton = true,
         isShowMoreInfo = false,
         onBackButtonClick = {
-           onBack()
+            onBack()
         },
         onMoreInfoClick = {},
         content = {
@@ -593,7 +590,7 @@ fun AddNewStudentDetailsScreen(onNext: () -> Unit, onBack: () -> Unit, addNewStu
                                     } else if (className.toString().isEmpty()) {
                                         context.toast(classMsg)
                                     } else {
-                                        addNewStudentMore()
+                                        onNext()
                                     }
 
                                     /*scope.launch {
@@ -1014,4 +1011,12 @@ fun BottomSheetReferUIScreen(
             }
         }
     }
+}
+
+@Preview(showSystemUi = true, showBackground = true)
+@Composable
+fun AddNewStudentDetailsScreenPreview() {
+    val onNext: () -> Unit = {}
+    val onBack: () -> Unit = {}
+    AddNewStudentDetailsScreen(onNext, onBack)
 }

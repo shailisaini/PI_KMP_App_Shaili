@@ -36,8 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.kmptemplate.logger.LoggerProvider
@@ -63,10 +61,11 @@ import com.pi.ProjectInclusion.android.screens.menu.DrawerBody
 import com.pi.ProjectInclusion.android.screens.menu.DrawerHeader
 import com.pi.ProjectInclusion.android.screens.menu.MenuItem
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningHomeScreen
+import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneReportScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneScreen
+import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.ChangePasswordActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.koin.core.logger.Logger
 
 class StudentDashboardActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -129,43 +128,37 @@ class StudentDashboardActivity : ComponentActivity() {
                                     icon = ImageVector.vectorResource(id = R.drawable.certificate_ic)
                                 ),
                                 MenuItem(
-                                    id = AppRoute.ScreeningScreen.route,
+                                    id = AppRoute.JoinMeetingScreen.route,
                                     title = stringResource(R.string.meeting_txt),
                                     contentDescription = "",
                                     icon = ImageVector.vectorResource(id = R.drawable.meeting_ic)
                                 ),
                                 MenuItem(
-                                    id = AppRoute.InterventionScreen.route,
+                                    id = AppRoute.ChangePasswordScreen.route,
                                     title = stringResource(R.string.change_password),
                                     contentDescription = "",
                                     icon = ImageVector.vectorResource(id = R.drawable.password_ic)
                                 ),
                                 MenuItem(
-                                    id = AppRoute.InterventionScreen.route,
+                                    id = AppRoute.LanguageScreen.route,
                                     title = stringResource(R.string.language_txt),
                                     contentDescription = "",
                                     icon = ImageVector.vectorResource(id = R.drawable.language_ic)
                                 ),
                                 MenuItem(
-                                    id = AppRoute.InterventionScreen.route,
+                                    id = AppRoute.ReferScreen.route,
                                     title = stringResource(R.string.nav_refer_txt),
                                     contentDescription = "",
                                     icon = ImageVector.vectorResource(id = R.drawable.refer_ic)
                                 ),
                                 MenuItem(
-                                    id = AppRoute.InterventionScreen.route,
-                                    title = stringResource(R.string.change_password),
-                                    contentDescription = "",
-                                    icon = ImageVector.vectorResource(id = R.drawable.password_ic)
-                                ),
-                                MenuItem(
-                                    id = AppRoute.InterventionScreen.route,
+                                    id = AppRoute.ContactUsScreen.route,
                                     title = stringResource(R.string.nav_contact),
                                     contentDescription = "",
                                     icon = ImageVector.vectorResource(id = R.drawable.contact_ic)
                                 ),
                                 MenuItem(
-                                    id = AppRoute.InterventionScreen.route,
+                                    id = AppRoute.FaqScreen.route,
                                     title = stringResource(R.string.nav_faq),
                                     contentDescription = "",
                                     icon = ImageVector.vectorResource(id = R.drawable.faq_ic)
@@ -316,42 +309,50 @@ class StudentDashboardActivity : ComponentActivity() {
                                 )
 
                                 AppRoute.ScreeningOne.route -> ScreeningOneScreen(
-                                    onNext = { navigateTo(AppRoute.AddStudentRegister.route) },
+                                    onNext = { navigateTo(AppRoute.ScreeningOneReport.route) },
+                                    onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
+                                )
+
+                                AppRoute.ScreeningOneReport.route -> ScreeningOneReportScreen(
+                                    onNext = { navigateTo(AppRoute.AddStudentRegister.route) }, // this is change according to condition
                                     onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
                                 )
 
                                 AppRoute.AddStudentRegister.route -> AddNewStudentDetailsScreen(
-                                    addNewStudentMore = { navigateTo(AppRoute.AddNewStudentMoreDetails.route) },
-                                    onNext = { navigateTo(AppRoute.AddStudentRegister.route) },
+                                    onNext = { navigateTo(AppRoute.AddNewStudentMoreDetails.route) },
                                     onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
                                 )
 
                                 AppRoute.AddNewStudentMoreDetails.route -> AddNewStudentMoreDetailsScreen(
-                                    addStudentReg = { navigateTo(AppRoute.AddStudentRegister.route) },
                                     onNext = { navigateTo(AppRoute.ScreeningScreen.route) },
-                                    onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
+                                    onBack = { navigateBack(AppRoute.AddStudentRegister.route) }
                                 )
 
                                 // This is for intervention
-                               /* composable(AppRoute.InterventionScreen.route) {
-                                    InterventionHomeScreen(navController)
-                                }
+                                AppRoute.InterventionScreen.route -> InterventionHomeScreen(
+                                    onNext = { navigateTo(AppRoute.InterventionStudentDetails.route) },
+                                    onBack = { navigateBack(AppRoute.DashboardScreen.route) }
+                                )
 
-                                        composable(AppRoute.InterventionStudentDetails.route) {
-                                    InterventionStudentDetailsScreen(navController)
-                                }
+                                AppRoute.InterventionStudentDetails.route -> InterventionStudentDetailsScreen(
+                                    uploadedDocumentScreen = { navigateTo(AppRoute.UploadedDocuments.route) },
+                                    acceptLevelScreen = { navigateTo(AppRoute.InterventionAcceptLevel.route) },
+                                    onBack = { navigateBack(AppRoute.InterventionScreen.route) }
+                                )
 
-                                        composable(AppRoute.InterventionAcceptLevel.route) {
-                                    InterventionAcceptLevelScreen(navController)
-                                }
+                                AppRoute.UploadedDocuments.route -> UploadedDocumentsScreen(
+                                    onBack = { navigateBack(AppRoute.InterventionStudentDetails.route) }
+                                )
 
-                                        composable(AppRoute.UploadedDocuments.route) {
-                                    UploadedDocumentsScreen(navController)
-                                }
+                                AppRoute.InterventionAcceptLevel.route -> InterventionAcceptLevelScreen(
+                                    onNext = { navigateTo(AppRoute.TeachingPlan.route) },
+                                    onBack = { navigateBack(AppRoute.InterventionStudentDetails.route) })
 
-                                        composable(AppRoute.TeachingPlan.route) {
-                                    TeachingPlanScreen(navController)
-                                }*/
+                                AppRoute.TeachingPlan.route -> TeachingPlanScreen(onBack = {
+                                    navigateBack(
+                                        AppRoute.InterventionAcceptLevel.route
+                                    )
+                                })
                             }
                         }
                     }
@@ -361,14 +362,13 @@ class StudentDashboardActivity : ComponentActivity() {
     }
 }
 
-
 // Function to handle item clicks
 @OptIn(ExperimentalMaterial3Api::class)
 fun onMenuItemClick(
     itemId: String,
     navController: NavHostController,
     studentDashboardActivity: StudentDashboardActivity,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
 ) {
     // Handle the click event here
     val context = studentDashboardActivity as Context
@@ -384,6 +384,33 @@ fun onMenuItemClick(
             startActivity(
                 context, Intent(context, CertificateListActivity::class.java), null
             ).apply { (context as? Activity)?.finish() }
+        }
+
+        AppRoute.JoinMeetingScreen.route -> {
+            LoggerProvider.logger.d("Screen: JoinMeetingActivity()")
+        }
+
+        AppRoute.ChangePasswordScreen.route -> {
+            LoggerProvider.logger.d("Screen: ChangePasswordActivity()")
+            startActivity(
+                context, Intent(context, ChangePasswordActivity::class.java), null
+            ).apply { (context as? Activity)?.finish() }
+        }
+
+        AppRoute.LanguageScreen.route -> {
+            LoggerProvider.logger.d("Screen: LanguageChangeActivity()")
+        }
+
+        AppRoute.ReferScreen.route -> {
+            LoggerProvider.logger.d("Screen: Refer dialog open screen")
+        }
+
+        AppRoute.ContactUsScreen.route -> {
+            LoggerProvider.logger.d("Screen: Contact us dialog screen")
+        }
+
+        AppRoute.FaqScreen.route -> {
+            LoggerProvider.logger.d("Screen: Faq screen")
         }
     }
 }

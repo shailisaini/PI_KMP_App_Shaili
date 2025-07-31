@@ -54,9 +54,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
@@ -72,10 +72,8 @@ import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlue3
 import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.R
-import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
 import com.pi.ProjectInclusion.android.common_UI.CustomHorizontalProgressBar
 import com.pi.ProjectInclusion.android.common_UI.DetailsBackgroundUi
-import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
@@ -85,7 +83,11 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
+fun InterventionStudentDetailsScreen(
+    uploadedDocumentScreen: () -> Unit,
+    acceptLevelScreen: () -> Unit,
+    onBack: () -> Unit,
+) {
 
     logger.d("Screen: " + "InterventionStudentDetailsScreen()")
 
@@ -141,7 +143,8 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
         isShowProfile = true,
         isShowMoreInfo = true,
         onBackButtonClick = {
-            BackButtonPress(navHostController, AppRoute.InterventionScreen.route)
+//            BackButtonPress(navHostController, AppRoute.InterventionScreen.route)
+            onBack()
         },
         onMoreInfoClick = {
             showDialog = true
@@ -318,7 +321,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                         }
 
                         if (showSocialAndCommunicationUI) {
-                            SocialAndCommunicationUI(navHostController)
+                            SocialAndCommunicationUI(acceptLevelScreen)
                         }
 
 //                      This is use for Cognitive content
@@ -723,7 +726,8 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
                                     modifier = Modifier
                                         .wrapContentWidth()
                                         .clickable {
-                                            navHostController.navigate(AppRoute.UploadedDocuments.route)
+//                                            navHostController.navigate(AppRoute.UploadedDocuments.route)
+                                            uploadedDocumentScreen()
                                         },
                                     fontFamily = fontMedium,
                                     fontSize = 14.sp,
@@ -907,7 +911,7 @@ fun InterventionStudentDetailsScreen(navHostController: NavHostController) {
 }
 
 @Composable
-private fun SocialAndCommunicationUI(navHostController: NavHostController) {
+private fun SocialAndCommunicationUI(acceptLevelScreen: () -> Unit) {
     val selectedBorder = BorderStroke(
         width = 0.5.dp, if (isSystemInDarkTheme()) {
             LightOrange1
@@ -1005,7 +1009,8 @@ private fun SocialAndCommunicationUI(navHostController: NavHostController) {
                     .align(Alignment.CenterVertically)
                     .background(Color.Unspecified)
                     .clickable {
-                        navHostController.navigate(AppRoute.InterventionAcceptLevel.route)
+//                        navHostController.navigate(AppRoute.InterventionAcceptLevel.route)
+                        acceptLevelScreen()
                     }) {
                 Image(
                     painter = painterResource(R.drawable.right_arrow_img),
@@ -1740,4 +1745,13 @@ fun BottomSheetCamGalScreen(
             }
         }
     }
+}
+
+@Preview(showSystemUi = true, showBackground = true)
+@Composable
+fun InterventionStudentDetailsScreenPreview() {
+    val uploadedDocumentScreen: () -> Unit = {}
+    val acceptLevelScreen: () -> Unit = {}
+    val onBack: () -> Unit = {}
+    InterventionStudentDetailsScreen(uploadedDocumentScreen, acceptLevelScreen, onBack)
 }
