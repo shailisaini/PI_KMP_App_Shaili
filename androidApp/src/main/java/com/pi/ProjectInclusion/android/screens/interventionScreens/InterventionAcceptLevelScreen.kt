@@ -38,10 +38,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.navigation.NavHostController
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
@@ -57,20 +57,21 @@ import com.pi.ProjectInclusion.PrimaryBlue3
 import com.pi.ProjectInclusion.PrimaryBlueLt1
 import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.R
-import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.DetailsBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.NoBtnUi
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnRight
 import com.pi.ProjectInclusion.android.common_UI.YesBtnUi
-import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 
 @Composable
-fun InterventionAcceptLevelScreen(navHostController: NavHostController) {
+fun InterventionAcceptLevelScreen(
+    onNext: () -> Unit,
+    onBack: () -> Unit,
+) {
 
     logger.d("Screen: " + "InterventionAcceptLevelScreen()")
 
@@ -115,7 +116,8 @@ fun InterventionAcceptLevelScreen(navHostController: NavHostController) {
         isShowProfile = false,
         isShowMoreInfo = true,
         onBackButtonClick = {
-            BackButtonPress(navHostController, AppRoute.InterventionStudentDetails.route)
+//            BackButtonPress(navHostController, AppRoute.InterventionStudentDetails.route)
+            onBack()
         },
         onMoreInfoClick = {
             showDialog = true
@@ -248,7 +250,8 @@ fun InterventionAcceptLevelScreen(navHostController: NavHostController) {
                                 },
                                 modifier = Modifier.padding(start = 8.dp, top = 8.dp),
                                 onClick = {
-                                    navHostController.navigate(AppRoute.TeachingPlan.route)
+//                                    navHostController.navigate(AppRoute.TeachingPlan.route)
+                                    onNext()
                                 })
                         }
 
@@ -710,4 +713,12 @@ fun HowMarkLevelDialog(onDismiss: () -> Unit) {
             }
         }
     }
+}
+
+@Preview(showSystemUi = true, showBackground = true)
+@Composable
+fun InterventionAcceptLevelScreenPreview() {
+    val onNext: () -> Unit = {}
+    val onBack: () -> Unit = {}
+    InterventionAcceptLevelScreen(onNext, onBack)
 }

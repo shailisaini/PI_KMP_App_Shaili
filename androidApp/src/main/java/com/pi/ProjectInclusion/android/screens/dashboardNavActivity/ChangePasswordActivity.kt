@@ -1,10 +1,10 @@
-package com.pi.ProjectInclusion.android.screens.sideBar
+package com.pi.ProjectInclusion.android.screens.dashboardNavActivity
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -46,8 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Bg_Gray
@@ -63,18 +62,25 @@ import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
-import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.BackHandler
 
 class ChangePasswordActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val navController = rememberNavController()
+            val context = LocalContext.current
+
+            BackHandler {
+                ContextCompat.startActivity(
+                    context, Intent(context, StudentDashboardActivity::class.java), null
+                ).apply { (context as? Activity)?.finish() }
+            }
+
             MyApplicationTheme {
                 logger.d("Screen: " + "ChangePasswordActivity()")
-
-                val navController = rememberNavController()
-                val context = LocalContext.current
                 var enterOldPasswordStr = rememberSaveable { mutableStateOf("") }
                 var enterPasswordStr = rememberSaveable { mutableStateOf("") }
                 var enterConfirmPasswordStr = rememberSaveable { mutableStateOf("") }
@@ -113,8 +119,9 @@ class ChangePasswordActivity : ComponentActivity() {
                 }
 
                 DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
-                    navController.popBackStack()
-                    navController.navigate(AppRoute.ForgetPasswordUI.route)
+                    ContextCompat.startActivity(
+                        context, Intent(context, StudentDashboardActivity::class.java), null
+                    ).apply { (context as? Activity)?.finish() }
                 }, content = {
                     Box(modifier = Modifier.fillMaxSize()) {
                         Column(

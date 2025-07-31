@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,28 +31,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Dark_02
 import com.pi.ProjectInclusion.Dark_03
-import com.pi.ProjectInclusion.GrayLight03
-import com.pi.ProjectInclusion.LightPurple04
+import com.pi.ProjectInclusion.GrayLight06
+import com.pi.ProjectInclusion.LightOrange2
 import com.pi.ProjectInclusion.LightPurple05
 import com.pi.ProjectInclusion.LightRed03
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.R
-import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
 import com.pi.ProjectInclusion.android.common_UI.CustomHorizontalProgressBar
 import com.pi.ProjectInclusion.android.common_UI.ScreeningDetailsBackgroundUi
+import com.pi.ProjectInclusion.android.common_UI.SmallBtnUi
 import com.pi.ProjectInclusion.android.common_UI.YesNoBtnUi
-import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
+
 
 @Composable
 fun ScreeningOneScreen(onNext: () -> Unit, onBack: () -> Unit) {
@@ -92,12 +93,6 @@ fun ScreeningOneScreen(onNext: () -> Unit, onBack: () -> Unit) {
             stringResource(R.string.txt_Question_Constant),
             stringResource(R.string.txt_Yes),
             stringResource(R.string.txt_No)
-        ),
-        ScreeningQuestionData(
-            5,
-            stringResource(R.string.txt_Question_Constant),
-            stringResource(R.string.txt_Yes),
-            stringResource(R.string.txt_No)
         )
     )
 
@@ -107,7 +102,7 @@ fun ScreeningOneScreen(onNext: () -> Unit, onBack: () -> Unit) {
         isShowBackButton = true,
         isShowMoreInfo = true,
         onBackButtonClick = {
-          onBack()
+            onBack()
         },
         onMoreInfoClick = {
             showDialog = true
@@ -203,7 +198,7 @@ fun ScreeningOneScreen(onNext: () -> Unit, onBack: () -> Unit) {
                     ) {
                         val num: Float = (1.toFloat() / 42)
                         CustomHorizontalProgressBar(
-                            num, LightPurple04, GrayLight03
+                            num, LightOrange2, GrayLight06
                         )
                     }
                 }
@@ -211,7 +206,7 @@ fun ScreeningOneScreen(onNext: () -> Unit, onBack: () -> Unit) {
                 Column(
                     modifier = Modifier
                         .wrapContentSize()
-                        .padding(start = 8.dp, end = 8.dp, bottom = 8.dp, top = 8.dp)
+                        .padding(start = 8.dp, end = 8.dp, bottom = 16.dp, top = 8.dp)
                         .background(
                             if (isSystemInDarkTheme()) {
                                 Dark_01
@@ -220,10 +215,33 @@ fun ScreeningOneScreen(onNext: () -> Unit, onBack: () -> Unit) {
                             }
                         )
                 ) {
-                    LazyColumn {
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(bottom = 64.dp)
+                    ) {
                         items(questionListData) { questionData ->
                             ScreeningQuestionDataUI(questionData)
                         }
+                    }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .padding(start = 8.dp, end = 16.dp, bottom = 16.dp, top = 16.dp),
+                    contentAlignment = Alignment.BottomCenter
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(color = White)
+                            .wrapContentHeight(), horizontalAlignment = Alignment.End
+                    ) {
+                        SmallBtnUi(
+                            enabled = true,
+                            title = stringResource(R.string.txt_submit),
+                            onClick = {
+                                onNext() // this change according to condition
+                            })
                     }
                 }
             }
@@ -257,9 +275,17 @@ fun ScreeningQuestionDataUI(questionData: ScreeningQuestionData) {
             fontFamily = fontRegular,
             fontSize = 14.sp,
             color = if (isSystemInDarkTheme()) {
-                PrimaryBlue
+                if (trueFalseYes || trueFalseNo) {
+                    GrayLight06
+                } else {
+                    Black
+                }
             } else {
-                PrimaryBlue
+                if (trueFalseYes || trueFalseNo) {
+                    GrayLight06
+                } else {
+                    Black
+                }
             },
             textAlign = TextAlign.Start
         )
@@ -294,9 +320,17 @@ fun ScreeningQuestionDataUI(questionData: ScreeningQuestionData) {
                     fontFamily = fontMedium,
                     fontSize = 15.sp,
                     color = if (isSystemInDarkTheme()) {
-                        Black
+                        if (trueFalseYes || trueFalseNo) {
+                            GrayLight06
+                        } else {
+                            Black
+                        }
                     } else {
-                        Black
+                        if (trueFalseYes || trueFalseNo) {
+                            GrayLight06
+                        } else {
+                            Black
+                        }
                     },
                     textAlign = TextAlign.Start
                 )
@@ -337,3 +371,11 @@ data class ScreeningQuestionData(
     var ansYes: String,
     var ansNo: String,
 )
+
+@Preview(showSystemUi = true, showBackground = true)
+@Composable
+fun ScreeningOneScreenPreview() {
+    val onNext: () -> Unit = {}
+    val onBack: () -> Unit = {}
+    ScreeningOneScreen(onNext, onBack)
+}

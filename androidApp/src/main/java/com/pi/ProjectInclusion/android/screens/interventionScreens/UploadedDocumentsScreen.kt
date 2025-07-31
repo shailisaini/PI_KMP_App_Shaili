@@ -29,9 +29,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
@@ -41,16 +41,16 @@ import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.R
-import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
-import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 
 @Composable
-fun UploadedDocumentsScreen(navHostController: NavHostController) {
+fun UploadedDocumentsScreen(
+    onBack: () -> Unit,
+) {
 
     logger.d("Screen: " + "UploadedDocumentsScreen()")
 
@@ -60,20 +60,17 @@ fun UploadedDocumentsScreen(navHostController: NavHostController) {
             stringResource(R.string.txt_date),
             painterResource(id = R.drawable.docs_docs_img),
             painterResource(id = R.drawable.docs_preview_img)
-        ),
-        DocumentsData(
+        ), DocumentsData(
             stringResource(R.string.txt_ScreeningReport_pdf),
             stringResource(R.string.txt_date),
             painterResource(id = R.drawable.docs_pdf_img),
             painterResource(id = R.drawable.docs_preview_img)
-        ),
-        DocumentsData(
+        ), DocumentsData(
             stringResource(R.string.txt_ScreeningReport_jpg),
             stringResource(R.string.txt_date),
             painterResource(id = R.drawable.doc_jpg_img),
             painterResource(id = R.drawable.docs_preview_img)
-        ),
-        DocumentsData(
+        ), DocumentsData(
             stringResource(R.string.txt_ScreeningReport_mp4),
             stringResource(R.string.txt_date),
             painterResource(id = R.drawable.doc_video_img),
@@ -88,7 +85,8 @@ fun UploadedDocumentsScreen(navHostController: NavHostController) {
         isShowBackButton = true,
         isShowMoreInfo = false,
         onBackButtonClick = {
-            BackButtonPress(navHostController, AppRoute.InterventionStudentDetails.route)
+//            BackButtonPress(navHostController, AppRoute.InterventionStudentDetails.route)
+            onBack()
         },
         onMoreInfoClick = {},
         content = {
@@ -106,16 +104,15 @@ fun UploadedDocumentsScreen(navHostController: NavHostController) {
             ) {
                 LazyColumn {
                     items(documentsListData) { interventionData ->
-                        UploadedDocumentsDataUI(interventionData, navHostController)
+                        UploadedDocumentsDataUI(interventionData)
                     }
                 }
             }
-        }
-    )
+        })
 }
 
 @Composable
-fun UploadedDocumentsDataUI(data: DocumentsData, controller: NavHostController) {
+fun UploadedDocumentsDataUI(data: DocumentsData) {
 
     val context = LocalContext.current
     var underProcessingStr = stringResource(R.string.txt_Under_Processing)
@@ -199,8 +196,7 @@ fun UploadedDocumentsDataUI(data: DocumentsData, controller: NavHostController) 
                     .background(Color.Unspecified)
                     .clickable {
                         context.toast(underProcessingStr)
-                    }
-            ) {
+                    }) {
                 Image(
                     painter = data.openImage,
                     contentDescription = IMG_DESCRIPTION,
@@ -217,3 +213,10 @@ data class DocumentsData(
     var docImage: Painter,
     var openImage: Painter,
 )
+
+@Preview(showSystemUi = true, showBackground = true)
+@Composable
+fun UploadedDocumentsScreenPreview() {
+    val onBack: () -> Unit = {}
+    UploadedDocumentsScreen(onBack)
+}

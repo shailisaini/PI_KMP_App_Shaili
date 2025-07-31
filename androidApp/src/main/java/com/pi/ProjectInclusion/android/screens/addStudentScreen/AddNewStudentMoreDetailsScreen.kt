@@ -38,9 +38,9 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Bg_Gray
 import com.pi.ProjectInclusion.Black
@@ -51,7 +51,6 @@ import com.pi.ProjectInclusion.OrangeSubTitle
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
-import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
 import com.pi.ProjectInclusion.android.common_UI.CustomToastMessage
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.DropdownMenuUi
@@ -61,7 +60,6 @@ import com.pi.ProjectInclusion.android.common_UI.SchoolListBottomSheet
 import com.pi.ProjectInclusion.android.common_UI.SmallBtnUi
 import com.pi.ProjectInclusion.android.common_UI.TextViewField
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
-import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
@@ -71,7 +69,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddNewStudentMoreDetailsScreen(addStudentReg: () -> Unit,onNext: () -> Unit, onBack: () -> Unit) {
+fun AddNewStudentMoreDetailsScreen(onNext: () -> Unit, onBack: () -> Unit) {
 
     logger.d("Screen: " + "AddNewStudentMoreDetailsScreen()")
 
@@ -147,7 +145,7 @@ fun AddNewStudentMoreDetailsScreen(addStudentReg: () -> Unit,onNext: () -> Unit,
         isShowBackButton = true,
         isShowMoreInfo = false,
         onBackButtonClick = {
-          onBack()
+            onBack()
         },
         onMoreInfoClick = {},
         content = {
@@ -545,7 +543,7 @@ fun AddNewStudentMoreDetailsScreen(addStudentReg: () -> Unit,onNext: () -> Unit,
                                 textColor = PrimaryBlue,
                                 iconColor = PrimaryBlue,
                                 onClick = {
-                                    addStudentReg()
+                                    onBack()
                                 },
                             )
 
@@ -573,7 +571,7 @@ fun AddNewStudentMoreDetailsScreen(addStudentReg: () -> Unit,onNext: () -> Unit,
                                         context.toast(schoolTypeMsg)
                                     } else {
                                         showToast = true
-                                       onBack()
+                                        onNext()
                                     }
                                 })
                         }
@@ -589,4 +587,12 @@ fun AddNewStudentMoreDetailsScreen(addStudentReg: () -> Unit,onNext: () -> Unit,
             visible = showToast,
             onClose = { showToast = false })
     }
+}
+
+@Preview(showSystemUi = true, showBackground = true)
+@Composable
+fun AddNewStudentMoreDetailsScreenPreview() {
+    val onNext: () -> Unit = {}
+    val onBack: () -> Unit = {}
+    AddNewStudentMoreDetailsScreen(onNext, onBack)
 }
