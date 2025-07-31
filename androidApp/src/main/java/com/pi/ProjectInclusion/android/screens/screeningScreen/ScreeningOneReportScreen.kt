@@ -73,6 +73,7 @@ fun ScreeningOneReportScreen(onNext: () -> Unit, onBack: () -> Unit) {
                 .verticalScroll(rememberScrollState())
                 .padding(start = 16.dp, end = 16.dp, top = 8.dp)
         ) {
+
             DomainSection(stringResource(R.string.txt_Visual_Domain_VI))
 
             ReportCard(
