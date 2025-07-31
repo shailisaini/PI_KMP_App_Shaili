@@ -571,7 +571,7 @@ fun AddNewStudentMoreDetailsScreen(onNext: () -> Unit, onBack: () -> Unit) {
                                         context.toast(schoolTypeMsg)
                                     } else {
                                         showToast = true
-//                                        onNext()
+                                        onNext()
                                     }
                                 })
                         }
