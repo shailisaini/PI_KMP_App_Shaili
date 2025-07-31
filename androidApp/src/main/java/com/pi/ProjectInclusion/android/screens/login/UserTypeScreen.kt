@@ -89,7 +89,7 @@ import kotlinx.coroutines.launch
 fun UserTypeScreen(
     viewModel: LoginViewModel,
     onNext: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
 ) {
     var isDialogVisible by remember { mutableStateOf(false) }
     val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
@@ -152,7 +152,7 @@ fun UserTypeResponseUI(
     context: Context,
     userTypeData: MutableList<GetUserTypeResponse.Data>,
     onNext: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberLazyGridState()
@@ -169,7 +169,7 @@ fun UserTypeResponseUI(
     val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
-     onBack()
+        onBack()
     }, content = {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -185,7 +185,7 @@ fun UserTypeResponseUI(
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                LoginScreenTitle(title, Black, Gray, subTitle)
+                LoginScreenTitle(title, Black, Gray, Transparent, subTitle)
                 Box(
                     modifier = Modifier
                         .wrapContentSize(Alignment.Center)
@@ -304,12 +304,12 @@ fun UserTypeCard(
                 onNext()
 
                 // Aashish
-               /* context.startActivity(
-                    Intent(
-                        context,
-                        StudentDashboardActivity::class.java
-                    )
-                )*/
+                /* context.startActivity(
+                     Intent(
+                         context,
+                         StudentDashboardActivity::class.java
+                     )
+                 )*/
             }
             .padding(8.dp)
             .fillMaxWidth(),
