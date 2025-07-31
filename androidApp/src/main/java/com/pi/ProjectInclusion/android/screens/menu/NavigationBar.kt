@@ -242,7 +242,7 @@ fun DrawerBody(
 //@Preview
 @Composable
 fun BottomNavigationBar(
-    navController: NavHostController = rememberNavController(),
+    onNavigateTo: (String) -> Unit,
     currentDestination: String? = "",
 ) {
     val colors = MaterialTheme.colorScheme
@@ -327,11 +327,14 @@ fun BottomNavigationBar(
                         }
                     }
                 }, selected = currentDestination == screen.appRoute, onClick = {
-                    if (screen.appRoute == "") { // student_wallet
-                        navController.navigate(screen.appRoute)
-                    } else {
-                        navController.navigate(screen.appRoute)
+                    if (currentDestination != screen.appRoute) {
+                        onNavigateTo(screen.appRoute)
                     }
+//                    if (screen.appRoute == "") { // student_wallet
+//                        navController.navigate(screen.appRoute)
+//                    } else {
+//                        navController.navigate(screen.appRoute)
+//                    }
                 }, label = {
                     Text(
                         text = screen.title,
@@ -342,9 +345,7 @@ fun BottomNavigationBar(
                     )
                 }, colors = NavigationBarItemDefaults.colors(
                     indicatorColor = Color.Transparent // Removes background color when selected
-                )/* se
-                lectedColor = activeColor,
-                 unselectedContentColor = inactiveColor*/
+                )
             )
         }
     }

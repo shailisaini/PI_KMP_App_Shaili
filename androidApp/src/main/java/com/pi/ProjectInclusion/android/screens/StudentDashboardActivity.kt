@@ -175,7 +175,7 @@ class StudentDashboardActivity : ComponentActivity() {
                 },
             ) {
                 Scaffold(bottomBar = {
-                    if (currentDestination in listOf(
+                    if (currentRoute in listOf(
                             AppRoute.DashboardScreen.route,
                             AppRoute.CourseScreen.route,
                             AppRoute.ScreeningScreen.route,
@@ -189,7 +189,8 @@ class StudentDashboardActivity : ComponentActivity() {
                                 .shadow(elevation = 8.dp)
                         ) {
                             BottomNavigationBar(
-                                navController = navController, currentDestination
+                                currentDestination = currentRoute,
+                                onNavigateTo = { route -> navigateTo(route) }
                             )
                         }
                     }
@@ -205,6 +206,7 @@ class StudentDashboardActivity : ComponentActivity() {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
+                            .padding(innerPadding)
                             .zIndex(1f)
                     ) {
                         /*NavHost(
