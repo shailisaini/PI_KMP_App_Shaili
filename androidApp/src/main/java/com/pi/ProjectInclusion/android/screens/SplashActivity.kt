@@ -74,7 +74,11 @@ class SplashActivity : ComponentActivity() {
                 ) { route ->
                     when (route) {
                         SPLASH_KEY -> SplashScreen {
-                            navigateTo(AppRoute.LanguageSelect.route)
+//                            navigateTo(AppRoute.LanguageSelect.route)
+                            context.startActivity(
+                                Intent(context, StudentDashboardActivity::class.java)
+                            )
+                            (context as? Activity)?.finish()
                         }
 
                         AppRoute.LanguageSelect.route -> {
@@ -98,30 +102,6 @@ class SplashActivity : ComponentActivity() {
                     }
                 }
             }
-           /* MyApplicationTheme {
-                val navController = rememberNavController()
-
-                NavHost(
-                    navController = navController,
-                            startDestination = "splash"
-                ) {
-                    composable("splash") {
-                        SplashScreen(navController)
-                    }
-                    composable(AppRoute.LanguageSelect.route) {
-                        startActivity(
-                            Intent(
-                                this@SplashActivity,
-                                LoginNavigationScreen::class.java
-                            )
-                        ).also { finish() }
-                    }
-
-                    composable(AppRoute.StudentDashboardActivity.route) {
-                        DashboardScreen(navController)
-                    }
-                }
-            }*/
         }
     }
 }
@@ -131,8 +111,5 @@ fun SplashScreen(onDone: () -> Unit) {
     LaunchedEffect(Unit) {
         delay(3000) // simulate loading
         onDone()
-       /* navController.navigate(AppRoute.LanguageSelect.route) {
-            popUpTo("splash") { inclusive = true }
-        }*/
     }
 }
