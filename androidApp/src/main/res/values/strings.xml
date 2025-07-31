@@ -284,6 +284,9 @@ and make a difference together!</string>
     <string name="txt_select_your_school_type_msg">Please select your school type.</string>
     <string name="head_leave">Want to leave?</string>
     <string name="body_leave">Your progress will be saved. You can continue from where you left off</string>
+    <string name="head_screening">Screening 1</string>
+    <string name="body_screening">You are about to submit the screening 1 form for “#student name”, do you want to check again before submitting it. </string>
+    <string name="txt_check_again">Check Again</string>
     <string name="txt_Student_added">Student added!</string>
     <string name="txt_Begin_Screening_process">Begin Screening 1 to continue the process.</string>
     <string name="txt_Kendriya_Vidhyalya_Delhi">Kendriya Vidhyalya 1, Delhi</string>
@@ -330,4 +333,13 @@ and make a difference together!</string>
     <string name="txt_cert_desc">Every certificate here is proof of your dedication and expertise. Keep learning, keep growing!</string>
     <string name="txt_Question">Questions</string>
     <string name="txt_Question_Constant">Constant drooping of eyelid(s)/ artificial eye(s)/ misaligned eye(s)/ asymmetrical or squinting/had any eye surgery</string>
+    <string name="txt_Screening_1_Report">Screening 1 Report</string>
+    <string name="txt_No_I_will_do_it_later">No, I will do it later</string>
+    <string name="txt_Profiler_Form">Profiler Form</string>
+    <string name="txt_Let_fill_profiler_Form_understand">Let’s us fill profiler form to understand students’ strengths and abilities</string>
+    <string name="txt_Visual_Domain_VI">Visual Domain (VI)</string>
+    <string name="txt_Condition">Condition</string>
+    <string name="txt_Recommendation">Recommendation</string>
+    <string name="txt_Auditory_Domain_HI">Auditory Domain (HI)</string>
+    <string name="txt_Based_observation_SAMAN_difficulty">Based on your observation, there is doubt that SAMAN is having difficulty in the auditory domain, therefore to rule out other environmental factors, kindly consult an ENT specialist and audiologist</string>
 </resources>

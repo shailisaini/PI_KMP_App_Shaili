@@ -88,6 +88,9 @@ val BannerColor00 = Color(0xFFF6E4D0)
 val BannerColor01 = Color(0xFFFAD6AE)
 val BannerColor03 = Color(0xFFEFF0F5) //#EFF0F5
 
+val HeaderColor01 = Color(0xFFDD7D38) //#DD7D38
+val CardColor01 = Color(0xFFE9EBF3) //#E9EBF3
+
 
 val BodyTextLight = Color(0xFFB0B3C0) //#B0B3C0
 

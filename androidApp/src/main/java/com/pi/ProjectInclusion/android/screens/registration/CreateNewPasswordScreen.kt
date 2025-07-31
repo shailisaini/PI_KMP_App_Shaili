@@ -64,6 +64,7 @@ import com.pi.ProjectInclusion.Dark_02
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlueLt1
+import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
@@ -77,10 +78,12 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 
 @Composable
-fun CreateNewPasswordScreen(onNext: () -> Unit,  //EnterUserProfileScreen
-                            onBack: () -> Unit,
-                            otpSendVerify: () -> Unit, // OtpSendVerifyUI
-                            viewModel: LoginViewModel) {
+fun CreateNewPasswordScreen(
+    onNext: () -> Unit,  //EnterUserProfileScreen
+    onBack: () -> Unit,
+    otpSendVerify: () -> Unit, // OtpSendVerifyUI
+    viewModel: LoginViewModel,
+) {
 
     LoggerProvider.logger.d("Screen: " + "CreateNewPasswordScreen()")
 
@@ -93,15 +96,17 @@ fun CreateNewPasswordScreen(onNext: () -> Unit,  //EnterUserProfileScreen
         DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
             onBack()
         }, content = {
-            CreateNewPasswordUI(onNext = onNext, onBack = onBack, otpSendVerify= otpSendVerify)
+            CreateNewPasswordUI(onNext = onNext, onBack = onBack, otpSendVerify = otpSendVerify)
         })
     }
 }
 
 @Composable
-fun CreateNewPasswordUI(onBack: () -> Unit,
-                        otpSendVerify: () -> Unit,
-                        onNext: () -> Unit ) {
+fun CreateNewPasswordUI(
+    onBack: () -> Unit,
+    otpSendVerify: () -> Unit,
+    onNext: () -> Unit,
+) {
     val context = LocalContext.current
     var showBottomSheet by remember { mutableStateOf(false) }
     var enterPasswordStr = rememberSaveable { mutableStateOf("") }
@@ -143,7 +148,7 @@ fun CreateNewPasswordUI(onBack: () -> Unit,
                 .fillMaxWidth()
         ) {
             LoginScreenTitle(
-                stringResource(R.string.txt_Set_your_Password), Black, Gray,
+                stringResource(R.string.txt_Set_your_Password), Black, Gray, Transparent,
                 stringResource(R.string.txt_set_password_desc)
             )
 
@@ -525,7 +530,7 @@ fun CreateNewPasswordUI(onBack: () -> Unit,
                             } else { // if first digit of mobile is less than 6 then error will show
                                 isDialogVisible = true
                                 buttonClicked = true
-                               onNext()
+                                onNext()
                             }
                         }
                     }, true
