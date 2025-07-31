@@ -101,7 +101,7 @@ import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
 @Composable
-fun DashboardScreen(navHostController: NavHostController) {
+fun DashboardScreen() {
 
     var isDialogVisible by remember { mutableStateOf(false) }
 

@@ -54,7 +54,9 @@ import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import okhttp3.Route
 
 @Composable
-fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewModel) {
+fun SetNewPasswordScreen(onNext: () -> Unit,
+                         onBack: () -> Unit,
+                         viewModel: LoginViewModel) {
 
     logger.d("Screen: " + "SetNewPasswordScreen()")
 
@@ -86,8 +88,7 @@ fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewM
     LoggerProvider.logger.d("Screen: " + "SetNewPasswordScreen()")
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
-        navController.popBackStack()
-        navController.navigate(AppRoute.ForgetPasswordUI.route)
+       onBack()
     }, content = {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -388,7 +389,7 @@ fun SetNewPasswordScreen(navController: NavHostController, viewModel: LoginViewM
                                         isDialogVisible = true
 //                                viewModel.saveUserPhoneNo(mobNo.value)
                                         buttonClicked = true
-                                        navController.navigate(AppRoute.UserNameScreen.route)
+                                       onNext()
                                     }
                                 }
                             }

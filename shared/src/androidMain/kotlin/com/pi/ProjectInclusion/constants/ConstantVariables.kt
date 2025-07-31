@@ -8,6 +8,8 @@ object ConstantVariables {
 
     // constant keys
 //    Pref keys
+    var SPLASH_KEY: String = "splash"
+    var ROUTE: String = "routeAnimation"
     var SHARED_PREF_KEY: String = "PI_PREF"
     var TOKEN_PREF_KEY: String = "user_token"
 

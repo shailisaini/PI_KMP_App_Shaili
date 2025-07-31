@@ -37,20 +37,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Bg_Gray1
 import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.LightRed01
 import com.pi.ProjectInclusion.android.R
-import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.MobileTextField
 import com.pi.ProjectInclusion.android.common_UI.TermsAndPrivacyText
-import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
@@ -60,7 +56,11 @@ import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 
 @Composable
-fun EnterUserNameScreen(navController: NavHostController, viewModel: LoginViewModel) {
+fun EnterUserNameScreen(
+    viewModel: LoginViewModel,
+    onNext: () -> Unit,
+    onBack: () -> Unit
+) {
     var isDialogVisible by remember { mutableStateOf(false) }
     val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
 
@@ -72,7 +72,7 @@ fun EnterUserNameScreen(navController: NavHostController, viewModel: LoginViewMo
         message = stringResource(R.string.txt_loading)
     )
     BackHandler {
-        BackButtonPress(navController, AppRoute.UserTypeSelect.route)
+        onBack()
     }
     LoggerProvider.logger.d("Screen: " + "EnterUserNameScreen()")
     LaunchedEffect(Unit) {
@@ -113,7 +113,7 @@ fun EnterUserNameScreen(navController: NavHostController, viewModel: LoginViewMo
                 .background(color = Bg_Gray1),
             verticalArrangement = Arrangement.Top
         ) {
-            LoginUI(context, navController)
+            LoginUI(context, onNext = onNext, onBack = onBack)
         }
     }
 }
@@ -121,7 +121,8 @@ fun EnterUserNameScreen(navController: NavHostController, viewModel: LoginViewMo
 @Composable
 fun LoginUI(
     context: Context,
-    navController: NavHostController
+    onBack: () -> Unit,
+    onNext: () -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberLazyGridState()
@@ -145,7 +146,7 @@ fun LoginUI(
     var inValidMobNo by remember { mutableStateOf(false) }
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
-        BackButtonPress(navController, AppRoute.UserTypeSelect.route)
+        onBack()
     }, content = {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -218,9 +219,8 @@ fun LoginUI(
                                     if (firstDigit < 6) {
                                         inValidMobNo = true
                                     } else {
-                                        isDialogVisible = true
-                                        navController.popBackStack()
-                                        navController.navigate(AppRoute.UserPasswordScreen.route)
+//                                        isDialogVisible = true
+                                        onNext()
 
                                     }
                                 }
@@ -252,7 +252,8 @@ fun LoginUI(
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
 fun LoginScreen() {
-    val navController = rememberNavController()
     val context = LocalContext.current
-    LoginUI(context, navController)
+    val onNext: () -> Unit = {}
+    val onBack: () -> Unit = {}
+    LoginUI(context, onBack, onNext)
 }

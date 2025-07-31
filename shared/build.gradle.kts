@@ -66,6 +66,8 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.sqldelight.coroutines)
 
+            implementation(libs.androidx.navigation.compose)
+            implementation(libs.accompanist.navigation.animation)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

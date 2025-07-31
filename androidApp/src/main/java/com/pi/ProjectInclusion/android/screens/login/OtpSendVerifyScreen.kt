@@ -59,7 +59,11 @@ import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun OtpSendVerifyScreen(navController: NavHostController, viewModel: LoginViewModel) {
+fun OtpSendVerifyScreen(
+    onNext: () -> Unit,
+    onBack: () -> Unit,
+    viewModel: LoginViewModel
+) {
 
     logger.d("Screen: " + "OtpSendVerifyScreen()")
 
@@ -72,8 +76,7 @@ fun OtpSendVerifyScreen(navController: NavHostController, viewModel: LoginViewMo
     var isFinished by remember { mutableStateOf(false) }
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
-        navController.popBackStack()
-        navController.navigate(AppRoute.ForgetPasswordUI.route)
+        onBack()
     }, content = {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -207,7 +210,8 @@ fun OtpSendVerifyScreen(navController: NavHostController, viewModel: LoginViewMo
                     BtnUi(
                         stringResource(R.string.txt_Verify_proceed),
                         onClick = {
-                            navController.navigate(AppRoute.SetNewPasswordUI.route)
+//                            navController.navigate(AppRoute.SetNewPasswordUI.route)
+                            onNext()
 
                             showError = otpValue.isEmpty()
                             inValidOTP = showError || otpValue.length < 6

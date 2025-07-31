@@ -1,7 +1,6 @@
 package com.pi.ProjectInclusion.android.screens.login
 
 import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -60,7 +59,6 @@ import com.pi.ProjectInclusion.android.common_UI.OTPBtnUi
 import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
 import com.pi.ProjectInclusion.android.common_UI.SurfaceLine
 import com.pi.ProjectInclusion.android.navigation.AppRoute
-import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
@@ -70,7 +68,12 @@ import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 
 @Composable
-fun EnterPasswordScreen(navController: NavHostController, viewModel: LoginViewModel) {
+fun EnterPasswordScreen(
+    viewModel: LoginViewModel,
+    onNext: () -> Unit, //OtpSendVerifyUI
+    onBack: () -> Unit,
+    isForgetPassword: () -> Unit
+) {
     var isDialogVisible by remember { mutableStateOf(false) }
     val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
 
@@ -83,9 +86,10 @@ fun EnterPasswordScreen(navController: NavHostController, viewModel: LoginViewMo
         message = stringResource(R.string.txt_loading)
     )
     BackHandler {
-        BackButtonPress(navController, AppRoute.UserTypeSelect.route)
+        // UserNameScreen
+       onBack()
     }
-    LoggerProvider.logger.d("Screen: " + "EnterUserNameScreen()")
+    LoggerProvider.logger.d("Screen: " + "EnterPasswordScreen()")
     LaunchedEffect(Unit) {
         viewModel.getUserType()
     }
@@ -124,7 +128,7 @@ fun EnterPasswordScreen(navController: NavHostController, viewModel: LoginViewMo
                 .background(color = Bg_Gray1),
             verticalArrangement = Arrangement.Top
         ) {
-            PasswordUI(context, navController)
+            PasswordUI(context, onNext = onNext, onBack = onBack, isForgetPassword= isForgetPassword)
         }
     }
 }
@@ -132,7 +136,9 @@ fun EnterPasswordScreen(navController: NavHostController, viewModel: LoginViewMo
 @Composable
 fun PasswordUI(
     context: Context,
-    navController: NavHostController,
+    onBack: () -> Unit,
+    isForgetPassword: () -> Unit,
+    onNext: () -> Unit,    // OtpSendVerifyUI
 ) {
     val scrollState = rememberLazyGridState()
     val coroutineScope = rememberCoroutineScope()
@@ -160,19 +166,16 @@ fun PasswordUI(
 
     if (showBottomSheet) {
         ChooseOneBottomSheet(onCallClick = {
-            navController.popBackStack()
-            navController.navigate(AppRoute.OtpSendVerifyUI.route)
+          onNext()
         }, onWhatsappClick = {
-            navController.popBackStack()
-//            navController.navigate(AppRoute.OtpSendVerifyUI.route)
-            navController.navigate(AppRoute.CreatePasswordScreen.route)   // just for UI
+           onNext
         }, onDismiss = {
             showBottomSheet = false
         })
     }
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
-        BackButtonPress(navController, AppRoute.UserTypeSelect.route)
+      onBack()
     }, content = {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -236,7 +239,7 @@ fun PasswordUI(
                                 .padding(5.dp)
                                 .align(Alignment.End)
                                 .clickable {
-                                    navController.navigate(AppRoute.ForgetPasswordUI.route)
+                                 isForgetPassword()
                                 },
                             fontFamily = fontMedium,
                             fontSize = 14.sp,
@@ -256,8 +259,8 @@ fun PasswordUI(
                                     if (passwordText.value.length < 6) {
                                         isValidMobNo = true
                                     } else { // if first digit of mobile is less than 6 then error will show
-                                        isDialogVisible = true
-                                        navController.navigate(AppRoute.OtpSendVerifyUI.route)
+//                                        isDialogVisible = true
+                                        onNext()
 
                                     }
                                 }
@@ -304,5 +307,8 @@ fun PasswordUI(
 fun LoginPassScreen() {
     val navController = rememberNavController()
     val context = LocalContext.current
-    PasswordUI(context, navController)
+    val onNext: () -> Unit = {}
+    val onBack: () -> Unit = {}
+    val isForgetPassword: () -> Unit = {}
+    PasswordUI(context, onNext, onBack, isForgetPassword)
 }

@@ -114,7 +114,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddNewStudentDetailsScreen(navHostController: NavHostController) {
+fun AddNewStudentDetailsScreen(onNext: () -> Unit, onBack: () -> Unit, addNewStudentMore: () -> Unit) {
 
     logger.d("Screen: " + "AddNewStudentDetailsScreen()")
 
@@ -202,7 +202,7 @@ fun AddNewStudentDetailsScreen(navHostController: NavHostController) {
         isShowBackButton = true,
         isShowMoreInfo = false,
         onBackButtonClick = {
-            BackButtonPress(navHostController, AppRoute.ScreeningScreen.route)
+           onBack()
         },
         onMoreInfoClick = {},
         content = {
@@ -593,8 +593,7 @@ fun AddNewStudentDetailsScreen(navHostController: NavHostController) {
                                     } else if (className.toString().isEmpty()) {
                                         context.toast(classMsg)
                                     } else {
-                                        navHostController.popBackStack()
-                                        navHostController.navigate(AppRoute.AddNewStudentMoreDetails.route)
+                                        addNewStudentMore()
                                     }
 
                                     /*scope.launch {

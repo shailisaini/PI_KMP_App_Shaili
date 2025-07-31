@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -42,6 +43,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.AnimatedRouteHost
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen1
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentDetailsScreen
@@ -87,6 +89,20 @@ class StudentDashboardActivity : ComponentActivity() {
             val halfScreenHeight = screenHeight / 2
             var sheetPeekHeight by remember { mutableStateOf(0.dp) }
             var isDialogVisible by remember { mutableStateOf(false) }
+            val startDestination = AppRoute.DashboardScreen.route
+            var currentRoute by remember { mutableStateOf(startDestination) }
+            var isForward by remember { mutableStateOf(true) }
+            val context = LocalContext.current
+
+            fun navigateTo(route: String) {
+                isForward = true
+                currentRoute = route
+            }
+
+            fun navigateBack(toRoute: String? = null) {
+                isForward = false
+                currentRoute = toRoute ?: AppRoute.LanguageSelect.route
+            }
 
             ModalNavigationDrawer(
                 drawerState = drawerState,
@@ -98,7 +114,10 @@ class StudentDashboardActivity : ComponentActivity() {
                             .background(Transparent)
                     ) {
                         DrawerHeader(drawerState, onItemClick = {
-                            navController.navigate(AppRoute.ProfileScreen.route) //AddStudentRegisterScreen
+                            scope.launch {
+                                drawerState.close()
+                                navigateTo(AppRoute.ProfileScreen.route)
+                            }
                         })
                         DrawerBody(
                             // List of Navigation Drawer
@@ -195,12 +214,12 @@ class StudentDashboardActivity : ComponentActivity() {
                             .fillMaxSize()
                             .zIndex(1f)
                     ) {
-                        NavHost(
+                        /*NavHost(
                             navController = navController,
                             startDestination = AppRoute.DashboardScreen.route, //AppRoute.DashboardScreen.route,
                         ) {
                             composable(AppRoute.DashboardScreen.route) {
-                                DashboardScreen(navController)
+                                DashboardScreen()
                             }
                             composable(AppRoute.ProfileScreen.route) {
                                 ViewProfileScreen(navController)
@@ -211,18 +230,9 @@ class StudentDashboardActivity : ComponentActivity() {
                             composable(AppRoute.EditProfileScreen2.route) {
                                 EditProfileScreen2(navController)
                             }
-//                                    composable(
-//                                        AppRoute.DashboardScreen(-1).route,
-//                                        arguments = listOf(navArgument("index") {
-//                                            type = NavType.IntType
-//                                        })
-//                                    ) { backStackEntry ->
-//                                        val index = backStackEntry.arguments?.getInt("index")!!
-//
-//                                    }
 
                             composable(AppRoute.CourseScreen.route) {
-                                DashboardScreen(navController)
+                                DashboardScreen()
                             }
 
                             // This is use for screening
@@ -262,6 +272,85 @@ class StudentDashboardActivity : ComponentActivity() {
                             composable(AppRoute.TeachingPlan.route) {
                                 TeachingPlanScreen(navController)
                             }
+                        }*/
+                        AnimatedRouteHost(
+                            currentRoute = currentRoute,
+                            isForward = isForward
+                        ) { route ->
+                            when (route) {
+                                AppRoute.DashboardScreen.route -> DashboardScreen()
+                                AppRoute.ProfileScreen.route -> ViewProfileScreen(
+                                    onNext = { navigateTo(AppRoute.EditProfileScreen.route) },
+                                    onBack = {
+                                        context.startActivity(
+                                            Intent(context, StudentDashboardActivity::class.java)
+                                        )
+                                        (context as? Activity)?.finish()
+                                    }
+                                )
+
+                                AppRoute.EditProfileScreen.route -> EditProfileScreen1(
+                                    onNext = { navigateTo(AppRoute.EditProfileScreen2.route) },
+                                    onBack = { navigateBack(AppRoute.ProfileScreen.route) })
+
+                                AppRoute.EditProfileScreen2.route -> EditProfileScreen2(
+                                    onNext = {
+                                        context.startActivity(
+                                            Intent(
+                                                context,
+                                                StudentDashboardActivity::class.java
+                                            )
+                                        )
+                                        (context as? Activity)?.finish()
+                                    },
+                                    onBack = { navigateBack(AppRoute.ProfileScreen.route) })
+
+                                // Screening
+                                AppRoute.ScreeningScreen.route -> ScreeningHomeScreen(
+                                    addStudent = { navigateTo(AppRoute.AddStudentRegister.route) },
+                                    screeningOne = { navigateTo(AppRoute.ScreeningOne.route) },
+                                    /*onNext = { navigateTo(AppRoute.EditProfileScreen2.route) },*/
+                                    onBack = { navigateBack(AppRoute.ProfileScreen.route) }
+                                )
+
+                                AppRoute.ScreeningOne.route -> ScreeningOneScreen(
+                                    onNext = { navigateTo(AppRoute.AddStudentRegister.route) },
+                                    onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
+                                )
+
+                                AppRoute.AddStudentRegister.route -> AddNewStudentDetailsScreen(
+                                    addNewStudentMore = { navigateTo(AppRoute.AddNewStudentMoreDetails.route) },
+                                    onNext = { navigateTo(AppRoute.AddStudentRegister.route) },
+                                    onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
+                                )
+
+                                AppRoute.AddNewStudentMoreDetails.route -> AddNewStudentMoreDetailsScreen(
+                                    addStudentReg = { navigateTo(AppRoute.AddStudentRegister.route) },
+                                    onNext = { navigateTo(AppRoute.ScreeningScreen.route) },
+                                    onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
+                                )
+
+                                // This is for intervention
+                               /* composable(AppRoute.InterventionScreen.route) {
+                                    InterventionHomeScreen(navController)
+                                }
+
+                                        composable(AppRoute.InterventionStudentDetails.route) {
+                                    InterventionStudentDetailsScreen(navController)
+                                }
+
+                                        composable(AppRoute.InterventionAcceptLevel.route) {
+                                    InterventionAcceptLevelScreen(navController)
+                                }
+
+                                        composable(AppRoute.UploadedDocuments.route) {
+                                    UploadedDocumentsScreen(navController)
+                                }
+
+                                        composable(AppRoute.TeachingPlan.route) {
+                                    TeachingPlanScreen(navController)
+                                }*/
+                            }
                         }
                     }
                 })
@@ -289,10 +378,10 @@ fun onMenuItemClick(
         }
 
         AppRoute.CertificateScreen.route -> {
-            LoggerProvider.logger.d("Screen: CertificateListActivity()" )
-             startActivity(
-                 context, Intent(context, CertificateListActivity::class.java), null
-             ).apply { (context as? Activity)?.finish() }
+            LoggerProvider.logger.d("Screen: CertificateListActivity()")
+            startActivity(
+                context, Intent(context, CertificateListActivity::class.java), null
+            ).apply { (context as? Activity)?.finish() }
         }
     }
 }

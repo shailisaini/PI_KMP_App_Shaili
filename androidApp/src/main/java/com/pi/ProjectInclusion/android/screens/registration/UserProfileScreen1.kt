@@ -91,7 +91,9 @@ import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 
 @Composable
-fun EnterUserScreen1(navController: NavHostController) {
+fun EnterUserScreen1(onNext: () -> Unit,  //EnterUserProfessionalScreen
+                     onBack: () -> Unit  //UserNameScreen
+) {
     var isDialogVisible by remember { mutableStateOf(false) }
 //    val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
 
@@ -103,7 +105,7 @@ fun EnterUserScreen1(navController: NavHostController) {
         message = stringResource(R.string.txt_loading)
     )
     BackHandler {
-        BackButtonPress(navController, AppRoute.UserTypeSelect.route)
+       onBack()
     }
     LoggerProvider.logger.d("Screen: " + "EnterUserNameScreen()")
 
@@ -147,7 +149,7 @@ fun EnterUserScreen1(navController: NavHostController) {
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            ProfileScreenUI(context, navController)
+            ProfileScreenUI(context, onBack = onBack, onNext = onNext)
         }
     }
 }
@@ -155,7 +157,8 @@ fun EnterUserScreen1(navController: NavHostController) {
 @Composable
 fun ProfileScreenUI(
     context: Context,
-    navController: NavHostController
+    onBack: () -> Unit,
+    onNext: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
@@ -207,7 +210,7 @@ fun ProfileScreenUI(
             RegistrationHeader(
                 stringResource(R.string.txt_create_profile), Black,
                 stringResource(R.string.txt_step_1), OrangeSubTitle, onBackButtonClick = {
-                    BackButtonPress(navController, AppRoute.UserTypeSelect.route)
+                    onBack()
                 })
             Column(
                 modifier = Modifier
@@ -547,8 +550,7 @@ fun ProfileScreenUI(
                                         inValidMobNo = true
                                     } else {
                                         isDialogVisible = true
-                                        navController.popBackStack()
-                                        navController.navigate(AppRoute.EnterUserProfessionalScreen.route)
+                                        onNext()
 
                                     }
                                 }
@@ -565,7 +567,9 @@ fun ProfileScreenUI(
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
 fun UserProfileUI() {
-    val navController = rememberNavController()
     val context = LocalContext.current
-    ProfileScreenUI(context, navController)
+    val onNext: () -> Unit = {}
+    val onBack: () -> Unit = {}
+    val isForgetPassword: () -> Unit = {}
+    ProfileScreenUI(context, onNext, onBack)
 }
