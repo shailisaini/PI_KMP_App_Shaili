@@ -78,7 +78,11 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ForgetPasswordScreen(navController: NavHostController, viewModel: LoginViewModel) {
+fun ForgetPasswordScreen(
+    onNext: () -> Unit,  //OtpSendVerifyUI
+    onBack: () -> Unit,
+    viewModel: LoginViewModel
+) {
 
     logger.d("Screen: " + "ForgetPasswordScreen()")
 
@@ -109,8 +113,7 @@ fun ForgetPasswordScreen(navController: NavHostController, viewModel: LoginViewM
         })
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
-        navController.popBackStack()
-        navController.navigate(AppRoute.UserPasswordScreen.route)
+        onBack()
     }, content = {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -235,7 +238,7 @@ fun ForgetPasswordScreen(navController: NavHostController, viewModel: LoginViewM
                                         isDialogVisible = true
 //                                viewModel.saveUserPhoneNo(mobNo.value)
                                         buttonClicked = true
-                                        navController.navigate(AppRoute.OtpSendVerifyUI.route)
+                                        onNext()
                                     }
                                 }
                             }

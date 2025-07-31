@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 sealed class AppRoute(val route: String) {
 
     @Serializable
+    data object Splash : AppRoute("splash")
     data object LanguageSelect : AppRoute("language_select")
     data object UserTypeSelect : AppRoute("user_type")
     data object UserNameScreen : AppRoute("user_name_screen")

@@ -52,7 +52,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
@@ -86,7 +85,7 @@ import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
 import kotlinx.coroutines.launch
 
 @Composable
-fun LanguageScreen(navController: NavHostController, viewModel: LoginViewModel) {
+fun LanguageScreen(viewModel: LoginViewModel, onNext: () -> Unit) {
 
     var isDialogVisible by remember { mutableStateOf(false) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -138,7 +137,7 @@ fun LanguageScreen(navController: NavHostController, viewModel: LoginViewModel) 
                 .background(color = Bg_Gray1),
             verticalArrangement = Arrangement.Top
         ) {
-            LanguageResponseUI(context, languageData, navController)
+            LanguageResponseUI(context, languageData, onNext)
         }
     }
 }
@@ -148,7 +147,7 @@ fun LanguageScreen(navController: NavHostController, viewModel: LoginViewModel) 
 fun LanguageResponseUI(
     context: Context,
     languageData: MutableList<GetLanguageListResponse.Data.Result>,
-    navController: NavHostController
+    onNext: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberLazyGridState()
@@ -206,7 +205,7 @@ fun LanguageResponseUI(
                     ) {
                         items(languageData.size) { index ->
                             ItemLanguageCard(
-                                navController,
+                                onNext,
                                 context,
                                 isSelected = selectedIndex == index,
                                 index,
@@ -234,7 +233,7 @@ fun LanguageResponseUI(
 
 @Composable
 fun ItemLanguageCard(
-    navController: NavHostController,
+    onNext: () -> Unit,
     context: Context,
     isSelected: Boolean = true,
     index: Int,
@@ -277,8 +276,9 @@ fun ItemLanguageCard(
             .clickable {
                 if (languageIndex.status == KEY_ACTIVE) {
                     onItemClicked.invoke()
-                    navController.popBackStack()
-                    navController.navigate(AppRoute.UserTypeSelect.route)
+                    onNext()
+                   /* navController.popBackStack()
+                    navController.navigate(AppRoute.UserTypeSelect.route)*/
                 } else {
                     LoggerProvider.logger.d("Languages fetched: ${languageIndex.status}")
                     context.toast(errorToast)

@@ -65,7 +65,7 @@ import com.pi.ProjectInclusion.android.utils.toast
 
 
 @Composable
-fun ScreeningOneScreen(navHostController: NavHostController) {
+fun ScreeningOneScreen(onNext: () -> Unit, onBack: () -> Unit) {
 
     logger.d("Screen: " + "ScreeningOneScreen()")
 
@@ -112,7 +112,7 @@ fun ScreeningOneScreen(navHostController: NavHostController) {
         isShowBackButton = true,
         isShowMoreInfo = true,
         onBackButtonClick = {
-            BackButtonPress(navHostController, AppRoute.ScreeningScreen.route)
+          onBack()
         },
         onMoreInfoClick = {
             showDialog = true
@@ -230,7 +230,7 @@ fun ScreeningOneScreen(navHostController: NavHostController) {
                             .padding(bottom = 64.dp)
                     ) {
                         items(questionListData) { questionData ->
-                            ScreeningQuestionDataUI(questionData, navHostController)
+                            ScreeningQuestionDataUI(questionData)
                         }
                     }
                 }
@@ -258,7 +258,7 @@ fun ScreeningOneScreen(navHostController: NavHostController) {
 }
 
 @Composable
-fun ScreeningQuestionDataUI(questionData: ScreeningQuestionData, controller: NavHostController) {
+fun ScreeningQuestionDataUI(questionData: ScreeningQuestionData) {
 
     val selectedBorder = BorderStroke(
         width = 0.5.dp, if (isSystemInDarkTheme()) {

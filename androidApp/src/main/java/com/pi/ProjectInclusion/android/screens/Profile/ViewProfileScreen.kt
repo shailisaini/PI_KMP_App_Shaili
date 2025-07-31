@@ -76,11 +76,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.example.kmptemplate.logger.AppLoggerImpl
 import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Bg_Gray1
 import com.pi.ProjectInclusion.Black
@@ -101,12 +98,10 @@ import com.pi.ProjectInclusion.PrimaryBlue3
 import com.pi.ProjectInclusion.RedBgColor
 import com.pi.ProjectInclusion.RedText
 import com.pi.ProjectInclusion.android.R
-import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.ProfileWithProgress
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
-import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
@@ -120,7 +115,8 @@ import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
 
 @Composable
-fun ViewProfileScreen(navController: NavHostController) {
+fun ViewProfileScreen(onNext: () -> Unit,  //EnterUserProfileScreen
+                      onBack: () -> Unit) {
 
     var isDialogVisible by remember { mutableStateOf(false) }
 
@@ -167,7 +163,7 @@ fun ViewProfileScreen(navController: NavHostController) {
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            ProfileViewUI(context, navController)
+            ProfileViewUI(context, onNext = onNext, onBack = onBack)
         }
     }
 }
@@ -175,7 +171,8 @@ fun ViewProfileScreen(navController: NavHostController) {
 @Composable
 fun ProfileViewUI(
     context: Context,
-    navController: NavHostController
+    onBack: () -> Unit,
+    onNext: () -> Unit
 ) {
     val scrollState = rememberScrollState()
     var isApiResponded by remember { mutableStateOf(false) }
@@ -214,7 +211,7 @@ fun ProfileViewUI(
         isShowBackButton = true,
         isShowMoreInfo = true,
         onBackButtonClick = {
-            BackButtonPress(navController, AppRoute.InterventionAcceptLevel.route)
+           onBack()
         },
         onMoreInfoClick = {
             showSheetMenu = true
@@ -256,7 +253,7 @@ fun ProfileViewUI(
 
                     Button(
                         onClick = {
-                            navController.navigate(AppRoute.EditProfileScreen.route)
+                          onNext()
                         }, modifier = Modifier
                             .wrapContentSize()
                             .clip(RoundedCornerShape(4.dp)),
@@ -274,7 +271,7 @@ fun ProfileViewUI(
                             textColor = BorderBlue,
                             iconColor = Color.Unspecified,
                             onClick = {
-                                navController.navigate(AppRoute.EditProfileScreen.route)
+                               onNext()
                             })
                     }
                 }
@@ -600,9 +597,10 @@ fun ProfileViewUI(
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
 fun ProfileUI() {
-    val navController = rememberNavController()
     val context = LocalContext.current
-    ProfileViewUI(context, navController)
+    val onNext: () -> Unit = {}
+    val onBack: () -> Unit = {}
+    ProfileViewUI(context, onNext, onBack)
 }
 
 @Preview
