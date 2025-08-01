@@ -61,6 +61,7 @@ and make a difference together!</string>
     <string name="nav_refer_txt">Refer</string>
     <string name="nav_contact">Contact us</string>
     <string name="nav_faq">F.A.Q</string>
+    <string name="nav_faq1">FAQ</string>
 
     <string name="txt_enter_mobile_no.">Enter Mobile No.</string>
     <string name="txt_Send_OTP">Send OTP</string>
@@ -342,4 +343,19 @@ and make a difference together!</string>
     <string name="txt_Recommendation">Recommendation</string>
     <string name="txt_Auditory_Domain_HI">Auditory Domain (HI)</string>
     <string name="txt_Based_observation_SAMAN_difficulty">Based on your observation, there is doubt that SAMAN is having difficulty in the auditory domain, therefore to rule out other environmental factors, kindly consult an ENT specialist and audiologist</string>
+    <string name="txt_Frequently_Asked_Questions">Frequently Asked Questions (FAQ)</string>
+    <string name="txt_Is_Project_Inclusion_available">Is Project Inclusion available for both iOS and android?</string>
+    <string name="txt_New_User_access_first_course">A New user can access the first course ‘Learning Difficulties Understanding and Management Level-1’. The other courses will be open for the user to access once they complete the screening and enter the intervention phase.</string>
+    <string name="txt_General">General</string>
+    <string name="txt_Accessibility">Accessibility</string>
+    <string name="txt_LMS">LMS</string>
+    <string name="txt_Course">Course</string>
+    <string name="txt_Which_course_new_access">Which course a new user can access?</string>
+    <string name="txt_Support">Support</string>
+    <string name="txt_Technical">Technical</string>
+    <string name="txt_Why_sometimes_not_open_show">Why does the app sometimes not open or show ‘service not available’?</string>
+    <string name="txt_Certification">Certification</string>
+    <string name="txt_Enter_Keyword">Enter Keyword</string>
+    <string name="txt_category">Category</string>
+    <string name="txt_subcategory">Subcategory</string>
 </resources>

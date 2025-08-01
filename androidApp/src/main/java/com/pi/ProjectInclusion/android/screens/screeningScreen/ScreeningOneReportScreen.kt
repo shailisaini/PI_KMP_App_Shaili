@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.BannerColor02
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.CardColor01
@@ -44,6 +45,8 @@ import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
 
 @Composable
 fun ScreeningOneReportScreen(onNext: () -> Unit, onBack: () -> Unit) {
+
+    logger.d("Screen: " + "ScreeningOneReportScreen()")
 
     Column(
         modifier = Modifier
