@@ -14,7 +14,6 @@ val Pink40 = Color(0xFF7D5260)
 val Transparent = Color(0x00000000)
 val SemiTransparent = Color(0xAA000000)
 
-
 val PrimaryBlue = Color(0xFF101942)
 val BorderBlue = Color(0xFF2C3EA2)
 val MenuSelectedColor = Color(0xFFC7E8FE)
