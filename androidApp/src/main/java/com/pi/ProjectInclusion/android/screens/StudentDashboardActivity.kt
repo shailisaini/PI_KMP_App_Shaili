@@ -237,7 +237,6 @@ class StudentDashboardActivity : ComponentActivity() {
                                 AppRoute.ScreeningScreen.route -> ScreeningHomeScreen(
                                     addStudent = { navigateTo(AppRoute.AddStudentRegister.route) },
                                     screeningOne = { navigateTo(AppRoute.ScreeningOne.route) },
-                                    /*onNext = { navigateTo(AppRoute.EditProfileScreen2.route) },*/
                                     onBack = { navigateBack(AppRoute.ProfileScreen.route) }
                                 )
 
