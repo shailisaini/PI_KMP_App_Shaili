@@ -64,6 +64,7 @@ import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningHomeScre
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneReportScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneScreen
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.ChangePasswordActivity
+import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.FaqActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -411,6 +412,9 @@ fun onMenuItemClick(
 
         AppRoute.FaqScreen.route -> {
             LoggerProvider.logger.d("Screen: Faq screen")
+            startActivity(
+                context, Intent(context, FaqActivity::class.java), null
+            ).apply { (context as? Activity)?.finish() }
         }
     }
 }
