@@ -37,10 +37,10 @@
     <string name="student_screen_add">+ Add Student</string>
     <string name="text_add">+ Add</string>
 
-    <string name="welcome_name">Hi, Aman Sharma</string>
+    <string name="welcome_name">Aman</string>
     <string name="welcome_desc">Learn, act, and create impact—one course at a time.</string>
     <string name="certificate_txt">Certificates</string>
-    <string name="certificate_txt_value">0</string>
+    <string name="certificate_txt_value">20</string>
     <string name="refer_txt">Refer fellow teachers >></string>
     <string name="refer_desc">Invite passionate teachers to join\n
 and make a difference together!</string>
@@ -342,6 +342,17 @@ and make a difference together!</string>
     <string name="txt_Condition">Condition</string>
     <string name="txt_Recommendation">Recommendation</string>
     <string name="txt_Auditory_Domain_HI">Auditory Domain (HI)</string>
+    <string name="txt_change_theme">Change Theme</string>
+    <string name="txt_light">Light</string>
+    <string name="txt_dark">Dark</string>
+    <string name="txt_hi">Hi,</string>
+    <string name="txt_screening_in_progress">Screening InProgress</string>
+    <string name="txt_screening_done">Screening Done</string>
+    <string name="txt_learning_plan">Learning Plan Shared</string>
+    <string name="txt_learning_plan_exe">Learning Plan Executed</string>
+    <string name="txt_course_completed">Course\nCompleted</string>
+    <string name="txt_course_certificates">Course\nCertificates</string>
+    <string name="txt_modules_certificates">Modules\nCertificates</string>
     <string name="txt_Based_observation_SAMAN_difficulty">Based on your observation, there is doubt that SAMAN is having difficulty in the auditory domain, therefore to rule out other environmental factors, kindly consult an ENT specialist and audiologist</string>
     <string name="txt_Frequently_Asked_Questions">Frequently Asked Questions (FAQ)</string>
     <string name="txt_Is_Project_Inclusion_available">Is Project Inclusion available for both iOS and android?</string>

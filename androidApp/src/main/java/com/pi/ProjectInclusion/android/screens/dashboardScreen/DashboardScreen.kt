@@ -1,24 +1,12 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.pi.ProjectInclusion.android.screens.dashboardScreen
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.material3.Card
-
-import androidx.compose.material3.ColorScheme
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,35 +16,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
-
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -64,45 +37,41 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
-
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
-import coil.compose.rememberAsyncImagePainter
-import coil.decode.SvgDecoder
-import coil.request.ImageRequest
-import coil.size.Size
-
 import com.example.kmptemplate.logger.AppLoggerImpl
+import com.pi.ProjectInclusion.Bg1_Gray
+import com.pi.ProjectInclusion.Bg_Gray
+import com.pi.ProjectInclusion.Bg_Gray1
 import com.pi.ProjectInclusion.Black
+import com.pi.ProjectInclusion.BorderBlue
+import com.pi.ProjectInclusion.DashboardCard1
+import com.pi.ProjectInclusion.DashboardCard2
+import com.pi.ProjectInclusion.DashboardCard3
+import com.pi.ProjectInclusion.DashboardCard4
+import com.pi.ProjectInclusion.Gray
+import com.pi.ProjectInclusion.GreenGradient1
+import com.pi.ProjectInclusion.GreenGradient2
+import com.pi.ProjectInclusion.LightBlueBox
+import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.Transparent
-
+import com.pi.ProjectInclusion.android.utils.fontBold
+import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.constants.CustomDialog
-import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
+
 @Composable
 fun DashboardScreen() {
-
     var isDialogVisible by remember { mutableStateOf(false) }
 
     val logger = AppLoggerImpl()
@@ -139,16 +108,16 @@ fun DashboardScreen() {
         }
     }
     Surface(
-        modifier = Modifier.wrapContentSize()
+        modifier = Modifier
+            .wrapContentSize()
             .background(
-                color = Transparent
+                color = Bg1_Gray
             )
-            .padding(0.dp),
-
-
-        ) {
+            .padding(top = 65.dp),
+    ) {
         Box(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .background(
                     color = Transparent
                 )
@@ -156,15 +125,47 @@ fun DashboardScreen() {
             // Add horizontal padding,
         )
         {
-
-
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally // Center rows inside the column
+                horizontalAlignment = Alignment.CenterHorizontally
             )
             {
+                Column(
+                    modifier = Modifier.padding(horizontal = 10.dp),
+                )
+                {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.txt_hi),
+                            fontSize = 28.sp,
+                            fontFamily = fontRegular,
+                            color = Gray,
+                            modifier = Modifier.padding(top = 10.dp)
+                        )
 
-                ItemAddStudentScreen(context)
-                ItemHeader(context)
+                        Text(
+                            text = stringResource(R.string.welcome_name),
+                            fontSize = 28.sp,
+                            fontFamily = fontBold,
+                            color = Black,
+                            modifier = Modifier.padding(top = 10.dp, start = 8.dp)
+                        )
+                    }
+
+                    Text(
+                        text = stringResource(R.string.welcome_desc),
+                        fontSize = 13.sp,
+                        fontFamily = fontRegular,
+                        color = Gray,
+                        modifier = Modifier
+                            .padding(vertical = 5.dp)
+                    )
+
+                }
+                ItemStudentAchievement(context)
                 ItemCard(context)
                 ItemReferCard(context)
 
@@ -173,233 +174,178 @@ fun DashboardScreen() {
     }
 }
 
-
-@Composable
-fun ItemHeader(context: Context){
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(0.dp)
-            .wrapContentHeight(),
-        horizontalArrangement = Arrangement.SpaceBetween // or Arrangement.Start/Center
-    )
-    {
-        Column(
-            modifier = Modifier.padding(16.dp)
-
-        ) {
-            Text(
-                stringResource(R.string.welcome_name), style = MaterialTheme.typography.titleMedium,
-                fontSize = 18.sp
-            )
-            Text(
-                stringResource(R.string.welcome_desc),
-                style = MaterialTheme.typography.bodyMedium,
-                fontSize = 12.sp
-            )
-        }
-
-    }
-}
-
-
 @Composable
 fun ItemCard(
     context: Context,
-){
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally // Center rows inside the column
     ) {
-
-
         Row(
             modifier = Modifier
+                .padding(top = 10.dp)
                 .fillMaxWidth()
                 .wrapContentHeight(),
             horizontalArrangement = Arrangement.Absolute.Center // or Arrangement.Start/Center
         )
         {
-            Column(
+            Card(
                 modifier = Modifier
-                    .wrapContentWidth()
+                    .padding(start = 10.dp, end = 5.dp)
+                    .fillMaxWidth()
+                    .weight(1f),
+                shape = RoundedCornerShape(12.dp), // optional
+                colors = CardDefaults.cardColors(
+                    containerColor = DashboardCard1,
+                    contentColor = Black
+                )
             )
             {
-                Card(
+                Column(
                     modifier = Modifier
-                        .padding(6.dp)
-                        .width(165.dp),
-                    border = BorderStroke(1.dp, color = Color(0xFFE9EAEB)),
-                    elevation = CardDefaults.cardElevation(4.dp), // optional
-                    shape = RoundedCornerShape(12.dp), // optional
-                    colors = CardDefaults.cardColors(
-                        containerColor = White,
-                        contentColor = Black
+                        .padding(15.dp)
+                        .align(Alignment.CenterHorizontally),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        modifier = Modifier.padding(bottom = 5.dp, top = 10.dp),
+                        text = stringResource(R.string.certificate_txt_value),
+                        fontFamily = fontBold,
+                        fontSize = 24.sp,
+                        color = Black
+                    )
+                    Text(
+                        modifier = Modifier.padding(top = 5.dp, bottom = 10.dp),
+                        text = stringResource(R.string.txt_screening_in_progress),
+                        fontFamily = fontRegular,
+                        fontSize = 13.sp,
+                        color = Black
                     )
 
-                )
-                {
-                    Column(
-                        modifier = Modifier .padding(16.dp, 20.dp, 16.dp, 20.dp)
-                            .align(Alignment.CenterHorizontally)
-                    ) {
-                        Text(
-                                text = stringResource(R.string.certificate_txt),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontSize = 14.sp,
-                            color = Color(0xFF535862)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = stringResource(R.string.certificate_txt_value),
-                            style = MaterialTheme.typography.bodyMedium,
-                                    fontSize = 18.sp,
-                            color = Black
-                        )
-                    }
                 }
             }
-            Column(
+            Card(
                 modifier = Modifier
-                    .width(200.dp)
+                    .padding(start = 5.dp, end = 10.dp)
+                    .fillMaxWidth()
+                    .weight(1f),
+                shape = RoundedCornerShape(12.dp), // optional
+                colors = CardDefaults.cardColors(
+                    containerColor = DashboardCard2,
+                    contentColor = Black
+                )
             )
             {
-                Card(
+                Column(
                     modifier = Modifier
-                        .padding(6.dp)
-                        .width(165.dp),
-                    border = BorderStroke(1.dp, color = Color(0xFFE9EAEB)),
-                    elevation = CardDefaults.cardElevation(4.dp), // optional
-                    shape = RoundedCornerShape(12.dp), // optional
-                    colors = CardDefaults.cardColors(
-                        containerColor = White,
-                        contentColor = Black
+                        .padding(15.dp)
+                        .align(Alignment.CenterHorizontally),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        modifier = Modifier.padding(bottom = 5.dp, top = 10.dp),
+                        text = stringResource(R.string.certificate_txt_value),
+                        fontFamily = fontBold,
+                        fontSize = 24.sp,
+                        color = Black
+                    )
+                    Text(
+                        modifier = Modifier.padding(top = 5.dp, bottom = 10.dp),
+                        text = stringResource(R.string.txt_screening_done),
+                        fontFamily = fontRegular,
+                        fontSize = 13.sp,
+                        color = Black
                     )
 
-                )
-                {
-                    Column(
-                        modifier = Modifier .padding(16.dp, 20.dp, 16.dp, 20.dp)
-                            .align(Alignment.CenterHorizontally)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.certificate_txt),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontSize = 14.sp,
-                            color = Color(0xFF535862)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = stringResource(R.string.certificate_txt_value),
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontSize = 18.sp,
-                            color = Black
-                        )
-                    }
                 }
             }
-
-
         }
-        Spacer(modifier = Modifier.height(16.dp).width(16.dp))
         Row(
             modifier = Modifier
+                .padding(vertical = 10.dp)
                 .fillMaxWidth()
                 .wrapContentHeight(),
             horizontalArrangement = Arrangement.Absolute.Center // or Arrangement.Start/Center
         )
         {
-            Column(
+            Card(
                 modifier = Modifier
-                    .wrapContentWidth()
+                    .padding(start = 10.dp, end = 5.dp)
+                    .fillMaxWidth()
+                    .weight(1f),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = DashboardCard3,
+                    contentColor = Black
+                )
             )
             {
-                Card(
+                Column(
                     modifier = Modifier
-                        .padding(6.dp)
-                        .width(165.dp),
-                    border = BorderStroke(1.dp, color = Color(0xFFE9EAEB)),
-                    elevation = CardDefaults.cardElevation(4.dp), // optional
-                    shape = RoundedCornerShape(12.dp), // optional
-                    colors = CardDefaults.cardColors(
-                        containerColor = White,
-                        contentColor = Black
+                        .padding(15.dp)
+                        .align(Alignment.CenterHorizontally),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        modifier = Modifier.padding(bottom = 5.dp, top = 10.dp),
+                        text = stringResource(R.string.certificate_txt_value),
+                        fontFamily = fontBold,
+                        fontSize = 24.sp,
+                        color = Black
                     )
-
-                )
-                {
-                    Column(
-                        modifier = Modifier .padding(16.dp, 20.dp, 16.dp, 20.dp)
-                            .align(Alignment.CenterHorizontally)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.certificate_txt),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontSize = 14.sp,
-                            color = Color(0xFF535862)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = stringResource(R.string.certificate_txt_value),
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontSize = 18.sp,
-                            color = Black
-                        )
-                    }
+                    Text(
+                        modifier = Modifier.padding(top = 5.dp, bottom = 10.dp),
+                        text = stringResource(R.string.txt_learning_plan),
+                        fontFamily = fontRegular,
+                        fontSize = 13.sp,
+                        color = Black
+                    )
                 }
             }
-            Column(
+            Card(
                 modifier = Modifier
-                    .width(200.dp)
+                    .padding(start = 5.dp, end = 10.dp)
+                    .fillMaxWidth()
+                    .weight(1f),
+                shape = RoundedCornerShape(12.dp), // optional
+                colors = CardDefaults.cardColors(
+                    containerColor = DashboardCard4,
+                    contentColor = Black
+                )
             )
             {
-                Card(
+                Column(
                     modifier = Modifier
-                        .padding(6.dp)
-                        .width(165.dp),
-                    border = BorderStroke(1.dp, color = Color(0xFFE9EAEB)),
-                    elevation = CardDefaults.cardElevation(4.dp), // optional
-                    shape = RoundedCornerShape(12.dp), // optional
-                    colors = CardDefaults.cardColors(
-                        containerColor = White,
-                        contentColor = Black
+                        .padding(15.dp)
+                        .align(Alignment.CenterHorizontally),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        modifier = Modifier.padding(bottom = 5.dp, top = 10.dp),
+                        text = stringResource(R.string.certificate_txt_value),
+                        fontFamily = fontBold,
+                        fontSize = 24.sp,
+                        color = Black
                     )
-
-                )
-                {
-                    Column(
-                        modifier = Modifier .padding(16.dp, 20.dp, 16.dp, 20.dp)
-                            .align(Alignment.CenterHorizontally)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.certificate_txt),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontSize = 14.sp,
-                            color = Color(0xFF535862)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = stringResource(R.string.certificate_txt_value),
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontSize = 18.sp,
-                            color = Black
-                        )
-                    }
+                    Text(
+                        modifier = Modifier.padding(top = 5.dp, bottom = 10.dp),
+                        text = stringResource(R.string.txt_learning_plan_exe),
+                        fontFamily = fontRegular,
+                        fontSize = 13.sp,
+                        color = Black
+                    )
                 }
             }
-
-
         }
-
-
     }
 }
 
 @Composable
-fun ItemReferCard(context: Context){
+fun ItemReferCard(context: Context) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(0.dp)
+            .padding(10.dp)
             .wrapContentHeight()
     )
     {
@@ -408,230 +354,228 @@ fun ItemReferCard(context: Context){
                 .fillMaxWidth()
         )
         {
-            Card(
+            Box(
                 modifier = Modifier
-                    .padding(10.dp)
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(8.dp),
-                // Do not set containerColor, let the Box inside handle the gradient
-                colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                GreenGradient1,
+                                GreenGradient2
+                            )
+                        )
+                    ),
+
             ) {
-                Box(
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            brush = Brush.linearGradient(
-                                colors = listOf(Color(0xFFFCE2B8), Color(0xFFC7F15C)) // Blue gradient
-                            )
-                        )
-                        .padding(10.dp)
+                        .padding(15.dp)
+                        .align(Alignment.TopStart)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(0.dp)
-                            .align(Alignment.TopStart)
-
+                    Text(
+                        text = stringResource(R.string.refer_txt),
+                        color = Black,
+                        fontFamily = fontBold,
+                        fontSize = 17.sp// Make sure text is readable on gradient
                     )
-                    {
-                        Text(
-                            text = stringResource(R.string.refer_txt),
-                            color = Color.Black,
-                            fontSize = 18.sp// Make sure text is readable on gradient
-                        )
-                        Text(
-                            text = stringResource(R.string.refer_desc),
-                            color = Color(0xFF6C6D72),
-                            fontSize = 12.sp// Make sure text is readable on gradient
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Card(
-                            modifier = Modifier
-                                .wrapContentWidth(),
-                            shape = RoundedCornerShape(4.dp),
-                            elevation = CardDefaults.cardElevation(4.dp)
-                            // Do not set containerColor, let the Box inside handle the gradient
-                        ){
-                            Text ( modifier = Modifier.wrapContentWidth()
-                                .padding(5.dp),
-                                text = stringResource(R.string.refer_count),
-                                color = Black,
-                                fontSize = 12.sp// Make sure text is readable on gradient
-                            )
-                        }
-//                                    Button(onClick = { /* Handle click */ }) {
-//
-//                                    }
-                    }
-                    Column(
-                        modifier = Modifier.padding(0.dp)
-                            .align(Alignment.CenterEnd)
-
+                    Text(
+                        text = stringResource(R.string.refer_desc),
+                        color = Bg_Gray,
+                        fontFamily = fontRegular,
+                        fontSize = 13.sp// Make sure text is readable on gradient
                     )
-                    {
-                        Icon(
-                            painter = painterResource(id = R.drawable.refer_banner),
-                            contentDescription = stringResource(R.string.lock_ic),
-                            tint = Color.Unspecified// Optional color
-                        )
-                    }
-                }
-            }
-
-
-        }
-
-    }
-
-}
-
-@Composable
-fun ItemAddStudentScreen(context: Context){
-    var showDialog by remember { mutableStateOf(false) }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(0.dp)
-            .wrapContentHeight()
-    )
-    {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-        )
-        {
-            Card(
-                modifier = Modifier
-                    .padding(10.dp)
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(8.dp),
-                // Do not set containerColor, let the Box inside handle the gradient
-                colors = CardDefaults.cardColors(containerColor = Color.Transparent)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            brush = Brush.linearGradient(
-                                colors = listOf(Color(0xFFDADFFF), Color(0xFFDADFFF)) // Blue gradient
-                            )
-                        )
-                        .padding(0.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(top = 16.dp, bottom = 16.dp, end = 10.dp, start = 10.dp)
-                            .align(Alignment.TopStart)
-                    )
-                    {
-                        Text(
-                            text = "Add Student for screening",
-                            color = Color(0xFF00051F),
-                            fontSize = 16.sp// Make sure text is readable on gradient
-                        )
-                        Spacer(modifier = Modifier.height(5.dp))
-
-                        Text(
-                            text = "Identify, support, and empower your\nstudents!",
-                            color = Color(0xFF6C6D72),
-                            fontSize = 14.sp// Make sure text is readable on gradient
-                        )
-
-                    }
-                    Column(
-                        modifier = Modifier.padding(10.dp)
-                            .align(Alignment.CenterEnd)
-
-                    )
-                    {
-                        Card(
-                            modifier = Modifier
-                                .wrapContentWidth()
-                                .wrapContentHeight(),
-
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color(0xFF2C3EA2)
-                            ),
-                            shape = RoundedCornerShape(8.dp),
-                            elevation = CardDefaults.cardElevation(4.dp)
-
-                            // Do not set containerColor, let the Box inside handle the gradient
-                        ){
-                            Text ( modifier = Modifier.wrapContentWidth()
-                                .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
-                                .clickable { showDialog = true },
-                                text = "+ Add",
-                                color = White,
-                                fontSize = 13.sp// Make sure text is readable on gradient
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-    }
-
-
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text(text = "Phase 2 - Introduction", style =MaterialTheme.typography.bodyMedium,
-                fontSize = 20.sp,
-                color = Black,
-                textAlign = TextAlign.Center) },
-            text = { Text("This is a simple dialog message.") },
-            confirmButton = {
-                //TextButton(onClick = { showDialog = false }) {
-
+                    Spacer(modifier = Modifier.height(10.dp))
                     Card(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
-
+                            .background(color = White)
+                            .wrapContentWidth(),
                         colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFF101942)
+                            containerColor = White,
+                            contentColor = Black
                         ),
-                        shape = RoundedCornerShape(8.dp),
-                        elevation = CardDefaults.cardElevation(4.dp)
-
+                        shape = RoundedCornerShape(4.dp),
                         // Do not set containerColor, let the Box inside handle the gradient
-                    ){
-                        Text ( modifier = Modifier.wrapContentWidth()
-                            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
-                            .align(Alignment.CenterHorizontally)
-                            .clickable { showDialog = false },
-                            text = "Got It",
-                            color = White,
-                            fontSize = 13.sp// Make sure text is readable on gradient
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .wrapContentWidth()
+                                .padding(vertical = 8.dp, horizontal = 10.dp),
+                            text = stringResource(R.string.refer_count),
+                            color = Black,
+                            fontSize = 12.sp// Make sure text is readable on gradient
                         )
                     }
-                  //  Text("Got It")
-               // }
-            },
-            containerColor = Color(0xFFFFFFFF)
-            )
+                }
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.refer_banner),
+                        contentDescription = stringResource(R.string.lock_ic),
+                        tint = Color.Unspecified// Optional color
+                    )
+                }
+            }
+        }
     }
-
 }
 
 @Composable
-fun AddStudentAlertDialog() {
-    var showDialog by remember { mutableStateOf(true) }
+fun ItemStudentAchievement(context: Context) {
 
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text(text = "Phase 2 - Introduction", style =MaterialTheme.typography.bodyMedium,
-                fontSize = 20.sp,
-                color = Black ) },
-            text = { Text("This is a simple dialog message.") },
-            confirmButton = {
-                TextButton(onClick = { showDialog = false }) {
-                    Text("Got It")
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+    )
+    {
+        Card(
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            // Do not set containerColor, let the Box inside handle the gradient
+            colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = LightBlueBox
+                    )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp, vertical = 15.dp)
+                )
+                {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                            .background(color = Bg_Gray1, shape = RoundedCornerShape(size = 10.dp))
+                            .padding(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Achievements",
+                            fontFamily = fontRegular,
+                            fontSize = 15.sp
+                        )
+                    }
+                    Row(
+                        modifier = Modifier
+                            .padding(
+                                start = 5.dp, end = 5.dp, top = 15.dp
+                            )
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .background(
+                                    color = White,
+                                    shape = RoundedCornerShape(size = 8.dp)
+                                )
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(
+                                    start = 15.dp,
+                                    end = 15.dp,
+                                    top = 10.dp,
+                                    bottom = 5.dp
+                                ),
+                                text = "4",
+                                fontFamily = fontBold,
+                                fontSize = 24.sp
+                            )
+                            Text(
+                                modifier = Modifier.padding(
+                                    start = 15.dp,
+                                    end = 15.dp,
+                                    bottom = 10.dp
+                                ),
+                                text = stringResource(R.string.txt_course_completed),
+                                fontFamily = fontRegular,
+                                fontSize = 13.sp
+                            )
+                        }
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 5.dp)
+                                .weight(1f)
+                                .background(
+                                    color = White,
+                                    shape = RoundedCornerShape(size = 8.dp)
+                                )
+
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(
+                                    start = 15.dp,
+                                    end = 10.dp,
+                                    top = 10.dp,
+                                    bottom = 5.dp
+                                ),
+                                text = "4",
+                                fontFamily = fontBold,
+                                fontSize = 24.sp
+                            )
+                            Text(
+                                modifier = Modifier.padding(
+                                    start = 15.dp,
+                                    end = 15.dp,
+                                    bottom = 10.dp
+                                ),
+                                text = stringResource(R.string.txt_course_certificates),
+                                fontFamily = fontRegular,
+                                fontSize = 13.sp
+                            )
+                        }
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .background(
+                                    color = White,
+                                    shape = RoundedCornerShape(size = 8.dp)
+                                )
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(
+                                    start = 15.dp,
+                                    end = 15.dp,
+                                    top = 10.dp,
+                                    bottom = 5.dp
+                                ),
+                                text = "4",
+                                fontFamily = fontBold,
+                                fontSize = 24.sp
+                            )
+                            Text(
+                                modifier = Modifier.padding(
+                                    start = 15.dp,
+                                    end = 15.dp,
+                                    bottom = 10.dp
+                                ),
+                                text = stringResource(R.string.txt_modules_certificates),
+                                fontFamily = fontRegular,
+                                fontSize = 13.sp
+                            )
+                        }
+                    }
                 }
-            },
-
-        )
+            }
+        }
     }
 }
 
+@Composable
+@Preview(showBackground = true, showSystemUi = true)
+fun DashboardScreenUI() {
+    DashboardScreen()
+}

@@ -10,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,7 +20,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
-import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,15 +28,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat.startActivity
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Transparent
@@ -77,21 +74,14 @@ class StudentDashboardActivity : ComponentActivity() {
 
             val colors = MaterialTheme.colorScheme
             val navController = rememberNavController()
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentDestination = navBackStackEntry?.destination?.route
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
             val scope = rememberCoroutineScope()
-            val bottomSheetState = rememberStandardBottomSheetState(
-                skipHiddenState = false  // Allow transitioning to hidden state
-            )
             val coroutineScope = rememberCoroutineScope()
-            val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-            val halfScreenHeight = screenHeight / 2
-            var sheetPeekHeight by remember { mutableStateOf(0.dp) }
             var isDialogVisible by remember { mutableStateOf(false) }
             val startDestination = AppRoute.DashboardScreen.route
             var currentRoute by remember { mutableStateOf(startDestination) }
             var isForward by remember { mutableStateOf(true) }
+            var isNotification by remember { mutableStateOf(true) }
             val context = LocalContext.current
 
             fun navigateTo(route: String) {
@@ -113,7 +103,8 @@ class StudentDashboardActivity : ComponentActivity() {
                             .padding(end = 30.dp)
                             .background(Transparent)
                     ) {
-                        DrawerHeader(drawerState, onItemClick = {
+                        DrawerHeader(drawerState,
+                            onItemClick = {
                             scope.launch {
                                 drawerState.close()
                                 navigateTo(AppRoute.ProfileScreen.route)
@@ -167,7 +158,6 @@ class StudentDashboardActivity : ComponentActivity() {
                             ), onItemClick = { itemId ->
                                 onMenuItemClick(
                                     itemId,
-                                    navController,
                                     this@StudentDashboardActivity,
                                     coroutineScope,
                                 )
@@ -175,7 +165,9 @@ class StudentDashboardActivity : ComponentActivity() {
                     }
                 },
             ) {
-                Scaffold(bottomBar = {
+                Scaffold(
+                    contentWindowInsets = WindowInsets(0, 0, 0, 0),
+                    bottomBar = {
                     if (currentRoute in listOf(
                             AppRoute.DashboardScreen.route,
                             AppRoute.CourseScreen.route,
@@ -196,79 +188,20 @@ class StudentDashboardActivity : ComponentActivity() {
                         }
                     }
                 }, topBar = {
-                    if (currentDestination == AppRoute.DashboardScreen.route) {
+                    if (currentRoute == AppRoute.DashboardScreen.route) {
                         AppBar(
+                            isNotification,
                             onNavigationIconClick = {
                                 scope.launch { drawerState.open() }
-                            }, scope, drawerState, currentDestination, navController
+                            },
+                            currentRoute = currentRoute
                         )
                     }
                 }, content = { innerPadding ->
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(innerPadding)
-                            .zIndex(1f)
                     ) {
-                        /*NavHost(
-                            navController = navController,
-                            startDestination = AppRoute.DashboardScreen.route, //AppRoute.DashboardScreen.route,
-                        ) {
-                            composable(AppRoute.DashboardScreen.route) {
-                                DashboardScreen()
-                            }
-                            composable(AppRoute.ProfileScreen.route) {
-                                ViewProfileScreen(navController)
-                            }
-                            composable(AppRoute.EditProfileScreen.route) {
-                                EditProfileScreen1(navController)
-                            }
-                            composable(AppRoute.EditProfileScreen2.route) {
-                                EditProfileScreen2(navController)
-                            }
-
-                            composable(AppRoute.CourseScreen.route) {
-                                DashboardScreen()
-                            }
-
-                            // This is use for screening
-                            composable(AppRoute.ScreeningScreen.route) {
-                                ScreeningHomeScreen(navController)
-                            }
-
-                            composable(AppRoute.ScreeningOne.route) {
-                                ScreeningOneScreen(navController)
-                            }
-
-                            composable(AppRoute.AddStudentRegister.route) {
-                                AddNewStudentDetailsScreen(navController)
-                            }
-
-                            composable(AppRoute.AddNewStudentMoreDetails.route) {
-                                AddNewStudentMoreDetailsScreen(navController)
-                            }
-
-                            // This is use for intervention
-                            composable(AppRoute.InterventionScreen.route) {
-                                InterventionHomeScreen(navController)
-                            }
-
-                            composable(AppRoute.InterventionStudentDetails.route) {
-                                InterventionStudentDetailsScreen(navController)
-                            }
-
-                            composable(AppRoute.InterventionAcceptLevel.route) {
-                                InterventionAcceptLevelScreen(navController)
-                            }
-
-                            composable(AppRoute.UploadedDocuments.route) {
-                                UploadedDocumentsScreen(navController)
-                            }
-
-                            composable(AppRoute.TeachingPlan.route) {
-                                TeachingPlanScreen(navController)
-                            }
-                        }*/
                         AnimatedRouteHost(
                             currentRoute = currentRoute,
                             isForward = isForward
@@ -305,7 +238,6 @@ class StudentDashboardActivity : ComponentActivity() {
                                 AppRoute.ScreeningScreen.route -> ScreeningHomeScreen(
                                     addStudent = { navigateTo(AppRoute.AddStudentRegister.route) },
                                     screeningOne = { navigateTo(AppRoute.ScreeningOne.route) },
-                                    /*onNext = { navigateTo(AppRoute.EditProfileScreen2.route) },*/
                                     onBack = { navigateBack(AppRoute.ProfileScreen.route) }
                                 )
 
@@ -367,7 +299,6 @@ class StudentDashboardActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 fun onMenuItemClick(
     itemId: String,
-    navController: NavHostController,
     studentDashboardActivity: StudentDashboardActivity,
     coroutineScope: CoroutineScope,
 ) {
@@ -381,7 +312,6 @@ fun onMenuItemClick(
         }
 
         AppRoute.CertificateScreen.route -> {
-            LoggerProvider.logger.d("Screen: CertificateListActivity()")
             startActivity(
                 context, Intent(context, CertificateListActivity::class.java), null
             ).apply { (context as? Activity)?.finish() }
@@ -392,7 +322,6 @@ fun onMenuItemClick(
         }
 
         AppRoute.ChangePasswordScreen.route -> {
-            LoggerProvider.logger.d("Screen: ChangePasswordActivity()")
             startActivity(
                 context, Intent(context, ChangePasswordActivity::class.java), null
             ).apply { (context as? Activity)?.finish() }
@@ -411,7 +340,6 @@ fun onMenuItemClick(
         }
 
         AppRoute.FaqScreen.route -> {
-            LoggerProvider.logger.d("Screen: Faq screen")
             startActivity(
                 context, Intent(context, FaqActivity::class.java), null
             ).apply { (context as? Activity)?.finish() }
