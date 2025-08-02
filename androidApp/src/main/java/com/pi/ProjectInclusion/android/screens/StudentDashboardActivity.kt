@@ -312,7 +312,6 @@ fun onMenuItemClick(
         }
 
         AppRoute.CertificateScreen.route -> {
-            LoggerProvider.logger.d("Screen: CertificateListActivity()")
             startActivity(
                 context, Intent(context, CertificateListActivity::class.java), null
             ).apply { (context as? Activity)?.finish() }
@@ -323,7 +322,6 @@ fun onMenuItemClick(
         }
 
         AppRoute.ChangePasswordScreen.route -> {
-            LoggerProvider.logger.d("Screen: ChangePasswordActivity()")
             startActivity(
                 context, Intent(context, ChangePasswordActivity::class.java), null
             ).apply { (context as? Activity)?.finish() }
@@ -342,7 +340,6 @@ fun onMenuItemClick(
         }
 
         AppRoute.FaqScreen.route -> {
-            LoggerProvider.logger.d("Screen: Faq screen")
             startActivity(
                 context, Intent(context, FaqActivity::class.java), null
             ).apply { (context as? Activity)?.finish() }

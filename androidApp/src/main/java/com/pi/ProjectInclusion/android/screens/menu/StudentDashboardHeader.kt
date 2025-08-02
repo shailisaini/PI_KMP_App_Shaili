@@ -175,7 +175,7 @@ fun TopBarPassport(
             }) {
                 Icon(
                     imageVector = Icons.Default.Menu,
-                    contentDescription = "Toggle drawer",
+                    contentDescription = "",
                     tint = Black
                 )
             }

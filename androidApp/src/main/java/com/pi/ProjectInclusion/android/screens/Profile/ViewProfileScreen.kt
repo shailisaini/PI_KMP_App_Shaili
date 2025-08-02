@@ -81,7 +81,6 @@ import coil.request.ImageRequest
 import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Bg_Gray1
 import com.pi.ProjectInclusion.Black
-import com.pi.ProjectInclusion.BlueBackground2
 import com.pi.ProjectInclusion.BorderBlue
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Dark_02
@@ -1184,7 +1183,7 @@ fun CameraGalleryButtons(
             TextWithIconOnLeft(
                 text = stringResource(R.string.txt_Camera),
                 icon = ImageVector.vectorResource(id = R.drawable.camera_img),
-                textColor = BlueBackground2,
+                textColor = Dark_03,
                 iconColor = Color.Unspecified,
                 onClick = {
                     val uri = createImageUri()
@@ -1211,7 +1210,7 @@ fun CameraGalleryButtons(
             TextWithIconOnLeft(
                 text = stringResource(R.string.txt_Gallery),
                 icon = ImageVector.vectorResource(id = R.drawable.gallery_img),
-                textColor = BlueBackground2,
+                textColor = Dark_03,
                 iconColor = Color.Unspecified,
                 onClick = {
                     galleryLauncher.launch(IMAGE_ALL_TYPE)

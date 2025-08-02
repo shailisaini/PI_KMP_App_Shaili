@@ -41,10 +41,8 @@ val GrayLight05 = Color(0xFFD0D5DD)  //#D0D5DD
 val GrayLight06 = Color(0xFFD3D3D3)  //#D3D3D3
 val White = Color(0xFFFFFFFF)
 val WhiteA = Color(0xFFFFF5DE)
-val BackgroundGray = Color(0xFF666666)
 val BlueBackground = Color(0x4DF6F4FE)
 val BlueBackground1 = Color(0xFFF5F9FE)
-val BlueBackground2 = Color(0xFF35383F) //#35383F   // CFD1D9
 val BlueBackground3 = Color(0xFFDADFFF) //#DADFFF
 
 val PurpleDark01 = Color(0xFF3B2C6E)
@@ -60,7 +58,6 @@ val GreenDark02 = Color(0xFF57A861)
 val LightGreen01 = Color(0xFF75C57F)
 val LightGreen02 = Color(0xFFACE9B4)
 val LightGreen03 = Color(0xFFDEFFE2)
-val LightGreen04 = Color(0xFFF5F9FE)
 val LightGreen05 = Color(0xFFECFAED)
 val LightGreen06 = Color(0xFF56A42F) // #56A42F
 
@@ -120,10 +117,6 @@ val DARK_BODY_TEXT = Color(0xFF666666)
 val DARK_DEFAULT_BUTTON_TEXT = Color(0xFFD1D1D1)
 val DARK_ACTIVE_BUTTON_TEXT = Color(0xFFF5F5F5)
 val PRIMARY_AURO_BLUE = Color(0xFF12AFFF)
-
-val GRAPH_PURPLE_LIGHT_01 = Color(0xFFB6B0FB)
-val GRAPH_GREEN_LIGHT_02 = Color(0xFFACE9B4)
-val GRAPH_YELLOW_LIGHT_01 = Color(0xFFFBDE9D)
 
 val INVITE_LIGHT_01 = Color(0xFF003C5A)
 val Dark_Selected_BG = Color(0xFF001E2B)
