@@ -2,7 +2,6 @@ package com.pi.ProjectInclusion.android.screens.menu
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,7 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerState
@@ -23,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -32,7 +31,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -50,33 +48,30 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
+import com.pi.ProjectInclusion.BannerColor03
+import com.pi.ProjectInclusion.Bg_Gray
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.BorderBlue
 import com.pi.ProjectInclusion.Transparent
-import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight01
-import com.pi.ProjectInclusion.GrayLight02
-import com.pi.ProjectInclusion.GreenDark01
 import com.pi.ProjectInclusion.LightPurple04
+import com.pi.ProjectInclusion.MenuSelectedColor
 import com.pi.ProjectInclusion.PrimaryBlue
+import com.pi.ProjectInclusion.RedLogout
 import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.MyApplicationTheme
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
+import com.pi.ProjectInclusion.android.common_UI.ThemeSwitch
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
-
 
 @Preview
 @Composable
 fun DrawerHeader(
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Open),
     onItemClick: () -> Unit = {},
-    closeMenu: () -> Unit = {},
 ) {
     Box(
         modifier = Modifier
@@ -122,14 +117,15 @@ fun DrawerHeader(
                             painter = painterResource(R.drawable.profile_user_icon),
                             contentDescription = stringResource(R.string.logo_ic),
                             modifier = Modifier
+                                .width(80.dp)
+                                .height(80.dp)
                                 .clip(CircleShape) // Add clip modifier to make the image circular
                                 .background(shape = CircleShape, color = Transparent)
                                 .border( // Add border modifier to make image stand out
-                                    width = 1.dp, color = White, shape = CircleShape
+                                    width = 2.dp, color = White, shape = CircleShape
                                 ),
                             contentScale = ContentScale.Crop // Clip the image to a circular shape
                         )
-
                     }
                 }
                 Column(
@@ -199,87 +195,133 @@ fun DrawerBody(
 ) {
     val colors = MaterialTheme.colorScheme
 
-    LazyColumn(
-        modifier
-            .padding(end = 50.dp)
+    Column(
+        modifier = Modifier.padding(end = 50.dp)
             .zIndex(1f)
             .fillMaxHeight()
-            .background(
-                color = if (isSystemInDarkTheme()) {
-                    colors.background
-                } else {
-                    Color.White
-                }
-            )
+            .background(color = White)
     ) {
-        items(items) { item ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        onItemClick(item.id)
+        LazyColumn(
+            modifier
+                .padding(vertical = 10.dp)
+                .fillMaxHeight()
+                .background(
+                    color = if (isSystemInDarkTheme()) {
+                        colors.background
+                    } else {
+                        Color.White
                     }
-                    .padding(horizontal = 20.dp, vertical = 15.dp),
-                verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = item.icon,
-                    contentDescription = "",
-                    tint = Color.Unspecified,
                 )
-                Spacer(modifier = Modifier.width(5.dp))
-
-                Text(
-                    text = item.title,
+        ) {
+            items(items) { item ->
+                Row(
                     modifier = Modifier
-                        .padding(horizontal = 10.dp, vertical = 10.dp)
-                        .weight(1f),
+                        .fillMaxWidth()
+                        .clickable {
+                            onItemClick(item.id)
+                        }
+                        .padding(start = 20.dp, end = 20.dp, top = 20.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = item.icon,
+                        contentDescription = "",
+                        tint = Color.Unspecified,
+                    )
+                    Spacer(modifier = Modifier.width(5.dp))
+
+                    Text(
+                        text = item.title,
+                        modifier = Modifier
+                            .padding(horizontal = 10.dp, vertical = 5.dp)
+                            .weight(1f),
                         color = Black,
-                    fontFamily = fontMedium,
+                        fontFamily = fontMedium,
                         fontSize = 16.sp,
+                    )
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.arrow_nxt_ic),
+                        contentDescription = "",
+                        tint = Color.Unspecified
+                    )
+                }
+            }
+
+            item {
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp, vertical = 10.dp)
                 )
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.arrow_nxt_ic),
-                    contentDescription = "",
-                    tint = Color.Unspecified
-                )
+                {
+                    var isLight by remember { mutableStateOf(true) }
+
+                    TextWithIconOnLeft(
+                        text = stringResource(R.string.txt_change_theme),
+                        icon = ImageVector.vectorResource(id = R.drawable.ic_change_theme),
+                        textColor = Bg_Gray,
+                        iconColor = Color.Unspecified,
+                        modifier = Modifier.padding(vertical = 10.dp),
+                        onClick = {
+
+                        })
+                    ThemeSwitch(isLightSelected = isLight) { selected ->
+                        isLight = selected
+                    }
+                    Surface(
+                        modifier = Modifier
+                            .padding(vertical = 20.dp)
+                            .height(1.dp)
+                            .fillMaxWidth(),
+                        color = BannerColor03,
+                      ){
+
+                    }
+                    TextWithIconOnLeft(
+                        text = stringResource(R.string.txt_logout),
+                        icon = ImageVector.vectorResource(id = R.drawable.ic_logout),
+                        textColor = RedLogout,
+                        iconColor = RedLogout,
+                        modifier = Modifier.padding(vertical = 5.dp),
+                        onClick = {
+
+                        })
+                }
             }
         }
     }
 }
 
-//@Preview
+@Preview
 @Composable
 fun BottomNavigationBar(
-    onNavigateTo: (String) -> Unit,
+    onNavigateTo: (String) -> Unit ={},
     currentDestination: String? = "",
 ) {
-    val colors = MaterialTheme.colorScheme
     val item = listOf(
         BottomNavigationItems(
             appRoute = AppRoute.DashboardScreen.route,
             title = stringResource(R.string.nav_home),
-            selectedIcon = ImageVector.vectorResource(id = R.drawable.home_icon),
-            unSelectedIcon = ImageVector.vectorResource(id = R.drawable.active_home_ic)
+            selectedIcon = ImageVector.vectorResource(id = R.drawable.active_home_ic),
+            unSelectedIcon = ImageVector.vectorResource(id = R.drawable.home_icon)
         ), BottomNavigationItems(
             appRoute = AppRoute.CourseScreen.route,
             title = stringResource(R.string.nav_course),
-            selectedIcon = ImageVector.vectorResource(id = R.drawable.course_icon),
+            selectedIcon = ImageVector.vectorResource(id = R.drawable.ic_selected_course),
             unSelectedIcon = ImageVector.vectorResource(id = R.drawable.course_icon)
         ), BottomNavigationItems(
             appRoute = AppRoute.ScreeningScreen.route,
             title = stringResource(R.string.nav_screening),
-            selectedIcon = ImageVector.vectorResource(id = R.drawable.screening_icon),
+            selectedIcon = ImageVector.vectorResource(id = R.drawable.ic_selected_screening),
             unSelectedIcon = ImageVector.vectorResource(id = R.drawable.screening_icon)
         ), BottomNavigationItems(
             appRoute = AppRoute.InterventionScreen.route,
             title = stringResource(R.string.nav_intervention),
-            selectedIcon = ImageVector.vectorResource(id = R.drawable.intervention_icon),
+            selectedIcon = ImageVector.vectorResource(id = R.drawable.ic_selected_intervention),
             unSelectedIcon = ImageVector.vectorResource(id = R.drawable.intervention_icon)
         )
     )
 
     val local = LocalContext.current
-    val activeColor = PrimaryBlue
+    val activeColor = BorderBlue
     val inactiveColor = GrayLight01
     val context: Context = LocalContext.current
 
@@ -296,6 +338,42 @@ fun BottomNavigationBar(
         item.forEach { screen ->
             NavigationBarItem(
                 icon = {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = if (currentDestination == screen.appRoute) MenuSelectedColor else Color.Transparent,
+                                shape = RoundedCornerShape(70.dp) // curved rectangle
+                            )
+                            .padding(horizontal = 12.dp), // control size of background
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            modifier = Modifier.padding(vertical = 4.dp, horizontal = 5.dp),
+                            imageVector = if (currentDestination == screen.appRoute)screen.selectedIcon else screen.unSelectedIcon,
+                            contentDescription = null,
+                            tint = Color.Unspecified,
+                        )
+                    }
+                },
+                selected = currentDestination == screen.appRoute, onClick = {
+                    if (currentDestination != screen.appRoute) {
+                        onNavigateTo(screen.appRoute)
+                    }
+                    },
+                label = {
+                    Text(
+                        text = screen.title,
+                        fontStyle = FontStyle.Normal,
+                        fontFamily = fontMedium,
+                        color = if (currentDestination == screen.appRoute) activeColor else inactiveColor,
+                        fontSize = 12.sp
+                    )
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    indicatorColor = White // disable default background
+                )
+
+                  /*      icon = {
                     Log.d("SelectedScreen: ", "" + screen.appRoute)
                     when (screen.appRoute) {
                         AppRoute.DashboardScreen.route -> Icon(
@@ -330,7 +408,6 @@ fun BottomNavigationBar(
                             Icon(
                                 imageVector = screen.selectedIcon,
                                 contentDescription = null,
-                                tint = if (currentDestination == screen.appRoute) activeColor else inactiveColor,
                                 modifier = Modifier.size(30.dp)
                             )
                         }
@@ -339,22 +416,18 @@ fun BottomNavigationBar(
                     if (currentDestination != screen.appRoute) {
                         onNavigateTo(screen.appRoute)
                     }
-//                    if (screen.appRoute == "") { // student_wallet
-//                        navController.navigate(screen.appRoute)
-//                    } else {
-//                        navController.navigate(screen.appRoute)
-//                    }
+
                 }, label = {
                     Text(
                         text = screen.title,
                         fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = fontMedium,
                         color = if (currentDestination == screen.appRoute) activeColor else inactiveColor,
-                        fontSize = 10.sp
+                        fontSize = 13.sp
                     )
                 }, colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = Color.Transparent // Removes background color when selected
-                )
+                    indicatorColor = White
+                )*/
             )
         }
     }

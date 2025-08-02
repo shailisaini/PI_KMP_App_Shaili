@@ -1309,6 +1309,7 @@ fun PasswordCheckField(
     }
 }
 
+@Preview
 @Composable
 fun CustomProgressBar(
     percentage: Float = 0f,
@@ -2864,6 +2865,73 @@ fun SubmissionDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
                     }
                 }
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun ThemeSwitch(
+    isLightSelected: Boolean = false,
+    onToggle: (Boolean) -> Unit ={}
+) {
+    val backgroundColor = Bg_Gray2
+    val selectedColor = White
+    val unselectedColor = Transparent
+
+    Row(
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .background(backgroundColor)
+            .border(1.dp, Bg_Gray2, RoundedCornerShape(50))
+            .padding(4.dp)
+    ) {
+        // Light Button
+        Row(
+            modifier = Modifier
+                .clip(RoundedCornerShape(50))
+                .background(if (isLightSelected) selectedColor else unselectedColor)
+                .clickable { onToggle(true) }
+                .padding(horizontal = 15.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_sun),
+                contentDescription = "",
+                tint = if (isLightSelected) Color.Black else GrayLight04,
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = stringResource(R.string.txt_light),
+                color = if (isLightSelected) Color.Black else GrayLight04,
+                fontFamily = fontMedium,
+                fontSize = 14.sp
+            )
+        }
+
+        // Dark Button
+        Row(
+            modifier = Modifier
+                .clip(RoundedCornerShape(50))
+                .background(if (!isLightSelected) selectedColor else unselectedColor)
+                .clickable { onToggle(false) }
+                .padding(horizontal = 12.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_moon),
+                contentDescription = "",
+                tint = if (!isLightSelected) Color.Black else GrayLight04,
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = stringResource(R.string.txt_dark),
+                color = if (!isLightSelected) Color.Black else GrayLight04,
+                fontFamily = fontMedium,
+                fontSize = 14.sp
+            )
         }
     }
 }

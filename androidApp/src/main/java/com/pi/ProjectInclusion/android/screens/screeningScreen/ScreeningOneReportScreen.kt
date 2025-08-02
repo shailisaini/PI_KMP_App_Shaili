@@ -28,7 +28,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.pi.ProjectInclusion.BannerColor02
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.CardColor01
 import com.pi.ProjectInclusion.Dark_01
@@ -148,7 +147,7 @@ fun DomainSection(title: String) {
         text = title,
         fontSize = 16.sp,
         fontFamily = fontBold,
-        color = BannerColor02,
+        color = PrimaryBlue,
         modifier = Modifier.padding(vertical = 8.dp)
     )
 }

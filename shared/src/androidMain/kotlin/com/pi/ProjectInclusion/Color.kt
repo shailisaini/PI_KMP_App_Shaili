@@ -17,15 +17,17 @@ val SemiTransparent = Color(0xAA000000)
 
 val PrimaryBlue = Color(0xFF101942)
 val BorderBlue = Color(0xFF2C3EA2)
-val PrimaryBlue1 = Color(0xFF75CDFA)
+val MenuSelectedColor = Color(0xFFC7E8FE)
 val PrimaryBlue2 = Color(0xFFDFF4FF)
 val PrimaryBlue3 = Color(0xFFF0F9FF) //#F0F9FF
 val PrimaryBlueLt = Color(0xFFF2FBFF)
 val PrimaryBlueLt1 = Color(0xFFE6E9FF) // #E6E9FF
 val LightBlue = Color(0xFF5E72E7) //#5E72E7
+
 val Black = Color(0xFF111111)
 val Gray = Color(0xFF808080) // gray // #808080
 val Bg_Gray = Color(0xFF6C6D72) // gray #555555
+val Bg1_Gray = Color(0xFFF9FAFF) // gray #555555
 val Bg_Gray1 = Color(0xF0F5F9FE) // gray
 val Bg_Gray2 = Color(0xFFD9D9D9) // #D9D9D9
 val Bg_Gray3 = Color(0xFF8E84A3) // #8E84A3
@@ -78,6 +80,7 @@ val LightOrange1 = Color(0xFFF3D4D4) // #F3D4D4
 val LightOrange2 = Color(0xFFCD6C27) // #CD6C27
 
 val RedText = Color(0xFFFF1A1A)
+val RedLogout = Color(0xFFDA0101)
 val RedBgColor = Color(0xFFFFE9E9)
 val DarkRed2 = Color(0xFFD76B66)
 val LightRed01 = Color(0xFFF2566D)
@@ -118,3 +121,14 @@ val INVITE_LIGHT_01 = Color(0xFF003C5A)
 val Dark_Selected_BG = Color(0xFF001E2B)
 val Auro_Light_Blue = Color(0xFFDFF4FF)
 val Male_selected = Color(0xFF175BCB)
+
+// dashboard card
+val LightBlueBox = Color(0xFFC9D3FF) //#5E72E7
+val DashboardCard1 = Color(0xFFDCF1FF)
+val DashboardCard2 = Color(0xFFFFE9E9)
+val DashboardCard3 = Color(0xFFFFECDF)
+val DashboardCard4 = Color(0xFFE5FFED)
+
+//linear gradient
+val GreenGradient1 = Color(0x32C7F15C)
+val GreenGradient2 = Color(0x80FCE2B8)
