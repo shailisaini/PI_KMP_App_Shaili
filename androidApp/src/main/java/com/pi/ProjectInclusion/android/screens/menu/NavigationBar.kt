@@ -372,62 +372,6 @@ fun BottomNavigationBar(
                 colors = NavigationBarItemDefaults.colors(
                     indicatorColor = White // disable default background
                 )
-
-                  /*      icon = {
-                    Log.d("SelectedScreen: ", "" + screen.appRoute)
-                    when (screen.appRoute) {
-                        AppRoute.DashboardScreen.route -> Icon(
-                            imageVector = screen.selectedIcon,
-                            contentDescription = null,
-                            tint = if (currentDestination == screen.appRoute) activeColor else inactiveColor,
-                            modifier = Modifier.size(30.dp)
-                        )
-
-                        AppRoute.CourseScreen.route -> Icon(
-                            imageVector = screen.selectedIcon,
-                            contentDescription = null,
-                            tint = if (currentDestination == screen.appRoute) activeColor else inactiveColor,
-                            modifier = Modifier.size(30.dp)
-                        )
-
-                        AppRoute.ScreeningScreen.route -> Icon(
-                            imageVector = screen.selectedIcon,
-                            contentDescription = null,
-                            tint = if (currentDestination == screen.appRoute) activeColor else inactiveColor,
-                            modifier = Modifier.size(30.dp)
-                        )
-
-                        AppRoute.InterventionScreen.route -> Icon(
-                            imageVector = screen.selectedIcon,
-                            contentDescription = null,
-                            tint = if (currentDestination == screen.appRoute) activeColor else inactiveColor,
-                            modifier = Modifier.size(30.dp)
-                        )
-
-                        else -> {
-                            Icon(
-                                imageVector = screen.selectedIcon,
-                                contentDescription = null,
-                                modifier = Modifier.size(30.dp)
-                            )
-                        }
-                    }
-                }, selected = currentDestination == screen.appRoute, onClick = {
-                    if (currentDestination != screen.appRoute) {
-                        onNavigateTo(screen.appRoute)
-                    }
-
-                }, label = {
-                    Text(
-                        text = screen.title,
-                        fontStyle = FontStyle.Normal,
-                        fontFamily = fontMedium,
-                        color = if (currentDestination == screen.appRoute) activeColor else inactiveColor,
-                        fontSize = 13.sp
-                    )
-                }, colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = White
-                )*/
             )
         }
     }
