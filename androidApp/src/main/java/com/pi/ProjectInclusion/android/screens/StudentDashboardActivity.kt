@@ -226,14 +226,10 @@ class StudentDashboardActivity : ComponentActivity() {
                                             (context as? Activity)?.finish()
                                         }
                                     )
-// for logout & delete account we need to route to login screen
+                                    // for logout & delete account we need to route to login screen
                                     AppRoute.UserNameScreen.route -> EnterUserNameScreen(
                                         viewModel = viewModel,
                                         onNext = { navigateTo(AppRoute.UserPasswordScreen.route) },
-//                            onNext = { context.startActivity(
-//                                Intent(context, StudentDashboardActivity::class.java)
-//                            )
-//                                (context as? Activity)?.finish() },
                                         onBack = { navigateBack(AppRoute.UserTypeSelect.route) }
                                     )
 
