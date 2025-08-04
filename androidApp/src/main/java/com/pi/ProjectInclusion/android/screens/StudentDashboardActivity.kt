@@ -63,6 +63,7 @@ import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneScree
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.ChangePasswordActivity
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.FaqActivity
 import com.pi.ProjectInclusion.android.screens.login.EnterUserNameScreen
+import com.pi.ProjectInclusion.android.screens.screeningScreen.ProfilerFormPageScreen
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -261,11 +262,16 @@ class StudentDashboardActivity : ComponentActivity() {
                                         onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
                                     )
 
-                                AppRoute.ScreeningOneReport.route -> ScreeningOneReportScreen(
-                                    showReportScreen = true,
-                                    onNext = { navigateTo(AppRoute.AddStudentRegister.route) }, // this is change according to condition
-                                    onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
-                                )
+                                    AppRoute.ScreeningOneReport.route -> ScreeningOneReportScreen(
+                                        showReportScreen = true,
+                                        onNext = { navigateTo(AppRoute.ProfilerFormPage.route) }, // this is change according to condition
+                                        onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
+                                    )
+
+                                    AppRoute.ProfilerFormPage.route -> ProfilerFormPageScreen(
+                                        onNext = { }, // this is change according to condition
+                                        onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
+                                    )
 
                                     AppRoute.AddStudentRegister.route -> AddNewStudentDetailsScreen(
                                         onNext = { navigateTo(AppRoute.AddNewStudentMoreDetails.route) },

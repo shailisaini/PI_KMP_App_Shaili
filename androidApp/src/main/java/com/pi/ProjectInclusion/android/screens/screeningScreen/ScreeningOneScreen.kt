@@ -348,7 +348,7 @@ fun ScreeningQuestionDataUI(questionData: ScreeningQuestionData) {
                         trueFalseYes = true
                         trueFalseNo = false
                     },
-                    title = stringResource(R.string.txt_Yes),
+                    title = questionData.ansYes,
                     enabled = trueFalseYes
                 )
 
@@ -358,7 +358,7 @@ fun ScreeningQuestionDataUI(questionData: ScreeningQuestionData) {
                     onClick = {
                         trueFalseNo = true
                         trueFalseYes = false
-                    }, title = stringResource(R.string.txt_No), enabled = trueFalseNo
+                    }, title = questionData.ansNo, enabled = trueFalseNo
                 )
             }
         }

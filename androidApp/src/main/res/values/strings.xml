@@ -378,4 +378,10 @@ and make a difference together!</string>
     <string name="txt_restore">Restore</string>
     <string name="txt_recover_desc">Your profile is marked for deletion. Would you like to restore your account?</string>
     <string name="txt_account_delete_desc">All your data (courses, certificates, student records, etc.) will be permanently deleted after 90 days. You can recover your account within this period by simply logging in.</string>
+    <string name="txt_Select_statement_from_following">Select one statement from the following that best reflects the overall academic performance of the child.</string>
+    <string name="txt_Choose_multiple_from_following">Choose multiple statement from the following that best reflects the overall academic performance of the child.</string>
+    <string name="txt_Does_not_participate">Does not participate at all</string>
+    <string name="txt_Below_average">Below average</string>
+    <string name="txt_Average">Average</string>
+    <string name="txt_Above_Average">Above average</string>
 </resources>
