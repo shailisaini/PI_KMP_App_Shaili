@@ -8,6 +8,7 @@ compose = "1.5.4"
 compose-material3 = "1.1.2"
 lifecycleRuntimeCompose = "2.6.0"
 lifecycleViewmodelCompose = "2.9.1"
+lottieCompose = "6.3.0"
 navigationCompose = "2.7.3"
 serialization = "1.6.3"
 androidx-activityCompose = "1.9.0"
@@ -74,6 +75,7 @@ koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 
 lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleRuntimeCompose" }
+lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 touchlab-kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }

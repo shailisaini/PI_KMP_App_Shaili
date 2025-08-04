@@ -62,9 +62,11 @@ import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneRepor
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneScreen
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.ChangePasswordActivity
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.FaqActivity
-import com.pi.ProjectInclusion.android.screens.screeningScreen.ProfilerFormPageScreen
+import com.pi.ProjectInclusion.android.screens.login.EnterUserNameScreen
+import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 class StudentDashboardActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -84,6 +86,7 @@ class StudentDashboardActivity : ComponentActivity() {
             var isForward by remember { mutableStateOf(true) }
             var isNotification by remember { mutableStateOf(true) }
             val context = LocalContext.current
+            val viewModel = koinViewModel<LoginViewModel>()
 
             fun navigateTo(route: String) {
                 isForward = true
@@ -212,6 +215,7 @@ class StudentDashboardActivity : ComponentActivity() {
                                     AppRoute.DashboardScreen.route -> DashboardScreen()
                                     AppRoute.ProfileScreen.route -> ViewProfileScreen(
                                         onNext = { navigateTo(AppRoute.EditProfileScreen.route) },
+                                        onBackLogin = { navigateTo(AppRoute.UserNameScreen.route) },
                                         onBack = {
                                             context.startActivity(
                                                 Intent(
@@ -221,6 +225,12 @@ class StudentDashboardActivity : ComponentActivity() {
                                             )
                                             (context as? Activity)?.finish()
                                         }
+                                    )
+                                    // for logout & delete account we need to route to login screen
+                                    AppRoute.UserNameScreen.route -> EnterUserNameScreen(
+                                        viewModel = viewModel,
+                                        onNext = { navigateTo(AppRoute.UserPasswordScreen.route) },
+                                        onBack = { navigateBack(AppRoute.UserTypeSelect.route) }
                                     )
 
                                     AppRoute.EditProfileScreen.route -> EditProfileScreen1(
@@ -251,15 +261,11 @@ class StudentDashboardActivity : ComponentActivity() {
                                         onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
                                     )
 
-                                    AppRoute.ScreeningOneReport.route -> ScreeningOneReportScreen(
-                                        onNext = { navigateTo(AppRoute.ProfilerFormPage.route) }, // this is change according to condition
-                                        onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
-                                    )
-
-                                    AppRoute.ProfilerFormPage.route -> ProfilerFormPageScreen(
-                                        onNext = { navigateTo(AppRoute.ProfilerFormPage.route) }, // this is change according to condition
-                                        onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
-                                    )
+                                AppRoute.ScreeningOneReport.route -> ScreeningOneReportScreen(
+                                    showReportScreen = true,
+                                    onNext = { navigateTo(AppRoute.AddStudentRegister.route) }, // this is change according to condition
+                                    onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
+                                )
 
                                     AppRoute.AddStudentRegister.route -> AddNewStudentDetailsScreen(
                                         onNext = { navigateTo(AppRoute.AddNewStudentMoreDetails.route) },

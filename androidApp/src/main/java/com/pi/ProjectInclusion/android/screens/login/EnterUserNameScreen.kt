@@ -43,8 +43,10 @@ import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.LightRed01
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.AccountRecoverDialog
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
+import com.pi.ProjectInclusion.android.common_UI.DeleteAccountPasswordDialog
 import com.pi.ProjectInclusion.android.common_UI.MobileTextField
 import com.pi.ProjectInclusion.android.common_UI.TermsAndPrivacyText
 import com.pi.ProjectInclusion.android.utils.fontMedium
@@ -144,6 +146,15 @@ fun LoginUI(
     val enterMobile = stringResource(R.string.txt_enter_mobile_no_)
     var showError by remember { mutableStateOf(false) }
     var inValidMobNo by remember { mutableStateOf(false) }
+    var confirmRecoverState by remember { mutableStateOf(false) }
+
+    if (confirmRecoverState) {
+        AccountRecoverDialog(
+            onRestore = {
+
+            },
+            onDismiss = { confirmRecoverState = false })
+    }
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
         onBack()
@@ -219,9 +230,11 @@ fun LoginUI(
                                     if (firstDigit < 6) {
                                         inValidMobNo = true
                                     } else {
-//                                        isDialogVisible = true
+                                        // if login with password
                                         onNext()
 
+                                        // if restore
+                                        confirmRecoverState = true
                                     }
                                 }
                             }
@@ -247,7 +260,6 @@ fun LoginUI(
         }
     })
 }
-
 
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
