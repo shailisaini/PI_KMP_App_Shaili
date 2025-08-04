@@ -73,41 +73,44 @@ fun ScreeningOneReportScreen(onNext: () -> Unit, onBack: () -> Unit) {
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
-                .padding(start = 16.dp, end = 16.dp, top = 8.dp)
         ) {
 
-            DomainSection(stringResource(R.string.txt_Visual_Domain_VI))
+            Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)) {
+                DomainSection(stringResource(R.string.txt_Visual_Domain_VI))
 
-            ReportCard(
-                title = stringResource(R.string.txt_Condition),
-                text = stringResource(R.string.txt_Based_observation_SAMAN_difficulty),
-                titleColor = HeaderColor01
-            )
+                ReportCard(
+                    title = stringResource(R.string.txt_Condition),
+                    text = stringResource(R.string.txt_Based_observation_SAMAN_difficulty),
+                    titleColor = HeaderColor01
+                )
 
-            ReportCard(
-                title = stringResource(R.string.nav_refer_txt),
-                text = stringResource(R.string.txt_Based_observation_SAMAN_difficulty),
-                titleColor = HeaderColor01
-            )
+                ReportCard(
+                    title = stringResource(R.string.nav_refer_txt),
+                    text = stringResource(R.string.txt_Based_observation_SAMAN_difficulty),
+                    titleColor = HeaderColor01
+                )
 
-            ReportCard(
-                title = stringResource(R.string.txt_Recommendation),
-                text = stringResource(R.string.txt_Based_observation_SAMAN_difficulty),
-                titleColor = HeaderColor01
-            )
+                ReportCard(
+                    title = stringResource(R.string.txt_Recommendation),
+                    text = stringResource(R.string.txt_Based_observation_SAMAN_difficulty),
+                    titleColor = HeaderColor01
+                )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            DomainSection(stringResource(R.string.txt_Auditory_Domain_HI))
+                DomainSection(stringResource(R.string.txt_Auditory_Domain_HI))
 
-            ReportCard(
-                title = stringResource(R.string.txt_Condition),
-                text = stringResource(R.string.txt_Based_observation_SAMAN_difficulty),
-                titleColor = HeaderColor01
-            )
+                ReportCard(
+                    title = stringResource(R.string.txt_Condition),
+                    text = stringResource(R.string.txt_Based_observation_SAMAN_difficulty),
+                    titleColor = HeaderColor01
+                )
+            }
+
+            BottomUI(onNext)
         }
 
-        BottomUI()
+//        BottomUI()
     }
 }
 
@@ -156,7 +159,7 @@ fun DomainSection(title: String) {
 }
 
 @Composable
-fun BottomUI() {
+fun BottomUI(onNext: () -> Unit = {}) {
     Surface(
         color = Color.White, tonalElevation = 4.dp, shadowElevation = 8.dp
     ) {
@@ -182,6 +185,7 @@ fun BottomUI() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(color = White)
+                    .padding(start = 8.dp, end = 8.dp)
                     .wrapContentHeight(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -194,10 +198,12 @@ fun BottomUI() {
                     color = PrimaryBlue,
                 )
 
-                Spacer(modifier = Modifier.width(24.dp))
+                Spacer(modifier = Modifier.width(20.dp))
 
                 BtnWithRightIconUi(
-                    onClick = {}, title = stringResource(R.string.txt_Profiler_Form), enabled = true
+                    onClick = {
+                        onNext()
+                    }, title = stringResource(R.string.txt_Profiler_Form), enabled = true
                 )
             }
         }

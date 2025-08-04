@@ -88,12 +88,12 @@ fun ScreeningOneScreen(onNext: () -> Unit, onBack: () -> Unit) {
             stringResource(R.string.txt_Yes),
             stringResource(R.string.txt_No)
         ),
-        ScreeningQuestionData(
+        /*ScreeningQuestionData(
             4,
             stringResource(R.string.txt_Question_Constant),
             stringResource(R.string.txt_Yes),
             stringResource(R.string.txt_No)
-        )
+        )*/
     )
 
     ScreeningDetailsBackgroundUi(
