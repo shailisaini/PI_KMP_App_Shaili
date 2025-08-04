@@ -40,6 +40,7 @@ import androidx.compose.ui.zIndex
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.pi.ProjectInclusion.BannerColor02
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.CardColor01
 import com.pi.ProjectInclusion.Dark_01
@@ -65,6 +66,8 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 fun ScreeningOneReportScreen(showReportScreen: Boolean,
                              onNext: () -> Unit,
                              onBack: () -> Unit) {
+
+    logger.d("Screen: " + "ScreeningOneReportScreen()")
 
     Column(
         modifier = Modifier
@@ -260,7 +263,7 @@ fun DomainSection(title: String) {
         text = title,
         fontSize = 16.sp,
         fontFamily = fontBold,
-        color = BannerColor02,
+        color = PrimaryBlue,
         modifier = Modifier.padding(vertical = 8.dp)
     )
 }

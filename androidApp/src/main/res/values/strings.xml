@@ -37,10 +37,10 @@
     <string name="student_screen_add">+ Add Student</string>
     <string name="text_add">+ Add</string>
 
-    <string name="welcome_name">Hi, Aman Sharma</string>
+    <string name="welcome_name">Aman</string>
     <string name="welcome_desc">Learn, act, and create impact—one course at a time.</string>
     <string name="certificate_txt">Certificates</string>
-    <string name="certificate_txt_value">0</string>
+    <string name="certificate_txt_value">20</string>
     <string name="refer_txt">Refer fellow teachers >></string>
     <string name="refer_desc">Invite passionate teachers to join\n
 and make a difference together!</string>
@@ -61,6 +61,7 @@ and make a difference together!</string>
     <string name="nav_refer_txt">Refer</string>
     <string name="nav_contact">Contact us</string>
     <string name="nav_faq">F.A.Q</string>
+    <string name="nav_faq1">FAQ</string>
 
     <string name="txt_enter_mobile_no.">Enter Mobile No.</string>
     <string name="txt_Send_OTP">Send OTP</string>
@@ -341,5 +342,40 @@ and make a difference together!</string>
     <string name="txt_Condition">Condition</string>
     <string name="txt_Recommendation">Recommendation</string>
     <string name="txt_Auditory_Domain_HI">Auditory Domain (HI)</string>
+    <string name="txt_change_theme">Change Theme</string>
+    <string name="txt_light">Light</string>
+    <string name="txt_dark">Dark</string>
+    <string name="txt_hi">Hi,</string>
+    <string name="txt_screening_in_progress">Screening InProgress</string>
+    <string name="txt_screening_done">Screening Done</string>
+    <string name="txt_learning_plan">Learning Plan Shared</string>
+    <string name="txt_learning_plan_exe">Learning Plan Executed</string>
+    <string name="txt_course_completed">Course\nCompleted</string>
+    <string name="txt_course_certificates">Course\nCertificates</string>
+    <string name="txt_modules_certificates">Modules\nCertificates</string>
     <string name="txt_Based_observation_SAMAN_difficulty">Based on your observation, there is doubt that SAMAN is having difficulty in the auditory domain, therefore to rule out other environmental factors, kindly consult an ENT specialist and audiologist</string>
+    <string name="txt_Frequently_Asked_Questions">Frequently Asked Questions (FAQ)</string>
+    <string name="txt_Is_Project_Inclusion_available">Is Project Inclusion available for both iOS and android?</string>
+    <string name="txt_New_User_access_first_course">A New user can access the first course ‘Learning Difficulties Understanding and Management Level-1’. The other courses will be open for the user to access once they complete the screening and enter the intervention phase.</string>
+    <string name="txt_General">General</string>
+    <string name="txt_Accessibility">Accessibility</string>
+    <string name="txt_LMS">LMS</string>
+    <string name="txt_Course">Course</string>
+    <string name="txt_Which_course_new_access">Which course a new user can access?</string>
+    <string name="txt_Support">Support</string>
+    <string name="txt_Technical">Technical</string>
+    <string name="txt_Why_sometimes_not_open_show">Why does the app sometimes not open or show ‘service not available’?</string>
+    <string name="txt_Certification">Certification</string>
+    <string name="txt_Enter_Keyword">Enter Keyword</string>
+    <string name="txt_category">Category</string>
+    <string name="txt_enter_password">Enter Password</string>
+    <string name="txt_subcategory">Subcategory</string>
+    <string name="txt_account_delete">Account Deletion</string>
+    <string name="txt_delete">Delete</string>
+    <string name="txt_90_days_left">90 Days Left</string>
+    <string name="txt_account_found">An Account Found</string>
+    <string name="txt_logout_desc">Are you sure you want to logout?</string>
+    <string name="txt_restore">Restore</string>
+    <string name="txt_recover_desc">Your profile is marked for deletion. Would you like to restore your account?</string>
+    <string name="txt_account_delete_desc">All your data (courses, certificates, student records, etc.) will be permanently deleted after 90 days. You can recover your account within this period by simply logging in.</string>
 </resources>

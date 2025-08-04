@@ -81,7 +81,6 @@ import coil.request.ImageRequest
 import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Bg_Gray1
 import com.pi.ProjectInclusion.Black
-import com.pi.ProjectInclusion.BlueBackground2
 import com.pi.ProjectInclusion.BorderBlue
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Dark_02
@@ -98,8 +97,11 @@ import com.pi.ProjectInclusion.PrimaryBlue3
 import com.pi.ProjectInclusion.RedBgColor
 import com.pi.ProjectInclusion.RedText
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.AccountDeleteDialog
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
+import com.pi.ProjectInclusion.android.common_UI.DeleteAccountPasswordDialog
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
+import com.pi.ProjectInclusion.android.common_UI.LogoutDialog
 import com.pi.ProjectInclusion.android.common_UI.ProfileWithProgress
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
 import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
@@ -113,10 +115,14 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.JPG
 import com.pi.ProjectInclusion.constants.ConstantVariables.PI_DOCUMENT
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
+import kotlin.Unit
 
 @Composable
-fun ViewProfileScreen(onNext: () -> Unit,  //EnterUserProfileScreen
-                      onBack: () -> Unit) {
+fun ViewProfileScreen(
+    onNext: () -> Unit,  //EnterUserProfileScreen
+    onBackLogin: () -> Unit,
+    onBack: () -> Unit
+) {
 
     var isDialogVisible by remember { mutableStateOf(false) }
 
@@ -163,7 +169,7 @@ fun ViewProfileScreen(onNext: () -> Unit,  //EnterUserProfileScreen
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            ProfileViewUI(context, onNext = onNext, onBack = onBack)
+            ProfileViewUI(context, onNext = onNext, onBack = onBack, onBackLogin = onBackLogin)
         }
     }
 }
@@ -172,6 +178,7 @@ fun ViewProfileScreen(onNext: () -> Unit,  //EnterUserProfileScreen
 fun ProfileViewUI(
     context: Context,
     onBack: () -> Unit,
+    onBackLogin: () -> Unit,
     onNext: () -> Unit
 ) {
     val scrollState = rememberScrollState()
@@ -192,13 +199,13 @@ fun ProfileViewUI(
     var isChangeRequestBottomSheet by remember { mutableStateOf(false) }
 
     if (showSheetMenu) {
-        ProfileBottomSheetMenu() {
+        ProfileBottomSheetMenu(onBackLogin = onBackLogin) {
             showSheetMenu = false
         }
     }
 
     if (isChangeRequestBottomSheet) {
-        ChangeRequestSheet() {
+        ChangeRequestSheet {
             isChangeRequestBottomSheet = false
         }
     }
@@ -211,7 +218,7 @@ fun ProfileViewUI(
         isShowBackButton = true,
         isShowMoreInfo = true,
         onBackButtonClick = {
-           onBack()
+            onBack()
         },
         onMoreInfoClick = {
             showSheetMenu = true
@@ -253,7 +260,7 @@ fun ProfileViewUI(
 
                     Button(
                         onClick = {
-                          onNext()
+                            onNext()
                         }, modifier = Modifier
                             .wrapContentSize()
                             .clip(RoundedCornerShape(4.dp)),
@@ -271,7 +278,7 @@ fun ProfileViewUI(
                             textColor = BorderBlue,
                             iconColor = Color.Unspecified,
                             onClick = {
-                               onNext()
+                                onNext()
                             })
                     }
                 }
@@ -599,14 +606,16 @@ fun ProfileViewUI(
 fun ProfileUI() {
     val context = LocalContext.current
     val onNext: () -> Unit = {}
+    val onBackLogin: () -> Unit = {}
     val onBack: () -> Unit = {}
-    ProfileViewUI(context, onNext, onBack)
+    ProfileViewUI(context, onNext, onBack,onBackLogin)
 }
 
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileBottomSheetMenu(
+    onBackLogin: () -> Unit ={},
     onDismiss: () -> Unit = {},
 ) {
     val sheetState = rememberModalBottomSheetState()
@@ -614,16 +623,33 @@ fun ProfileBottomSheetMenu(
     var logOutSheet by remember { mutableStateOf(false) }
     // show logout sheet while click on logout
     if (logOutSheet) {
-//        LogoutBottomSheetMenu(viewModel, languageData, colors) {
-//            logOutSheet = false
-//        }
+        LogoutDialog(
+            onDismiss = { logOutSheet = false },
+            onClick = {
+                logOutSheet = false
+                onBackLogin() // move to Login Screen
+            }
+        )
     }
     var confirmDeleteState by remember { mutableStateOf(false) }
+    var deleteAccountDialog by remember { mutableStateOf(false) }
     // show logout sheet while click on logout
     if (confirmDeleteState) {
-        /* ConfirmationDeleteAccountBottomSheet(viewModel, languageData, isDialogVisible, colors) {
-             confirmDeleteState = false
-         }*/
+        DeleteAccountPasswordDialog(
+            onSubmit = {
+                confirmDeleteState = false
+                deleteAccountDialog = true
+            },
+            onDismiss = { confirmDeleteState = false })
+    }
+    if (deleteAccountDialog) {
+        AccountDeleteDialog(
+            onDismiss = { deleteAccountDialog = false },
+            onClick = {
+                deleteAccountDialog = false
+                onBackLogin()
+            }  // move to Login Screen
+        )
     }
 
     ModalBottomSheet(
@@ -651,7 +677,7 @@ fun ProfileBottomSheetMenu(
                 )
 
                 TextButton(onClick = {
-                    confirmDeleteState = true
+
                 }) {
                     Text(
                         text = stringResource(R.string.txt_track_request),
@@ -703,7 +729,7 @@ fun ProfileBottomSheetMenu(
                 )
 
                 TextButton(onClick = {
-                    confirmDeleteState = true
+                    logOutSheet = true
                 }) {
                     Text(
                         text = stringResource(R.string.txt_logout),
@@ -1184,7 +1210,7 @@ fun CameraGalleryButtons(
             TextWithIconOnLeft(
                 text = stringResource(R.string.txt_Camera),
                 icon = ImageVector.vectorResource(id = R.drawable.camera_img),
-                textColor = BlueBackground2,
+                textColor = Dark_03,
                 iconColor = Color.Unspecified,
                 onClick = {
                     val uri = createImageUri()
@@ -1211,7 +1237,7 @@ fun CameraGalleryButtons(
             TextWithIconOnLeft(
                 text = stringResource(R.string.txt_Gallery),
                 icon = ImageVector.vectorResource(id = R.drawable.gallery_img),
-                textColor = BlueBackground2,
+                textColor = Dark_03,
                 iconColor = Color.Unspecified,
                 onClick = {
                     galleryLauncher.launch(IMAGE_ALL_TYPE)
@@ -1278,7 +1304,7 @@ fun RequestSubmittedDialog(title: String = "", subText: String = "", onDismiss: 
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically,
 
-                    ) {
+                        ) {
                         Button(
                             onClick = {
                                 onDismiss()

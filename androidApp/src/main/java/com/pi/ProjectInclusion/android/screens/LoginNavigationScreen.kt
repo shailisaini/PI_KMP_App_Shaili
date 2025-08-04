@@ -157,11 +157,11 @@ class LoginNavigationScreen : ComponentActivity() {
 
                         AppRoute.UserNameScreen.route -> EnterUserNameScreen(
                             viewModel = viewModel,
-//                            onNext = { navigateTo(AppRoute.UserPasswordScreen.route) },
-                            onNext = { context.startActivity(
-                                Intent(context, StudentDashboardActivity::class.java)
-                            )
-                                (context as? Activity)?.finish() },
+                            onNext = { navigateTo(AppRoute.UserPasswordScreen.route) },
+//                            onNext = { context.startActivity(
+//                                Intent(context, StudentDashboardActivity::class.java)
+//                            )
+//                                (context as? Activity)?.finish() },
                             onBack = { navigateBack(AppRoute.UserTypeSelect.route) }
                         )
 
