@@ -261,10 +261,11 @@ class StudentDashboardActivity : ComponentActivity() {
                                         onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
                                     )
 
-                                    AppRoute.ScreeningOneReport.route -> ScreeningOneReportScreen(
-                                        onNext = { navigateTo(AppRoute.AddStudentRegister.route) }, // this is change according to condition
-                                        onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
-                                    )
+                                AppRoute.ScreeningOneReport.route -> ScreeningOneReportScreen(
+                                    showReportScreen = true,
+                                    onNext = { navigateTo(AppRoute.AddStudentRegister.route) }, // this is change according to condition
+                                    onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
+                                )
 
                                     AppRoute.AddStudentRegister.route -> AddNewStudentDetailsScreen(
                                         onNext = { navigateTo(AppRoute.AddNewStudentMoreDetails.route) },
