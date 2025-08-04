@@ -46,6 +46,11 @@ kotlin {
             implementation(libs.compose.material3)
             implementation(libs.lifecycle.runtime.compose)
             implementation(libs.sqldelight.android)
+
+            implementation(libs.androidx.lifecycle.viewmodel)
+            implementation(libs.androidx.navigation.compose)
+            implementation(libs.accompanist.navigation.animation)
+            implementation(libs.lottie.compose)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.ios)
@@ -60,14 +65,11 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.content.negotiation)
 
-            implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.kotlinx.coroutines.core)
             api(libs.touchlab.kermit)
             implementation(libs.koin.core)
             implementation(libs.sqldelight.coroutines)
 
-            implementation(libs.androidx.navigation.compose)
-            implementation(libs.accompanist.navigation.animation)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
