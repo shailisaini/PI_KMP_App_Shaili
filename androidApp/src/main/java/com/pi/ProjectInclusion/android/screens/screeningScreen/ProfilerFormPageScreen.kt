@@ -66,7 +66,6 @@ fun ProfilerFormPageScreen(onNext: () -> Unit, onBack: () -> Unit) {
 
     logger.d("Screen: " + "ProfilerFormPageScreen()")
 
-    val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
     val steps = listOf("Academic", "Interest", "Strength", "Temperament")
 
