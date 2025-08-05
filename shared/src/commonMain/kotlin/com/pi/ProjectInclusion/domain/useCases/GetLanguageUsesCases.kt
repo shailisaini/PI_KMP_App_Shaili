@@ -14,13 +14,14 @@ import kotlinx.coroutines.flow.flowOn
 
 class GetLanguageUsesCases(private val repository: LanguageRepository) {
 
+    var unableToConnectServer: String = "Unable to connect to server"
 
     fun getLanguage(): Flow<Result<GetLanguageListResponse>> = flow {
         try {
             val response = repository.getLanguage()
             emit(Result.success(response))
         } catch (e: Exception) {
-            val errorMessage = e.message ?: "Unable to connect to server"
+            val errorMessage = e.message ?: unableToConnectServer
             LoggerProvider.logger.d("Exception in getLanguage() $errorMessage")
             emit(Result.failure(Exception(errorMessage)))
         }
@@ -31,7 +32,7 @@ class GetLanguageUsesCases(private val repository: LanguageRepository) {
             val response = repository.getUserType()
             emit(Result.success(response))
         } catch (e: Exception) {
-            val errorMessage = e.message ?: "Unable to connect to server"
+            val errorMessage = e.message ?: unableToConnectServer
             LoggerProvider.logger.d("Exception in getUserType() $errorMessage")
             emit(Result.failure(Exception(errorMessage)))
         }
