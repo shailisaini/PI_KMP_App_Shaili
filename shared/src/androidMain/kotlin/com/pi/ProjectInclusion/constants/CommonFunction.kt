@@ -62,10 +62,8 @@ object CommonFunction {
             Text(
                 title,
                 textAlign = TextAlign.Center,
-                fontSize = 16.sp,
-                fontStyle = FontStyle.Normal,
+                fontSize = 25.sp,
                 fontWeight = FontWeight.Bold,
-                overflow = TextOverflow.Ellipsis,
                 color = colors,
                 modifier = Modifier
                     .padding(top = 10.dp)

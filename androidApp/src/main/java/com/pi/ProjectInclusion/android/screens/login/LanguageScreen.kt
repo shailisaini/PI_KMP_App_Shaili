@@ -166,7 +166,7 @@ fun LanguageResponseUI(
     isInternetAvailable = isNetworkAvailable(context)
     Box(
         modifier = Modifier
-            .padding(vertical = 5.dp)
+            .padding(top = 5.dp)
             .wrapContentSize(Alignment.Center)
             .background(
                 color = if (isSystemInDarkTheme()) {
@@ -175,13 +175,11 @@ fun LanguageResponseUI(
                     Transparent
                 }
             )
-            .padding(4.dp), // Add horizontal padding,
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(vertical = 5.dp),
+                .wrapContentHeight(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             LoginScreenTitle(title, Black, Gray, Transparent, "")
@@ -194,10 +192,9 @@ fun LanguageResponseUI(
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(2),
                         state = scrollState,
-                        contentPadding = PaddingValues(vertical = 5.dp),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 5.dp, horizontal = 8.dp)
+                            .padding(horizontal = 8.dp)
                             .draggable(
                                 orientation = Orientation.Vertical,
                                 state = rememberDraggableState { delta ->
