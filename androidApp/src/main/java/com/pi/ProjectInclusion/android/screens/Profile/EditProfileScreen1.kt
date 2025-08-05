@@ -93,7 +93,7 @@ fun EditProfileScreen1(onNext: () -> Unit,  //EditProfileScreen2
 //    val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
-    val userType = remember { mutableStateListOf<GetUserTypeResponse.Data>() }
+    val userType = remember { mutableStateListOf<GetUserTypeResponse.UserTypeResponse>() }
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },

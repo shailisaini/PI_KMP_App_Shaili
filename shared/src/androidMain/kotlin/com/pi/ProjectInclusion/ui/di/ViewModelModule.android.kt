@@ -7,7 +7,7 @@ import org.koin.dsl.module
 
 private val viewModelModules = module {
     viewModel {
-        LoginViewModel(get(), get())
+        LoginViewModel(get(), get(), get())
     }
 }
 actual fun sharedViewModelModule(): Module = viewModelModules

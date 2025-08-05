@@ -6,25 +6,41 @@ import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
 import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
 import com.pi.ProjectInclusion.database.LocalDataSource
+import com.pi.ProjectInclusion.domain.ConnectivityObserver
 import com.pi.ProjectInclusion.domain.useCases.GetLanguageUsesCases
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
     private val getLanguageUsesCases: GetLanguageUsesCases,
-    private val localData: LocalDataSource
-):ViewModel() {
-    private val _uiState = MutableStateFlow(UiState<GetLanguageListResponse>())
-    val uiState = _uiState.asStateFlow()
+    private val localData: LocalDataSource,
+    private val connectivityObserver: ConnectivityObserver //  to check network
+) : ViewModel() {
+    var noInternetConnection: String = "No Internet Found!"
+    var somethingWentWrong: String = "Something went wrong"
 
-//    private val _uiStateUserType = MutableStateFlow(UiState<List<GetUserTypeResponse>>())
+    // check if which API has to call if internet comes
+    private var shouldRefreshLanguages = false
+    private var shouldRefreshUserType = false
+
+    fun isNetworkAvailable(): Boolean {
+        return connectivityObserver.getCurrentStatus() == ConnectivityObserver.Status.Available
+    }
+
+    val _uiState = MutableStateFlow(UiState<GetLanguageListResponse>())
+    val uiState: StateFlow<UiState<GetLanguageListResponse>> = _uiState
+
+    //    private val _uiStateUserType = MutableStateFlow(UiState<List<GetUserTypeResponse>>())
     private val _uiStateUserType = MutableStateFlow(UiState<GetUserTypeResponse>())
-    val uiStateType = _uiStateUserType.asStateFlow()
+    val uiStateType: StateFlow<UiState<GetUserTypeResponse>> = _uiStateUserType
 
     private val query = MutableStateFlow("")
 
@@ -37,36 +53,109 @@ class LoginViewModel(
     }
 
     init {
+        observeNetworkChangesAndRefresh()
         viewModelScope.launch {
             query.debounce(1000)
                 .filter { it.isNotEmpty() }
-                .collectLatest { }
-
+                .collectLatest {
+                    // Your logic
+                }
+            // it can be use for search
+            /*.collectLatest { queryText ->
+                    getSearchResults(queryText)
+                }*/
         }
     }
 
-    fun getLanguages(page: String, limit: String) = viewModelScope.launch {
-        _uiState.update { UiState(isLoading = true) }
-       val response = getLanguageUsesCases.getLanguage(page, limit)
-        if (response.isSuccess){
-            _uiState.update { UiState(success = response.getOrThrow() ) }
-        }
-        else{
-            _uiState.update { UiState(error = response.exceptionOrNull()?.message.toString() ) }
+    // observer function for data syncing
+    private fun observeNetworkChangesAndRefresh() {
+        viewModelScope.launch {
+            var wasPreviouslyOffline = !isNetworkAvailable()
+
+            connectivityObserver.observe()
+                .distinctUntilChanged()
+                .collect { status ->
+                    val isNowOnline = status == ConnectivityObserver.Status.Available
+
+                    if (wasPreviouslyOffline && isNowOnline) {
+                        LoggerProvider.logger.d("Reconnected - checking which APIs to retry")
+
+                        if (shouldRefreshLanguages) getLanguages()
+                        if (shouldRefreshUserType) getUserType()
+
+                    }
+
+                    wasPreviouslyOffline = !isNowOnline
+                }
         }
     }
+
+    fun getLanguages() = viewModelScope.launch {
+        if (!isNetworkAvailable()) {
+            shouldRefreshLanguages = true
+            _uiState.update {
+                UiState(error = noInternetConnection)
+            }
+            return@launch
+        }
+
+        shouldRefreshLanguages = false // Reset on successful start
+
+        _uiState.update { it.copy(isLoading = true, error = "") }
+
+        getLanguageUsesCases.getLanguage()
+            .catch { exception ->
+                _uiState.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        _uiState.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        _uiState.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
     fun getUserType() = viewModelScope.launch {
+        if (!isNetworkAvailable()) {
+            shouldRefreshUserType = true
+            _uiStateUserType.update {
+                UiState(error = noInternetConnection)
+            }
+            return@launch
+        }
+
+        shouldRefreshUserType = false
+
         _uiStateUserType.update { UiState(isLoading = true) }
-        val response = getLanguageUsesCases.getUserType()
-        if (response.isSuccess){
-            LoggerProvider.logger.d("Screen: "+"UserTypeScreen()"+response)
-            _uiStateUserType.update { UiState(success = response.getOrThrow() ) }
-        }
-        else{
-            _uiStateUserType.update { UiState(error = response.exceptionOrNull()?.message.toString() ) }
-            LoggerProvider.logger.d("Screen: "+"UserTypeScreen()"+response.exceptionOrNull())
-        }
+        getLanguageUsesCases.getUserType()
+            .catch { exception ->
+                _uiStateUserType.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        _uiStateUserType.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        _uiStateUserType.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
     }
+
+
 }
 
 data class UiState<T>(

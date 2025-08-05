@@ -10,6 +10,7 @@
     <string name="select_userType_subtitle">Select your user type to continue. This helps us tailor your experience</string>
     <string name="txt_loading">Loading your data..</string>
     <string name="txt_oops_no_data_found">Oops!!, No data found</string>
+    <string name="txt_oops_no_internet">Oops!!, No Internet found</string>
     <string name="student_gender">Gender</string>
     <string name="student_dob">DOB</string>
     <string name="dob_format">MM DD YY</string>

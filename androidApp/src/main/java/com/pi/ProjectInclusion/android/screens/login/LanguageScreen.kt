@@ -29,7 +29,6 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -68,16 +67,16 @@ import com.pi.ProjectInclusion.Dark_Selected_BG
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
+import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlueLt1
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
-import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
 import com.pi.ProjectInclusion.constants.CommonFunction.NoDataFound
 import com.pi.ProjectInclusion.constants.CommonFunction.ShowError
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
-import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_ACTIVE
 import com.pi.ProjectInclusion.constants.ConstantVariables.PAGE_LENGTH
 import com.pi.ProjectInclusion.constants.ConstantVariables.PAGE_LIMIT
 import com.pi.ProjectInclusion.constants.CustomDialog
@@ -91,7 +90,7 @@ fun LanguageScreen(viewModel: LoginViewModel, onNext: () -> Unit) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
-    val languageData = remember { mutableStateListOf<GetLanguageListResponse.Data.Result>() }
+    val languageData = remember { mutableStateListOf<GetLanguageListResponse.LanguageResponse>() }
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
@@ -100,7 +99,7 @@ fun LanguageScreen(viewModel: LoginViewModel, onNext: () -> Unit) {
 
     LoggerProvider.logger.d("Screen: " + "LanguageScreen()")
     LaunchedEffect(Unit) {
-        viewModel.getLanguages(PAGE_LENGTH, PAGE_LIMIT)
+        viewModel.getLanguages()
     }
 
     LaunchedEffect(uiState) {
@@ -119,11 +118,15 @@ fun LanguageScreen(viewModel: LoginViewModel, onNext: () -> Unit) {
 
             uiState.success != null -> {
                 isDialogVisible = false
-                uiState.success!!.data.results.reversed().let {
+                val list = uiState.success?.response ?: emptyList()
+                LoggerProvider.logger.d("Languages fetched: ${list.size}")
+
+                if (list.isNotEmpty()) {
                     languageData.clear()
-                    languageData.addAll(it)
+                    languageData.addAll(list)
+                } else {
+                    LoggerProvider.logger.d("Languages fetched: 0 (null or empty response)")
                 }
-                LoggerProvider.logger.d("Languages fetched: ${uiState.success!!.data.results.size}")
             }
         }
     }
@@ -146,23 +149,24 @@ fun LanguageScreen(viewModel: LoginViewModel, onNext: () -> Unit) {
 @Composable
 fun LanguageResponseUI(
     context: Context,
-    languageData: MutableList<GetLanguageListResponse.Data.Result>,
+    languageData: MutableList<GetLanguageListResponse.LanguageResponse>,
     onNext: () -> Unit,
 ) {
-    val colors = MaterialTheme.colorScheme
+    val errColor = PrimaryBlue
     val scrollState = rememberLazyGridState()
     val coroutineScope = rememberCoroutineScope()
-    val isInternetAvailable by remember { mutableStateOf(true) }
+    var isInternetAvailable by remember { mutableStateOf(true) }
     var isApiResponded by remember { mutableStateOf(false) }
-    val internetMessage by remember { mutableStateOf("") }
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
     val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
     val selectedLanguage = remember { mutableStateOf<String?>(null) }
     val title = stringResource(R.string.select_language)
 
+    isInternetAvailable = isNetworkAvailable(context)
     Box(
         modifier = Modifier
-            .padding(vertical = 15.dp)
+            .padding(vertical = 5.dp)
             .wrapContentSize(Alignment.Center)
             .background(
                 color = if (isSystemInDarkTheme()) {
@@ -186,12 +190,11 @@ fun LanguageResponseUI(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
-                        .weight(1f)
                 ) {
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(2),
                         state = scrollState,
-                        contentPadding = PaddingValues(vertical = 15.dp),
+                        contentPadding = PaddingValues(vertical = 5.dp),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 10.dp, horizontal = 8.dp)
@@ -222,9 +225,9 @@ fun LanguageResponseUI(
                 }
             } else {
                 if (!isInternetAvailable) {
-                    ShowError(internetMessage, colors)
+                    ShowError(internetMessage, errColor, painterResource(R.drawable.sad_emoji))
                 } else {
-                    NoDataFound(noDataMessage, painterResource(R.drawable.img_teacher))
+                    NoDataFound(noDataMessage, painterResource(R.drawable.sad_emoji))
                 }
             }
         }
@@ -237,7 +240,7 @@ fun ItemLanguageCard(
     context: Context,
     isSelected: Boolean = true,
     index: Int,
-    language: MutableList<GetLanguageListResponse.Data.Result>,
+    language: MutableList<GetLanguageListResponse.LanguageResponse>,
     onItemClicked: () -> Unit = {},
 ) {
     val languageIndex = language[index]
@@ -274,7 +277,7 @@ fun ItemLanguageCard(
     Card(
         modifier = Modifier
             .clickable {
-                if (languageIndex.status == KEY_ACTIVE) {
+                if (languageIndex.status == 1) {
                     onItemClicked.invoke()
                     onNext()
                     /* navController.popBackStack()
@@ -315,10 +318,10 @@ fun ItemLanguageCard(
                         .background(Color.Unspecified)
                         .size(45.dp),
                     contentScale = ContentScale.Fit,
-                    painter = if (languageIndex.icon.isNotEmpty()) {
+                    painter = if (!languageIndex.lang_icon.isNullOrEmpty()) {
                         rememberAsyncImagePainter(
                             model = ImageRequest.Builder(LocalContext.current)
-                                .data(languageIndex.icon)
+                                .data(languageIndex.lang_icon)
                                 .decoderFactory(SvgDecoder.Factory())
                                 .size(Size.ORIGINAL)
                                 .placeholder(R.drawable.ic_hindi)
@@ -331,7 +334,7 @@ fun ItemLanguageCard(
                     contentDescription = IMG_DESCRIPTION
                 )
                 Text(
-                    languageIndex.nativeName,
+                    (languageIndex.translated_name?:languageIndex.name)!!,
                     textAlign = TextAlign.Start,
                     maxLines = 1,
                     fontSize = 16.sp,
