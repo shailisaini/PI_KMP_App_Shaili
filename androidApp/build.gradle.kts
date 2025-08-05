@@ -79,4 +79,5 @@ dependencies {
     // image dependencies
     implementation(libs.coil.compose) // Or latest version
     implementation(libs.coil.svg) // For SVG support
+    implementation(libs.lottie.compose)
 }
