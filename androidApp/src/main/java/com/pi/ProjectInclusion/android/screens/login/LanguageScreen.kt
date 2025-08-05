@@ -181,7 +181,7 @@ fun LanguageResponseUI(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .padding(vertical = 10.dp),
+                .padding(vertical = 5.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             LoginScreenTitle(title, Black, Gray, Transparent, "")
@@ -197,7 +197,7 @@ fun LanguageResponseUI(
                         contentPadding = PaddingValues(vertical = 5.dp),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 10.dp, horizontal = 8.dp)
+                            .padding(vertical = 5.dp, horizontal = 8.dp)
                             .draggable(
                                 orientation = Orientation.Vertical,
                                 state = rememberDraggableState { delta ->
