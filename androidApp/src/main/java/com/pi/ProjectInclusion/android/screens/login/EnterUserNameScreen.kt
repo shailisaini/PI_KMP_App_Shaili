@@ -67,7 +67,7 @@ fun EnterUserNameScreen(
     val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
-    val userType = remember { mutableStateListOf<GetUserTypeResponse.Data>() }
+    val userType = remember { mutableStateListOf<GetUserTypeResponse.UserTypeResponse>() }
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
@@ -97,11 +97,8 @@ fun EnterUserNameScreen(
 
             uiState.success != null -> {
                 isDialogVisible = false
-                uiState.success!!.data.let {
-                    userType.clear()
-                    userType.addAll(it)
-                }
-                LoggerProvider.logger.d("Languages fetched: ${uiState.success!!.data}")
+
+                LoggerProvider.logger.d("Languages fetched: ${uiState.success!!.response}")
             }
         }
     }
