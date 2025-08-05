@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
@@ -28,16 +29,20 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -60,14 +65,23 @@ import com.pi.ProjectInclusion.android.common_UI.SmallBtnUi
 import com.pi.ProjectInclusion.android.common_UI.YesNoBtnUi
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
+import com.pi.ProjectInclusion.android.utils.toast
 
 @Composable
 fun ProfilerFormPageScreen(onNext: () -> Unit, onBack: () -> Unit) {
 
     logger.d("Screen: " + "ProfilerFormPageScreen()")
 
+    val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
     val steps = listOf("Academic", "Interest", "Strength", "Temperament")
+    var stepTitle by remember { mutableStateOf(0) }
+    val totalSteps = steps.size
+
+    var answerQ1 by remember { mutableStateOf("") }
+    var answerQ2 by remember { mutableStateOf("") }
+    var answerQ3 by remember { mutableStateOf("") }
+    var answerQ4 by remember { mutableStateOf("") }
 
     val questionListData = listOf(
         ProfilerQuestionData(
@@ -132,7 +146,7 @@ fun ProfilerFormPageScreen(onNext: () -> Unit, onBack: () -> Unit) {
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Row(   // Stepper
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp),
@@ -140,11 +154,8 @@ fun ProfilerFormPageScreen(onNext: () -> Unit, onBack: () -> Unit) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         steps.forEachIndexed { index, label ->
-
                             var progress by remember { mutableStateOf(0.65f) } // 65% progress
                             ProgressBarWithText(progress = progress, index, label)
-
-                            // Dashed line between steps
                             if (index < steps.lastIndex) {
                                 DashedLine()
                             }
@@ -152,13 +163,57 @@ fun ProfilerFormPageScreen(onNext: () -> Unit, onBack: () -> Unit) {
                     }
                 }
 
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 12.dp, end = 12.dp, top = 16.dp, bottom = 16.dp)
-                ) {
-                    items(questionListData) { questionData ->
-                        ProfilerQuestionDataUI(questionData)
+                when (stepTitle) {
+                    0 -> {
+                        AcademicScreenUI()
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 12.dp, end = 12.dp, top = 16.dp, bottom = 16.dp)
+                        ) {
+                            items(questionListData) { questionData ->
+                                ProfilerQuestionDataUI(questionData)
+                            }
+                        }
+                    }
+
+                    1 -> {
+                        InterestScreenUI()
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 12.dp, end = 12.dp, top = 16.dp, bottom = 16.dp)
+                        ) {
+                            items(questionListData) { questionData ->
+                                ProfilerQuestionDataUI(questionData)
+                            }
+                        }
+                    }
+
+                    2 -> {
+                        StrengthScreenUI()
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 12.dp, end = 12.dp, top = 16.dp, bottom = 16.dp)
+                        ) {
+                            items(questionListData) { questionData ->
+                                ProfilerQuestionDataUI(questionData)
+                            }
+                        }
+                    }
+
+                    3 -> {
+                        TemperamentScreenUI()
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 12.dp, end = 12.dp, top = 16.dp, bottom = 16.dp)
+                        ) {
+                            items(questionListData) { questionData ->
+                                ProfilerQuestionDataUI(questionData)
+                            }
+                        }
                     }
                 }
 
@@ -178,15 +233,43 @@ fun ProfilerFormPageScreen(onNext: () -> Unit, onBack: () -> Unit) {
                     ) {
                         SmallBtnUi(
                             enabled = true,
-                            title = stringResource(R.string.string_next),
+                            title = if (stepTitle < totalSteps - 1) {
+                                stringResource(R.string.string_next)
+                            } else {
+                                stringResource(R.string.txt_Save_Continue)
+                            },
                             onClick = {
-                                // this change according to condition
+                                if (stepTitle < totalSteps - 1) {
+                                    stepTitle++
+                                } else {
+                                    context.toast("It will Submit all data here")
+                                }
                             })
                     }
                 }
             }
         }
     )
+}
+
+@Composable
+fun AcademicScreenUI() {
+    println("Not yet implemented")
+}
+
+@Composable
+fun InterestScreenUI() {
+    println("Not yet implemented")
+}
+
+@Composable
+fun StrengthScreenUI() {
+    println("Not yet implemented")
+}
+
+@Composable
+fun TemperamentScreenUI() {
+    println("Not yet implemented")
 }
 
 @Composable
