@@ -86,7 +86,7 @@ fun EditProfileScreen2(onNext: () -> Unit,  //EditProfileScreen2
     var isDialogVisible by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    val userType = remember { mutableStateListOf<GetUserTypeResponse.Data>() }
+    val userType = remember { mutableStateListOf<GetUserTypeResponse.UserTypeResponse>() }
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
@@ -133,7 +133,7 @@ fun EditProfileScreen2UI(
 //  languageData[LanguageTranslationsResponse.KEY_INVALID_MOBILE_NO_ERROR].toString()
     val txtContinue = stringResource(id = R.string.text_continue)
     val tvUdise = stringResource(id = R.string.txt_udise_number)
-    val schoolList = remember { mutableStateListOf<GetLanguageListResponse.Data.Result>() }
+    val schoolList = remember { mutableStateListOf<GetLanguageListResponse.LanguageResponse>() }
     var mobNo = rememberSaveable { mutableStateOf("") }
     var firstName = rememberSaveable { mutableStateOf("") }
     var lastName = rememberSaveable { mutableStateOf("") }
@@ -287,7 +287,7 @@ fun EditProfileScreen2UI(
                          }*/
                                 "School"
                             },
-                            schoolList.map { it.name }.toList()
+                            schoolList.map { it.name }.toList() as List<String>
                         )
 
                         // District
@@ -339,7 +339,7 @@ fun EditProfileScreen2UI(
                          }*/
                                 "School"
                             },
-                            schoolList.map { it.name }.toList()
+                            schoolList.map { it.name }.toList() as List<String>
                         )
 
                         // Block
@@ -391,7 +391,7 @@ fun EditProfileScreen2UI(
                          }*/
                                 "School"
                             },
-                            schoolList.map { it.name }.toList()
+                            schoolList.map { it.name }.toList() as List<String>
                         )
 
                         // School
@@ -443,7 +443,7 @@ fun EditProfileScreen2UI(
                          }*/
                                 "School"
                             },
-                            schoolList.map { it.name }.toList()
+                            schoolList.map { it.name }.toList() as List<String>
                         )
 
                         if (inValidMobNo) {

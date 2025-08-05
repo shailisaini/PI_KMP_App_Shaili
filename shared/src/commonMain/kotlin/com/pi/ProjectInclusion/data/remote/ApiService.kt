@@ -17,17 +17,14 @@ class ApiService(private val client: HttpClient) {
 
     companion object {
         //    private val STUDENT_BASE_URL = "https://staging-api-pi.projectinclusion.in/api/"   // Production BASE URL
-        const val STUDENT_BASE_URL =
-            "https://student-api.auroscholar.org/api/"                         // Production
-        const val STUDENT_END_POINT = STUDENT_BASE_URL + "v1/student/"
+//        const val STUDENT_BASE_URL = "https://student-api.auroscholar.org/api/"                         // Production
+        const val STUDENT_BASE_URL = "https://staging-pi-api.projectinclusion.in/api/v2"
     }
 
-    suspend fun getLanguages(page: String, limit: String): GetLanguageListResponse = client.get {
+    suspend fun getLanguages(): GetLanguageListResponse = client.get {
         url {
-            takeFrom(STUDENT_END_POINT)
-            appendPathSegments("admin", "languages") // end points
-            parameters.append("page", page)
-            parameters.append("limit", limit)
+            takeFrom(STUDENT_BASE_URL)
+            appendPathSegments("language", "get-all") // end points
         }
         headers {
             append(HttpHeaders.Accept, "application/json")
@@ -35,21 +32,22 @@ class ApiService(private val client: HttpClient) {
     }.body<GetLanguageListResponse>()
 
 
-    //    suspend fun getUserType(): GetUserTypeResponse = client.get {
-    suspend fun getUserType(): GetUserTypeResponse {
-        val response: HttpResponse = client.get {
+    // it is commenting if we need it later for testing response
+    /*suspend fun getUserType(): GetUserTypeResponse {
+        val response: HttpResponse = client.get {*/
+
+    suspend fun getUserType(): GetUserTypeResponse = client.get {
 
             url {
-                takeFrom(STUDENT_END_POINT)
-                appendPathSegments("admin", "userType")
+                takeFrom(STUDENT_BASE_URL)
+                appendPathSegments("user-type", "get-for-app")
             }
             headers {
                 append(HttpHeaders.Accept, "application/json")
             }
-        }
 
-        val raw = response.bodyAsText()
+        /*val raw = response.bodyAsText()
         println("Raw Response:\n$raw")
-        return Json.decodeFromString<GetUserTypeResponse>(raw)
-    }
+        return Json.decodeFromString<GetUserTypeResponse>(raw)*/
+    }.body<GetUserTypeResponse>()
 }

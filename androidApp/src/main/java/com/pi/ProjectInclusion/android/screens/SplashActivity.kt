@@ -74,11 +74,11 @@ class SplashActivity : ComponentActivity() {
                 ) { route ->
                     when (route) {
                         SPLASH_KEY -> SplashScreen {
-//                            navigateTo(AppRoute.LanguageSelect.route)
-                            context.startActivity(
+                            navigateTo(AppRoute.LanguageSelect.route)
+                            /*context.startActivity(
                                 Intent(context, StudentDashboardActivity::class.java)
                             )
-                            (context as? Activity)?.finish()
+                            (context as? Activity)?.finish()*/
                         }
 
                         AppRoute.LanguageSelect.route -> {
