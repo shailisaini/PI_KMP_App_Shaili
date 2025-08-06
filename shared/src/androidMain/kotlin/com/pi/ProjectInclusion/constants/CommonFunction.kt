@@ -93,7 +93,7 @@ object CommonFunction {
             Text(
                 title,
                 textAlign = TextAlign.Center,
-                fontSize = 24.sp,
+                fontSize = 17.sp,
                 fontStyle = FontStyle.Normal,
                 fontWeight = FontWeight.Bold,
                 overflow = TextOverflow.Ellipsis,

@@ -1,7 +1,5 @@
 package com.pi.ProjectInclusion.android.screens.screeningScreen
 
-import android.R.attr.progress
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -12,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -32,11 +31,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.kmptemplate.logger.LoggerProvider.logger
@@ -56,9 +60,10 @@ import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.pi.ProjectInclusion.BorderBlue
+import com.pi.ProjectInclusion.LightPurple04
 
 
 @Composable
@@ -82,7 +87,7 @@ fun ScreeningOneReportScreen(showReportScreen: Boolean,
         LoginScreenTitle(
             stringResource(R.string.txt_Screening_1_Report),
             White,
-            White,
+            LightPurple04,
             if (isSystemInDarkTheme()) {
                 PrimaryBlue
             } else {
@@ -95,7 +100,8 @@ fun ScreeningOneReportScreen(showReportScreen: Boolean,
         if (showReportScreen) {
             ReportScreenContent()
         } else {
-            CongratulationsScreen("Rahul")
+            var name = stringResource(R.string.user_name)
+            CongratulationsScreen(name)
         }
 
     }
@@ -143,7 +149,6 @@ fun ReportScreenContent(){
 
     BottomUI()
 }
-
 @Composable
 fun CongratulationsScreen(name: String) {
     val compositionState = rememberLottieComposition(
@@ -151,76 +156,88 @@ fun CongratulationsScreen(name: String) {
     )
     val composition = compositionState.value
 
-
     val progressState = animateLottieCompositionAsState(
-        composition = compositionState.value,
+        composition = composition,
         iterations = LottieConstants.IterateForever
     )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
         // 🎉 Background Lottie
-//        LottieAnimation(
-//            composition = composition,
-//            progress = progress,
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .zIndex(0f)
-//        )
-
-        // Foreground UI
-        Column(
+        LottieAnimation(
+            composition = composition,
+            progress = progressState.value,
             modifier = Modifier
                 .fillMaxSize()
+                .zIndex(0f)
+        )
+        Column(
+            modifier = Modifier
+                .align(Alignment.Center)
                 .padding(horizontal = 24.dp)
-                .verticalScroll(rememberScrollState())
-                .zIndex(1f), // Bring UI above animation
+                .offset(y = (-50).dp)
+                .zIndex(1f),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(40.dp))
-
             Icon(
-                imageVector = ImageVector.vectorResource(id = R.drawable.sad_emoji),
-                contentDescription = "Icon",
-                modifier = Modifier.size(60.dp),
+                imageVector = ImageVector.vectorResource(id = R.drawable.congrats_img),
+                contentDescription = IMG_DESCRIPTION,
+                modifier = Modifier
+                    .size(138.dp)
+                ,
                 tint = Color.Unspecified
             )
 
             Text(
-                text = name + stringResource(R.string.head_leave),
+                text = stringResource(R.string.head_congratulations),
                 modifier = Modifier
-                    .wrapContentWidth()
-                    .padding(top = 16.dp, start = 8.dp, end = 8.dp),
+                    .padding(top = 16.dp, start = 8.dp, end = 8.dp, bottom = 8  .dp),
                 fontFamily = fontBold,
-                fontSize = 19.sp,
+                fontSize = 21.sp,
                 color = Black,
                 textAlign = TextAlign.Center
             )
 
             Text(
-                text = stringResource(R.string.body_leave),
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(
+                        color = BorderBlue,
+                        fontWeight = FontWeight.Bold
+                    )) {
+                        append(name + " ")
+                    }
+                    withStyle(style = SpanStyle(color = GrayLight04)) {
+                        append(stringResource(R.string.txt_body_congratulations))
+                    }
+                },
+//                text = name + " " + stringResource(R.string.txt_body_congratulations),
                 modifier = Modifier
-                    .wrapContentWidth()
                     .padding(top = 3.dp, start = 8.dp, end = 8.dp),
                 fontFamily = fontRegular,
                 fontSize = 15.sp,
                 color = GrayLight04,
                 textAlign = TextAlign.Center
             )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
+        }
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(24.dp)
+        ){
             BtnWithRightIconUi(
                 onClick = {
                     println("testing =>")
                 },
-                title = "Continue",
-                enabled = true
+                title = stringResource(R.string.back_screening),
+                enabled = true,
             )
+
         }
     }
 }
+
 
 
 @Composable
@@ -321,5 +338,5 @@ fun BottomUI() {
 fun ScreeningOneReportScreenPreview() {
     val onNext: () -> Unit = {}
     val onBack: () -> Unit = {}
-    ScreeningOneReportScreen(true,onNext, onBack)
+    ScreeningOneReportScreen(false,onNext, onBack)
 }

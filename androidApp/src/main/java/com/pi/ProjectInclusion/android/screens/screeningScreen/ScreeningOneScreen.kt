@@ -82,18 +82,20 @@ fun ScreeningOneScreen(onNext: () -> Unit, onBack: () -> Unit) {
             stringResource(R.string.txt_Yes),
             stringResource(R.string.txt_No)
         ),
-        ScreeningQuestionData(
-            3,
-            stringResource(R.string.txt_Question_Constant),
-            stringResource(R.string.txt_Yes),
-            stringResource(R.string.txt_No)
-        ),
-        ScreeningQuestionData(
-            4,
-            stringResource(R.string.txt_Question_Constant),
-            stringResource(R.string.txt_Yes),
-            stringResource(R.string.txt_No)
-        )
+                                    /*   this code is commented to navigate on Congratulation Screen*/
+
+//        ScreeningQuestionData(
+//            3,
+//            stringResource(R.string.txt_Question_Constant),
+//            stringResource(R.string.txt_Yes),
+//            stringResource(R.string.txt_No)
+//        ),
+//        ScreeningQuestionData(
+//            4,
+//            stringResource(R.string.txt_Question_Constant),
+//            stringResource(R.string.txt_Yes),
+//            stringResource(R.string.txt_No)
+//        )
     )
 
     ScreeningDetailsBackgroundUi(
