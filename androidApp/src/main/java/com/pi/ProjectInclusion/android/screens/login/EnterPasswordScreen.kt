@@ -76,7 +76,7 @@ fun EnterPasswordScreen(
     onNext: (String) -> Unit, //OtpSendVerifyUI
     onBack: () -> Unit,
     isForgetPassword: () -> Unit,
-    mobileNo: String = ""
+    mobileNo: String = "8851291824" // keeping it static wil change after login API
 ) {
     var isDialogVisible by remember { mutableStateOf(false) }
     val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()

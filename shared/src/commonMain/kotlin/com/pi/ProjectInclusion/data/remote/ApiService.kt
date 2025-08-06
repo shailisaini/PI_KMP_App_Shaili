@@ -57,7 +57,7 @@ class ApiService(private val client: HttpClient) {
         url {
             takeFrom(STUDENT_BASE_URL)
             appendPathSegments("users", "otp-on-call") // → /language/get-all
-            parameters.append("mobileNe", mobNo)
+            parameters.append("mobileNo", mobNo)
         }
         headers {
             append(HttpHeaders.Accept, "application/json")
@@ -68,7 +68,7 @@ class ApiService(private val client: HttpClient) {
         url {
             takeFrom(STUDENT_BASE_URL)
             appendPathSegments("users", "send-otp-whatsapp") // → /language/get-all
-            parameters.append("mobileNo", mobNo)
+            parameters.append("mobileNe", mobNo)
         }
         headers {
             append(HttpHeaders.Accept, "application/json")

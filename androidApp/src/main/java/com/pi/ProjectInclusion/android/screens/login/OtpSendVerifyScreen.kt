@@ -67,7 +67,7 @@ fun OtpSendVerifyScreen(
     onNext: () -> Unit,
     onBack: () -> Unit,
     viewModel: LoginViewModel,
-    mobNo: String = "9654074714"
+    mobNo: String = ""
 ) {
 
     val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
