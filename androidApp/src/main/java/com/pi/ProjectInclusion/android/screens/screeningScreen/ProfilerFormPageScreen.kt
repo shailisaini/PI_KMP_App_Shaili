@@ -60,33 +60,23 @@ import com.pi.ProjectInclusion.android.common_UI.SmallBtnUi
 import com.pi.ProjectInclusion.android.common_UI.YesNoBtnUi
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
+import com.pi.ProjectInclusion.android.utils.toast
 
 @Composable
 fun ProfilerFormPageScreen(onNext: () -> Unit, onBack: () -> Unit) {
 
     logger.d("Screen: " + "ProfilerFormPageScreen()")
 
+    val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
     val steps = listOf("Academic", "Interest", "Strength", "Temperament")
+    var stepTitle by remember { mutableStateOf(0) }
+    val totalSteps = steps.size
 
-    val questionListData = listOf(
-        ProfilerQuestionData(
-            1,
-            stringResource(R.string.txt_Select_statement_from_following),
-            stringResource(R.string.txt_Does_not_participate),
-            stringResource(R.string.txt_Below_average),
-            stringResource(R.string.txt_Average),
-            stringResource(R.string.txt_Above_Average)
-        ),
-        ProfilerQuestionData(
-            2,
-            stringResource(R.string.txt_Choose_multiple_from_following),
-            stringResource(R.string.txt_Does_not_participate),
-            stringResource(R.string.txt_Below_average),
-            stringResource(R.string.txt_Average),
-            stringResource(R.string.txt_Above_Average)
-        )
-    )
+    var answerQ1 by remember { mutableStateOf("") }
+    var answerQ2 by remember { mutableStateOf("") }
+    var answerQ3 by remember { mutableStateOf("") }
+    var answerQ4 by remember { mutableStateOf("") }
 
     // This function will be change according to recommend
     if (showDialog) {
@@ -132,7 +122,7 @@ fun ProfilerFormPageScreen(onNext: () -> Unit, onBack: () -> Unit) {
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Row(   // Stepper
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp),
@@ -140,11 +130,8 @@ fun ProfilerFormPageScreen(onNext: () -> Unit, onBack: () -> Unit) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         steps.forEachIndexed { index, label ->
-
                             var progress by remember { mutableStateOf(0.65f) } // 65% progress
                             ProgressBarWithText(progress = progress, index, label)
-
-                            // Dashed line between steps
                             if (index < steps.lastIndex) {
                                 DashedLine()
                             }
@@ -152,13 +139,38 @@ fun ProfilerFormPageScreen(onNext: () -> Unit, onBack: () -> Unit) {
                     }
                 }
 
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 12.dp, end = 12.dp, top = 16.dp, bottom = 16.dp)
-                ) {
-                    items(questionListData) { questionData ->
-                        ProfilerQuestionDataUI(questionData)
+                when (stepTitle) {
+                    0 -> {
+                        AcademicScreenUI(selectedAns = { option ->
+                            option.toString()
+                            println("Selected Answer A :- $option")
+                            answerQ1 = option.toString()
+                        })
+                    }
+
+                    1 -> {
+                        InterestScreenUI(selectedAns = { option ->
+                            option.toString()
+                            println("Selected Answer B :- $option")
+                            answerQ2 = option.toString()
+                        })
+                    }
+
+                    2 -> {
+                        StrengthScreenUI(selectedAns = { option ->
+                            option.toString()
+                            println("Selected Answer C :- $option")
+                            answerQ3 = option.toString()
+
+                        })
+                    }
+
+                    3 -> {
+                        TemperamentScreenUI(selectedAns = { option ->
+                            option.toString()
+                            println("Selected Answer D :- $option")
+                            answerQ4 = option.toString()
+                        })
                     }
                 }
 
@@ -178,9 +190,17 @@ fun ProfilerFormPageScreen(onNext: () -> Unit, onBack: () -> Unit) {
                     ) {
                         SmallBtnUi(
                             enabled = true,
-                            title = stringResource(R.string.string_next),
+                            title = if (stepTitle < totalSteps - 1) {
+                                stringResource(R.string.string_next)
+                            } else {
+                                stringResource(R.string.txt_Save_Continue)
+                            },
                             onClick = {
-                                // this change according to condition
+                                if (stepTitle < totalSteps - 1) {
+                                    stepTitle++
+                                } else {
+                                    context.toast("It will Submit all data here")
+                                }
                             })
                     }
                 }
@@ -190,7 +210,135 @@ fun ProfilerFormPageScreen(onNext: () -> Unit, onBack: () -> Unit) {
 }
 
 @Composable
-fun ProfilerQuestionDataUI(questionData: ProfilerQuestionData) {
+fun AcademicScreenUI(selectedAns: (String) -> Unit) {
+    val questionListData = listOf(
+        ProfilerQuestionData(
+            1,
+            stringResource(R.string.txt_Select_statement_from_following),
+            stringResource(R.string.txt_Does_not_participate),
+            stringResource(R.string.txt_Below_average),
+            stringResource(R.string.txt_Average),
+            stringResource(R.string.txt_Above_Average)
+        ),
+        ProfilerQuestionData(
+            2,
+            stringResource(R.string.txt_Choose_multiple_from_following),
+            stringResource(R.string.txt_Does_not_participate),
+            stringResource(R.string.txt_Below_average),
+            stringResource(R.string.txt_Average),
+            stringResource(R.string.txt_Above_Average)
+        )
+    )
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 12.dp, end = 12.dp, top = 16.dp, bottom = 16.dp)
+    ) {
+        items(questionListData) { questionData ->
+            ProfilerQuestionDataUI(questionData, selectedAns)
+        }
+    }
+}
+
+@Composable
+fun InterestScreenUI(selectedAns: (String) -> Unit) {
+    val questionListData = listOf(
+        ProfilerQuestionData(
+            1,
+            stringResource(R.string.txt_Select_statement_from_following),
+            stringResource(R.string.txt_Does_not_participate),
+            stringResource(R.string.txt_Below_average),
+            stringResource(R.string.txt_Average),
+            stringResource(R.string.txt_Above_Average)
+        ),
+        ProfilerQuestionData(
+            2,
+            stringResource(R.string.txt_Choose_multiple_from_following),
+            stringResource(R.string.txt_Does_not_participate),
+            stringResource(R.string.txt_Below_average),
+            stringResource(R.string.txt_Average),
+            stringResource(R.string.txt_Above_Average)
+        )
+    )
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 12.dp, end = 12.dp, top = 16.dp, bottom = 16.dp)
+    ) {
+        items(questionListData) { questionData ->
+            ProfilerQuestionDataUI(questionData, selectedAns)
+        }
+    }
+}
+
+@Composable
+fun StrengthScreenUI(selectedAns: (String) -> Unit) {
+    val questionListData = listOf(
+        ProfilerQuestionData(
+            1,
+            stringResource(R.string.txt_Select_statement_from_following),
+            stringResource(R.string.txt_Does_not_participate),
+            stringResource(R.string.txt_Below_average),
+            stringResource(R.string.txt_Average),
+            stringResource(R.string.txt_Above_Average)
+        ),
+        ProfilerQuestionData(
+            2,
+            stringResource(R.string.txt_Choose_multiple_from_following),
+            stringResource(R.string.txt_Does_not_participate),
+            stringResource(R.string.txt_Below_average),
+            stringResource(R.string.txt_Average),
+            stringResource(R.string.txt_Above_Average)
+        )
+    )
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 12.dp, end = 12.dp, top = 16.dp, bottom = 16.dp)
+    ) {
+        items(questionListData) { questionData ->
+            ProfilerQuestionDataUI(questionData, selectedAns)
+        }
+    }
+}
+
+@Composable
+fun TemperamentScreenUI(selectedAns: (String) -> Unit) {
+    val questionListData = listOf(
+        ProfilerQuestionData(
+            1,
+            stringResource(R.string.txt_Select_statement_from_following),
+            stringResource(R.string.txt_Does_not_participate),
+            stringResource(R.string.txt_Below_average),
+            stringResource(R.string.txt_Average),
+            stringResource(R.string.txt_Above_Average)
+        ),
+        ProfilerQuestionData(
+            2,
+            stringResource(R.string.txt_Choose_multiple_from_following),
+            stringResource(R.string.txt_Does_not_participate),
+            stringResource(R.string.txt_Below_average),
+            stringResource(R.string.txt_Average),
+            stringResource(R.string.txt_Above_Average)
+        )
+    )
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 12.dp, end = 12.dp, top = 16.dp, bottom = 16.dp)
+    ) {
+        items(questionListData) { questionData ->
+            ProfilerQuestionDataUI(questionData, selectedAns)
+        }
+    }
+}
+
+@Composable
+fun ProfilerQuestionDataUI(questionData: ProfilerQuestionData, selectedAns: (String) -> Unit) {
     val selectedBorder = BorderStroke(
         width = 0.5.dp, if (isSystemInDarkTheme()) {
             Dark_02
@@ -286,6 +434,7 @@ fun ProfilerQuestionDataUI(questionData: ProfilerQuestionData) {
             ) {
                 SelectOptBtnUi(
                     onClick = {
+                        selectedAns(questionData.ansZero)
                         trueFalseZero = true
                     },
                     title = questionData.ansZero,
@@ -302,6 +451,7 @@ fun ProfilerQuestionDataUI(questionData: ProfilerQuestionData) {
             ) {
                 SelectOptBtnUi(
                     onClick = {
+                        selectedAns(questionData.ansOne)
                         trueFalseOne = true
                     },
                     title = questionData.ansOne,
@@ -312,6 +462,7 @@ fun ProfilerQuestionDataUI(questionData: ProfilerQuestionData) {
 
                 YesNoBtnUi(
                     onClick = {
+                        selectedAns(questionData.ansTwo)
                         trueFalseTwo = true
                     }, title = questionData.ansTwo, enabled = trueFalseTwo
                 )
@@ -326,6 +477,7 @@ fun ProfilerQuestionDataUI(questionData: ProfilerQuestionData) {
             ) {
                 SelectOptBtnUi(
                     onClick = {
+                        selectedAns(questionData.ansThree)
                         trueFalseThree = true
                     },
                     title = questionData.ansThree,
