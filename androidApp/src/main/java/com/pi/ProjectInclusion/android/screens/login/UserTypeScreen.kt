@@ -2,7 +2,6 @@ package com.pi.ProjectInclusion.android.screens.login
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -53,7 +52,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
@@ -72,8 +70,6 @@ import com.pi.ProjectInclusion.PrimaryBlueLt1
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
-import com.pi.ProjectInclusion.android.navigation.AppRoute
-import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
@@ -95,7 +91,7 @@ fun UserTypeScreen(
     val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
-    val userType = remember { mutableStateListOf<GetUserTypeResponse.Data>() }
+    val userType = remember { mutableStateListOf<GetUserTypeResponse.UserTypeResponse>() }
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
@@ -116,18 +112,18 @@ fun UserTypeScreen(
 
             uiState.error.isNotEmpty() -> {
                 userType.clear()
-                isDialogVisible = false
                 LoggerProvider.logger.d("Error: ${uiState.error}")
                 context.toast(uiState.error)
+                isDialogVisible = false
             }
 
             uiState.success != null -> {
-                isDialogVisible = false
-                uiState.success!!.data.let {
+                uiState.success!!.let {
                     userType.clear()
-                    userType.addAll(it)
+                    userType.addAll(it.response!!)
                 }
-                LoggerProvider.logger.d("Languages fetched: ${uiState.success!!.data}")
+                LoggerProvider.logger.d("Languages fetched: ${uiState.success!!}")
+                isDialogVisible = false
             }
         }
     }
@@ -150,22 +146,22 @@ fun UserTypeScreen(
 @Composable
 fun UserTypeResponseUI(
     context: Context,
-    userTypeData: MutableList<GetUserTypeResponse.Data>,
+    userTypeData: MutableList<GetUserTypeResponse.UserTypeResponse>,
     onNext: () -> Unit,
     onBack: () -> Unit,
 ) {
-    val colors = MaterialTheme.colorScheme
+    val errColor = PrimaryBlue
     val scrollState = rememberLazyGridState()
     val coroutineScope = rememberCoroutineScope()
     val isInternetAvailable by remember { mutableStateOf(true) }
     var isApiResponded by remember { mutableStateOf(false) }
-    val internetMessage by remember { mutableStateOf("") }
 
     var isDialogVisible by remember { mutableStateOf(false) }
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
     val selectedLanguage = remember { mutableStateOf<String?>(null) }
     val title = stringResource(R.string.select_userType)
     val subTitle = stringResource(R.string.select_userType_subtitle)
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
     val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
@@ -239,9 +235,9 @@ fun UserTypeResponseUI(
                         }
                     } else {
                         if (!isInternetAvailable) {
-                            ShowError(internetMessage, colors)
+                            ShowError(internetMessage, errColor, painterResource(R.drawable.sad_emoji))
                         } else {
-                            NoDataFound(noDataMessage, painterResource(R.drawable.img_teacher))
+                            NoDataFound(noDataMessage, painterResource(R.drawable.sad_emoji))
                         }
                     }
                 }
@@ -260,7 +256,7 @@ fun UserTypeCard(
     context: Context,
     isSelected: Boolean = true,
     index: Int,
-    userType: MutableList<GetUserTypeResponse.Data>,
+    userType: MutableList<GetUserTypeResponse.UserTypeResponse>,
     onItemClicked: () -> Unit = {},
 ) {
     val userTypeIndex = userType[index]
@@ -298,18 +294,7 @@ fun UserTypeCard(
         modifier = Modifier
             .clickable {
                 onItemClicked.invoke()
-//                navController.popBackStack()
-//                navController.navigate(AppRoute.UserNameScreen.route)
-//                navController.navigate(AppRoute.EnterUserProfileScreen.route)
                 onNext()
-
-                // Aashish
-                /* context.startActivity(
-                     Intent(
-                         context,
-                         StudentDashboardActivity::class.java
-                     )
-                 )*/
             }
             .padding(8.dp)
             .fillMaxWidth(),
@@ -346,7 +331,7 @@ fun UserTypeCard(
                     painter =
                         rememberAsyncImagePainter(
                             model = ImageRequest.Builder(LocalContext.current)
-                                .data(R.drawable.img_teacher)
+                                .data(userTypeIndex.icon)
                                 .decoderFactory(SvgDecoder.Factory())
                                 .size(Size.ORIGINAL)
                                 .placeholder(R.drawable.img_teacher)
@@ -364,7 +349,7 @@ fun UserTypeCard(
                     textAlign = TextAlign.Start,
                     maxLines = 1,
                     fontSize = 14.sp,
-                    color = Gray,
+                    color = if (isSelected) Black else Gray,
                     modifier = Modifier
                         .wrapContentWidth()
                         .padding(top = 5.dp)

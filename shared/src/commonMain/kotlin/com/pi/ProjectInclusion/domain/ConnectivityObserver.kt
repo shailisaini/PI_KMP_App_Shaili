@@ -1,4 +1,4 @@
-package com.pi.ProjectInclusion.android.utils
+package com.pi.ProjectInclusion.domain
 
 import kotlinx.coroutines.flow.Flow
 

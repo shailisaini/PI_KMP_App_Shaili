@@ -71,51 +71,10 @@ class LoginNavigationScreen : ComponentActivity() {
                 currentRoute = toRoute ?: AppRoute.LanguageSelect.route
             }
 
-            /* MyApplicationTheme {
-                 val navController = rememberNavController()
-
-                 NavHost(
-                     navController = navController,
-                     startDestination = startDestination,
-                     modifier = Modifier.background(Color.White)
-                 ) {
-                     composable(AppRoute.LanguageSelect.route) {
-                         LanguageScreen(navController, viewModel)
-                     }
-                     composable(AppRoute.UserTypeSelect.route) {
-                         UserTypeScreen(navController, viewModel)
-                     }
-                     composable(AppRoute.UserNameScreen.route) {
-                         EnterUserNameScreen(navController, viewModel)
-                     }
-                     composable(AppRoute.UserPasswordScreen.route) {
-                         EnterPasswordScreen(navController, viewModel)
-                     }
-                     composable(AppRoute.CreatePasswordScreen.route) {
-                         CreateNewPasswordScreen(navController, viewModel)
-                     }
-                     composable(AppRoute.EnterUserProfileScreen.route) {
-                         EnterUserScreen1(navController)
-                     }
-                     composable(AppRoute.EnterUserProfessionalScreen.route) {
-                         EnterUserScreen2(navController)
-                     }
-                     composable(AppRoute.ForgetPasswordUI.route) {
-                         ForgetPasswordScreen(navController, viewModel)
-                     }
-                     composable(AppRoute.OtpSendVerifyUI.route) {
-                         OtpSendVerifyScreen(navController, viewModel)
-                     }
-                     composable(AppRoute.SetNewPasswordUI.route) {
-                         SetNewPasswordScreen(navController, viewModel)
-                     }
-                 }
-             }*/
-
             MyApplicationTheme {
                 AnimatedContent(
                     targetState = currentRoute,
-                    label = "Route Transition",
+                    label = "",
                     transitionSpec = {
                         val duration = 400
                         if (isForward) {
@@ -167,7 +126,9 @@ class LoginNavigationScreen : ComponentActivity() {
 
                         AppRoute.UserPasswordScreen.route -> EnterPasswordScreen(
                             viewModel = viewModel,
-                            onNext = { navigateTo(AppRoute.OtpSendVerifyUI.route) },
+                            onNext = {
+                                val mobNo = viewModel.getPrefData("MOBILE")
+                                navigateTo(AppRoute.OtpSendVerifyUI.withArgs(mobNo)) },
                             isForgetPassword = { navigateTo(AppRoute.ForgetPasswordUI.route) },
                             onBack = { navigateBack(AppRoute.UserNameScreen.route) }
                         )
@@ -176,7 +137,10 @@ class LoginNavigationScreen : ComponentActivity() {
                             viewModel = viewModel,
                             onNext = { navigateTo(AppRoute.EnterUserProfileScreen.route) },
                             onBack = { navigateBack(AppRoute.UserNameScreen.route) },
-                            otpSendVerify = { navigateTo(AppRoute.OtpSendVerifyUI.route) }
+                            otpSendVerify = {
+                                val mobNo = viewModel.getPrefData("MOBILE")
+                                navigateTo(AppRoute.OtpSendVerifyUI.withArgs(mobNo))
+                            }
                         )
 
                         AppRoute.EnterUserProfileScreen.route -> EnterUserScreen1(
@@ -195,7 +159,10 @@ class LoginNavigationScreen : ComponentActivity() {
                         )
 
                         AppRoute.ForgetPasswordUI.route -> ForgetPasswordScreen(
-                            onNext = { navigateTo(AppRoute.OtpSendVerifyUI.route) },
+                            onNext = {
+                                val mobNo = viewModel.getPrefData("MOBILE")
+                                navigateTo(AppRoute.OtpSendVerifyUI.withArgs(mobNo))
+                                     },
                             onBack = { navigateBack(AppRoute.UserNameScreen.route) },
                             viewModel = viewModel
                         )
@@ -210,7 +177,9 @@ class LoginNavigationScreen : ComponentActivity() {
 
                         AppRoute.SetNewPasswordUI.route -> SetNewPasswordScreen(
                             onNext = { navigateTo(AppRoute.UserNameScreen.route) },
-                            onBack = { navigateBack(AppRoute.OtpSendVerifyUI.route) },
+                            onBack = {
+//                                navigateBack(AppRoute.OtpSendVerifyUI.route)
+                                     },
                             viewModel = viewModel
                         )
                     }

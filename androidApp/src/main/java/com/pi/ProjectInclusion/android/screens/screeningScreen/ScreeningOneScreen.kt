@@ -82,20 +82,18 @@ fun ScreeningOneScreen(onNext: () -> Unit, onBack: () -> Unit) {
             stringResource(R.string.txt_Yes),
             stringResource(R.string.txt_No)
         ),
-                                    /*   this code is commented to navigate on Congratulation Screen*/
-
-//        ScreeningQuestionData(
-//            3,
-//            stringResource(R.string.txt_Question_Constant),
-//            stringResource(R.string.txt_Yes),
-//            stringResource(R.string.txt_No)
-//        ),
-//        ScreeningQuestionData(
-//            4,
-//            stringResource(R.string.txt_Question_Constant),
-//            stringResource(R.string.txt_Yes),
-//            stringResource(R.string.txt_No)
-//        )
+        ScreeningQuestionData(
+            3,
+            stringResource(R.string.txt_Question_Constant),
+            stringResource(R.string.txt_Yes),
+            stringResource(R.string.txt_No)
+        ),
+        /*ScreeningQuestionData(
+            4,
+            stringResource(R.string.txt_Question_Constant),
+            stringResource(R.string.txt_Yes),
+            stringResource(R.string.txt_No)
+        )*/
     )
 
     ScreeningDetailsBackgroundUi(
@@ -350,7 +348,7 @@ fun ScreeningQuestionDataUI(questionData: ScreeningQuestionData) {
                         trueFalseYes = true
                         trueFalseNo = false
                     },
-                    title = stringResource(R.string.txt_Yes),
+                    title = questionData.ansYes,
                     enabled = trueFalseYes
                 )
 
@@ -360,7 +358,7 @@ fun ScreeningQuestionDataUI(questionData: ScreeningQuestionData) {
                     onClick = {
                         trueFalseNo = true
                         trueFalseYes = false
-                    }, title = stringResource(R.string.txt_No), enabled = trueFalseNo
+                    }, title = questionData.ansNo, enabled = trueFalseNo
                 )
             }
         }

@@ -41,6 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.kmptemplate.logger.LoggerProvider.logger
@@ -67,11 +69,14 @@ import com.pi.ProjectInclusion.LightPurple04
 
 
 @Composable
-fun ScreeningOneReportScreen(showReportScreen: Boolean,
-                             onNext: () -> Unit,
-                             onBack: () -> Unit) {
+fun ScreeningOneReportScreen(
+    showReportScreen: Boolean,
+    onNext: () -> Unit,
+    onBack: () -> Unit,
+) {
 
     logger.d("Screen: " + "ScreeningOneReportScreen()")
+
 
     Column(
         modifier = Modifier
@@ -98,7 +103,7 @@ fun ScreeningOneReportScreen(showReportScreen: Boolean,
 
         // Conditional content
         if (showReportScreen) {
-            ReportScreenContent()
+            ReportScreenContent(onNext)
         } else {
             var name = stringResource(R.string.user_name)
             CongratulationsScreen(name)
@@ -108,46 +113,49 @@ fun ScreeningOneReportScreen(showReportScreen: Boolean,
 }
 
 @Composable
-fun ReportScreenContent(){
+fun ReportScreenContent(onNext: () -> Unit = {}) {
 
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
-            .padding(start = 16.dp, end = 16.dp, top = 8.dp)
     ) {
+        Column(
+            modifier = Modifier
+                .padding(start = 16.dp, end = 16.dp, top = 8.dp)
+        ) {
+            DomainSection(stringResource(R.string.txt_Visual_Domain_VI))
 
-        DomainSection(stringResource(R.string.txt_Visual_Domain_VI))
+            ReportCard(
+                title = stringResource(R.string.txt_Condition),
+                text = stringResource(R.string.txt_Based_observation_SAMAN_difficulty),
+                titleColor = HeaderColor01
+            )
 
-        ReportCard(
-            title = stringResource(R.string.txt_Condition),
-            text = stringResource(R.string.txt_Based_observation_SAMAN_difficulty),
-            titleColor = HeaderColor01
-        )
+            ReportCard(
+                title = stringResource(R.string.nav_refer_txt),
+                text = stringResource(R.string.txt_Based_observation_SAMAN_difficulty),
+                titleColor = HeaderColor01
+            )
 
-        ReportCard(
-            title = stringResource(R.string.nav_refer_txt),
-            text = stringResource(R.string.txt_Based_observation_SAMAN_difficulty),
-            titleColor = HeaderColor01
-        )
+            ReportCard(
+                title = stringResource(R.string.txt_Recommendation),
+                text = stringResource(R.string.txt_Based_observation_SAMAN_difficulty),
+                titleColor = HeaderColor01
+            )
 
-        ReportCard(
-            title = stringResource(R.string.txt_Recommendation),
-            text = stringResource(R.string.txt_Based_observation_SAMAN_difficulty),
-            titleColor = HeaderColor01
-        )
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
+            DomainSection(stringResource(R.string.txt_Auditory_Domain_HI))
 
-        DomainSection(stringResource(R.string.txt_Auditory_Domain_HI))
+            ReportCard(
+                title = stringResource(R.string.txt_Condition),
+                text = stringResource(R.string.txt_Based_observation_SAMAN_difficulty),
+                titleColor = HeaderColor01
+            )
+        }
 
-        ReportCard(
-            title = stringResource(R.string.txt_Condition),
-            text = stringResource(R.string.txt_Based_observation_SAMAN_difficulty),
-            titleColor = HeaderColor01
-        )
+        BottomUI(onNext)
     }
-
-    BottomUI()
 }
 @Composable
 fun CongratulationsScreen(name: String) {
@@ -285,7 +293,7 @@ fun DomainSection(title: String) {
 }
 
 @Composable
-fun BottomUI() {
+fun BottomUI(onNext: () -> Unit = {}) {
     Surface(
         color = Color.White, tonalElevation = 4.dp, shadowElevation = 8.dp
     ) {
@@ -326,7 +334,9 @@ fun BottomUI() {
                 Spacer(modifier = Modifier.width(24.dp))
 
                 BtnWithRightIconUi(
-                    onClick = {}, title = stringResource(R.string.txt_Profiler_Form), enabled = true
+                    onClick = {
+                        onNext()
+                    }, title = stringResource(R.string.txt_Profiler_Form), enabled = true
                 )
             }
         }

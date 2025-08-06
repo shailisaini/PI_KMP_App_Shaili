@@ -35,4 +35,7 @@ object ConstantVariables {
     var ALL: String = "All"
     var MODULE: String = "Module"
     var COURSE: String = "Course"
+
+    // API Response Messages
+    var SUCCESS: String = "Success"
 }

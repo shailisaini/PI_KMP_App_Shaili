@@ -2760,6 +2760,76 @@ fun YesNoBtnUi(
     }
 }
 
+@Preview
+@Composable
+fun SelectOptBtnUi(
+    title: String = "No", onClick: () -> Unit = {}, enabled: Boolean = false,
+) {
+    val selectedBorder = BorderStroke(
+        width = 1.dp, if (isSystemInDarkTheme()) {
+            if (enabled) {
+                PrimaryBlue
+            } else {
+                GrayLight05
+            }
+        } else {
+            if (enabled) {
+                PrimaryBlue
+            } else {
+                GrayLight05
+            }
+        }
+    )
+
+    Card(
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier
+            .wrapContentHeight()
+            .clickable {
+                onClick()
+            },
+        colors = if (isSystemInDarkTheme()) {
+            if (enabled) {
+                CardDefaults.cardColors(PrimaryBlueLt1)
+            } else {
+                CardDefaults.cardColors(White)
+            }
+        } else {
+            if (enabled) {
+                CardDefaults.cardColors(
+                    containerColor = PrimaryBlueLt1,
+                    contentColor = PrimaryBlueLt1,
+                    disabledContentColor = PrimaryBlueLt1,
+                    disabledContainerColor = PrimaryBlueLt1
+                )
+            } else {
+                CardDefaults.cardColors(
+                    containerColor = White,
+                    contentColor = White,
+                    disabledContentColor = White,
+                    disabledContainerColor = White
+                )
+            }
+        },
+        border = selectedBorder
+    ) {
+        Text(
+            text = title,
+            modifier = Modifier
+                .wrapContentWidth()
+                .padding(bottom = 8.dp, top = 8.dp, start = 8.dp, end = 8.dp),
+            fontSize = 14.sp,
+            color = if (enabled) {
+                PrimaryBlue
+            } else {
+                BodyTextLight
+            },
+            textAlign = TextAlign.Center,
+            fontFamily = fontMedium,
+        )
+    }
+}
+
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Preview
 @Composable

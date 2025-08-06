@@ -63,6 +63,7 @@ import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneScree
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.ChangePasswordActivity
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.FaqActivity
 import com.pi.ProjectInclusion.android.screens.login.EnterUserNameScreen
+import com.pi.ProjectInclusion.android.screens.screeningScreen.ProfilerFormPageScreen
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -253,6 +254,7 @@ class StudentDashboardActivity : ComponentActivity() {
                                     AppRoute.ScreeningScreen.route -> ScreeningHomeScreen(
                                         addStudent = { navigateTo(AppRoute.AddStudentRegister.route) },
                                         screeningOne = { navigateTo(AppRoute.ScreeningOne.route) },
+                                        profilerForm = { navigateTo(AppRoute.ProfilerFormPage.route) },
                                         onBack = { navigateBack(AppRoute.ProfileScreen.route) }
                                     )
 

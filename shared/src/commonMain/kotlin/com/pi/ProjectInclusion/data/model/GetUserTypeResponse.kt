@@ -5,21 +5,38 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GetUserTypeResponse(
-    @SerialName("data")
-    val data: List<Data>,
+    @SerialName("message")
+    val message: String? = null,
 
-    @SerialName("error")
-    val error: String,
+    @SerialName("statusCode")
+    val statusCode: Int? = null,
 
-    @SerialName("isSuccess")
-    val isSuccess: Boolean
-) {
+    @SerialName("status")
+    val status: Boolean? = null,
+
+    @SerialName("response")
+    val response: List<UserTypeResponse>? = null,
+
+    ) {
     @Serializable
-    data class Data(
+    data class UserTypeResponse(
         @SerialName("id")
-        val id: String,
+        val id: String? = null,
 
         @SerialName("name")
-        val name: String
-    )
+        val name: String? = null,
+
+        @SerialName("icon")
+        val icon: String? = null,
+
+        @SerialName("status")
+        val status: Int? = null,
+
+        @SerialName("isShowOnApp")
+        val isShowOnApp: Int? = null,
+
+        @SerialName("createdBy")
+        val createdBy: String? = null,
+
+        )
 }

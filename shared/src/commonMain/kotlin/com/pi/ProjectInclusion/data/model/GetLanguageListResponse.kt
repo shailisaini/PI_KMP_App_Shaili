@@ -5,53 +5,39 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GetLanguageListResponse(
-    @SerialName("data")
-    val `data`: Data,
 
-    @SerialName("error")
-    val error: String,
+    @SerialName("message")
+    val message: String? = null,
 
-    @SerialName("isSuccess")
-    val isSuccess: Boolean
-) {
-    @Serializable
-    data class Data(
-        @SerialName("limit")
-        val limit: String,
+    @SerialName("statusCode")
+    val statusCode: Int? = null,
 
-        @SerialName("page")
-        val page: String,
+    @SerialName("status")
+    val status: Boolean? = null,
 
-        @SerialName("results")
-        val results: List<Result>,
+    @SerialName("response")
+    val response: List<LanguageResponse>? = null,
 
-        @SerialName("totalCount")
-        val totalCount: Int
     ) {
         @Serializable
-        data class Result(
+        data class LanguageResponse(
             @SerialName("id")
-            val id: Int,
+            val id: String? = null,
 
             @SerialName("name")
-            val name: String,
+            val name: String? = null,
 
-            @SerialName("icon")
-            val icon: String,
+            @SerialName("translated_name")
+            val translated_name: String? = null,
 
-            @SerialName("nativeName")
-            val nativeName: String,
+            @SerialName("lang_icon")
+            val lang_icon: String? = null,
 
             @SerialName("status")
-            val status: String,
+            val status: Int? = null,
 
-            @SerialName("languageCode")
-            val languageCode: String? = null,
+            @SerialName("createdBy")
+            val createdBy: String? = null,
 
-            @SerialName("priority")
-            val priority: String? = null,
-
-            var isSelected: Boolean = false // Defaulted, not from API
         )
     }
-}

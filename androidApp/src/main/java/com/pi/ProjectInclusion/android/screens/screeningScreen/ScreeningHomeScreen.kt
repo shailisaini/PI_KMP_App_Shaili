@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -86,7 +85,6 @@ import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.BtnWithRightIconUi
 import com.pi.ProjectInclusion.android.common_UI.CustomHorizontalProgressBar
-import com.pi.ProjectInclusion.android.common_UI.YesBtnUi
 import com.pi.ProjectInclusion.android.screens.menu.TabItem
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
@@ -97,7 +95,12 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ScreeningHomeScreen(addStudent: () -> Unit, onBack: () -> Unit, screeningOne: () -> Unit) {
+fun ScreeningHomeScreen(
+    addStudent: () -> Unit,
+    onBack: () -> Unit,
+    screeningOne: () -> Unit,
+    profilerForm: () -> Unit,
+) {
 
     logger.d("Screen: " + "ScreeningHomeScreen()")
 
@@ -161,92 +164,92 @@ fun ScreeningHomeScreen(addStudent: () -> Unit, onBack: () -> Unit, screeningOne
             )
     ) {
         // This is used for add new students while come for first time screening
-       /* Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .background(
-                    if (isSystemInDarkTheme()) {
-                        Dark_01
-                    } else {
-                        White
-                    }
-                ), verticalArrangement = Arrangement.Center
-        ) {
-            Card(
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
-                    .wrapContentHeight(),
-                colors = if (isSystemInDarkTheme()) {
-                    CardDefaults.cardColors(BlueBackground3)
-                } else {
-                    CardDefaults.cardColors(
-                        containerColor = BlueBackground3,
-                        contentColor = BlueBackground3,
-                        disabledContentColor = BlueBackground3,
-                        disabledContainerColor = BlueBackground3
-                    )
-                },
-                border = selectedBorder
-            ) {
-                Column(
-                    modifier = Modifier.padding(
-                        start = 5.dp, end = 5.dp, top = 5.dp, bottom = 5.dp
-                    ), horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = stringResource(R.string.txt_add_Student_Screening),
-                        modifier = Modifier
-                            .wrapContentWidth()
-                            .padding(top = 16.dp, start = 8.dp, end = 8.dp),
-                        fontFamily = fontBold,
-                        fontSize = 16.sp,
-                        color = if (isSystemInDarkTheme()) {
-                            DARK_TITLE_TEXT
-                        } else {
-                            Black
-                        },
-                        textAlign = TextAlign.Center
-                    )
+        /* Column(
+             modifier = Modifier
+                 .fillMaxWidth()
+                 .fillMaxHeight()
+                 .background(
+                     if (isSystemInDarkTheme()) {
+                         Dark_01
+                     } else {
+                         White
+                     }
+                 ), verticalArrangement = Arrangement.Center
+         ) {
+             Card(
+                 shape = RoundedCornerShape(8.dp),
+                 modifier = Modifier
+                     .fillMaxWidth()
+                     .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
+                     .wrapContentHeight(),
+                 colors = if (isSystemInDarkTheme()) {
+                     CardDefaults.cardColors(BlueBackground3)
+                 } else {
+                     CardDefaults.cardColors(
+                         containerColor = BlueBackground3,
+                         contentColor = BlueBackground3,
+                         disabledContentColor = BlueBackground3,
+                         disabledContainerColor = BlueBackground3
+                     )
+                 },
+                 border = selectedBorder
+             ) {
+                 Column(
+                     modifier = Modifier.padding(
+                         start = 5.dp, end = 5.dp, top = 5.dp, bottom = 5.dp
+                     ), horizontalAlignment = Alignment.CenterHorizontally
+                 ) {
+                     Text(
+                         text = stringResource(R.string.txt_add_Student_Screening),
+                         modifier = Modifier
+                             .wrapContentWidth()
+                             .padding(top = 16.dp, start = 8.dp, end = 8.dp),
+                         fontFamily = fontBold,
+                         fontSize = 16.sp,
+                         color = if (isSystemInDarkTheme()) {
+                             DARK_TITLE_TEXT
+                         } else {
+                             Black
+                         },
+                         textAlign = TextAlign.Center
+                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Text(
-                        text = stringResource(R.string.txt_No_Student_been_added),
-                        modifier = Modifier
-                            .wrapContentWidth()
-                            .padding(start = 8.dp, end = 8.dp),
-                        fontFamily = fontRegular,
-                        fontSize = 14.sp,
-                        color = if (isSystemInDarkTheme()) {
-                            DARK_TITLE_TEXT
-                        } else {
-                            Gray
-                        },
-                        textAlign = TextAlign.Center
-                    )
+                     Text(
+                         text = stringResource(R.string.txt_No_Student_been_added),
+                         modifier = Modifier
+                             .wrapContentWidth()
+                             .padding(start = 8.dp, end = 8.dp),
+                         fontFamily = fontRegular,
+                         fontSize = 14.sp,
+                         color = if (isSystemInDarkTheme()) {
+                             DARK_TITLE_TEXT
+                         } else {
+                             Gray
+                         },
+                         textAlign = TextAlign.Center
+                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Column(
-                        modifier = Modifier
-                            .padding(bottom = 8.dp, start = 8.dp, end = 8.dp)
-                            .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        YesBtnUi(
-                            onClick = {
-                                showTermDialog = true
-                            },
-                            title = stringResource(R.string.txt_Add_Student),
-                            modifier = Modifier.width(165.dp),
-                            enabled = true
-                        )
-                    }
-                }
-            }
-        }*/
+                     Column(
+                         modifier = Modifier
+                             .padding(bottom = 8.dp, start = 8.dp, end = 8.dp)
+                             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
+                     ) {
+                         YesBtnUi(
+                             onClick = {
+                                 showTermDialog = true
+                             },
+                             title = stringResource(R.string.txt_Add_Student),
+                             modifier = Modifier.width(165.dp),
+                             enabled = true
+                         )
+                     }
+                 }
+             }
+         }*/
 
         // This is used for tab and student list for all, screening, profiler and advanced screening
         Column(
@@ -320,19 +323,27 @@ fun ScreeningHomeScreen(addStudent: () -> Unit, onBack: () -> Unit, screeningOne
                 ) { index ->
                     when (index) {
                         0 -> {
-                            AllScreening()
+                            AllScreening(stringResource(R.string.AllScreening))
                         }
 
                         1 -> {
-                            ScreeningFirst(screeningOne = screeningOne)
+                            ScreeningFirst(
+                                stringResource(R.string.ScreeningOne),
+                                screeningOne = screeningOne,
+                                profilerForm = profilerForm
+                            )
                         }
 
                         2 -> {
-                            ProfilerScreening()
+                            ProfilerScreening(
+                                stringResource(R.string.txt_Profiler),
+                                screeningOne = screeningOne,
+                                profilerForm = profilerForm
+                            )
                         }
 
                         else -> {
-                            AdvanceScreening()
+                            AdvanceScreening(stringResource(R.string.txt_Advance_Screening))
                         }
                     }
                 }
@@ -364,12 +375,12 @@ fun ScreeningHomeScreen(addStudent: () -> Unit, onBack: () -> Unit, screeningOne
 }
 
 @Composable
-fun AllScreening() {
+fun AllScreening(allScreeningStr: String) {
     println("Not yet implemented :- AllScreening")
 }
 
 @Composable
-fun ScreeningFirst(screeningOne: () -> Unit) {
+fun ScreeningFirst(screeningOneStr: String, screeningOne: () -> Unit, profilerForm: () -> Unit) {
     val screeningListData = listOf(
         ScreeningData(
             stringResource(R.string.txt_Abhisheki_Muthuswami),
@@ -415,7 +426,7 @@ fun ScreeningFirst(screeningOne: () -> Unit) {
     ) {
         LazyColumn {
             items(screeningListData) { screeningData ->
-                ScreeningFirstDataUI(screeningData, screeningOne)
+                ScreeningFirstDataUI(screeningOneStr, screeningData, screeningOne, profilerForm)
             }
         }
     }
@@ -423,9 +434,12 @@ fun ScreeningFirst(screeningOne: () -> Unit) {
 
 @Composable
 fun ScreeningFirstDataUI(
+    screeningStr: String,
     screeningData: ScreeningData,
     screeningOne: () -> Unit,
+    profilerForm: () -> Unit,
 ) {
+    val tabStr = stringResource(R.string.ScreeningOne)
     val selectedBorder = BorderStroke(
         width = 0.5.dp, if (isSystemInDarkTheme()) {
             Dark_02
@@ -437,7 +451,7 @@ fun ScreeningFirstDataUI(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 8.dp, bottom = 32.dp)
+            .padding(top = 8.dp, bottom = 8.dp)
             .background(
                 if (isSystemInDarkTheme()) {
                     Dark_01
@@ -679,7 +693,11 @@ fun ScreeningFirstDataUI(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = screeningData.interventionContinueStatus,
+                    text = if (screeningStr.contains(tabStr)) {
+                        screeningData.interventionContinueStatus
+                    } else {
+                        stringResource(R.string.txt_Continue_Profiler)
+                    },
                     modifier = Modifier
                         .wrapContentWidth()
                         .padding(start = 16.dp, end = 8.dp),
@@ -701,7 +719,11 @@ fun ScreeningFirstDataUI(
                         .padding(start = 8.dp, end = 16.dp)
                         .background(Color.Unspecified)
                         .clickable {
-                            screeningOne()
+                            if (screeningStr.contains(tabStr)) {
+                                screeningOne()
+                            } else {
+                                profilerForm()
+                            }
                         })
             }
         }
@@ -709,12 +731,60 @@ fun ScreeningFirstDataUI(
 }
 
 @Composable
-fun ProfilerScreening() {
-    println("Not yet implemented :- ProfilerScreening")
+fun ProfilerScreening(profilerStr: String, screeningOne: () -> Unit, profilerForm: () -> Unit) {
+    val screeningListData = listOf(
+        ScreeningData(
+            stringResource(R.string.txt_Abhisheki_Muthuswami),
+            stringResource(R.string.txt_Class_6),
+            stringResource(R.string.txt_Start_screening),
+            stringResource(R.string.txt_Continue_with_screening_1),
+            stringResource(R.string.txt_Completed_screening),
+            stringResource(R.string.txt_Inprogress),
+            6,
+            painterResource(id = R.drawable.dummy_image)
+        ), ScreeningData(
+            stringResource(R.string.txt_Abhi_Kothari),
+            stringResource(R.string.txt_Class_4),
+            stringResource(R.string.txt_Start_screening),
+            stringResource(R.string.txt_Continue_with_screening_1),
+            stringResource(R.string.txt_Completed_screening),
+            stringResource(R.string.txt_Inprogress),
+            4,
+            painterResource(id = R.drawable.dummy_image)
+        ), ScreeningData(
+            stringResource(R.string.txt_Hare_Krishna),
+            stringResource(R.string.txt_Class_2),
+            stringResource(R.string.txt_Start_screening),
+            stringResource(R.string.txt_Continue_with_screening_1),
+            stringResource(R.string.txt_Completed_screening),
+            stringResource(R.string.txt_Inprogress),
+            2,
+            painterResource(id = R.drawable.dummy_image)
+        )
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(start = 8.dp, end = 8.dp, bottom = 8.dp, top = 8.dp)
+            .background(
+                if (isSystemInDarkTheme()) {
+                    Dark_01
+                } else {
+                    White
+                }
+            )
+    ) {
+        LazyColumn {
+            items(screeningListData) { screeningData ->
+                ScreeningFirstDataUI(profilerStr, screeningData, screeningOne, profilerForm)
+            }
+        }
+    }
 }
 
 @Composable
-fun AdvanceScreening() {
+fun AdvanceScreening(advanceScreeningStr: String) {
     println("Not yet implemented :- AdvanceScreening")
 }
 
@@ -1143,5 +1213,6 @@ fun ScreeningHomeScreenPreview() {
     val addStudent: () -> Unit = {}
     val onBack: () -> Unit = {}
     val screeningOne: () -> Unit = {}
-    ScreeningHomeScreen(addStudent, onBack, screeningOne)
+    val profilerForm: () -> Unit = {}
+    ScreeningHomeScreen(addStudent, onBack, screeningOne, profilerForm)
 }

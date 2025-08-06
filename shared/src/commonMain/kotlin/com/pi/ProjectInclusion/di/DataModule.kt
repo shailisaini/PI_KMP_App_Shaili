@@ -10,5 +10,4 @@ import org.koin.dsl.module
 val dataModule = module {
     factory { ApiService(KtorClient.client) }
     factory<LanguageRepository> { LanguageRepoImpl(get()) }
-//    factory<LanguageRepository> { LanguageRepoImpl(get()) }
 }
