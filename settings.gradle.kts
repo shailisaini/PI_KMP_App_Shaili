@@ -4,7 +4,7 @@ pluginManagement {
         google()
         gradlePluginPortal()
         mavenCentral()
-        maven { url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev") } // ✅ For Kotlin dev plugins
+        maven { url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev") } // For Kotlin dev plugins
     }
 }
 
@@ -16,7 +16,7 @@ dependencyResolutionManagement {
     }
     versionCatalogs {
         create("myLibs") {
-            from(files("gradle/libs.versions.toml")) // ✅ Only ONE from() call!
+            from(files("gradle/libs.versions.toml")) //  Only ONE from() call!
         }
     }
 }

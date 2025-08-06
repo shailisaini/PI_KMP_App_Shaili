@@ -112,18 +112,18 @@ fun UserTypeScreen(
 
             uiState.error.isNotEmpty() -> {
                 userType.clear()
-                isDialogVisible = false
                 LoggerProvider.logger.d("Error: ${uiState.error}")
                 context.toast(uiState.error)
+                isDialogVisible = false
             }
 
             uiState.success != null -> {
-                isDialogVisible = false
                 uiState.success!!.let {
                     userType.clear()
                     userType.addAll(it.response!!)
                 }
                 LoggerProvider.logger.d("Languages fetched: ${uiState.success!!}")
+                isDialogVisible = false
             }
         }
     }

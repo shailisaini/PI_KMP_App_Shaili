@@ -5,12 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
 import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.SendOTPResponse
 import com.pi.ProjectInclusion.database.LocalDataSource
 import com.pi.ProjectInclusion.domain.ConnectivityObserver
 import com.pi.ProjectInclusion.domain.useCases.GetLanguageUsesCases
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
@@ -38,9 +38,11 @@ class LoginViewModel(
     val _uiState = MutableStateFlow(UiState<GetLanguageListResponse>())
     val uiState: StateFlow<UiState<GetLanguageListResponse>> = _uiState
 
-    //    private val _uiStateUserType = MutableStateFlow(UiState<List<GetUserTypeResponse>>())
     private val _uiStateUserType = MutableStateFlow(UiState<GetUserTypeResponse>())
     val uiStateType: StateFlow<UiState<GetUserTypeResponse>> = _uiStateUserType
+
+    private val _uiStateSendOtp = MutableStateFlow(UiState<SendOTPResponse>())
+    val uiStateSendOtpResponse: StateFlow<UiState<SendOTPResponse>> = _uiStateSendOtp
 
     private val query = MutableStateFlow("")
 
@@ -155,7 +157,69 @@ class LoginViewModel(
             }
     }
 
+    fun getOTPViewModel(mobNo : String) = viewModelScope.launch {
+        if (!isNetworkAvailable()) {
+            shouldRefreshUserType = true
+            _uiStateSendOtp.update {
+                UiState(error = noInternetConnection)
+            }
+            return@launch
+        }
 
+        shouldRefreshUserType = false
+
+        _uiStateSendOtp.update { UiState(isLoading = true) }
+        getLanguageUsesCases.getOtpOnCall(mobNo)
+            .catch { exception ->
+                _uiStateSendOtp.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        _uiStateSendOtp.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        _uiStateSendOtp.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun getOTPWhatsappViewModel(mobNo : String) = viewModelScope.launch {
+        if (!isNetworkAvailable()) {
+            shouldRefreshUserType = true
+            _uiStateSendOtp.update {
+                UiState(error = noInternetConnection)
+            }
+            return@launch
+        }
+
+        shouldRefreshUserType = false
+
+        _uiStateSendOtp.update { UiState(isLoading = true) }
+        getLanguageUsesCases.getOTPOnWhatsapp(mobNo)
+            .catch { exception ->
+                _uiStateSendOtp.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        _uiStateSendOtp.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        _uiStateSendOtp.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
 }
 
 data class UiState<T>(

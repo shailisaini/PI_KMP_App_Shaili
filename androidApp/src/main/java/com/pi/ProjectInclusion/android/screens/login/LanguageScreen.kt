@@ -111,13 +111,12 @@ fun LanguageScreen(viewModel: LoginViewModel, onNext: () -> Unit) {
 
             uiState.error.isNotEmpty() -> {
                 languageData.clear()
-                isDialogVisible = false
                 LoggerProvider.logger.d("Error: ${uiState.error}")
                 context.toast(uiState.error)
+                isDialogVisible = false
             }
 
             uiState.success != null -> {
-                isDialogVisible = false
                 val list = uiState.success?.response ?: emptyList()
                 LoggerProvider.logger.d("Languages fetched: ${list.size}")
 
@@ -127,6 +126,7 @@ fun LanguageScreen(viewModel: LoginViewModel, onNext: () -> Unit) {
                 } else {
                     LoggerProvider.logger.d("Languages fetched: 0 (null or empty response)")
                 }
+                isDialogVisible = false
             }
         }
     }

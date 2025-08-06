@@ -2,10 +2,12 @@ package com.pi.ProjectInclusion.data.remote
 
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
 import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.SendOTPResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
+import io.ktor.client.request.post
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
@@ -50,4 +52,26 @@ class ApiService(private val client: HttpClient) {
         println("Raw Response:\n$raw")
         return Json.decodeFromString<GetUserTypeResponse>(raw)*/
     }.body<GetUserTypeResponse>()
+
+    suspend fun getOTPOnCall(mobNo : String): SendOTPResponse = client.post {
+        url {
+            takeFrom(STUDENT_BASE_URL)
+            appendPathSegments("users", "otp-on-call") // → /language/get-all
+            parameters.append("mobileNe", mobNo)
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+    }.body<SendOTPResponse>()
+
+    suspend fun getOTPOnWhatsapp(mobNo : String): SendOTPResponse = client.post {
+        url {
+            takeFrom(STUDENT_BASE_URL)
+            appendPathSegments("users", "send-otp-whatsapp") // → /language/get-all
+            parameters.append("mobileNo", mobNo)
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+    }.body<SendOTPResponse>()
 }
