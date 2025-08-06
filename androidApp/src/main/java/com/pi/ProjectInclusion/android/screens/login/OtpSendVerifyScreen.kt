@@ -39,7 +39,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.example.kmptemplate.logger.LoggerProvider
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
@@ -55,6 +57,8 @@ import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.OtpInputField
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
 import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.delay
 
@@ -62,9 +66,11 @@ import kotlinx.coroutines.delay
 fun OtpSendVerifyScreen(
     onNext: () -> Unit,
     onBack: () -> Unit,
-    viewModel: LoginViewModel
+    viewModel: LoginViewModel,
+    mobNo: String = ""
 ) {
 
+    val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
     logger.d("Screen: " + "OtpSendVerifyScreen()")
 
     var otpValue by remember { mutableStateOf("") }
@@ -74,6 +80,36 @@ fun OtpSendVerifyScreen(
     val invalidOtpText = stringResource(R.string.txt_Enter_valid_OTP)
     var isDialogVisible by remember { mutableStateOf(false) }
     var isFinished by remember { mutableStateOf(false) }
+
+    CustomDialog(
+        isVisible = isDialogVisible,
+        onDismiss = { isDialogVisible = false },
+        message = stringResource(R.string.txt_loading)
+    )
+
+    LaunchedEffect(Unit) {
+        viewModel.getOTPViewModel(otpValue)
+    }
+
+    LaunchedEffect(sendOtpState) {
+        when {
+            sendOtpState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            sendOtpState.error.isNotEmpty() -> {
+                LoggerProvider.logger.d("Error: ${sendOtpState.error}")
+                isDialogVisible = false
+            }
+
+            sendOtpState.success != null -> {
+//                val list = sendOtpState.success?.response ?: emptyList()
+//                LoggerProvider.logger.d("Languages fetched: ${list.size}")
+
+                isDialogVisible = false
+            }
+        }
+    }
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
         onBack()

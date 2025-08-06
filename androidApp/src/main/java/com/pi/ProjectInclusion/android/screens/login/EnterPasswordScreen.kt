@@ -16,7 +16,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -63,16 +64,19 @@ import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.SUCCESS
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun EnterPasswordScreen(
     viewModel: LoginViewModel,
-    onNext: () -> Unit, //OtpSendVerifyUI
+    onNext: (String) -> Unit, //OtpSendVerifyUI
     onBack: () -> Unit,
-    isForgetPassword: () -> Unit
+    isForgetPassword: () -> Unit,
+    mobileNo: String = "8851291824" // keeping it static wil change after login API
 ) {
     var isDialogVisible by remember { mutableStateOf(false) }
     val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
@@ -87,7 +91,7 @@ fun EnterPasswordScreen(
     )
     BackHandler {
         // UserNameScreen
-       onBack()
+        onBack()
     }
     LoggerProvider.logger.d("Screen: " + "EnterPasswordScreen()")
     LaunchedEffect(Unit) {
@@ -124,7 +128,14 @@ fun EnterPasswordScreen(
                 .background(color = Bg_Gray1),
             verticalArrangement = Arrangement.Top
         ) {
-            PasswordUI(context, onNext = onNext, onBack = onBack, isForgetPassword= isForgetPassword)
+            PasswordUI(
+                context,
+                onNext = { onNext("") },
+                onBack = onBack,
+                isForgetPassword = isForgetPassword,
+                viewModel = viewModel,
+                mobileNo = mobileNo
+            )
         }
     }
 }
@@ -133,10 +144,12 @@ fun EnterPasswordScreen(
 fun PasswordUI(
     context: Context,
     onBack: () -> Unit,
+    mobileNo: String = "",
+    viewModel: LoginViewModel,
     isForgetPassword: () -> Unit,
-    onNext: () -> Unit,    // OtpSendVerifyUI
+    onNext: (String) -> Unit,    // OtpSendVerifyUI
 ) {
-    val scrollState = rememberLazyGridState()
+    val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
     val isInternetAvailable by remember { mutableStateOf(true) }
     var isApiResponded by remember { mutableStateOf(false) }
@@ -159,25 +172,69 @@ fun PasswordUI(
     var passwordText = rememberSaveable { mutableStateOf("") }
     val enterMobile = stringResource(R.string.txt_enter_mobile_no_)
     var isValidMobNo by remember { mutableStateOf(false) }
+    var sendOtpViaCall by remember { mutableStateOf(false) }
+    var sendOtpViaWhatsApp by remember { mutableStateOf(false) }
 
+
+    if (sendOtpViaCall) {
+        // api for otp on call
+        LaunchedEffect(Unit) {
+            viewModel.getOTPViewModel(mobileNo)
+            sendOtpViaCall = false
+        }
+    }
+    if (sendOtpViaWhatsApp) {
+        // api for otp on Whatsapp
+        LaunchedEffect(Unit) {
+            viewModel.getOTPWhatsappViewModel(mobileNo)
+            sendOtpViaWhatsApp = false
+        }
+    }
+
+    LaunchedEffect(sendOtpState) {
+        when {
+            sendOtpState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            sendOtpState.error.isNotEmpty() -> {
+                LoggerProvider.logger.d("Error: ${sendOtpState.error}")
+                isDialogVisible = false
+            }
+
+            sendOtpState.success != null -> {
+//                LoggerProvider.logger.d("Languages fetched: ${list.size}")
+                if (sendOtpState.success!!.response!!.message.equals(SUCCESS)) {
+                    onNext(mobileNo)
+                } else {
+                    context.toast(sendOtpState.success!!.response!!.message.toString())
+                }
+
+                isDialogVisible = false
+            }
+        }
+    }
+
+    // dialog to show otp on whatsapp or call
     if (showBottomSheet) {
         ChooseOneBottomSheet(onCallClick = {
-          onNext()
+            sendOtpViaCall = true
         }, onWhatsappClick = {
-           onNext
+            sendOtpViaWhatsApp = true
         }, onDismiss = {
             showBottomSheet = false
         })
     }
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
-      onBack()
+        onBack()
     }, content = {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
                     .padding(10.dp)
                     .fillMaxWidth(),
+//                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
@@ -235,7 +292,7 @@ fun PasswordUI(
                                 .padding(5.dp)
                                 .align(Alignment.End)
                                 .clickable {
-                                 isForgetPassword()
+                                    isForgetPassword()
                                 },
                             fontFamily = fontMedium,
                             fontSize = 14.sp,
@@ -256,7 +313,7 @@ fun PasswordUI(
                                         isValidMobNo = true
                                     } else { // if first digit of mobile is less than 6 then error will show
 //                                        isDialogVisible = true
-                                        onNext()
+                                        onNext("")
 
                                     }
                                 }
@@ -303,8 +360,9 @@ fun PasswordUI(
 fun LoginPassScreen() {
     val navController = rememberNavController()
     val context = LocalContext.current
-    val onNext: () -> Unit = {}
+    val onNext: (String) -> Unit = {}
     val onBack: () -> Unit = {}
     val isForgetPassword: () -> Unit = {}
-    PasswordUI(context, onNext, onBack, isForgetPassword)
+//    val viewModel: LoginViewModel = koinViewModel<LoginViewModel>()
+//    PasswordUI(context, onNext = { onNext("") }, onBack = onBack, isForgetPassword= isForgetPassword,viewModel = viewModel, mobileNo = "")
 }

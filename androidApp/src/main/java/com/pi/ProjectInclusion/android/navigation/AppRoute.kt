@@ -12,7 +12,13 @@ sealed class AppRoute(val route: String) {
     data object UserPasswordScreen : AppRoute("user_password_screen")
     data object CreatePasswordScreen : AppRoute("create_password_screen")
     data object ForgetPasswordUI : AppRoute("forget_password_UI")
-    data object OtpSendVerifyUI : AppRoute("otp_send_verify_UI")
+//    data object OtpSendVerifyUI : AppRoute("otp_send_verify_UI")
+
+    object OtpSendVerifyUI {
+        const val route = "otp_send_verify_UI/{mobNo}"
+        fun withArgs(mobNo: String) = "otp_send_verify_UI/$mobNo"
+    }
+
     data object SetNewPasswordUI : AppRoute("set_new_password_UI")
     data object EnterUserProfileScreen : AppRoute("user_profile_screen") // registration 1
     data object EnterUserProfessionalScreen : AppRoute("user_professional_screen") // registration 2

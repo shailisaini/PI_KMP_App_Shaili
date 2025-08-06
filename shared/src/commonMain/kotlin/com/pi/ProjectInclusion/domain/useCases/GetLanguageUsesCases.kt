@@ -3,6 +3,7 @@ package com.pi.ProjectInclusion.domain.useCases
 import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
 import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.SendOTPResponse
 import com.pi.ProjectInclusion.domain.repository.LanguageRepository
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -37,6 +38,29 @@ class GetLanguageUsesCases(private val repository: LanguageRepository) {
             emit(Result.failure(Exception(errorMessage)))
         }
     }.flowOn(Dispatchers.IO)
+
+    fun getOtpOnCall(mobNo : String): Flow<Result<SendOTPResponse>> = flow {
+        try {
+            val response = repository.getOTPOnCall(mobNo)
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            LoggerProvider.logger.d("Exception in otpOnCall() $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getOTPOnWhatsapp(mobNo : String): Flow<Result<SendOTPResponse>> = flow {
+        try {
+            val response = repository.getOTPOnWhatsapp(mobNo)
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            LoggerProvider.logger.d("Exception in otpOnWhatsapp() $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
+
 }
 
 //private fun getErrorMessage(errorBody: String?): String {
