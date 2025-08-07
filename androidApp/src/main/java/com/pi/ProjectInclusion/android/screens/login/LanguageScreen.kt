@@ -81,7 +81,7 @@ import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetLanguageListRes
 import kotlinx.coroutines.launch
 
 @Composable
-fun LanguageScreen(viewModel: LoginViewModel, onNext: () -> Unit) {
+    fun LanguageScreen(viewModel: LoginViewModel, onNext: () -> Unit) {
 
     var isDialogVisible by remember { mutableStateOf(false) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

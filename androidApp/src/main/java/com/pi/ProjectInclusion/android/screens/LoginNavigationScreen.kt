@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.kmptemplate.logger.LoggerProvider
@@ -39,6 +40,7 @@ import com.pi.ProjectInclusion.android.screens.login.UserTypeScreen
 import com.pi.ProjectInclusion.android.screens.registration.CreateNewPasswordScreen
 import com.pi.ProjectInclusion.android.screens.registration.EnterUserScreen1
 import com.pi.ProjectInclusion.android.screens.registration.EnterUserScreen2
+import com.pi.ProjectInclusion.android.screens.registration.specialEdu.SpecialEducatorScreen2
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -107,8 +109,8 @@ class LoginNavigationScreen : ComponentActivity() {
                         AppRoute.LanguageSelect.route -> LanguageScreen(
                             viewModel = viewModel
                         ) {
-                            navigateTo(AppRoute.EnterUserProfileScreen.route)
 //                            navigateTo(AppRoute.UserTypeSelect.route)
+                            navigateTo(AppRoute.SpecialEducatorRegistration2.route)
                         }
 
                         AppRoute.UserTypeSelect.route -> UserTypeScreen(
@@ -160,6 +162,18 @@ class LoginNavigationScreen : ComponentActivity() {
                         )
 
                         AppRoute.EnterUserProfessionalScreen.route -> EnterUserScreen2(
+                            onNext = {
+                                context.startActivity(
+                                    Intent(context, StudentDashboardActivity::class.java)
+                                )
+                                (context as? Activity)?.finish()
+                            },
+                            onBack = { navigateBack(AppRoute.EnterUserProfileScreen.route) }
+                        )
+
+//                        Special Educator
+                        AppRoute.SpecialEducatorRegistration2.route -> SpecialEducatorScreen2(
+                            viewModel = viewModel,
                             onNext = {
                                 context.startActivity(
                                     Intent(context, StudentDashboardActivity::class.java)

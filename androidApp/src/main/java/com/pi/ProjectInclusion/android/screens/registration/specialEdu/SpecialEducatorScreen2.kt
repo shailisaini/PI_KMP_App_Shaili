@@ -1,4 +1,4 @@
-package com.pi.ProjectInclusion.android.screens.registration
+package com.pi.ProjectInclusion.android.screens.registration.specialEdu
 
 import android.content.Context
 import androidx.compose.foundation.background
@@ -23,7 +23,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Bg_Gray
@@ -62,18 +65,23 @@ import com.pi.ProjectInclusion.android.common_UI.MobileTextField
 import com.pi.ProjectInclusion.android.common_UI.RegistrationHeader
 import com.pi.ProjectInclusion.android.common_UI.SchoolListBottomSheet
 import com.pi.ProjectInclusion.android.common_UI.SmallBtnUi
+import com.pi.ProjectInclusion.android.common_UI.TextViewField
 import com.pi.ProjectInclusion.android.utils.fontMedium
+import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetLanguageListResponse
 import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetUserTypeResponse
+import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun EnterUserScreen2(
+fun SpecialEducatorScreen2(
     onNext: () -> Unit, // Dashboard
     onBack: () -> Unit,
+    viewModel: LoginViewModel,
 ) {
     var isDialogVisible by remember { mutableStateOf(false) }
 //    val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
@@ -91,37 +99,6 @@ fun EnterUserScreen2(
     }
     LoggerProvider.logger.d("Screen: " + "EnterUserScreen2()")
 
-    // it will user during API implementation
-
-    /* LaunchedEffect(Unit) {
-         viewModel.getUserType()
-     }
-
-     LaunchedEffect(uiState) {
-         when {
-             uiState.isLoading -> {
-                 userType.clear()
-                 isDialogVisible = true
-             }
-
-             uiState.error.isNotEmpty() -> {
-                 userType.clear()
-                 isDialogVisible = false
-                 LoggerProvider.logger.d("Error: ${uiState.error}")
-                 context.toast(uiState.error)
-             }
-
-             uiState.success != null -> {
-                 isDialogVisible = false
-                 uiState.success!!.data.let {
-                     userType.clear()
-                     userType.addAll(it)
-                 }
-                 LoggerProvider.logger.d("Languages fetched: ${uiState.success!!.data}")
-             }
-         }
-     }*/
-
     Surface(
         modifier = Modifier.fillMaxWidth(), color = White
     ) {
@@ -131,55 +108,84 @@ fun EnterUserScreen2(
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            ProfileScreen2UI(context, onBack = onBack, onNext = onNext)
+            SpeEducatorScreen2UI(context, onBack = onBack, onNext = onNext, viewModel =viewModel)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen2UI(
+fun SpeEducatorScreen2UI(
     context: Context,
     onNext: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    viewModel: LoginViewModel,
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
-    val coroutineScope = rememberCoroutineScope()
-    val isInternetAvailable by remember { mutableStateOf(true) }
     var isApiResponded by remember { mutableStateOf(false) }
     val internetMessage by remember { mutableStateOf("") }
 
     var isDialogVisible by remember { mutableStateOf(false) }
-    var selectedIndex by remember { mutableStateOf<Int?>(null) }
 
-    val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
     val invalidMobNo = stringResource(id = R.string.text_enter_no)
-//  languageData[LanguageTranslationsResponse.KEY_INVALID_MOBILE_NO_ERROR].toString()
     val txtContinue = stringResource(id = R.string.text_continue)
     val tvUdise = stringResource(id = R.string.txt_udise_number)
+    val enterMobile = stringResource(R.string.txt_enter_udise)
+    val enterHere = stringResource(R.string.enter_here).toString()
+    var selectedSchool = stringResource(R.string.choose_option)
+    val schoolSelectedId = remember { mutableStateOf("0") }
+
     val schoolList = remember { mutableStateListOf<GetLanguageListResponse.LanguageResponse>() }
+
     var mobNo = rememberSaveable { mutableStateOf("") }
-    var firstName = rememberSaveable { mutableStateOf("") }
-    var lastName = rememberSaveable { mutableStateOf("") }
-    var whatsappNo = rememberSaveable { mutableStateOf("") }
-    var email = rememberSaveable { mutableStateOf("") }
-    var textUpload = stringResource(R.string.txt_profile_pic_upload)
-    val enterUdiseCode = stringResource(R.string.txt_udise_number)
-    val textNameEg = stringResource(R.string.txt_eg_first_name)
-    val textWhatsappEg = stringResource(R.string.txt_eg_whatsapp_name)
-    val textLastNameEg = stringResource(R.string.txt_eg_last_name)
-    val textEmailEg = stringResource(R.string.txt_eg_email_name)
+    val crrText = rememberSaveable { mutableStateOf("") }
+
+    val enterHereText =remember { mutableStateOf(enterHere) }
     var showError by remember { mutableStateOf(false) }
     var inValidMobNo by remember { mutableStateOf(false) }
-    var date by remember { mutableStateOf("") }
+
     val scope = rememberCoroutineScope()
     var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true,
         confirmValueChange = { it != SheetValue.Hidden })
 
-    var selectedSchool = stringResource(R.string.choose_option)
+    LaunchedEffect(Unit) {
+        viewModel.getLanguages()
+    }
+
+    LaunchedEffect(uiState) {
+        when {
+            uiState.isLoading -> {
+                schoolList.clear()
+                isDialogVisible = true
+            }
+
+            uiState.error.isNotEmpty() -> {
+//                languageData.clear()
+                LoggerProvider.logger.d("Error: ${uiState.error}")
+                context.toast(uiState.error)
+                isDialogVisible = false
+            }
+
+            uiState.success != null -> {
+                val list = uiState.success?.response ?: emptyList()
+                LoggerProvider.logger.d("Languages fetched: ${list.size}")
+
+                if (list.isNotEmpty()) {
+                    schoolList.clear()
+                    schoolList.addAll(list)
+                } else {
+                    LoggerProvider.logger.d("Languages fetched: 0 (null or empty response)")
+                }
+                isDialogVisible = false
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -215,7 +221,7 @@ fun ProfileScreen2UI(
                     tvUdise,
                     modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),
                     fontFamily = fontMedium,
-                    fontSize = 14.sp,
+                    fontSize = 15.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_DEFAULT_BUTTON_TEXT
                     } else {
@@ -229,7 +235,7 @@ fun ProfileScreen2UI(
                     colors = colors,
                     number = mobNo,
                     trueFalse = true,
-                    hint = enterUdiseCode.toString()
+                    hint = enterMobile.toString()
                 )
 
                 // State
@@ -247,7 +253,7 @@ fun ProfileScreen2UI(
                     ),
                     textAlign = TextAlign.Start,
                     fontFamily = fontMedium,
-                    fontSize = 14.sp,
+                    fontSize = 15.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_BODY_TEXT
                     } else {
@@ -255,17 +261,23 @@ fun ProfileScreen2UI(
                     }
                 )
 
-                DropdownMenuUi(listOf(), onItemSelected = {
+                DropdownMenuUi(
+                    schoolList.map { it.name }.toMutableList() as List<String>,
+                    onItemSelected = { selected ->
+                        schoolList.find { it.name == selected }?.id?.let {
+                            schoolSelectedId.value = it
+                        }
+                    },
+                    modifier = Modifier.clickable {
 
-                }, modifier = Modifier.clickable {
-
-                }, placeholder = selectedSchool, onClick = {
-//                            schoolListOpen = true
-                    scope.launch {
-                        isBottomSheetVisible = true // true under development code
-                        sheetState.expand()
-                    }
-                })
+                    },
+                    placeholder = selectedSchool,
+                    onClick = {
+                        scope.launch {
+                            isBottomSheetVisible = true // true under development code
+                            sheetState.expand()
+                        }
+                    })
                 SchoolListBottomSheet(
                     isBottomSheetVisible = isBottomSheetVisible,
                     sheetState = sheetState,
@@ -277,11 +289,10 @@ fun ProfileScreen2UI(
 
                     },
                     onTextSelected = { it ->
-                        /* selectedSchool = it
+                        selectedSchool = it
                  schoolList.find { it.name == selectedSchool }?.id?.let {
                      schoolSelectedId.value = it
-                 }*/
-                        "School"
+                 }
                     },
                     schoolList.map { it.name }.toList() as List<String>
                 )
@@ -301,7 +312,7 @@ fun ProfileScreen2UI(
                     ),
                     textAlign = TextAlign.Start,
                     fontFamily = fontMedium,
-                    fontSize = 14.sp,
+                    fontSize = 15.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_BODY_TEXT
                     } else {
@@ -318,25 +329,25 @@ fun ProfileScreen2UI(
                         sheetState.expand()
                     }
                 })
-                SchoolListBottomSheet(
-                    isBottomSheetVisible = isBottomSheetVisible,
-                    sheetState = sheetState,
-                    onDismiss = {
-                        scope.launch { sheetState.hide() }
-                            .invokeOnCompletion { isBottomSheetVisible = false }
-                    },
-                    onDecline = {
-
-                    },
-                    onTextSelected = { it ->
-                        /* selectedSchool = it
-                 schoolList.find { it.name == selectedSchool }?.id?.let {
-                     schoolSelectedId.value = it
-                 }*/
-                        "School"
-                    },
-                    schoolList.map { it.name }.toList() as List<String>
-                )
+//                SchoolListBottomSheet(
+//                    isBottomSheetVisible = isBottomSheetVisible,
+//                    sheetState = sheetState,
+//                    onDismiss = {
+//                        scope.launch { sheetState.hide() }
+//                            .invokeOnCompletion { isBottomSheetVisible = false }
+//                    },
+//                    onDecline = {
+//
+//                    },
+//                    onTextSelected = { it ->
+//                        /* selectedSchool = it
+//                 schoolList.find { it.name == selectedSchool }?.id?.let {
+//                     schoolSelectedId.value = it
+//                 }*/
+//                        "School"
+//                    },
+//                    schoolList.map { it.name }.toList() as List<String>
+//                )
 
                 // Block
                 Text(
@@ -353,7 +364,7 @@ fun ProfileScreen2UI(
                     ),
                     textAlign = TextAlign.Start,
                     fontFamily = fontMedium,
-                    fontSize = 14.sp,
+                    fontSize = 15.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_BODY_TEXT
                     } else {
@@ -370,25 +381,25 @@ fun ProfileScreen2UI(
                         sheetState.expand()
                     }
                 })
-                SchoolListBottomSheet(
-                    isBottomSheetVisible = isBottomSheetVisible,
-                    sheetState = sheetState,
-                    onDismiss = {
-                        scope.launch { sheetState.hide() }
-                            .invokeOnCompletion { isBottomSheetVisible = false }
-                    },
-                    onDecline = {
-
-                    },
-                    onTextSelected = { it ->
-                        /* selectedSchool = it
-                 schoolList.find { it.name == selectedSchool }?.id?.let {
-                     schoolSelectedId.value = it
-                 }*/
-                        "School"
-                    },
-                    schoolList.map { it.name }.toList() as List<String>
-                )
+//                SchoolListBottomSheet(
+//                    isBottomSheetVisible = isBottomSheetVisible,
+//                    sheetState = sheetState,
+//                    onDismiss = {
+//                        scope.launch { sheetState.hide() }
+//                            .invokeOnCompletion { isBottomSheetVisible = false }
+//                    },
+//                    onDecline = {
+//
+//                    },
+//                    onTextSelected = { it ->
+//                        selectedSchool = it
+//                 schoolList.find { it.name == selectedSchool }?.id?.let {
+//                     schoolSelectedId.value = it
+//                 }
+//                        "School"
+//                    },
+//                    schoolList.map { it.name }.toList() as List<String>
+//                )
 
                 // School
                 Text(
@@ -405,7 +416,7 @@ fun ProfileScreen2UI(
                     ),
                     textAlign = TextAlign.Start,
                     fontFamily = fontMedium,
-                    fontSize = 14.sp,
+                    fontSize = 15.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_BODY_TEXT
                     } else {
@@ -433,11 +444,10 @@ fun ProfileScreen2UI(
 
                     },
                     onTextSelected = { it ->
-                        /* selectedSchool = it
+                        selectedSchool = it
                  schoolList.find { it.name == selectedSchool }?.id?.let {
                      schoolSelectedId.value = it
-                 }*/
-                        "School"
+                 }
                     },
                     schoolList.map { it.name }.toList() as List<String>
                 )
@@ -451,8 +461,155 @@ fun ProfileScreen2UI(
                     )
                 }
 
+                Text(
+                    text = stringResource(R.string.txt_reason_empty_school),
+                    modifier = Modifier.padding(
+                        top = 24.dp,
+                        bottom = 10.dp,
+                        start = 8.dp, end = 8.dp
+                    ),
+                    textAlign = TextAlign.Start,
+                    fontFamily = fontMedium,
+                    fontSize = 15.sp,
+                    color = if (isSystemInDarkTheme()) {
+                        DARK_BODY_TEXT
+                    } else {
+                        Bg_Gray
+                    }
+                )
+
+                DropdownMenuUi(listOf(), onItemSelected = {
+
+                }, modifier = Modifier.clickable {
+
+                }, placeholder = selectedSchool, onClick = {
+//                            schoolListOpen = true
+                    scope.launch {
+                        isBottomSheetVisible = true // true under development code
+                        sheetState.expand()
+                    }
+                })
+
+
+                // Profession
+                Text(
+                    text = stringResource(R.string.txt_profession),
+                    modifier = Modifier.padding(
+                        top = 24.dp,
+                        bottom = 10.dp,
+                        start = 8.dp, end = 8.dp
+                    ),
+                    textAlign = TextAlign.Start,
+                    fontFamily = fontMedium,
+                    fontSize = 15.sp,
+                    color = if (isSystemInDarkTheme()) {
+                        DARK_BODY_TEXT
+                    } else {
+                        Bg_Gray
+                    }
+                )
+
+                DropdownMenuUi(listOf(), onItemSelected = {
+
+                }, modifier = Modifier.clickable {
+
+                }, placeholder = selectedSchool, onClick = {
+//                            schoolListOpen = true
+                    scope.launch {
+                        isBottomSheetVisible = true // true under development code
+                        sheetState.expand()
+                    }
+                })
+
+                // Qualification
+                Text(
+                    text = stringResource(R.string.txt_qualification),
+                    modifier = Modifier.padding(
+                        top = 24.dp,
+                        bottom = 10.dp,
+                        start = 8.dp, end = 8.dp
+                    ),
+                    textAlign = TextAlign.Start,
+                    fontFamily = fontMedium,
+                    fontSize = 15.sp,
+                    color = if (isSystemInDarkTheme()) {
+                        DARK_BODY_TEXT
+                    } else {
+                        Bg_Gray
+                    }
+                )
+
+                DropdownMenuUi(listOf(), onItemSelected = {
+
+                }, modifier = Modifier.clickable {
+
+                }, placeholder = selectedSchool, onClick = {
+//                            schoolListOpen = true
+                    scope.launch {
+                        isBottomSheetVisible = true // true under development code
+                        sheetState.expand()
+                    }
+                })
+
+                // Specialization
+                Text(
+                    text = stringResource(R.string.txt_specialization),
+                    modifier = Modifier.padding(
+                        top = 24.dp,
+                        bottom = 10.dp,
+                        start = 8.dp, end = 8.dp
+                    ),
+                    textAlign = TextAlign.Start,
+                    fontFamily = fontMedium,
+                    fontSize = 15.sp,
+                    color = if (isSystemInDarkTheme()) {
+                        DARK_BODY_TEXT
+                    } else {
+                        Bg_Gray
+                    }
+                )
+
+                DropdownMenuUi(listOf(), onItemSelected = {
+
+                }, modifier = Modifier.clickable {
+
+                }, placeholder = selectedSchool, onClick = {
+//                            schoolListOpen = true
+                    scope.launch {
+                        isBottomSheetVisible = true // true under development code
+                        sheetState.expand()
+                    }
+                })
+
+                // State
+                Text(
+                    text = stringResource(R.string.txt_crrNo),
+                    modifier = Modifier.padding(
+                        top = 24.dp,
+                        bottom = 10.dp,
+                        start = 8.dp, end = 8.dp
+                    ),
+                    textAlign = TextAlign.Start,
+                    fontFamily = fontMedium,
+                    fontSize = 15.sp,
+                    color = if (isSystemInDarkTheme()) {
+                        DARK_BODY_TEXT
+                    } else {
+                        Bg_Gray
+                    }
+                )
+
+                TextViewField(
+                    isIcon = false,
+                    icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
+                    colors = colors,
+                    text = enterHereText,
+                    trueFalse = true,
+                    hint = enterHereText.toString()
+                )
                 Spacer(modifier = Modifier.height(15.dp))
             }
+
             Box(
                 modifier = Modifier
                     .padding(20.dp)
@@ -509,5 +666,6 @@ fun UserProfile2UI() {
     val context = LocalContext.current
     val onNext: () -> Unit = {}
     val onBack: () -> Unit = {}
-    ProfileScreen2UI(context, onNext, onBack)
+    val viewModel: LoginViewModel = koinViewModel()
+    SpeEducatorScreen2UI(context, onNext, onBack, viewModel = viewModel)
 }
