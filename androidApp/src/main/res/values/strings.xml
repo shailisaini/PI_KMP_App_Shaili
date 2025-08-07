@@ -18,6 +18,7 @@
     <string name="f_name">Father\'s Name</string>
     <string name="f_name_ex">eg: Singh</string>
     <string name="student_class">Class</string>
+    <string name="back_screening">Back to Screening</string>
     <string name="choose_option">Select an option</string>
     <string name="choose_an_option">Choose an option</string>
     <string name="string_next">Next</string>
@@ -327,6 +328,8 @@ and make a difference together!</string>
     <string name="txt_ICSE">ICSE</string>
     <string name="txt_UP_Board">UP Board</string>
     <string name="txt_congratulations">Congratulations!</string>
+    <string name="head_congratulations">Congratulations</string>
+    <string name="txt_body_congratulations">is showing age-appropriate development in all the domains.</string>
     <string name="txt_learning_difficulties">Learning Difficulties</string>
     <string name="txt_you_have_earned_it"> You\'ve Earned It.</string>
     <string name="txt_view">View</string>
