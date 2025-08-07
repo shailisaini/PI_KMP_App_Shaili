@@ -70,6 +70,7 @@ import com.pi.ProjectInclusion.LightPurple04
 fun ScreeningOneReportScreen(
     showReportScreen: Boolean,
     onNext: () -> Unit,
+    onNextCongratulate: () -> Unit,
     onBack: () -> Unit,
 ) {
 
@@ -104,14 +105,14 @@ fun ScreeningOneReportScreen(
             ReportScreenContent(onNext)
         } else {
             var name = stringResource(R.string.user_name)
-            CongratulationsScreen(name)
+            CongratulationsScreen(name, onNextCongratulate,onBack)
         }
 
     }
 }
 
 @Composable
-fun ReportScreenContent(onNext: () -> Unit = {}) {
+private fun ReportScreenContent(onNext: () -> Unit = {}) {
 
     Column(
         modifier = Modifier
@@ -156,7 +157,7 @@ fun ReportScreenContent(onNext: () -> Unit = {}) {
     }
 }
 @Composable
-fun CongratulationsScreen(name: String) {
+fun CongratulationsScreen(name: String,onNext: () -> Unit = {}, onBack: () -> Unit) {
     val compositionState = rememberLottieComposition(
         spec = LottieCompositionSpec.Asset("Confetti.json")
     )
@@ -234,7 +235,7 @@ fun CongratulationsScreen(name: String) {
         ){
             BtnWithRightIconUi(
                 onClick = {
-                    println("testing =>")
+                    onNext()
                 },
                 title = stringResource(R.string.back_screening),
                 enabled = true,
@@ -247,7 +248,7 @@ fun CongratulationsScreen(name: String) {
 
 
 @Composable
-fun ReportCard(title: String, text: String, titleColor: Color) {
+private fun ReportCard(title: String, text: String, titleColor: Color) {
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
@@ -280,7 +281,7 @@ fun ReportCard(title: String, text: String, titleColor: Color) {
 }
 
 @Composable
-fun DomainSection(title: String) {
+private fun DomainSection(title: String) {
     Text(
         text = title,
         fontSize = 16.sp,
@@ -291,7 +292,7 @@ fun DomainSection(title: String) {
 }
 
 @Composable
-fun BottomUI(onNext: () -> Unit = {}) {
+private fun BottomUI(onNext: () -> Unit = {}) {
     Surface(
         color = Color.White, tonalElevation = 4.dp, shadowElevation = 8.dp
     ) {
@@ -346,5 +347,6 @@ fun BottomUI(onNext: () -> Unit = {}) {
 fun ScreeningOneReportScreenPreview() {
     val onNext: () -> Unit = {}
     val onBack: () -> Unit = {}
-    ScreeningOneReportScreen(false,onNext, onBack)
+    val onNextCongratulate: () -> Unit = {}
+    ScreeningOneReportScreen(false,onNext, onBack,onNextCongratulate)
 }
