@@ -42,6 +42,7 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    sourceSets["main"].assets.srcDirs("src/main/assets")
 }
 dependencies {
     implementation(projects.shared)

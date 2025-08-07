@@ -257,6 +257,7 @@ class StudentDashboardActivity : ComponentActivity() {
                                     AppRoute.ScreeningScreen.route -> ScreeningHomeScreen(
                                         addStudent = { navigateTo(AppRoute.AddStudentRegister.route) },
                                         screeningOne = { navigateTo(AppRoute.ScreeningOne.route) },
+                                        profilerForm = { navigateTo(AppRoute.ProfilerFormPage.route) },
                                         onBack = { navigateBack(AppRoute.ProfileScreen.route) }
                                     )
 
@@ -265,16 +266,11 @@ class StudentDashboardActivity : ComponentActivity() {
                                         onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
                                     )
 
-                                    AppRoute.ScreeningOneReport.route -> ScreeningOneReportScreen(
-                                        showReportScreen = true,
-                                        onNext = { navigateTo(AppRoute.ProfilerFormPage.route) }, // this is change according to condition
-                                        onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
-                                    )
-
-                                    AppRoute.ProfilerFormPage.route -> ProfilerFormPageScreen(
-                                        onNext = { }, // this is change according to condition
-                                        onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
-                                    )
+                                AppRoute.ScreeningOneReport.route -> ScreeningOneReportScreen(
+                                    showReportScreen = false,
+                                    onNext = { navigateTo(AppRoute.AddStudentRegister.route) }, // this is change according to condition
+                                    onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
+                                )
 
                                     AppRoute.AddStudentRegister.route -> AddNewStudentDetailsScreen(
                                         onNext = { navigateTo(AppRoute.AddNewStudentMoreDetails.route) },
