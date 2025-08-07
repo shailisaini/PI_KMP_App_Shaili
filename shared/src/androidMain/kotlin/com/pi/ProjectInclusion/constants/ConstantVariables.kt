@@ -38,4 +38,7 @@ object ConstantVariables {
 
     // API Response Messages
     var SUCCESS: String = "Success"
+    var NEW_USER: String = "New User"
+    var USER_EXIST: String = "User Already Exist"
+    var DEACTIVATE: String = "Deactivate"
 }

@@ -2,18 +2,15 @@ package com.pi.ProjectInclusion.ui.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
-import com.pi.ProjectInclusion.domain.useCases.GetLanguageUsesCases
+import com.pi.ProjectInclusion.domain.useCases.AuthenticationUsesCases
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class DashboardViewModel(
-    private val getLanguageUsesCases: GetLanguageUsesCases
+    private val getLanguageUsesCases: AuthenticationUsesCases
 ):ViewModel() {
 //    private val _uiState = MutableStateFlow(UiState())
 //    val uiState = _uiState.asStateFlow()

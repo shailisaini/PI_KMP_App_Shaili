@@ -414,7 +414,7 @@ fun LogoutDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
 @Composable
 fun AccountRecoverDialog(onDismiss: () -> Unit = {}, onRestore: () -> Unit = {}) {
     Dialog(onDismissRequest = { onDismiss() },
-        properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        properties = DialogProperties(usePlatformDefaultWidth = false, dismissOnClickOutside = false)) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier

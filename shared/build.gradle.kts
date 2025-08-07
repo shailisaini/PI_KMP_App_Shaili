@@ -64,7 +64,7 @@ kotlin {
             implementation(libs.ktor.logging)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.content.negotiation)
-
+            implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.kotlinx.coroutines.core)
             api(libs.touchlab.kermit)
             implementation(libs.koin.core)

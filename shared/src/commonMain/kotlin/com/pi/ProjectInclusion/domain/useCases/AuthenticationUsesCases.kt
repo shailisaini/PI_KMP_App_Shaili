@@ -1,19 +1,18 @@
 package com.pi.ProjectInclusion.domain.useCases
 
 import com.example.kmptemplate.logger.LoggerProvider
-import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
-import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
-import com.pi.ProjectInclusion.data.model.SendOTPResponse
-import com.pi.ProjectInclusion.domain.repository.LanguageRepository
-import io.ktor.client.plugins.HttpRequestTimeoutException
-import kotlinx.coroutines.CoroutineDispatcher
+import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetLanguageListResponse
+import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.AuthenticationModel.SendOTPResponse
+import com.pi.ProjectInclusion.data.model.AuthenticationModel.ValidateUserResponse
+import com.pi.ProjectInclusion.domain.repository.AuthenticationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
-class GetLanguageUsesCases(private val repository: LanguageRepository) {
+class AuthenticationUsesCases(private val repository: AuthenticationRepository) {
 
     var unableToConnectServer: String = "Unable to connect to server"
 
@@ -35,6 +34,17 @@ class GetLanguageUsesCases(private val repository: LanguageRepository) {
         } catch (e: Exception) {
             val errorMessage = e.message ?: unableToConnectServer
             LoggerProvider.logger.d("Exception in getUserType() $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getValidateUserCase(userName : String, userTypeId : String): Flow<Result<ValidateUserResponse>> = flow {
+        try {
+            val response = repository.getValidate(userName, userTypeId)
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            LoggerProvider.logger.d("Exception in validateUser() $errorMessage")
             emit(Result.failure(Exception(errorMessage)))
         }
     }.flowOn(Dispatchers.IO)

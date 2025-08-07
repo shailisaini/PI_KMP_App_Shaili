@@ -87,7 +87,7 @@ class StudentDashboardActivity : ComponentActivity() {
             var isForward by remember { mutableStateOf(true) }
             var isNotification by remember { mutableStateOf(true) }
             val context = LocalContext.current
-            val viewModel = koinViewModel<LoginViewModel>()
+            val viewModel: LoginViewModel = koinViewModel()
 
             fun navigateTo(route: String) {
                 isForward = true
@@ -231,6 +231,8 @@ class StudentDashboardActivity : ComponentActivity() {
                                     AppRoute.UserNameScreen.route -> EnterUserNameScreen(
                                         viewModel = viewModel,
                                         onNext = { navigateTo(AppRoute.UserPasswordScreen.route) },
+                                        onRegister = {
+                                            navigateTo(AppRoute.OtpSendVerifyUI.route) },
                                         onBack = { navigateBack(AppRoute.UserTypeSelect.route) }
                                     )
 

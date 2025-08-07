@@ -3,12 +3,13 @@ package com.pi.ProjectInclusion.ui.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kmptemplate.logger.LoggerProvider
-import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
-import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
-import com.pi.ProjectInclusion.data.model.SendOTPResponse
+import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetLanguageListResponse
+import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.AuthenticationModel.SendOTPResponse
+import com.pi.ProjectInclusion.data.model.AuthenticationModel.ValidateUserResponse
 import com.pi.ProjectInclusion.database.LocalDataSource
 import com.pi.ProjectInclusion.domain.ConnectivityObserver
-import com.pi.ProjectInclusion.domain.useCases.GetLanguageUsesCases
+import com.pi.ProjectInclusion.domain.useCases.AuthenticationUsesCases
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -20,7 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
-    private val getLanguageUsesCases: GetLanguageUsesCases,
+    private val getLanguageUsesCases: AuthenticationUsesCases,
     private val localData: LocalDataSource,
     private val connectivityObserver: ConnectivityObserver //  to check network
 ) : ViewModel() {
@@ -41,10 +42,22 @@ class LoginViewModel(
     private val _uiStateUserType = MutableStateFlow(UiState<GetUserTypeResponse>())
     val uiStateType: StateFlow<UiState<GetUserTypeResponse>> = _uiStateUserType
 
+    private val _uiStateValidateUser = MutableStateFlow(UiState<ValidateUserResponse>())
+    val validateUserResponse: StateFlow<UiState<ValidateUserResponse>> = _uiStateValidateUser
+
     private val _uiStateSendOtp = MutableStateFlow(UiState<SendOTPResponse>())
     val uiStateSendOtpResponse: StateFlow<UiState<SendOTPResponse>> = _uiStateSendOtp
 
     private val query = MutableStateFlow("")
+
+
+    // getting mobile no from intent
+    private val _mobileNumber = MutableStateFlow<String?>(null)
+    val mobileNumber: String? get() = _mobileNumber.value
+
+    fun saveMobileNumber(number: String) {
+        _mobileNumber.value = number
+    }
 
     fun savePrefData(key: String, value: String) {
         localData.saveValue(key, value)
@@ -157,17 +170,32 @@ class LoginViewModel(
             }
     }
 
-    fun getOTPViewModel(mobNo : String) = viewModelScope.launch {
-        if (!isNetworkAvailable()) {
-            shouldRefreshUserType = true
-            _uiStateSendOtp.update {
-                UiState(error = noInternetConnection)
+    fun getValidateUser(userName : String, userTypeId : String) = viewModelScope.launch {
+        // no need to sync data
+
+        _uiStateValidateUser.update { UiState(isLoading = true) }
+        getLanguageUsesCases.getValidateUserCase(userName, userTypeId)
+            .catch { exception ->
+                _uiStateValidateUser.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
             }
-            return@launch
-        }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        _uiStateValidateUser.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        _uiStateValidateUser.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
 
-        shouldRefreshUserType = false
-
+    fun getOTPViewModel(mobNo : String) = viewModelScope.launch {
+//        no need to data sync
         _uiStateSendOtp.update { UiState(isLoading = true) }
         getLanguageUsesCases.getOtpOnCall(mobNo)
             .catch { exception ->
@@ -190,15 +218,7 @@ class LoginViewModel(
     }
 
     fun getOTPWhatsappViewModel(mobNo : String) = viewModelScope.launch {
-        if (!isNetworkAvailable()) {
-            shouldRefreshUserType = true
-            _uiStateSendOtp.update {
-                UiState(error = noInternetConnection)
-            }
-            return@launch
-        }
-
-        shouldRefreshUserType = false
+        // no need to sync data
 
         _uiStateSendOtp.update { UiState(isLoading = true) }
         getLanguageUsesCases.getOTPOnWhatsapp(mobNo)
