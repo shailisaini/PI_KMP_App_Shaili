@@ -1,10 +1,10 @@
-package com.pi.ProjectInclusion.data.model
+package com.pi.ProjectInclusion.data.model.AuthenticationModel
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SendOTPResponse(
+data class ValidateUserResponse(
     @SerialName("message")
     val message: String? = null,
 
@@ -15,18 +15,14 @@ data class SendOTPResponse(
     val status: Boolean? = null,
 
     @SerialName("response")
-    val response: OTPResponse? = null,
+    val response: ValidateResponse? = null
+) {
 
-    ) {
     @Serializable
-    data class OTPResponse(
-        @SerialName("mobileNo")
-        val mobileNo: String? = null,
-
-        @SerialName("otp")
-        val otp: String? = null,
+    data class ValidateResponse(
 
         @SerialName("message")
-        val message: String? = null
+        val message: String? = null,
+
         )
 }

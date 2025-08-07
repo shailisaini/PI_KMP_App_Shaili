@@ -79,7 +79,7 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_FEMALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_MALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_OTHER
 import com.pi.ProjectInclusion.constants.CustomDialog
-import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetUserTypeResponse
 
 @Composable
 fun EnterUserScreen1(onNext: () -> Unit,  //EnterUserProfessionalScreen
@@ -98,7 +98,7 @@ fun EnterUserScreen1(onNext: () -> Unit,  //EnterUserProfessionalScreen
     BackHandler {
        onBack()
     }
-    LoggerProvider.logger.d("Screen: " + "EnterUserNameScreen()")
+    LoggerProvider.logger.d("Screen: " + "EnterUserScreen1()")
 
     // commenting it for now it will use after API
 

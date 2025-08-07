@@ -1,6 +1,6 @@
 package com.pi.ProjectInclusion.data.mapper
 
-import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
+import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetLanguageListResponse
 
 fun List<GetLanguageListResponse>.toDomain() : List<GetLanguageListResponse> = map {
     GetLanguageListResponse(message = it.message,
