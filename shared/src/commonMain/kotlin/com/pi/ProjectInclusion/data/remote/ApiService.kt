@@ -1,19 +1,17 @@
 package com.pi.ProjectInclusion.data.remote
 
-import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
-import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
-import com.pi.ProjectInclusion.data.model.SendOTPResponse
+import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetLanguageListResponse
+import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.AuthenticationModel.SendOTPResponse
+import com.pi.ProjectInclusion.data.model.AuthenticationModel.ValidateUserResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.appendPathSegments
 import io.ktor.http.takeFrom
-import kotlinx.serialization.json.Json
 
 class ApiService(private val client: HttpClient) {
 
@@ -21,6 +19,7 @@ class ApiService(private val client: HttpClient) {
         //    private val STUDENT_BASE_URL = "https://staging-api-pi.projectinclusion.in/api/"   // Production BASE URL
 //        const val STUDENT_BASE_URL = "https://student-api.auroscholar.org/api/"                         // Production
         const val STUDENT_BASE_URL = "https://staging-pi-api.projectinclusion.in/api/v2"
+        const val appendUser = "users"
     }
 
     suspend fun getLanguages(): GetLanguageListResponse = client.get {
@@ -53,10 +52,24 @@ class ApiService(private val client: HttpClient) {
         return Json.decodeFromString<GetUserTypeResponse>(raw)*/
     }.body<GetUserTypeResponse>()
 
+    // Login API's
+
+    suspend fun getValidateUser(userName : String,userTypeId : String): ValidateUserResponse = client.get {
+        url {
+            takeFrom(STUDENT_BASE_URL)
+            appendPathSegments(appendUser, "validate-user") // api end points
+            parameters.append("username", userName)
+            parameters.append("userTypeId", userTypeId)
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+    }.body<ValidateUserResponse>()
+
     suspend fun getOTPOnCall(mobNo : String): SendOTPResponse = client.post {
         url {
             takeFrom(STUDENT_BASE_URL)
-            appendPathSegments("users", "otp-on-call") // → /language/get-all
+            appendPathSegments(appendUser, "otp-on-call")
             parameters.append("mobileNo", mobNo)
         }
         headers {
@@ -67,7 +80,7 @@ class ApiService(private val client: HttpClient) {
     suspend fun getOTPOnWhatsapp(mobNo : String): SendOTPResponse = client.post {
         url {
             takeFrom(STUDENT_BASE_URL)
-            appendPathSegments("users", "send-otp-whatsapp") // → /language/get-all
+            appendPathSegments(appendUser, "send-otp-whatsapp") // → /language/get-all
             parameters.append("mobileNe", mobNo)
         }
         headers {

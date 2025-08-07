@@ -1,7 +1,6 @@
 package com.pi.ProjectInclusion.android.screens.Profile
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -24,7 +23,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -46,9 +44,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Bg_Gray
 import com.pi.ProjectInclusion.Bg_Gray1
@@ -61,23 +56,17 @@ import com.pi.ProjectInclusion.LightRed01
 import com.pi.ProjectInclusion.OrangeSubTitle
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
-import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.DropdownMenuUi
 import com.pi.ProjectInclusion.android.common_UI.MobileTextField
-import com.pi.ProjectInclusion.android.common_UI.RegistrationHeader
 import com.pi.ProjectInclusion.android.common_UI.SchoolListBottomSheet
 import com.pi.ProjectInclusion.android.common_UI.SmallBtnUi
-import com.pi.ProjectInclusion.android.common_UI.TextViewField
-import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontMedium
-import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.CustomDialog
-import com.pi.ProjectInclusion.data.model.GetLanguageListResponse
-import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
-import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
+import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetLanguageListResponse
+import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetUserTypeResponse
 import kotlinx.coroutines.launch
 
 @Composable

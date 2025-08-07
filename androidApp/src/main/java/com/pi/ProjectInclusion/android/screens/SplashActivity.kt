@@ -74,7 +74,7 @@ class SplashActivity : ComponentActivity() {
                 ) { route ->
                     when (route) {
                         SPLASH_KEY -> SplashScreen {
-                            // shaili
+                            // Shaili
 //                            navigateTo(AppRoute.LanguageSelect.route)
 
                             // for abhishek & aashish

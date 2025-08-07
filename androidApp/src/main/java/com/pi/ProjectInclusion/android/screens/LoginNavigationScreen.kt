@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.kmptemplate.logger.LoggerProvider
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.android.MyApplicationTheme
 import com.pi.ProjectInclusion.android.navigation.AppRoute
@@ -49,7 +50,8 @@ class LoginNavigationScreen : ComponentActivity() {
         setContent {
             val context = LocalContext.current
             val navController = rememberNavController()
-            val viewModel = koinViewModel<LoginViewModel>()
+//            val viewModel = koinViewModel<LoginViewModel>()
+            val viewModel : LoginViewModel = koinViewModel()
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination?.route
 //            val loadScreenName = intent.getStringExtra(screenName.screenName)
@@ -117,6 +119,12 @@ class LoginNavigationScreen : ComponentActivity() {
                         AppRoute.UserNameScreen.route -> EnterUserNameScreen(
                             viewModel = viewModel,
                             onNext = { navigateTo(AppRoute.UserPasswordScreen.route) },
+                            // for register & activate
+                            onRegister = {
+                                val mobNo = viewModel.mobileNumber
+                                val route = AppRoute.OtpSendVerifyUI.withArgs(mobNo.toString())
+                                logger.d("Screen: Moving to $route")
+                                navigateTo(AppRoute.OtpSendVerifyUI.withArgs(mobNo.toString())) },
 //                            onNext = { context.startActivity(
 //                                Intent(context, StudentDashboardActivity::class.java)
 //                            )
@@ -124,11 +132,18 @@ class LoginNavigationScreen : ComponentActivity() {
                             onBack = { navigateBack(AppRoute.UserTypeSelect.route) }
                         )
 
+                        AppRoute.OtpSendVerifyUI.route -> OtpSendVerifyScreen(
+                            onNext = { navigateTo(AppRoute.SetNewPasswordUI.route) },
+                            onBack = {
+                                navigateBack(AppRoute.ForgetPasswordUI.route) },
+                            viewModel = viewModel
+                        )
+
                         AppRoute.UserPasswordScreen.route -> EnterPasswordScreen(
                             viewModel = viewModel,
                             onNext = {
-                                val mobNo = viewModel.getPrefData("MOBILE")
-                                navigateTo(AppRoute.OtpSendVerifyUI.withArgs(mobNo)) },
+                                val mobNo = viewModel.mobileNumber
+                                navigateTo(AppRoute.OtpSendVerifyUI.withArgs(mobNo.toString())) },
                             isForgetPassword = { navigateTo(AppRoute.ForgetPasswordUI.route) },
                             onBack = { navigateBack(AppRoute.UserNameScreen.route) }
                         )
@@ -138,8 +153,8 @@ class LoginNavigationScreen : ComponentActivity() {
                             onNext = { navigateTo(AppRoute.EnterUserProfileScreen.route) },
                             onBack = { navigateBack(AppRoute.UserNameScreen.route) },
                             otpSendVerify = {
-                                val mobNo = viewModel.getPrefData("MOBILE")
-                                navigateTo(AppRoute.OtpSendVerifyUI.withArgs(mobNo))
+                                val mobNo = viewModel.mobileNumber
+                                navigateTo(AppRoute.OtpSendVerifyUI.withArgs(mobNo.toString()))
                             }
                         )
 
@@ -160,18 +175,10 @@ class LoginNavigationScreen : ComponentActivity() {
 
                         AppRoute.ForgetPasswordUI.route -> ForgetPasswordScreen(
                             onNext = {
-                                val mobNo = viewModel.getPrefData("MOBILE")
-                                navigateTo(AppRoute.OtpSendVerifyUI.withArgs(mobNo))
+                                val mobNo = viewModel.mobileNumber
+                                navigateTo(AppRoute.OtpSendVerifyUI.withArgs(mobNo.toString()))
                                      },
                             onBack = { navigateBack(AppRoute.UserNameScreen.route) },
-                            viewModel = viewModel
-                        )
-
-                        AppRoute.OtpSendVerifyUI.route -> OtpSendVerifyScreen(
-                            onNext = { navigateTo(AppRoute.SetNewPasswordUI.route) },
-                            onBack = {
-                                logger.d("Screen123: $currentDestination")
-                                navigateBack(AppRoute.ForgetPasswordUI.route) },
                             viewModel = viewModel
                         )
 

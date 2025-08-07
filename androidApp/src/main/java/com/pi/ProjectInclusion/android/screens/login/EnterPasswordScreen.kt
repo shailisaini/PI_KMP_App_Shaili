@@ -16,8 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -42,7 +40,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Bg_Gray1
@@ -52,21 +49,19 @@ import com.pi.ProjectInclusion.LightRed01
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.R
-import com.pi.ProjectInclusion.android.common_UI.BackButtonPress
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.ChooseOneBottomSheet
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.OTPBtnUi
 import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
 import com.pi.ProjectInclusion.android.common_UI.SurfaceLine
-import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.SUCCESS
 import com.pi.ProjectInclusion.constants.CustomDialog
-import com.pi.ProjectInclusion.data.model.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetUserTypeResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -363,6 +358,6 @@ fun LoginPassScreen() {
     val onNext: (String) -> Unit = {}
     val onBack: () -> Unit = {}
     val isForgetPassword: () -> Unit = {}
-//    val viewModel: LoginViewModel = koinViewModel<LoginViewModel>()
-//    PasswordUI(context, onNext = { onNext("") }, onBack = onBack, isForgetPassword= isForgetPassword,viewModel = viewModel, mobileNo = "")
+    val viewModel: LoginViewModel =  koinViewModel()
+    PasswordUI(context, onNext = { onNext("") }, onBack = onBack, isForgetPassword= isForgetPassword,viewModel = viewModel, mobileNo = "")
 }

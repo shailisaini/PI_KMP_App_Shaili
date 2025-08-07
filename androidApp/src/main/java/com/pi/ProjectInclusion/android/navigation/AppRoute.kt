@@ -16,7 +16,7 @@ sealed class AppRoute(val route: String) {
 
     object OtpSendVerifyUI {
         const val route = "otp_send_verify_UI/{mobNo}"
-        fun withArgs(mobNo: String) = "otp_send_verify_UI/$mobNo"
+        fun withArgs(mobNo: String): String { return "otp_send_verify_UI/$mobNo"}
     }
 
     data object SetNewPasswordUI : AppRoute("set_new_password_UI")

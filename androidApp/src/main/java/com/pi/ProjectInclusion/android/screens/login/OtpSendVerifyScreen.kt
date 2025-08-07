@@ -66,8 +66,7 @@ import kotlinx.coroutines.delay
 fun OtpSendVerifyScreen(
     onNext: () -> Unit,
     onBack: () -> Unit,
-    viewModel: LoginViewModel,
-    mobNo: String = ""
+    viewModel: LoginViewModel
 ) {
 
     val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
@@ -80,6 +79,7 @@ fun OtpSendVerifyScreen(
     val invalidOtpText = stringResource(R.string.txt_Enter_valid_OTP)
     var isDialogVisible by remember { mutableStateOf(false) }
     var isFinished by remember { mutableStateOf(false) }
+    val mobNo = viewModel.mobileNumber
 
     CustomDialog(
         isVisible = isDialogVisible,
