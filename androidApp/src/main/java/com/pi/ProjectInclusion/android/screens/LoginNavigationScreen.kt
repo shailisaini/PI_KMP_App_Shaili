@@ -121,10 +121,7 @@ class LoginNavigationScreen : ComponentActivity() {
                             onNext = { navigateTo(AppRoute.UserPasswordScreen.route) },
                             // for register & activate
                             onRegister = {
-                                val mobNo = viewModel.mobileNumber
-                                val route = AppRoute.OtpSendVerifyUI.withArgs(mobNo.toString())
-                                logger.d("Screen: Moving to $route")
-                                navigateTo(AppRoute.OtpSendVerifyUI.withArgs(mobNo.toString())) },
+                                navigateTo(AppRoute.OtpSendVerifyUI.route) },
 //                            onNext = { context.startActivity(
 //                                Intent(context, StudentDashboardActivity::class.java)
 //                            )
@@ -142,8 +139,7 @@ class LoginNavigationScreen : ComponentActivity() {
                         AppRoute.UserPasswordScreen.route -> EnterPasswordScreen(
                             viewModel = viewModel,
                             onNext = {
-                                val mobNo = viewModel.mobileNumber
-                                navigateTo(AppRoute.OtpSendVerifyUI.withArgs(mobNo.toString())) },
+                                navigateTo(AppRoute.OtpSendVerifyUI.route) },
                             isForgetPassword = { navigateTo(AppRoute.ForgetPasswordUI.route) },
                             onBack = { navigateBack(AppRoute.UserNameScreen.route) }
                         )
@@ -153,8 +149,7 @@ class LoginNavigationScreen : ComponentActivity() {
                             onNext = { navigateTo(AppRoute.EnterUserProfileScreen.route) },
                             onBack = { navigateBack(AppRoute.UserNameScreen.route) },
                             otpSendVerify = {
-                                val mobNo = viewModel.mobileNumber
-                                navigateTo(AppRoute.OtpSendVerifyUI.withArgs(mobNo.toString()))
+                                navigateTo(AppRoute.OtpSendVerifyUI.route)
                             }
                         )
 
@@ -175,8 +170,7 @@ class LoginNavigationScreen : ComponentActivity() {
 
                         AppRoute.ForgetPasswordUI.route -> ForgetPasswordScreen(
                             onNext = {
-                                val mobNo = viewModel.mobileNumber
-                                navigateTo(AppRoute.OtpSendVerifyUI.withArgs(mobNo.toString()))
+                                navigateTo(AppRoute.OtpSendVerifyUI.route)
                                      },
                             onBack = { navigateBack(AppRoute.UserNameScreen.route) },
                             viewModel = viewModel

@@ -232,8 +232,7 @@ class StudentDashboardActivity : ComponentActivity() {
                                         viewModel = viewModel,
                                         onNext = { navigateTo(AppRoute.UserPasswordScreen.route) },
                                         onRegister = {
-                                            val mobNo = viewModel.mobileNumber
-                                            navigateTo(AppRoute.OtpSendVerifyUI.withArgs(mobNo.toString())) },
+                                            navigateTo(AppRoute.OtpSendVerifyUI.route) },
                                         onBack = { navigateBack(AppRoute.UserTypeSelect.route) }
                                     )
 
