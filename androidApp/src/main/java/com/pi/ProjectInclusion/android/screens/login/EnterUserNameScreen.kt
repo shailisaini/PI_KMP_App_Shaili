@@ -158,6 +158,7 @@ fun LoginUI(
                 confirmRecoverState = false
                 viewModel.saveMobileNumber(mobNo.value)
 //                LoggerProvider.logger.d("Screen: Moving to$onRegister.route")
+
                 onRegister() // Go to OTP screen
             },
             onDismiss = {
