@@ -51,6 +51,7 @@ import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_EXIST
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.NEW_USER
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 
@@ -113,10 +114,15 @@ fun LoginUI(
     var inValidMobNo by remember { mutableStateOf(false) }
     var isApiCalled by remember { mutableStateOf(false) }
     var confirmRecoverState by remember { mutableStateOf(false) }
+    val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
+
+    // user Type Id
+    var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
 
     if (isApiCalled) {
         LaunchedEffect(Unit) {
-            viewModel.getValidateUser("9654074714", "3")
+            LoggerProvider.logger.d("ValidateUserParams: " + mobNo.value +" .. "+userTypeId)
+            viewModel.getValidateUser(mobNo.value, userTypeId)
         }
 
         LaunchedEffect(uiState) {
@@ -158,13 +164,34 @@ fun LoginUI(
                 confirmRecoverState = false
                 viewModel.saveMobileNumber(mobNo.value)
 //                LoggerProvider.logger.d("Screen: Moving to$onRegister.route")
-
-                onRegister() // Go to OTP screen
+                viewModel.getOTPViewModel(mobNo.value)
             },
             onDismiss = {
                 confirmRecoverState = false
             }
         )
+    }
+
+    // Response for sent OTP on mobile
+    LaunchedEffect(sendOtpState) {
+//        viewModel.getOTPViewModel(otpValue)
+
+        when {
+            sendOtpState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            sendOtpState.error.isNotEmpty() -> {
+                LoggerProvider.logger.d("Error: ${sendOtpState.error}")
+                isDialogVisible = false
+            }
+
+            sendOtpState.success != null -> {
+//                LoggerProvider.logger.d("Languages fetched: ${list.size}")
+                isDialogVisible = false
+                onRegister() // Go to OTP Verify screen
+            }
+        }
     }
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
