@@ -110,7 +110,6 @@ class LoginNavigationScreen : ComponentActivity() {
                         AppRoute.LanguageSelect.route -> LanguageScreen(
                             viewModel = viewModel
                         ) {
-//                            navigateTo(AppRoute.UserTypeSelect.route)
                             navigateTo(AppRoute.SpecialEducatorRegistration2.route)
                         }
 
