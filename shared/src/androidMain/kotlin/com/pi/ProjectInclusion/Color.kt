@@ -15,7 +15,7 @@ val Transparent = Color(0x00000000)
 val SemiTransparent = Color(0xAA000000)
 
 val PrimaryBlue = Color(0xFF101942)
-val BorderBlue = Color(0xFF2C3EA2)
+val BorderBlue = Color(0xFF2C3EA2) //#2C3EA2
 val MenuSelectedColor = Color(0xFFC7E8FE)
 val PrimaryBlue2 = Color(0xFFDFF4FF)
 val PrimaryBlue3 = Color(0xFFF0F9FF) //#F0F9FF

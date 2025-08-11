@@ -339,8 +339,10 @@ and make a difference together!</string>
     <string name="txt_Question">Questions</string>
     <string name="txt_Question_Constant">Constant drooping of eyelid(s)/ artificial eye(s)/ misaligned eye(s)/ asymmetrical or squinting/had any eye surgery</string>
     <string name="txt_Screening_1_Report">Screening 1 Report</string>
+    <string name="txt_adv_screen_report">Advance Screening Report</string>
     <string name="txt_No_I_will_do_it_later">No, I will do it later</string>
     <string name="txt_Profiler_Form">Profiler Form</string>
+    <string name="btn_profiler_Form">Profiler Form ></string>
     <string name="txt_Let_fill_profiler_Form_understand">Let’s us fill profiler form to understand students’ strengths and abilities</string>
     <string name="txt_Visual_Domain_VI">Visual Domain (VI)</string>
     <string name="txt_Condition">Condition</string>
@@ -359,6 +361,7 @@ and make a difference together!</string>
     <string name="txt_modules_certificates">Modules\nCertificates</string>
     <string name="txt_Based_observation_SAMAN_difficulty">Based on your observation, there is doubt that SAMAN is having difficulty in the auditory domain, therefore to rule out other environmental factors, kindly consult an ENT specialist and audiologist</string>
     <string name="txt_Frequently_Asked_Questions">Frequently Asked Questions (FAQ)</string>
+    <string name="txt_adv_message">This student\'s profiler has been updated in classroom observation section</string>
     <string name="txt_Is_Project_Inclusion_available">Is Project Inclusion available for both iOS and android?</string>
     <string name="txt_New_User_access_first_course">A New user can access the first course ‘Learning Difficulties Understanding and Management Level-1’. The other courses will be open for the user to access once they complete the screening and enter the intervention phase.</string>
     <string name="txt_General">General</string>

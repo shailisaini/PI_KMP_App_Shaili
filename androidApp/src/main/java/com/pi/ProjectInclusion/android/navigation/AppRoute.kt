@@ -43,6 +43,7 @@ sealed class AppRoute(val route: String) {
     data object AddNewStudentMoreDetails : AppRoute("add_new_student_more_details")
     data object ScreeningOne : AppRoute("screening_one")
     data object ScreeningOneReport : AppRoute("screening_one_report")
+    data object AdvanceScreeningReport : AppRoute("advance_screening_report")
     data object ProfilerFormPage : AppRoute("profiler_form_page")
 
     data object InterventionScreen : AppRoute("intervention_screen")
