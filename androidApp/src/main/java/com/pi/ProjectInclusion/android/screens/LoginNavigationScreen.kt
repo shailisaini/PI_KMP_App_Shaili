@@ -40,6 +40,7 @@ import com.pi.ProjectInclusion.android.screens.login.UserTypeScreen
 import com.pi.ProjectInclusion.android.screens.registration.CreateNewPasswordScreen
 import com.pi.ProjectInclusion.android.screens.registration.EnterUserScreen1
 import com.pi.ProjectInclusion.android.screens.registration.EnterUserScreen2
+import com.pi.ProjectInclusion.android.screens.registration.professionals.ProfessionalsRegistration2
 import com.pi.ProjectInclusion.android.screens.registration.specialEdu.SpecialEducatorScreen2
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -125,10 +126,7 @@ class LoginNavigationScreen : ComponentActivity() {
                             // for register & activate
                             onRegister = {
                                 navigateTo(AppRoute.OtpSendVerifyUI.route) },
-//                            onNext = { context.startActivity(
-//                                Intent(context, StudentDashboardActivity::class.java)
-//                            )
-//                                (context as? Activity)?.finish() },
+
                             onBack = { navigateBack(AppRoute.UserTypeSelect.route) }
                         )
 
@@ -157,11 +155,22 @@ class LoginNavigationScreen : ComponentActivity() {
                         )
 
                         AppRoute.EnterUserProfileScreen.route -> EnterUserScreen1(
-                            onNext = { navigateTo(AppRoute.EnterUserProfessionalScreen.route) },
+                            viewModel = viewModel,
+                            onNextTeacher = { navigateTo(AppRoute.EnterTeacherRegScreen.route) },
+                            onNextSpecialEdu = { navigateTo(AppRoute.SpecialEducatorRegistration2.route) },
+                            onNextProfessional = { navigateTo(AppRoute.EnterProfessionalScreen2.route) },
+                            onBack = { navigateBack(AppRoute.UserNameScreen.route) }
+                        )
+                        AppRoute.EnterUserProfileScreen.route -> ProfessionalsRegistration2(
+                            viewModel = viewModel,
+                            onNext = { context.startActivity(
+                                Intent(context, StudentDashboardActivity::class.java)
+                            )
+                                (context as? Activity)?.finish() },
                             onBack = { navigateBack(AppRoute.UserNameScreen.route) }
                         )
 
-                        AppRoute.EnterUserProfessionalScreen.route -> EnterUserScreen2(
+                        AppRoute.EnterTeacherRegScreen.route -> EnterUserScreen2(
                             onNext = {
                                 context.startActivity(
                                     Intent(context, StudentDashboardActivity::class.java)

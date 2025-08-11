@@ -1,4 +1,4 @@
-package com.pi.ProjectInclusion.android.screens.registration.specialEdu
+package com.pi.ProjectInclusion.android.screens.registration.professionals
 
 import android.content.Context
 import androidx.compose.foundation.background
@@ -78,7 +78,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun SpecialEducatorScreen2(
+fun ProfessionalsRegistration2(
     onNext: () -> Unit, // Dashboard
     onBack: () -> Unit,
     viewModel: LoginViewModel,
@@ -133,8 +133,10 @@ fun SpeEducatorScreen2UI(
     val tvUdise = stringResource(id = R.string.txt_udise_number)
     val enterMobile = stringResource(R.string.txt_enter_udise)
     val enterHere = stringResource(R.string.enter_here).toString()
-    var selectedSchool = stringResource(R.string.choose_option)
-    val schoolSelectedId = remember { mutableStateOf("0") }
+    var chooseOpt = stringResource(R.string.choose_option)
+    var selectedSchool by remember { mutableStateOf(chooseOpt) }
+//    var selectedSchool = stringResource(R.string.choose_option)
+    var schoolSelectedId = remember { mutableStateOf("0") }
 
     val schoolList = remember { mutableStateListOf<GetLanguageListResponse.LanguageResponse>() }
 
@@ -261,38 +263,33 @@ fun SpeEducatorScreen2UI(
                     }
                 )
 
+                // Dropdown field (no internal menu)
                 DropdownMenuUi(
-                    schoolList.map { it.name }.toMutableList() as List<String>,
-                    onItemSelected = { selected ->
-                        schoolList.find { it.name == selected }?.id?.let {
-                            schoolSelectedId.value = it
-                        }
-                    },
-                    modifier = Modifier.clickable {
-
-                    },
+                    options = emptyList(), // not needed since bottom sheet will handle it
+                    onItemSelected = {selectedSchool }, // not used
                     placeholder = selectedSchool,
                     onClick = {
                         scope.launch {
-                            isBottomSheetVisible = true // true under development code
-                            sheetState.expand()
+                            isBottomSheetVisible = true
+                            sheetState.show()
                         }
-                    })
+                    }
+                )
+                // Bottom sheet for school list
                 SchoolListBottomSheet(
                     isBottomSheetVisible = isBottomSheetVisible,
                     sheetState = sheetState,
                     onDismiss = {
-                        scope.launch { sheetState.hide() }
-                            .invokeOnCompletion { isBottomSheetVisible = false }
+                        scope.launch {
+                            sheetState.hide()
+                        }.invokeOnCompletion { isBottomSheetVisible = false }
                     },
-                    onDecline = {
-
-                    },
-                    onTextSelected = { it ->
-                        selectedSchool = it
-                 schoolList.find { it.name == selectedSchool }?.id?.let {
-                     schoolSelectedId.value = it
-                 }
+                    onDecline = { /* No decline action */ },
+                    onTextSelected = { selectedName ->
+                        selectedSchool = selectedName
+                        // If you want ID mapping:
+                        schoolSelectedId.value = selectedName
+//                        schoolSelectedId = schoolList.find { it == selectedName } // Replace with your mapping
                     },
                     schoolList.map { it.name }.toList() as List<String>
                 )
@@ -445,9 +442,9 @@ fun SpeEducatorScreen2UI(
                     },
                     onTextSelected = { it ->
                         selectedSchool = it
-                 schoolList.find { it.name == selectedSchool }?.id?.let {
-                     schoolSelectedId.value = it
-                 }
+                        schoolList.find { it.name == selectedSchool }?.id?.let {
+                            schoolSelectedId.value = it
+                        }
                     },
                     schoolList.map { it.name }.toList() as List<String>
                 )

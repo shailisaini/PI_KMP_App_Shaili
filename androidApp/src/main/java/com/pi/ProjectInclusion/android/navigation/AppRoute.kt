@@ -21,8 +21,9 @@ sealed class AppRoute(val route: String) {
 
     data object SetNewPasswordUI : AppRoute("set_new_password_UI")
     data object EnterUserProfileScreen : AppRoute("user_profile_screen") // registration 1
-    data object EnterUserProfessionalScreen : AppRoute("user_professional_screen") // registration 2
+    data object EnterTeacherRegScreen : AppRoute("user_professional_screen") // registration 2
     data object SpecialEducatorRegistration2 : AppRoute("SpecialEducatorRegistration2") // speEducator registration 2
+    data object EnterProfessionalScreen2 : AppRoute("user_professional_screen") // Professional registration 2
 
     data object DashboardScreen : AppRoute("dashboard_screen")
     data object ProfileScreen : AppRoute("profile_screen")     // user profile after Dashboard
