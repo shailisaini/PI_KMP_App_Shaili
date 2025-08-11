@@ -68,7 +68,6 @@ fun OtpSendVerifyScreen(
     onBack: () -> Unit,
     viewModel: LoginViewModel
 ) {
-
     val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
     logger.d("Screen: " + "OtpSendVerifyScreen()")
 
@@ -88,11 +87,9 @@ fun OtpSendVerifyScreen(
         message = stringResource(R.string.txt_loading)
     )
 
-    LaunchedEffect(Unit) {
-        viewModel.getOTPViewModel(otpValue)
-    }
-
     LaunchedEffect(sendOtpState) {
+//        viewModel.getOTPViewModel(otpValue)
+
         when {
             sendOtpState.isLoading -> {
                 isDialogVisible = true

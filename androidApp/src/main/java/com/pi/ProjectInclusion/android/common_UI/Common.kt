@@ -63,6 +63,7 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -2226,7 +2227,7 @@ fun DropdownMenuUi(
                             Black
                         }
                     },
-                    fontSize = 14.sp,
+                    fontSize = 15.sp,
                     fontFamily = if (selectedOption == null) {
                         fontRegular
                     } else {
@@ -2266,20 +2267,16 @@ fun DropdownMenuUi(
                     )
             ) {
                 options.forEach { option ->
-                    /* androidx.compose.material.DropdownMenuItem(onClick = {
-                         onItemSelected(option)
-                         selectedOption = option
-                         menuExpanded = false
-                     }) {
-                         Text(
-                             text = option,
- //                        color = Color.Gray,
-                             color = colors.onSurface,
-                             fontSize = 16.sp,
-                             fontStyle = FontStyle.Normal,
-                             fontWeight = FontWeight.SemiBold
-                         )
-                     }*/
+                    DropdownMenuItem(
+                        text = { Text(option,
+                            fontSize = 15.sp,
+                            fontFamily = fontSemiBold,
+                            color = Black) },
+                        onClick = {
+                            onItemSelected(option)
+                            selectedOption = option
+                            menuExpanded = false
+                        })
                 }
             }
         }

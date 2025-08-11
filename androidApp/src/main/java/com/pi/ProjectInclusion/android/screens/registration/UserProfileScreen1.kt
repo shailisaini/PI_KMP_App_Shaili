@@ -78,12 +78,19 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_FEMALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_MALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_OTHER
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetUserTypeResponse
+import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun EnterUserScreen1(onNext: () -> Unit,  //EnterUserProfessionalScreen
-                     onBack: () -> Unit  //UserNameScreen
+fun EnterUserScreen1(
+    onNextTeacher: () -> Unit,  //EnterUserProfessionalScreen
+    onBack: () -> Unit,  //UserNameScreen
+    onNextSpecialEdu: () -> Unit,
+    onNextProfessional: () -> Unit,
+    viewModel: LoginViewModel
 ) {
     var isDialogVisible by remember { mutableStateOf(false) }
 //    val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
@@ -96,7 +103,7 @@ fun EnterUserScreen1(onNext: () -> Unit,  //EnterUserProfessionalScreen
         message = stringResource(R.string.txt_loading)
     )
     BackHandler {
-       onBack()
+        onBack()
     }
     LoggerProvider.logger.d("Screen: " + "EnterUserScreen1()")
 
@@ -140,7 +147,11 @@ fun EnterUserScreen1(onNext: () -> Unit,  //EnterUserProfessionalScreen
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            ProfileScreenUI(context, onBack = onBack, onNext = onNext)
+            ProfileScreenUI(context, onBack = onBack,
+                onNextTeacher = onNextTeacher,
+                onNextProfessional = onNextProfessional,
+                onNextSpecialEdu = onNextSpecialEdu,
+                viewModel = viewModel)
         }
     }
 }
@@ -149,7 +160,10 @@ fun EnterUserScreen1(onNext: () -> Unit,  //EnterUserProfessionalScreen
 fun ProfileScreenUI(
     context: Context,
     onBack: () -> Unit,
-    onNext: () -> Unit
+    onNextTeacher: () -> Unit,
+    onNextSpecialEdu: () -> Unit,
+    onNextProfessional: () -> Unit,
+    viewModel: LoginViewModel,
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
@@ -541,8 +555,17 @@ fun ProfileScreenUI(
                                         inValidMobNo = true
                                     } else {
                                         isDialogVisible = true
-                                        onNext()
-
+                                        if (viewModel.getPrefData(USER_TYPE_ID) == "7") {
+                                            onNextSpecialEdu()
+                                        } else if (viewModel.getPrefData(USER_TYPE_ID) == "8") {
+                                            onNextProfessional()
+                                        } else if (viewModel.getPrefData(USER_TYPE_ID) == "3") {
+                                            // teacher
+                                            onNextTeacher()
+                                        }
+                                        else{
+                                        // reviewer
+                                        }
                                     }
                                 }
                             }
@@ -561,6 +584,8 @@ fun UserProfileUI() {
     val context = LocalContext.current
     val onNext: () -> Unit = {}
     val onBack: () -> Unit = {}
-    val isForgetPassword: () -> Unit = {}
-    ProfileScreenUI(context, onNext, onBack)
+    val speEdu: () -> Unit = {}
+    val profession: () -> Unit = {}
+    val viewModel: LoginViewModel = koinViewModel()
+    ProfileScreenUI(context, onNext, onBack, profession,speEdu, viewModel)
 }

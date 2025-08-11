@@ -75,6 +75,7 @@ import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
 import com.pi.ProjectInclusion.constants.CommonFunction.NoDataFound
 import com.pi.ProjectInclusion.constants.CommonFunction.ShowError
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetUserTypeResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
@@ -136,7 +137,7 @@ fun UserTypeScreen(
                 .background(color = Bg_Gray1),
             verticalArrangement = Arrangement.Top
         ) {
-            UserTypeResponseUI(context, userType, onNext, onBack)
+            UserTypeResponseUI(context, userType, onNext, onBack, viewModel)
         }
     }
 }
@@ -148,6 +149,7 @@ fun UserTypeResponseUI(
     userTypeData: MutableList<GetUserTypeResponse.UserTypeResponse>,
     onNext: () -> Unit,
     onBack: () -> Unit,
+    viewModel: LoginViewModel
 ) {
     val errColor = PrimaryBlue
     val scrollState = rememberLazyGridState()
@@ -217,6 +219,7 @@ fun UserTypeResponseUI(
                             ) {
                                 items(userTypeData.size) { index ->
                                     UserTypeCard(
+                                        viewModel,
                                         onNext,
                                         context,
                                         isSelected = selectedIndex == index,
@@ -251,6 +254,7 @@ fun UserTypeResponseUI(
 
 @Composable
 fun UserTypeCard(
+    viewModel: LoginViewModel,
     onNext: () -> Unit,
     context: Context,
     isSelected: Boolean = true,
@@ -292,6 +296,8 @@ fun UserTypeCard(
     Card(
         modifier = Modifier
             .clickable {
+                // saving User type ID
+                viewModel.savePrefData(USER_TYPE_ID, userTypeIndex.id.toString())
                 onItemClicked.invoke()
                 onNext()
             }

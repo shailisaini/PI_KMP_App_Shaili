@@ -12,6 +12,7 @@ object ConstantVariables {
     var ROUTE: String = "routeAnimation"
     var SHARED_PREF_KEY: String = "PI_PREF"
     var TOKEN_PREF_KEY: String = "user_token"
+    var USER_TYPE_ID: String = "userTypeId"
 
     // for language Screen
     var IMG_DESCRIPTION: String = "img"
