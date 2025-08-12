@@ -206,6 +206,22 @@ class StudentDashboardActivity : ComponentActivity() {
                                 },
                                 currentRoute = currentRoute
                             )
+                        } else if (currentRoute == AppRoute.ScreeningScreen.route) {
+                            AppBar(
+                                isNotification,
+                                onNavigationIconClick = {
+                                    scope.launch { drawerState.open() }
+                                },
+                                currentRoute = currentRoute
+                            )
+                        } else if (currentRoute == AppRoute.InterventionScreen.route) {
+                            AppBar(
+                                isNotification,
+                                onNavigationIconClick = {
+                                    scope.launch { drawerState.open() }
+                                },
+                                currentRoute = currentRoute
+                            )
                         }
                     }, content = { innerPadding ->
                         Column(
@@ -262,6 +278,7 @@ class StudentDashboardActivity : ComponentActivity() {
                                         addStudent = { navigateTo(AppRoute.AddStudentRegister.route) },
                                         screeningOne = { navigateTo(AppRoute.ScreeningOne.route) },
                                         profilerForm = { navigateTo(AppRoute.ProfilerFormPage.route) },
+                                        advanceScreening = { navigateTo(AppRoute.ProfilerFormPage.route) },
                                         onBack = { navigateBack(AppRoute.DashboardScreen.route) }
                                     )
 

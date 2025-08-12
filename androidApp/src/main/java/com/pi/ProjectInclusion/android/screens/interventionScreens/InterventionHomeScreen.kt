@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -30,6 +31,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -77,6 +79,7 @@ import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.fontSemiBold
+import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -108,6 +111,10 @@ fun InterventionHomeScreen(onNext: () -> Unit, onBack: () -> Unit) {
         }
     }
 
+    BackHandler {
+        onBack()
+    }
+
     // This function will be change according to recommend
     if (showDialog) {
         InterventionIntroDialog {
@@ -115,9 +122,9 @@ fun InterventionHomeScreen(onNext: () -> Unit, onBack: () -> Unit) {
         }
     }
 
-    Column(
+    Surface(
         modifier = Modifier
-            .fillMaxSize()
+            .wrapContentSize()
             .background(
                 if (isSystemInDarkTheme()) {
                     Dark_01
@@ -125,46 +132,9 @@ fun InterventionHomeScreen(onNext: () -> Unit, onBack: () -> Unit) {
                     White
                 }
             )
+            .padding(top = 65.dp),
     ) {
-        ScrollableTabRow(
-            selectedTabIndex = selectedTabIndex, edgePadding = 0.dp
-        ) {
-            tabItems.forEachIndexed { index, tabItem ->
-                Tab(
-                    selected = index == selectedTabIndex,
-                    onClick = { selectedTabIndex = index },
-                    modifier = Modifier.background(
-                        if (isSystemInDarkTheme()) {
-                            Dark_01
-                        } else {
-                            White
-                        }
-                    ),
-                    text = {
-                        Text(
-                            text = tabItem.title,
-                            color = if (index == selectedTabIndex) {
-                                if (isSystemInDarkTheme()) {
-                                    PRIMARY_AURO_BLUE
-                                } else {
-                                    PrimaryBlue
-                                }
-                            } else {
-                                if (isSystemInDarkTheme()) {
-                                    DARK_BODY_TEXT
-                                } else {
-                                    GrayLight01
-                                }
-                            },
-                            fontFamily = fontSemiBold,
-                            fontSize = 14.sp
-                        )
-                    })
-            }
-        }
-
-        HorizontalPager(
-            state = pagerState,
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
@@ -173,20 +143,70 @@ fun InterventionHomeScreen(onNext: () -> Unit, onBack: () -> Unit) {
                     } else {
                         White
                     }
-                ),
-            userScrollEnabled = true,
-        ) { index ->
-            when (index) {
-                0 -> {
-                    PendingIntervention(onNext)
+                )
+        ) {
+            ScrollableTabRow(
+                selectedTabIndex = selectedTabIndex, edgePadding = 0.dp
+            ) {
+                tabItems.forEachIndexed { index, tabItem ->
+                    Tab(
+                        selected = index == selectedTabIndex,
+                        onClick = { selectedTabIndex = index },
+                        modifier = Modifier.background(
+                            if (isSystemInDarkTheme()) {
+                                Dark_01
+                            } else {
+                                White
+                            }
+                        ),
+                        text = {
+                            Text(
+                                text = tabItem.title,
+                                color = if (index == selectedTabIndex) {
+                                    if (isSystemInDarkTheme()) {
+                                        PRIMARY_AURO_BLUE
+                                    } else {
+                                        PrimaryBlue
+                                    }
+                                } else {
+                                    if (isSystemInDarkTheme()) {
+                                        DARK_BODY_TEXT
+                                    } else {
+                                        GrayLight01
+                                    }
+                                },
+                                fontFamily = fontSemiBold,
+                                fontSize = 14.sp
+                            )
+                        })
                 }
+            }
 
-                1 -> {
-                    InProgressIntervention(onNext)
-                }
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        if (isSystemInDarkTheme()) {
+                            Dark_01
+                        } else {
+                            White
+                        }
+                    ),
+                userScrollEnabled = true,
+            ) { index ->
+                when (index) {
+                    0 -> {
+                        PendingIntervention(onNext)
+                    }
 
-                else -> {
-                    CompletedIntervention(onNext)
+                    1 -> {
+                        InProgressIntervention(onNext)
+                    }
+
+                    else -> {
+                        CompletedIntervention(onNext)
+                    }
                 }
             }
         }
