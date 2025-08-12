@@ -1,6 +1,11 @@
 package com.pi.ProjectInclusion.android.screens.registration
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -50,6 +56,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Bg_Gray
 import com.pi.ProjectInclusion.Bg_Gray1
@@ -63,6 +72,8 @@ import com.pi.ProjectInclusion.OrangeSubTitle
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.CameraGalleryDialog
+import com.pi.ProjectInclusion.android.common_UI.CameraPermission
 import com.pi.ProjectInclusion.android.common_UI.GenderOption
 import com.pi.ProjectInclusion.android.common_UI.MobileTextField
 import com.pi.ProjectInclusion.android.common_UI.RegistrationHeader
@@ -72,6 +83,7 @@ import com.pi.ProjectInclusion.android.common_UI.TextViewField
 import com.pi.ProjectInclusion.android.common_UI.showDatePickerDialog
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
+import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
@@ -97,6 +109,11 @@ fun EnterUserScreen1(
 
     val context = LocalContext.current
     val userType = remember { mutableStateListOf<GetUserTypeResponse.UserTypeResponse>() }
+
+    var hasAllPermissions = remember { mutableStateOf(false) }
+
+    CameraPermission(hasAllPermissions, context)
+
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
@@ -147,11 +164,13 @@ fun EnterUserScreen1(
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            ProfileScreenUI(context, onBack = onBack,
+            ProfileScreenUI(
+                context, onBack = onBack,
                 onNextTeacher = onNextTeacher,
                 onNextProfessional = onNextProfessional,
                 onNextSpecialEdu = onNextSpecialEdu,
-                viewModel = viewModel)
+                viewModel = viewModel
+            )
         }
     }
 }
@@ -194,7 +213,23 @@ fun ProfileScreenUI(
     val textEmailEg = stringResource(R.string.txt_eg_email_name)
     var showError by remember { mutableStateOf(false) }
     var inValidMobNo by remember { mutableStateOf(false) }
+    var isAddImageClicked by remember { mutableStateOf(false) }
     var date by remember { mutableStateOf("") }
+    var selectedUri = remember { mutableStateOf<Uri?>(null) }
+    var hasAllPermissions = remember { mutableStateOf(false) }
+
+    CameraPermission(hasAllPermissions, context)
+
+    if (isAddImageClicked) {
+        if (hasAllPermissions.value) {
+            CameraGalleryDialog(selectedUri) {
+                isAddImageClicked = false
+            }
+        }
+        else{
+            context.toast(context.getString(R.string.txt_permission_grant))
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -235,7 +270,18 @@ fun ProfileScreenUI(
                     Image(
                         modifier = Modifier
                             .size(90.dp), // adjust the size as needed,
-                        painter = painterResource(id = R.drawable.profile_user_icon),
+                        painter =
+                            if (selectedUri.value != null) {
+                                rememberAsyncImagePainter(
+                                    ImageRequest.Builder(LocalContext.current)
+                                        .data(selectedUri.value)
+                                        .placeholder(R.drawable.profile_user_icon)
+                                        .crossfade(true) // Optional: Add a fade transition
+                                        .build()
+                                )
+                            } else {
+                                painterResource(id = R.drawable.profile_user_icon)
+                            },
                         contentDescription = IMG_DESCRIPTION
                     )
                     Column(
@@ -261,7 +307,7 @@ fun ProfileScreenUI(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Button(
-                                onClick = { }, modifier = Modifier
+                                onClick = { isAddImageClicked = true }, modifier = Modifier
                                     .wrapContentSize()
                                     .clip(RoundedCornerShape(4.dp)),
                                 shape = RoundedCornerShape(4.dp),
@@ -272,9 +318,16 @@ fun ProfileScreenUI(
                                 border = BorderStroke(1.dp, color = PrimaryBlue)
                             ) {
                                 Text(
-                                    stringResource(R.string.txt_add_photo),
+                                    if (selectedUri.value != null) {
+                                        stringResource(R.string.txt_change_photo)
+                                    } else {
+                                        stringResource(R.string.txt_add_photo)
+                                    },
                                     modifier = Modifier
                                         .wrapContentSize()
+                                        .clickable {
+                                            isAddImageClicked = true
+                                        }
                                         .padding(bottom = 2.dp, top = 2.dp),
                                     fontSize = 12.sp,
                                     fontFamily = fontMedium,
@@ -282,13 +335,18 @@ fun ProfileScreenUI(
                                     textAlign = TextAlign.Center
                                 )
                             }
-                            Image(
-                                modifier = Modifier
-                                    .size(35.dp)
-                                    .padding(start = 10.dp),
-                                painter = painterResource(id = R.drawable.ic_delete_red),
-                                contentDescription = IMG_DESCRIPTION
-                            )
+                            if (selectedUri.value != null) {
+                                Image(
+                                    modifier = Modifier
+                                        .size(35.dp)
+                                        .clickable {
+                                            selectedUri.value = null
+                                        }
+                                        .padding(start = 10.dp),
+                                    painter = painterResource(id = R.drawable.ic_delete_red),
+                                    contentDescription = IMG_DESCRIPTION
+                                )
+                            }
                         }
                     }
                 }
@@ -562,9 +620,8 @@ fun ProfileScreenUI(
                                         } else if (viewModel.getPrefData(USER_TYPE_ID) == "3") {
                                             // teacher
                                             onNextTeacher()
-                                        }
-                                        else{
-                                        // reviewer
+                                        } else {
+                                            // reviewer
                                         }
                                     }
                                 }
@@ -587,5 +644,5 @@ fun UserProfileUI() {
     val speEdu: () -> Unit = {}
     val profession: () -> Unit = {}
     val viewModel: LoginViewModel = koinViewModel()
-    ProfileScreenUI(context, onNext, onBack, profession,speEdu, viewModel)
+    ProfileScreenUI(context, onNext, onBack, profession, speEdu, viewModel)
 }

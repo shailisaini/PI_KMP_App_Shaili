@@ -1,6 +1,10 @@
 package com.pi.ProjectInclusion.android.screens.Profile
 
+import android.Manifest
 import android.content.Context
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -63,6 +68,8 @@ import com.pi.ProjectInclusion.OrangeSubTitle
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.CameraGalleryDialog
+import com.pi.ProjectInclusion.android.common_UI.CameraPermission
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.GenderOption
 import com.pi.ProjectInclusion.android.common_UI.MobileTextField
@@ -72,6 +79,7 @@ import com.pi.ProjectInclusion.android.common_UI.TextViewField
 import com.pi.ProjectInclusion.android.common_UI.showDatePickerDialog
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
+import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
@@ -86,9 +94,13 @@ fun EditProfileScreen1(onNext: () -> Unit,  //EditProfileScreen2
                        onBack: () -> Unit) {
     var isDialogVisible by remember { mutableStateOf(false) }
 //    val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
-
     val context = LocalContext.current
     val userType = remember { mutableStateListOf<GetUserTypeResponse.UserTypeResponse>() }
+
+    var hasAllPermissions = remember { mutableStateOf(false) }
+
+    CameraPermission(hasAllPermissions, context)
+
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
@@ -149,6 +161,23 @@ fun EditProfileScreenUI(
     var showError by remember { mutableStateOf(false) }
     var inValidMobNo by remember { mutableStateOf(false) }
     var date by remember { mutableStateOf("") }
+    var isAddImageClicked by remember { mutableStateOf(false) }
+
+    var selectedUri = remember { mutableStateOf<Uri?>(null) }
+    var hasAllPermissions = remember { mutableStateOf(false) }
+
+    CameraPermission(hasAllPermissions, context)
+
+    if (isAddImageClicked) {
+        if (hasAllPermissions.value) {
+            CameraGalleryDialog(selectedUri) {
+                isAddImageClicked = false
+            }
+        }
+        else{
+            context.toast(context.getString(R.string.txt_permission_grant))
+        }
+    }
 
     DetailsNoImgBackgroundUi(
         backgroundColor = White,
@@ -241,7 +270,7 @@ fun EditProfileScreenUI(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Button(
-                                        onClick = { }, modifier = Modifier
+                                        onClick = { isAddImageClicked = true }, modifier = Modifier
                                             .wrapContentSize()
                                             .clip(RoundedCornerShape(4.dp)),
                                         shape = RoundedCornerShape(4.dp),
@@ -252,9 +281,16 @@ fun EditProfileScreenUI(
                                         border = BorderStroke(1.dp, color = PrimaryBlue)
                                     ) {
                                         Text(
-                                            stringResource(R.string.txt_add_photo),
+                                            if (selectedUri.value != null) {
+                                                stringResource(R.string.txt_change_photo)
+                                            } else {
+                                                stringResource(R.string.txt_add_photo)
+                                            },
                                             modifier = Modifier
                                                 .wrapContentSize()
+                                                .clickable {
+                                                    isAddImageClicked = true
+                                                }
                                                 .padding(bottom = 2.dp, top = 2.dp),
                                             fontSize = 12.sp,
                                             fontFamily = fontMedium,
@@ -262,13 +298,18 @@ fun EditProfileScreenUI(
                                             textAlign = TextAlign.Center
                                         )
                                     }
-                                    Image(
-                                        modifier = Modifier
-                                            .size(35.dp)
-                                            .padding(start = 10.dp),
-                                        painter = painterResource(id = R.drawable.ic_delete_red),
-                                        contentDescription = IMG_DESCRIPTION
-                                    )
+                                    if (selectedUri.value != null) {
+                                        Image(
+                                            modifier = Modifier
+                                                .size(35.dp)
+                                                .clickable {
+                                                    selectedUri.value = null
+                                                }
+                                                .padding(start = 10.dp),
+                                            painter = painterResource(id = R.drawable.ic_delete_red),
+                                            contentDescription = IMG_DESCRIPTION
+                                        )
+                                    }
                                 }
                             }
                         }
