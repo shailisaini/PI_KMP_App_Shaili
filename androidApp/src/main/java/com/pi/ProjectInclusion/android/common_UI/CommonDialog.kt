@@ -1,6 +1,13 @@
 package com.pi.ProjectInclusion.android.common_UI
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -22,9 +29,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,9 +57,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.content.ContextCompat
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.BorderBlue
 import com.pi.ProjectInclusion.Dark_02
+import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight04
 import com.pi.ProjectInclusion.LightRed01
 import com.pi.ProjectInclusion.PrimaryBlue
@@ -56,6 +70,7 @@ import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
+import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 
 // Dialog for delete profile
@@ -522,6 +537,111 @@ fun AccountRecoverDialog(onDismiss: () -> Unit = {}, onRestore: () -> Unit = {})
                     }
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedBoxWithConstraintsScope")
+@Preview
+@Composable
+fun CameraGalleryDialog(selectedUri: MutableState<Uri?> = mutableStateOf(null) , onDismiss: () -> Unit = {}) {
+    val sheetState = rememberModalBottomSheetState()
+    ModalBottomSheet(
+        onDismissRequest = {
+            onDismiss()
+        }, sheetState = sheetState
+    ) {
+
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(20.dp))
+                .background(Color.Unspecified)
+                .fillMaxWidth()
+
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp, start = 8.dp, end = 8.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = stringResource(R.string.choose_an_option),
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .padding(start = 20.dp, end = 8.dp),
+                    fontFamily = fontRegular,
+                    fontSize = 15.sp,
+                    color = Gray,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Column(
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier
+                        .padding(top = 10.dp, bottom = 20.dp)
+                        .fillMaxWidth()
+                ) {
+
+                    // gallery & camera button
+                    BottomSheetCameraGallery { selectedImageUri ->
+                        if (selectedImageUri != null) {
+//                                        Logger.d("SelectedURI: $selectedImageUri")
+                            selectedUri.value = selectedImageUri
+                            onDismiss()
+                            // Use the URI as needed (e.g., upload, display, etc.)
+                        } else {
+//                                        Logger.d("SelectedURI:$selectedImageUri")
+                            onDismiss()
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CameraPermission(hasAllPermissions: MutableState<Boolean>, context: Context) {
+    val permissionsToCheck = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        listOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.READ_MEDIA_IMAGES
+        )
+    } else {
+        listOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+    }
+
+    fun checkAllPermissions(): Boolean {
+        return permissionsToCheck.all {
+            ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+        }
+    }
+
+    val permissionsLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        hasAllPermissions.value = permissionsToCheck.all {
+            permissions[it] == true
+        }
+        if (!hasAllPermissions.value) {
+            context.toast(context.getString(R.string.txt_permission_grant))
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if (checkAllPermissions()) {
+            hasAllPermissions.value = true
+        } else {
+            permissionsLauncher.launch(permissionsToCheck.toTypedArray())
         }
     }
 }

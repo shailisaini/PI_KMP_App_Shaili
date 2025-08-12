@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -33,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.kmptemplate.logger.LoggerProvider.logger
+import com.pi.ProjectInclusion.Bg_Card
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.BorderBlue
 import com.pi.ProjectInclusion.CardColor01
@@ -48,6 +50,7 @@ import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
 import com.pi.ProjectInclusion.LightPurple04
 import com.pi.ProjectInclusion.PrimaryBlueLt1
+import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.common_UI.MobileTextField
 import com.pi.ProjectInclusion.android.utils.toast
 
@@ -94,27 +97,26 @@ fun ReportAdvanceScreen(
 private fun ReportScreenContent(onNext: () -> Unit = {},onBack: () -> Unit) {
 
     Column(
-        modifier = Modifier
-            .verticalScroll(rememberScrollState())
+//        modifier = Modifier
+//            .verticalScroll(rememberScrollState())
     ) {
         Column(
             modifier = Modifier
+                .fillMaxSize()
+                .weight(1f)
                 .padding(start = 16.dp, end = 16.dp, top = 8.dp)
         ) {
-            DomainSection(stringResource(R.string.txt_Visual_Domain_VI))
 
-            ReportCard(
+            ReportDataCard(
                 title = stringResource(R.string.txt_Condition),
-                text = stringResource(R.string.txt_Based_observation_SAMAN_difficulty),
+                 myList,
                 titleColor = HeaderColor01
             )
 
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            DomainSection(stringResource(R.string.txt_Auditory_Domain_HI))
-
-            ReportCard(
+            BottomCard(
 
                 title = stringResource(R.string.txt_Condition),
                 text = stringResource(R.string.txt_adv_message),
@@ -127,7 +129,56 @@ private fun ReportScreenContent(onNext: () -> Unit = {},onBack: () -> Unit) {
 }
 
 @Composable
-private fun ReportCard(title: String, text: String, titleColor: Color) {
+internal fun ReportDataCard(title: String, textList: List<String>, titleColor: Color) {
+    Card(
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp, bottom = 4.dp)
+            .wrapContentHeight(),
+        colors = if (isSystemInDarkTheme()) {
+            CardDefaults.cardColors(Bg_Card)
+        } else {
+            CardDefaults.cardColors(
+                containerColor = Bg_Card,
+                contentColor = Bg_Card,
+                disabledContentColor = Bg_Card,
+                disabledContainerColor = Bg_Card
+            )
+        }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+                .background(color = Transparent)
+                .wrapContentHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(textList.size) { item ->
+                    Text(
+                        modifier = Modifier
+                            .padding(start = 16 .dp),
+                        text = textList[item],
+                        fontSize = 15.sp,
+                        fontFamily = fontRegular,
+                        color = Black
+                    )
+                }
+            }
+
+        }
+    }
+}
+@Composable
+private fun BottomCard(title: String, text: String, titleColor: Color) {
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
@@ -154,27 +205,29 @@ private fun ReportCard(title: String, text: String, titleColor: Color) {
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                modifier = Modifier.padding(16 .dp),
+                modifier = Modifier
+                    .padding(16 .dp),
                 text = text,
-                fontSize = 17.sp,
+                textAlign = TextAlign.Center,
+                fontSize = 15.sp,
                 fontFamily = fontMedium,
                 color = Black
             )
             Spacer(
-                    modifier = Modifier
-                        .width(24.dp)
-                        .padding(top = 16.dp)
-                    )
+                modifier = Modifier
+                    .width(8.dp)
+                    .padding(top = 8.dp)
+            )
 
             Text(
                 modifier = Modifier
-                    .padding(16 .dp)
+                    .padding(8 .dp)
                     .clickable{
 
                     },
                 text = stringResource(R.string.btn_profiler_Form),
                 textAlign = TextAlign.Center,
-                fontSize = 21.sp,
+                fontSize = 17.sp,
                 fontFamily = fontMedium,
                 color = BorderBlue,
             )
@@ -183,16 +236,7 @@ private fun ReportCard(title: String, text: String, titleColor: Color) {
     }
 }
 
-@Composable
-private fun DomainSection(title: String) {
-    Text(
-        text = title,
-        fontSize = 16.sp,
-        fontFamily = fontBold,
-        color = PrimaryBlue,
-        modifier = Modifier.padding(vertical = 8.dp)
-    )
-}
+
 
 @Composable
 private fun BottomUI(onNext: () -> Unit = {},onBack: () -> Unit) {
@@ -249,3 +293,8 @@ fun ReportAdvanceScreenPreview() {
     val onBack: () -> Unit = {}
     ReportAdvanceScreen(onNext, onBack)
 }
+val myList = listOf(
+    "Point 1: This is an example.",
+    "Point 2: More details here.",
+    "Point 3: Final note."
+)

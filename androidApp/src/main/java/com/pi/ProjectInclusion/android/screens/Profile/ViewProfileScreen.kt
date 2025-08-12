@@ -98,6 +98,7 @@ import com.pi.ProjectInclusion.RedText
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.AccountDeleteDialog
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
+import com.pi.ProjectInclusion.android.common_UI.CameraGalleryButtons
 import com.pi.ProjectInclusion.android.common_UI.DeleteAccountPasswordDialog
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.LogoutDialog
@@ -1148,101 +1149,6 @@ fun Modifier.drawDashedBorder(
         )
     }
 )
-
-@Composable
-fun CameraGalleryButtons(
-    onImageUri: (Uri?) -> Unit
-) {
-    val context = LocalContext.current
-
-    // For Camera
-    val cameraImageUri = remember { mutableStateOf<Uri?>(null) }
-    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
-        onImageUri(cameraImageUri.value)
-    }
-
-    // For Gallery
-    val galleryLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            onImageUri(uri)
-        }
-
-    // Create a file to store image
-    fun createImageUri(): Uri? {
-        val contentValues = ContentValues().apply {
-            put(
-                MediaStore.Images.Media.DISPLAY_NAME,
-                PI_DOCUMENT + System.currentTimeMillis() + JPG
-            )
-            put(MediaStore.Images.Media.MIME_TYPE, IMAGE_MIME)
-        }
-        return context.contentResolver.insert(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            contentValues
-        )
-    }
-
-    Row(
-        modifier = Modifier
-            .padding(top = 16.dp)
-            .wrapContentWidth(),
-    ) {
-        Button(
-            onClick = {
-                val uri = createImageUri()
-                cameraImageUri.value = uri
-                uri?.let { cameraLauncher.launch(it) }
-            },
-            modifier = Modifier
-                .wrapContentWidth()
-                .padding(end = 8.dp)
-                .clip(RoundedCornerShape(8.dp)),
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = White,
-                contentColor = PrimaryBlue
-            ),
-            border = BorderStroke(1.dp, GrayLight01)
-        ) {
-            TextWithIconOnLeft(
-                text = stringResource(R.string.txt_Camera),
-                icon = ImageVector.vectorResource(id = R.drawable.camera_img),
-                textColor = Dark_03,
-                iconColor = Color.Unspecified,
-                onClick = {
-                    val uri = createImageUri()
-                    cameraImageUri.value = uri
-                    uri?.let { cameraLauncher.launch(it) }
-                }
-            )
-        }
-
-        Button(
-            onClick = {
-                galleryLauncher.launch(IMAGE_ALL_TYPE)
-            },
-            modifier = Modifier
-                .wrapContentWidth()
-                .clip(RoundedCornerShape(8.dp)),
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = White,
-                contentColor = PrimaryBlue
-            ),
-            border = BorderStroke(1.dp, GrayLight01)
-        ) {
-            TextWithIconOnLeft(
-                text = stringResource(R.string.txt_Gallery),
-                icon = ImageVector.vectorResource(id = R.drawable.gallery_img),
-                textColor = Dark_03,
-                iconColor = Color.Unspecified,
-                onClick = {
-                    galleryLauncher.launch(IMAGE_ALL_TYPE)
-                }
-            )
-        }
-    }
-}
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Preview
