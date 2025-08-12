@@ -22,6 +22,7 @@ val PrimaryBlue3 = Color(0xFFF0F9FF) //#F0F9FF
 val PrimaryBlueLt = Color(0xFFF2FBFF)
 val PrimaryBlueLt1 = Color(0xFFE6E9FF) // #E6E9FF
 val LightBlue = Color(0xFF5E72E7) //#5E72E7
+val Bg_Card = Color(0xFFF8F8F8) //#F8F8F8
 
 val Black = Color(0xFF111111)
 val Gray = Color(0xFF808080) // gray // #808080
