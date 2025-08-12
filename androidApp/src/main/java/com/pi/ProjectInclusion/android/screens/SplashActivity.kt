@@ -75,16 +75,16 @@ class SplashActivity : ComponentActivity() {
                     when (route) {
                         SPLASH_KEY -> SplashScreen {
                             // shaili
-                            navigateTo(AppRoute.EnterUserProfileScreen.route)
+//                            navigateTo(AppRoute.LanguageSelect.route)
 
                             // for abhishek & aashish
-                           /* context.startActivity(
+                            context.startActivity(
                                 Intent(context, StudentDashboardActivity::class.java)
                             )
-                            (context as? Activity)?.finish()*/
+                            (context as? Activity)?.finish()
                         }
 
-                        AppRoute.EnterUserProfileScreen.route -> {
+                        AppRoute.LanguageSelect.route -> {
                             LaunchedEffect(Unit) {
                                 delay(300) // optional smooth transition
                                 startActivity(

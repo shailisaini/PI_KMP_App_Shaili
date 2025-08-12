@@ -228,6 +228,7 @@ fun ProfileScreenUI(
         }
         else{
             context.toast(context.getString(R.string.txt_permission_grant))
+            isAddImageClicked = false
         }
     }
 

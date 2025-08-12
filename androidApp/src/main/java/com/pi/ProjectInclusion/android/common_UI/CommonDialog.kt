@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -606,12 +607,20 @@ fun CameraGalleryDialog(selectedUri: MutableState<Uri?> = mutableStateOf(null) ,
 
 @Composable
 fun CameraPermission(hasAllPermissions: MutableState<Boolean>, context: Context) {
-    fun checkAllPermissions(): Boolean {
-        val permissionsToCheck = listOf(
+    val permissionsToCheck = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        listOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.READ_MEDIA_IMAGES
+        )
+    } else {
+        listOf(
             Manifest.permission.CAMERA,
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
         )
+    }
+
+    fun checkAllPermissions(): Boolean {
         return permissionsToCheck.all {
             ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
         }
@@ -620,10 +629,10 @@ fun CameraPermission(hasAllPermissions: MutableState<Boolean>, context: Context)
     val permissionsLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        hasAllPermissions.value = permissions.all { it.value }
-        if (hasAllPermissions.value) {
-            // Now show camera/gallery
-        } else {
+        hasAllPermissions.value = permissionsToCheck.all {
+            permissions[it] == true
+        }
+        if (!hasAllPermissions.value) {
             context.toast(context.getString(R.string.txt_permission_grant))
         }
     }
@@ -632,12 +641,7 @@ fun CameraPermission(hasAllPermissions: MutableState<Boolean>, context: Context)
         if (checkAllPermissions()) {
             hasAllPermissions.value = true
         } else {
-            val permissionsToRequest = arrayOf(
-                Manifest.permission.CAMERA,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-            permissionsLauncher.launch(permissionsToRequest)
+            permissionsLauncher.launch(permissionsToCheck.toTypedArray())
         }
     }
 }
