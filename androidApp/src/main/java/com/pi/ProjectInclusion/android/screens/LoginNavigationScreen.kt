@@ -59,7 +59,7 @@ class LoginNavigationScreen : ComponentActivity() {
             val currentDestination = navBackStackEntry?.destination?.route
 //            val loadScreenName = intent.getStringExtra(screenName.screenName)
 //            val startDestination = if (viewModel.getScreenName() == onboarding2) {
-            val startDestination = AppRoute.LanguageSelect.route
+            val startDestination = AppRoute.EnterUserProfileScreen.route
 //            } else if (loadScreenName == onboarding1 || viewModel.getScreenName() == onboarding1) {
 //                AppRoute.RegistrationStep1()
 

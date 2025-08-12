@@ -7,6 +7,8 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -170,10 +172,15 @@ import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.fontSemiBold
+import com.pi.ProjectInclusion.constants.ConstantVariables.IMAGE_ALL_TYPE
+import com.pi.ProjectInclusion.constants.ConstantVariables.IMAGE_MIME
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.JPG
 import kotlinx.coroutines.delay
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_FEMALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_MALE
+import com.pi.ProjectInclusion.constants.ConstantVariables.PI_DOCUMENT
+import com.pi.ProjectInclusion.contactUsTxt
 import java.util.Calendar
 
 fun BackButtonPress(navController: NavHostController, route: String) {
@@ -3003,5 +3010,196 @@ fun ThemeSwitch(
                 fontSize = 14.sp
             )
         }
+    }
+}
+
+@Composable
+fun CameraGalleryButtons(
+    onImageUri: (Uri?) -> Unit
+) {
+    val context = LocalContext.current
+
+    // For Camera
+    val cameraImageUri = remember { mutableStateOf<Uri?>(null) }
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
+        onImageUri(cameraImageUri.value)
+    }
+
+    // For Gallery
+    val galleryLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            onImageUri(uri)
+        }
+
+    // Create a file to store image
+    fun createImageUri(): Uri? {
+        val contentValues = ContentValues().apply {
+            put(
+                MediaStore.Images.Media.DISPLAY_NAME,
+                PI_DOCUMENT + System.currentTimeMillis() + JPG
+            )
+            put(MediaStore.Images.Media.MIME_TYPE, IMAGE_MIME)
+        }
+        return context.contentResolver.insert(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            contentValues
+        )
+    }
+
+    Row(
+        modifier = Modifier
+            .padding(top = 16.dp)
+            .wrapContentWidth(),
+    ) {
+        Button(
+            onClick = {
+                val uri = createImageUri()
+                cameraImageUri.value = uri
+                uri?.let { cameraLauncher.launch(it) }
+            },
+            modifier = Modifier
+                .wrapContentWidth()
+                .padding(end = 8.dp)
+                .clip(RoundedCornerShape(8.dp)),
+            shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = White,
+                contentColor = PrimaryBlue
+            ),
+            border = BorderStroke(1.dp, GrayLight01)
+        ) {
+            TextWithIconOnLeft(
+                text = stringResource(R.string.txt_Camera),
+                icon = ImageVector.vectorResource(id = R.drawable.camera_img),
+                textColor = Dark_03,
+                iconColor = Color.Unspecified,
+                onClick = {
+                    val uri = createImageUri()
+                    cameraImageUri.value = uri
+                    uri?.let { cameraLauncher.launch(it) }
+                }
+            )
+        }
+
+        Button(
+            onClick = {
+                galleryLauncher.launch(IMAGE_ALL_TYPE)
+            },
+            modifier = Modifier
+                .wrapContentWidth()
+                .clip(RoundedCornerShape(8.dp)),
+            shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = White,
+                contentColor = PrimaryBlue
+            ),
+            border = BorderStroke(1.dp, GrayLight01)
+        ) {
+            TextWithIconOnLeft(
+                text = stringResource(R.string.txt_Gallery),
+                icon = ImageVector.vectorResource(id = R.drawable.gallery_img),
+                textColor = Dark_03,
+                iconColor = Color.Unspecified,
+                onClick = {
+                    galleryLauncher.launch(IMAGE_ALL_TYPE)
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun BottomSheetCameraGallery(
+    onImageUri: (Uri?) -> Unit
+) {
+    val context = LocalContext.current
+
+    // For Camera
+    val cameraImageUri = remember { mutableStateOf<Uri?>(null) }
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
+        onImageUri(cameraImageUri.value)
+    }
+
+    // For Gallery
+    val galleryLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            onImageUri(uri)
+        }
+
+    // Create a file to store image
+    fun createImageUri(): Uri? {
+        val contentValues = ContentValues().apply {
+            put(
+                MediaStore.Images.Media.DISPLAY_NAME,
+                PI_DOCUMENT + System.currentTimeMillis() + JPG
+            )
+            put(MediaStore.Images.Media.MIME_TYPE, IMAGE_MIME)
+        }
+        return context.contentResolver.insert(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            contentValues
+        )
+    }
+
+    Row(
+        modifier = Modifier
+            .padding(horizontal = 20.dp)
+            .wrapContentWidth(),
+    ) {
+        Column(
+            modifier = Modifier
+                .wrapContentWidth()
+                .clickable{
+                    val uri = createImageUri()
+                    cameraImageUri.value = uri
+                    uri?.let { cameraLauncher.launch(it) }
+                },
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_circle_camera),
+                contentDescription = IMG_DESCRIPTION,
+                modifier = Modifier.size(60.dp),
+                tint = Color.Unspecified
+            )
+            Text(
+                text = stringResource(R.string.txt_Camera),
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .padding(top = 16.dp, start = 8.dp, end = 8.dp),
+                fontFamily = fontMedium,
+                fontSize = 15.sp,
+                color = contactUsTxt,
+                textAlign = TextAlign.Center
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .wrapContentWidth()
+                .padding(start = 15.dp)
+                .clickable{
+                    galleryLauncher.launch(IMAGE_ALL_TYPE)
+                },
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_circle_gallery),
+                contentDescription = IMG_DESCRIPTION,
+                modifier = Modifier.size(60.dp),
+                tint = Color.Unspecified
+            )
+            Text(
+                text = stringResource(R.string.txt_Gallery),
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .padding(top = 16.dp, start = 8.dp, end = 8.dp),
+                fontFamily = fontMedium,
+                fontSize = 15.sp,
+                color = contactUsTxt,
+                textAlign = TextAlign.Center
+            )
+        }
+
     }
 }

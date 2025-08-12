@@ -120,6 +120,7 @@ and make a difference together!</string>
     <string name="txt_step_1">Step 1 of 2</string>
     <string name="txt_step_2">Step 2 of 2</string>
     <string name="txt_add_photo">Add Photo</string>
+    <string name="txt_change_photo">Change Photo</string>
     <string name="txt_first_name">First Name</string>
     <string name="txt_email">Email</string>
     <string name="txt_last_name">Last Name</string>
@@ -400,5 +401,6 @@ and make a difference together!</string>
     <string name="txt_qualification">Qualification</string>
     <string name="txt_specialization">Specialization</string>
     <string name="txt_crrNo">CRR No</string>
+    <string name="txt_permission_grant">Please grant all the permissions from settings.</string>
     <string name="txt_enter_udise">Enter UDISE Code</string>
 </resources>
