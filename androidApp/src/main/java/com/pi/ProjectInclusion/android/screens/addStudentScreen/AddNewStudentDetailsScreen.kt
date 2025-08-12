@@ -100,6 +100,7 @@ import com.pi.ProjectInclusion.android.common_UI.showDatePickerDialog
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_FEMALE
@@ -158,6 +159,10 @@ fun AddNewStudentDetailsScreen(onNext: () -> Unit, onBack: () -> Unit) {
     val fNameMsg = stringResource(R.string.txt_enter_your_F_name_msg)
     val schoolMsg = stringResource(R.string.txt_select_your_school_msg)
     val classMsg = stringResource(R.string.txt_select_your_class_msg)
+
+    BackHandler {
+        onBack()
+    }
 
     // This is used for drawer navigation when dashboard is working properly then It will use right place.
     BottomSheetReferUIScreen(

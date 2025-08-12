@@ -128,6 +128,10 @@ fun AppBar(
             OpenDashboardHeader(onNavigationIconClick, isNotification)
         }
 
+        AppRoute.ScreeningScreen.route -> {
+            OpenDashboardHeader(onNavigationIconClick, isNotification)
+        }
+
         else -> {
 
         }

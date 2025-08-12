@@ -62,6 +62,7 @@ import com.pi.ProjectInclusion.android.common_UI.TextViewField
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.RURAL
 import com.pi.ProjectInclusion.constants.ConstantVariables.URBAN
@@ -136,6 +137,10 @@ fun AddNewStudentMoreDetailsScreen(onNext: () -> Unit, onBack: () -> Unit) {
     var boardMsg = stringResource(R.string.txt_select_your_board_msg)
     var schoolTypeMsg = stringResource(R.string.txt_select_your_school_type_msg)
     var showToast by remember { mutableStateOf(false) }
+
+    BackHandler {
+        onBack()
+    }
 
     DetailsNoImgBackgroundUi(
         backgroundColor = White,

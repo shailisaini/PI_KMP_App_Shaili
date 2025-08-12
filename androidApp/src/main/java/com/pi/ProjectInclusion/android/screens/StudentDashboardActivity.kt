@@ -66,6 +66,7 @@ import com.pi.ProjectInclusion.android.screens.login.EnterUserNameScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.AdvanceScreening
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ProfilerFormPageScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ReportAdvanceScreen
+import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -103,6 +104,7 @@ class StudentDashboardActivity : ComponentActivity() {
 
             ModalNavigationDrawer(
                 drawerState = drawerState,
+                gesturesEnabled = false, // prevents swipe
                 drawerContent = {
                     Column(
                         modifier = Modifier
@@ -124,43 +126,43 @@ class StudentDashboardActivity : ComponentActivity() {
                                 MenuItem(
                                     id = AppRoute.CertificateScreen.route,
                                     title = stringResource(R.string.certificate_txt),
-                                    contentDescription = "",
+                                    contentDescription = IMG_DESCRIPTION,
                                     icon = ImageVector.vectorResource(id = R.drawable.certificate_ic)
                                 ),
                                 MenuItem(
                                     id = AppRoute.JoinMeetingScreen.route,
                                     title = stringResource(R.string.meeting_txt),
-                                    contentDescription = "",
+                                    contentDescription = IMG_DESCRIPTION,
                                     icon = ImageVector.vectorResource(id = R.drawable.meeting_ic)
                                 ),
                                 MenuItem(
                                     id = AppRoute.ChangePasswordScreen.route,
                                     title = stringResource(R.string.change_password),
-                                    contentDescription = "",
+                                    contentDescription = IMG_DESCRIPTION,
                                     icon = ImageVector.vectorResource(id = R.drawable.password_ic)
                                 ),
                                 MenuItem(
                                     id = AppRoute.LanguageScreen.route,
                                     title = stringResource(R.string.language_txt),
-                                    contentDescription = "",
+                                    contentDescription = IMG_DESCRIPTION,
                                     icon = ImageVector.vectorResource(id = R.drawable.language_ic)
                                 ),
                                 MenuItem(
                                     id = AppRoute.ReferScreen.route,
                                     title = stringResource(R.string.nav_refer_txt),
-                                    contentDescription = "",
+                                    contentDescription = IMG_DESCRIPTION,
                                     icon = ImageVector.vectorResource(id = R.drawable.refer_ic)
                                 ),
                                 MenuItem(
                                     id = AppRoute.ContactUsScreen.route,
                                     title = stringResource(R.string.nav_contact),
-                                    contentDescription = "",
+                                    contentDescription = IMG_DESCRIPTION,
                                     icon = ImageVector.vectorResource(id = R.drawable.contact_ic)
                                 ),
                                 MenuItem(
                                     id = AppRoute.FaqScreen.route,
                                     title = stringResource(R.string.nav_faq),
-                                    contentDescription = "",
+                                    contentDescription = IMG_DESCRIPTION,
                                     icon = ImageVector.vectorResource(id = R.drawable.faq_ic)
                                 ),
                             ), onItemClick = { itemId ->
@@ -234,7 +236,8 @@ class StudentDashboardActivity : ComponentActivity() {
                                         viewModel = viewModel,
                                         onNext = { navigateTo(AppRoute.UserPasswordScreen.route) },
                                         onRegister = {
-                                            navigateTo(AppRoute.OtpSendVerifyUI.route) },
+                                            navigateTo(AppRoute.OtpSendVerifyUI.route)
+                                        },
                                         onBack = { navigateBack(AppRoute.UserTypeSelect.route) }
                                     )
 
@@ -259,7 +262,7 @@ class StudentDashboardActivity : ComponentActivity() {
                                         addStudent = { navigateTo(AppRoute.AddStudentRegister.route) },
                                         screeningOne = { navigateTo(AppRoute.ScreeningOne.route) },
                                         profilerForm = { navigateTo(AppRoute.ProfilerFormPage.route) },
-                                        onBack = { navigateBack(AppRoute.ProfileScreen.route) }
+                                        onBack = { navigateBack(AppRoute.DashboardScreen.route) }
                                     )
 
                                     AppRoute.ScreeningOne.route -> ScreeningOneScreen(
@@ -267,14 +270,21 @@ class StudentDashboardActivity : ComponentActivity() {
                                         onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
                                     )
 
-                                AppRoute.ScreeningOneReport.route -> {
+                                    AppRoute.ScreeningOneReport.route -> {
                                         ScreeningOneReportScreen(
-                                            showReportScreen = false,
+                                            showReportScreen = true,
                                             onNext = { navigateTo(AppRoute.ProfilerFormPage.route) },
                                             onNextCongratulate = { navigateTo(AppRoute.AdvanceScreeningReport.route) },
                                             onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
                                         )
-                                }
+                                    }
+
+                                    AppRoute.ProfilerFormPage.route -> {
+                                        ProfilerFormPageScreen(
+                                            onNext = { navigateTo(AppRoute.ProfilerFormPage.route) },
+                                            onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
+                                        )
+                                    }
 
                                     AppRoute.AdvanceScreeningReport.route -> {
                                         ReportAdvanceScreen(

@@ -91,6 +91,7 @@ import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.fontSemiBold
 import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -111,6 +112,10 @@ fun ScreeningHomeScreen(
             BlueBackground3
         }
     )
+
+    BackHandler {
+        onBack()
+    }
 
     val tabItems = listOf(
         TabItem(
