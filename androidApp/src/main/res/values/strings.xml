@@ -344,7 +344,7 @@ and make a difference together!</string>
     <string name="txt_adv_screen_report">Advance Screening Report</string>
     <string name="txt_No_I_will_do_it_later">No, I will do it later</string>
     <string name="txt_Profiler_Form">Profiler Form</string>
-    <string name="btn_profiler_Form">Profiler Form ></string>
+    <string name="btn_profiler_Form">View Profiler></string>
     <string name="txt_Let_fill_profiler_Form_understand">Let’s us fill profiler form to understand students’ strengths and abilities</string>
     <string name="txt_Visual_Domain_VI">Visual Domain (VI)</string>
     <string name="txt_Condition">Condition</string>
@@ -406,4 +406,5 @@ and make a difference together!</string>
     <string name="txt_permission_grant">Please grant all the permissions from settings.</string>
     <string name="txt_enter_udise">Enter UDISE Code</string>
     <string name="all_screening_completed">All Screening completed</string>
+    <string name="key_fcm_token">fcm_token</string>
 </resources>

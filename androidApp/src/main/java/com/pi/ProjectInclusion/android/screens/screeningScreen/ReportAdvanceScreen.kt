@@ -272,6 +272,7 @@ private fun BottomUI(onNext: () -> Unit = {},onBack: () -> Unit) {
 
                 Text(
                     modifier = Modifier
+                        .padding(bottom = 8 .dp)
                         .clickable{
                             onBack()
                         },

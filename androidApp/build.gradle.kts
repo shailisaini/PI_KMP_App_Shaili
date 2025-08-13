@@ -81,4 +81,8 @@ dependencies {
     implementation(libs.coil.compose) // Or latest version
     implementation(libs.coil.svg) // For SVG support
     implementation(libs.lottie.compose)
+
+//    firebase crashlytics
+    implementation(libs.firebase.messaging) // latest stable version
+    implementation(libs.firebase.analytics.ktx)
 }
