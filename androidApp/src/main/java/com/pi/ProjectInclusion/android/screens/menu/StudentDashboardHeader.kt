@@ -26,7 +26,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +43,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,6 +54,7 @@ import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -58,7 +64,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun OpenDashboardHeader(
     onNavigationIconClick: () -> Unit = {},
-    isNotification: Boolean = true
+    isNotification: Boolean = true,
 ) {
     Box(
         modifier = Modifier
@@ -110,8 +116,83 @@ fun OpenDashboardHeader(
                         tint = Black
                     )
                 }
-            }
-        )
+            })
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun OpenScreeningHeader(
+    onNavigationIconClick: () -> Unit,
+    hideShowFilter: Boolean,
+) {
+    Box(
+        modifier = Modifier
+            .wrapContentHeight()
+            .background(color = White)
+            .fillMaxWidth()
+            .clipToBounds()
+    ) {
+        TopAppBar(
+            title = {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (hideShowFilter) stringResource(R.string.nav_screening) else stringResource(
+                            R.string.nav_intervention
+                        ),
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Start,
+                        fontFamily = fontBold,
+                        color = Black,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Spacer(Modifier.weight(1f))
+
+                    Image(
+                        modifier = Modifier
+                            .padding(
+                                end = if (hideShowFilter) {
+                                    10.dp
+                                } else {
+                                    0.dp
+                                }
+                            )
+                            .size(25.dp),
+                        painter = painterResource(R.drawable.more_info_black_icon),
+                        contentDescription = IMG_DESCRIPTION,
+                        contentScale = ContentScale.Crop// Clip the image to a circular shape
+                    )
+
+                    if (hideShowFilter) {
+                        Image(
+                            painter = painterResource(R.drawable.filter_img),
+                            contentDescription = IMG_DESCRIPTION,
+                            modifier = Modifier.size(25.dp),
+                            contentScale = ContentScale.Crop// Clip the image to a circular shape
+                        )
+                    }
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = White),
+            modifier = Modifier
+                .background(Transparent)
+                .zIndex(1f),
+            navigationIcon = {
+                IconButton(onClick = onNavigationIconClick) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_menu),
+                        contentDescription = "",
+                        tint = Black
+                    )
+                }
+            })
     }
 }
 
@@ -119,13 +200,21 @@ fun OpenDashboardHeader(
 fun AppBar(
     isNotification: Boolean,
     onNavigationIconClick: () -> Unit = {},
-    currentRoute: String? = ""
+    currentRoute: String? = "",
 ) {
-
     when (currentRoute) {
-
         AppRoute.DashboardScreen.route -> {
             OpenDashboardHeader(onNavigationIconClick, isNotification)
+        }
+
+        AppRoute.ScreeningScreen.route -> {
+            var hideShowFilter by remember { mutableStateOf(true) }
+            OpenScreeningHeader(onNavigationIconClick, hideShowFilter)
+        }
+
+        AppRoute.InterventionScreen.route -> {
+            var hideShowFilter by remember { mutableStateOf(false) }
+            OpenScreeningHeader(onNavigationIconClick, hideShowFilter)
         }
 
         else -> {
@@ -140,13 +229,12 @@ fun AppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 fun TopBarPassport(
     scope: CoroutineScope = rememberCoroutineScope(),
-    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Open)
+    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Open),
 ) {
     TopAppBar(
         title = {
             Row(
-                modifier = Modifier.height(80.dp),
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier.height(80.dp), verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = stringResource(id = R.string.language_txt),
@@ -174,11 +262,8 @@ fun TopBarPassport(
                 }
             }) {
                 Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "",
-                    tint = Black
+                    imageVector = Icons.Default.Menu, contentDescription = "", tint = Black
                 )
             }
-        }
-    )
+        })
 }

@@ -65,6 +65,7 @@ import com.pi.ProjectInclusion.android.common_UI.YesBtnUi
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
+import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 
 @Composable
@@ -89,6 +90,10 @@ fun InterventionAcceptLevelScreen(
     var showLevelCheckDialog by remember { mutableStateOf(false) }
     var showHowMarkLevelDialog by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
+
+    BackHandler {
+        onBack()
+    }
 
     if (showLevelCheckDialog) {
         LevelCheckDialog {

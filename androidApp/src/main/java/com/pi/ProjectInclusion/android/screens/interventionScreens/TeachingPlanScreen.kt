@@ -42,6 +42,7 @@ import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
+import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,6 +50,10 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 fun TeachingPlanScreen(onBack: () -> Unit) {
 
     logger.d("Screen: " + "TeachingPlanScreen()")
+
+    BackHandler {
+        onBack()
+    }
 
     DetailsNoImgBackgroundUi(
         backgroundColor = PrimaryBlue,

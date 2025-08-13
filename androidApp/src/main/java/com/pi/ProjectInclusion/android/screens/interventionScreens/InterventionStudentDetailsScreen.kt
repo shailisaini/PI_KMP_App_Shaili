@@ -77,6 +77,7 @@ import com.pi.ProjectInclusion.android.common_UI.DetailsBackgroundUi
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.contactUsTxt
 import kotlinx.coroutines.launch
@@ -133,6 +134,10 @@ fun InterventionStudentDetailsScreen(
         InterventionIntroDialog {
             showDialog = false
         }
+    }
+
+    BackHandler {
+        onBack()
     }
 
     DetailsBackgroundUi(

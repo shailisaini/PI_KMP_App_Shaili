@@ -52,6 +52,7 @@ import com.pi.ProjectInclusion.android.common_UI.SmallBtnUi
 import com.pi.ProjectInclusion.android.common_UI.YesNoBtnUi
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
+import com.pi.ProjectInclusion.constants.BackHandler
 
 
 @Composable
@@ -61,6 +62,10 @@ fun ScreeningOneScreen(onNext: () -> Unit, onBack: () -> Unit) {
 
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
+
+    BackHandler {
+        onBack()
+    }
 
     // This function will be change according to recommend
     if (showDialog) {

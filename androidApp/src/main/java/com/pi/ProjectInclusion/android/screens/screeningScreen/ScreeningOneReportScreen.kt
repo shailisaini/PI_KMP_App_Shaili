@@ -64,6 +64,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.pi.ProjectInclusion.BorderBlue
 import com.pi.ProjectInclusion.LightPurple04
+import com.pi.ProjectInclusion.constants.BackHandler
 
 
 @Composable
@@ -76,6 +77,9 @@ fun ScreeningOneReportScreen(
 
     logger.d("Screen: " + "ScreeningOneReportScreen()")
 
+    BackHandler {
+        onBack()
+    }
 
     Column(
         modifier = Modifier
@@ -105,9 +109,8 @@ fun ScreeningOneReportScreen(
             ReportScreenContent(onNext)
         } else {
             var name = stringResource(R.string.user_name)
-            CongratulationsScreen(name, onNextCongratulate,onBack)
+            CongratulationsScreen(name, onNextCongratulate, onBack)
         }
-
     }
 }
 
@@ -156,8 +159,9 @@ private fun ReportScreenContent(onNext: () -> Unit = {}) {
         BottomUI(onNext)
     }
 }
+
 @Composable
-fun CongratulationsScreen(name: String,onNext: () -> Unit = {}, onBack: () -> Unit) {
+fun CongratulationsScreen(name: String, onNext: () -> Unit = {}, onBack: () -> Unit) {
     val compositionState = rememberLottieComposition(
         spec = LottieCompositionSpec.Asset("Confetti.json")
     )
@@ -192,15 +196,14 @@ fun CongratulationsScreen(name: String,onNext: () -> Unit = {}, onBack: () -> Un
                 imageVector = ImageVector.vectorResource(id = R.drawable.congrats_img),
                 contentDescription = IMG_DESCRIPTION,
                 modifier = Modifier
-                    .size(138.dp)
-                ,
+                    .size(138.dp),
                 tint = Color.Unspecified
             )
 
             Text(
                 text = stringResource(R.string.head_congratulations),
                 modifier = Modifier
-                    .padding(top = 16.dp, start = 8.dp, end = 8.dp, bottom = 8  .dp),
+                    .padding(top = 16.dp, start = 8.dp, end = 8.dp, bottom = 8.dp),
                 fontFamily = fontBold,
                 fontSize = 21.sp,
                 color = Black,
@@ -209,10 +212,12 @@ fun CongratulationsScreen(name: String,onNext: () -> Unit = {}, onBack: () -> Un
 
             Text(
                 text = buildAnnotatedString {
-                    withStyle(style = SpanStyle(
-                        color = BorderBlue,
-                        fontWeight = FontWeight.Bold
-                    )) {
+                    withStyle(
+                        style = SpanStyle(
+                            color = BorderBlue,
+                            fontWeight = FontWeight.Bold
+                        )
+                    ) {
                         append(name + " ")
                     }
                     withStyle(style = SpanStyle(color = GrayLight04)) {
@@ -232,7 +237,7 @@ fun CongratulationsScreen(name: String,onNext: () -> Unit = {}, onBack: () -> Un
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(24.dp)
-        ){
+        ) {
             BtnWithRightIconUi(
                 onClick = {
                     onNext()
@@ -244,7 +249,6 @@ fun CongratulationsScreen(name: String,onNext: () -> Unit = {}, onBack: () -> Un
         }
     }
 }
-
 
 
 @Composable
@@ -348,5 +352,5 @@ fun ScreeningOneReportScreenPreview() {
     val onNext: () -> Unit = {}
     val onBack: () -> Unit = {}
     val onNextCongratulate: () -> Unit = {}
-    ScreeningOneReportScreen(false,onNext, onBack,onNextCongratulate)
+    ScreeningOneReportScreen(false, onNext, onBack, onNextCongratulate)
 }

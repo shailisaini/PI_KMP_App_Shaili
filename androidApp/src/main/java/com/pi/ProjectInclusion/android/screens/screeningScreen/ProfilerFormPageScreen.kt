@@ -61,6 +61,7 @@ import com.pi.ProjectInclusion.android.common_UI.YesNoBtnUi
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.BackHandler
 
 @Composable
 fun ProfilerFormPageScreen(onNext: () -> Unit, onBack: () -> Unit) {
@@ -83,6 +84,10 @@ fun ProfilerFormPageScreen(onNext: () -> Unit, onBack: () -> Unit) {
         ScreeningIntroDialog {
             showDialog = false
         }
+    }
+
+    BackHandler {
+        onBack()
     }
 
     ScreeningDetailsBackgroundUi(

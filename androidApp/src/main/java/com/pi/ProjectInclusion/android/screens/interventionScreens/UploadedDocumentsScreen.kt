@@ -45,6 +45,7 @@ import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 
 @Composable
@@ -77,6 +78,10 @@ fun UploadedDocumentsScreen(
             painterResource(id = R.drawable.docs_preview_img)
         )
     )
+
+    BackHandler {
+        onBack()
+    }
 
     DetailsNoImgBackgroundUi(
         backgroundColor = PrimaryBlue,

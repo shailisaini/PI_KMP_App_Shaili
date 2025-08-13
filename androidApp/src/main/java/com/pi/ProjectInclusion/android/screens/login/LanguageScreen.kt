@@ -111,6 +111,7 @@ import kotlinx.coroutines.launch
                 LoggerProvider.logger.d("Error: ${uiState.error}")
                 context.toast(uiState.error)
                 isDialogVisible = false
+                onNext()
             }
 
             uiState.success != null -> {

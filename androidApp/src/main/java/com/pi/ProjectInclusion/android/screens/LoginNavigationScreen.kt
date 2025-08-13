@@ -54,7 +54,7 @@ class LoginNavigationScreen : ComponentActivity() {
             val context = LocalContext.current
             val navController = rememberNavController()
 //            val viewModel = koinViewModel<LoginViewModel>()
-            val viewModel : LoginViewModel = koinViewModel()
+            val viewModel: LoginViewModel = koinViewModel()
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination?.route
 //            val loadScreenName = intent.getStringExtra(screenName.screenName)
@@ -110,12 +110,18 @@ class LoginNavigationScreen : ComponentActivity() {
                         AppRoute.LanguageSelect.route -> LanguageScreen(
                             viewModel = viewModel
                         ) {
-                            navigateTo(AppRoute.SpecialEducatorRegistration2.route)
+//                            navigateTo(AppRoute.SpecialEducatorRegistration2.route)
+                            navigateTo(AppRoute.UserTypeSelect.route)
                         }
 
                         AppRoute.UserTypeSelect.route -> UserTypeScreen(
                             viewModel = viewModel,
-                            onNext = { navigateTo(AppRoute.UserNameScreen.route) },
+                            onNext = { /*navigateTo(AppRoute.UserNameScreen.route)*/
+                                context.startActivity(
+                                    Intent(context, StudentDashboardActivity::class.java)
+                                )
+                                (context as? Activity)?.finish()
+                            },
                             onBack = { navigateBack(AppRoute.LanguageSelect.route) }
                         )
 
@@ -124,7 +130,8 @@ class LoginNavigationScreen : ComponentActivity() {
                             onNext = { navigateTo(AppRoute.UserPasswordScreen.route) },
                             // for register & activate
                             onRegister = {
-                                navigateTo(AppRoute.OtpSendVerifyUI.route) },
+                                navigateTo(AppRoute.OtpSendVerifyUI.route)
+                            },
 
                             onBack = { navigateBack(AppRoute.UserTypeSelect.route) }
                         )
@@ -132,14 +139,16 @@ class LoginNavigationScreen : ComponentActivity() {
                         AppRoute.OtpSendVerifyUI.route -> OtpSendVerifyScreen(
                             onNext = { navigateTo(AppRoute.SetNewPasswordUI.route) },
                             onBack = {
-                                navigateBack(AppRoute.ForgetPasswordUI.route) },
+                                navigateBack(AppRoute.ForgetPasswordUI.route)
+                            },
                             viewModel = viewModel
                         )
 
                         AppRoute.UserPasswordScreen.route -> EnterPasswordScreen(
                             viewModel = viewModel,
                             onNext = {
-                                navigateTo(AppRoute.OtpSendVerifyUI.route) },
+                                navigateTo(AppRoute.OtpSendVerifyUI.route)
+                            },
                             isForgetPassword = { navigateTo(AppRoute.ForgetPasswordUI.route) },
                             onBack = { navigateBack(AppRoute.UserNameScreen.route) }
                         )
@@ -160,12 +169,15 @@ class LoginNavigationScreen : ComponentActivity() {
                             onNextProfessional = { navigateTo(AppRoute.EnterProfessionalScreen2.route) },
                             onBack = { navigateBack(AppRoute.UserNameScreen.route) }
                         )
+
                         AppRoute.EnterUserProfileScreen.route -> ProfessionalsRegistration2(
                             viewModel = viewModel,
-                            onNext = { context.startActivity(
-                                Intent(context, StudentDashboardActivity::class.java)
-                            )
-                                (context as? Activity)?.finish() },
+                            onNext = {
+                                context.startActivity(
+                                    Intent(context, StudentDashboardActivity::class.java)
+                                )
+                                (context as? Activity)?.finish()
+                            },
                             onBack = { navigateBack(AppRoute.UserNameScreen.route) }
                         )
 
@@ -194,7 +206,7 @@ class LoginNavigationScreen : ComponentActivity() {
                         AppRoute.ForgetPasswordUI.route -> ForgetPasswordScreen(
                             onNext = {
                                 navigateTo(AppRoute.OtpSendVerifyUI.route)
-                                     },
+                            },
                             onBack = { navigateBack(AppRoute.UserNameScreen.route) },
                             viewModel = viewModel
                         )
@@ -203,7 +215,7 @@ class LoginNavigationScreen : ComponentActivity() {
                             onNext = { navigateTo(AppRoute.UserNameScreen.route) },
                             onBack = {
 //                                navigateBack(AppRoute.OtpSendVerifyUI.route)
-                                     },
+                            },
                             viewModel = viewModel
                         )
                     }
