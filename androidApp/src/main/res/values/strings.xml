@@ -401,4 +401,5 @@ and make a difference together!</string>
     <string name="txt_specialization">Specialization</string>
     <string name="txt_crrNo">CRR No</string>
     <string name="txt_enter_udise">Enter UDISE Code</string>
+    <string name="key_fcm_token">fcm_token</string>
 </resources>
