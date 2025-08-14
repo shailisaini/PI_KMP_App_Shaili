@@ -41,6 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
+import com.pi.ProjectInclusion.android.common_UI.AESEncryption.decrypt
+import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
 import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Bg_Gray1
 import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
@@ -154,6 +156,17 @@ fun PasswordUI(
     var enterConfirmPasswordStr = rememberSaveable { mutableStateOf("") }
     val enterPassword = stringResource(R.string.txt_Enter_your_password)
     val showPassword = remember { mutableStateOf(false) }
+
+    val mobNo = viewModel.mobileNumber
+
+    val isEncrypted = remember { isEncrypted(viewModel.getUserEmail()) }
+    if (isEncrypted) {
+        decrypt(viewModel.getUserEmail())
+    } else {
+        viewModel.getUserEmail()
+    }
+
+    val encryptedPhoneNo = mobNo?.encryptAES().toString().trim()
 
     var isDialogVisible by remember { mutableStateOf(false) }
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
