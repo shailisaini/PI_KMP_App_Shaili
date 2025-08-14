@@ -1,13 +1,10 @@
 package com.pi.ProjectInclusion.android.screens.screeningScreen
 
-import android.content.Intent
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,9 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Surface
@@ -27,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,32 +31,27 @@ import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Bg_Card
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.BorderBlue
-import com.pi.ProjectInclusion.CardColor01
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.HeaderColor01
+import com.pi.ProjectInclusion.LightPurple04
 import com.pi.ProjectInclusion.PrimaryBlue
+import com.pi.ProjectInclusion.PrimaryBlueLt1
+import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BtnWithRightIconUi
-import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
-import com.pi.ProjectInclusion.LightPurple04
-import com.pi.ProjectInclusion.PrimaryBlueLt1
-import com.pi.ProjectInclusion.Transparent
-import com.pi.ProjectInclusion.android.common_UI.MobileTextField
-import com.pi.ProjectInclusion.android.utils.toast
-
 
 @Composable
 fun ReportAdvanceScreen(
     onNext: () -> Unit,
+    onViewProfileDetails: () -> Unit,
     onBack: () -> Unit,
 ) {
 
-    logger.d("Screen: " + "ScreeningOneReportScreen()")
-
+    logger.d("Screen: " + "ReportAdvanceScreen()")
 
     Column(
         modifier = Modifier
@@ -87,14 +76,17 @@ fun ReportAdvanceScreen(
             stringResource(R.string.txt_Student_Name)
         )
 
-        ReportScreenContent(onNext,onBack)
-
+        ReportScreenContent(onNext, onViewProfileDetails, onBack)
 
     }
 }
 
 @Composable
-private fun ReportScreenContent(onNext: () -> Unit = {},onBack: () -> Unit) {
+private fun ReportScreenContent(
+    onNext: () -> Unit = {},
+    onViewProfileDetails: () -> Unit = {},
+    onBack: () -> Unit,
+) {
 
     Column(
 //        modifier = Modifier
@@ -109,7 +101,7 @@ private fun ReportScreenContent(onNext: () -> Unit = {},onBack: () -> Unit) {
 
             ReportDataCard(
                 title = stringResource(R.string.txt_Condition),
-                 myList,
+                myList,
                 titleColor = HeaderColor01
             )
 
@@ -117,7 +109,7 @@ private fun ReportScreenContent(onNext: () -> Unit = {},onBack: () -> Unit) {
             Spacer(modifier = Modifier.height(16.dp))
 
             BottomCard(
-
+                onViewProfileDetails = onViewProfileDetails,
                 title = stringResource(R.string.txt_Condition),
                 text = stringResource(R.string.txt_adv_message),
                 titleColor = HeaderColor01
@@ -165,7 +157,7 @@ internal fun ReportDataCard(title: String, textList: List<String>, titleColor: C
                 items(textList.size) { item ->
                     Text(
                         modifier = Modifier
-                            .padding(start = 16 .dp),
+                            .padding(start = 16.dp),
                         text = textList[item],
                         fontSize = 15.sp,
                         fontFamily = fontRegular,
@@ -173,12 +165,17 @@ internal fun ReportDataCard(title: String, textList: List<String>, titleColor: C
                     )
                 }
             }
-
         }
     }
 }
+
 @Composable
-private fun BottomCard(title: String, text: String, titleColor: Color) {
+private fun BottomCard(
+    onViewProfileDetails: () -> Unit = {},
+    title: String,
+    text: String,
+    titleColor: Color,
+) {
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
@@ -206,13 +203,14 @@ private fun BottomCard(title: String, text: String, titleColor: Color) {
         ) {
             Text(
                 modifier = Modifier
-                    .padding(16 .dp),
+                    .padding(16.dp),
                 text = text,
                 textAlign = TextAlign.Center,
                 fontSize = 15.sp,
                 fontFamily = fontMedium,
                 color = Black
             )
+
             Spacer(
                 modifier = Modifier
                     .width(8.dp)
@@ -221,9 +219,9 @@ private fun BottomCard(title: String, text: String, titleColor: Color) {
 
             Text(
                 modifier = Modifier
-                    .padding(8 .dp)
-                    .clickable{
-
+                    .padding(8.dp)
+                    .clickable {
+                        onViewProfileDetails()
                     },
                 text = stringResource(R.string.btn_profiler_Form),
                 textAlign = TextAlign.Center,
@@ -231,15 +229,12 @@ private fun BottomCard(title: String, text: String, titleColor: Color) {
                 fontFamily = fontMedium,
                 color = BorderBlue,
             )
-
         }
     }
 }
 
-
-
 @Composable
-private fun BottomUI(onNext: () -> Unit = {},onBack: () -> Unit) {
+private fun BottomUI(onNext: () -> Unit = {}, onBack: () -> Unit) {
     Surface(
         color = Color.White, tonalElevation = 4.dp, shadowElevation = 8.dp
     ) {
@@ -250,7 +245,6 @@ private fun BottomUI(onNext: () -> Unit = {},onBack: () -> Unit) {
                     start = 16.dp, end = 16.dp, top = 36.dp, bottom = 16.dp
                 )
         ) {
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -264,6 +258,7 @@ private fun BottomUI(onNext: () -> Unit = {},onBack: () -> Unit) {
                         onNext()
                     }, title = stringResource(R.string.txt_Start_Intervention), enabled = true
                 )
+
                 Spacer(
                     modifier = Modifier
                         .width(54.dp)
@@ -272,8 +267,8 @@ private fun BottomUI(onNext: () -> Unit = {},onBack: () -> Unit) {
 
                 Text(
                     modifier = Modifier
-                        .padding(bottom = 8 .dp)
-                        .clickable{
+                        .padding(bottom = 8.dp)
+                        .clickable {
                             onBack()
                         },
                     text = stringResource(R.string.txt_No_I_will_do_it_later),
@@ -291,9 +286,11 @@ private fun BottomUI(onNext: () -> Unit = {},onBack: () -> Unit) {
 @Composable
 fun ReportAdvanceScreenPreview() {
     val onNext: () -> Unit = {}
+    val onViewProfileDetails: () -> Unit = {}
     val onBack: () -> Unit = {}
-    ReportAdvanceScreen(onNext, onBack)
+    ReportAdvanceScreen(onNext, onViewProfileDetails, onBack)
 }
+
 val myList = listOf(
     "Point 1: This is an example.",
     "Point 2: More details here.",

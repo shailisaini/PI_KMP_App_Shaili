@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.kmptemplate.logger.LoggerProvider.logger
@@ -78,14 +79,12 @@ fun AdvanceScreeningScreen(onNext: () -> Unit, onBack: () -> Unit) {
             stringResource(R.string.txt_Question_Constant),
             stringResource(R.string.txt_Yes),
             stringResource(R.string.txt_No)
-        ),
-        AdvanceScreeningQuestionData(
+        ), AdvanceScreeningQuestionData(
             2,
             stringResource(R.string.txt_Question_Constant),
             stringResource(R.string.txt_Yes),
             stringResource(R.string.txt_No)
-        ),
-        AdvanceScreeningQuestionData(
+        ), AdvanceScreeningQuestionData(
             3,
             stringResource(R.string.txt_Question_Constant),
             stringResource(R.string.txt_Yes),
@@ -213,8 +212,7 @@ fun AdvanceScreeningScreen(onNext: () -> Unit, onBack: () -> Unit) {
                         )
                 ) {
                     LazyColumn(
-                        modifier = Modifier
-                            .padding(bottom = 64.dp)
+                        modifier = Modifier.padding(bottom = 64.dp)
                     ) {
                         items(questionListData) { questionData ->
                             AdvanceScreeningQuestionDataUI(questionData)
@@ -223,9 +221,12 @@ fun AdvanceScreeningScreen(onNext: () -> Unit, onBack: () -> Unit) {
                 }
 
                 Box(
-                    modifier = Modifier
-                        .padding(start = 8.dp, end = 16.dp, bottom = 16.dp, top = 16.dp),
-                    contentAlignment = Alignment.BottomCenter
+                    modifier = Modifier.padding(
+                            start = 8.dp,
+                            end = 16.dp,
+                            bottom = 16.dp,
+                            top = 16.dp
+                        ), contentAlignment = Alignment.BottomCenter
                 ) {
                     Column(
                         modifier = Modifier
@@ -234,16 +235,13 @@ fun AdvanceScreeningScreen(onNext: () -> Unit, onBack: () -> Unit) {
                             .wrapContentHeight(), horizontalAlignment = Alignment.End
                     ) {
                         SmallBtnUi(
-                            enabled = true,
-                            title = stringResource(R.string.txt_submit),
-                            onClick = {
+                            enabled = true, title = stringResource(R.string.txt_submit), onClick = {
                                 onNext() // this change according to condition
                             })
                     }
                 }
             }
-        }
-    )
+        })
 }
 
 @Composable
@@ -263,8 +261,7 @@ fun AdvanceScreeningQuestionDataUI(questionData: AdvanceScreeningQuestionData) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 8.dp, top = 8.dp, bottom = 8.dp)
-            .wrapContentHeight(),
-        horizontalArrangement = Arrangement.SpaceBetween
+            .wrapContentHeight(), horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             text = "${questionData.queNumber}. ",
@@ -288,8 +285,7 @@ fun AdvanceScreeningQuestionDataUI(questionData: AdvanceScreeningQuestionData) {
         )
 
         Column(
-            modifier = Modifier
-                .wrapContentSize()
+            modifier = Modifier.wrapContentSize()
         ) {
             Card(
                 shape = RoundedCornerShape(8.dp),
@@ -344,9 +340,7 @@ fun AdvanceScreeningQuestionDataUI(questionData: AdvanceScreeningQuestionData) {
                     onClick = {
                         trueFalseYes = true
                         trueFalseNo = false
-                    },
-                    title = questionData.ansYes,
-                    enabled = trueFalseYes
+                    }, title = questionData.ansYes, enabled = trueFalseYes
                 )
 
                 Spacer(modifier = Modifier.width(16.dp))
@@ -368,3 +362,11 @@ data class AdvanceScreeningQuestionData(
     var ansYes: String,
     var ansNo: String,
 )
+
+@Preview(showSystemUi = true, showBackground = true)
+@Composable
+fun AdvanceScreeningPreview() {
+    val onNext: () -> Unit = {}
+    val onBack: () -> Unit = {}
+    AdvanceScreeningScreen(onNext, onBack)
+}

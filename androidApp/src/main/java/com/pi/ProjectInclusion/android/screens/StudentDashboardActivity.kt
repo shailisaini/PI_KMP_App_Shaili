@@ -67,6 +67,7 @@ import com.pi.ProjectInclusion.android.screens.screeningScreen.AdvanceScreening
 import com.pi.ProjectInclusion.android.screens.screeningScreen.AdvanceScreeningScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ProfilerFormPageScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ReportAdvanceScreen
+import com.pi.ProjectInclusion.android.screens.screeningScreen.ViewScreeningProfileDetailsScreen
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -311,7 +312,15 @@ class StudentDashboardActivity : ComponentActivity() {
 
                                     AppRoute.AdvanceScreeningReport.route -> {
                                         ReportAdvanceScreen(
-                                            onNext = { navigateTo(AppRoute.ProfilerFormPage.route) },
+                                            onNext = { navigateTo(AppRoute.InterventionScreen.route) },
+                                            onViewProfileDetails = { navigateTo(AppRoute.ViewScreeningProfileDetails.route) },
+                                            onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
+                                        )
+                                    }
+
+                                    AppRoute.ViewScreeningProfileDetails.route -> {
+                                        ViewScreeningProfileDetailsScreen(
+                                            onNext = { navigateTo(AppRoute.ScreeningScreen.route) },
                                             onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
                                         )
                                     }

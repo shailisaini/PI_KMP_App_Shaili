@@ -1179,7 +1179,7 @@ fun TextWithIconOnRight(
         Text(
             text = text, style = MaterialTheme.typography.bodyMedium.copy(
                 color = textColor,
-                fontSize = 13.sp,
+                fontSize = 14.sp,
                 textAlign = TextAlign.Start,
                 fontFamily = fontMedium,
             )
@@ -2170,6 +2170,53 @@ fun ProfileWithProgress(
                 .background(shape = CircleShape, color = White)
                 .border( // Add border modifier to make image stand out
                     width = 1.dp, color = GrayLight02, shape = CircleShape
+                ),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ProfileWithFullProgress(
+    image: String = "",
+    painter: Painter = painterResource(id = R.drawable.round_back_key),
+    progress: Float = 0.0f, // 0.0f to 1.0f
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier = modifier.size(90.dp), contentAlignment = Alignment.Center) {
+        // Canvas for circular progress
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val strokeWidth = 6.dp.toPx()
+            val radius = 90.dp.toPx() / 2 - strokeWidth / 2
+
+            drawArc(
+                color = LightRed01, // royal blue
+                startAngle = -90f,
+                sweepAngle = 360 * progress,
+                useCenter = false,
+                style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+            )
+        }
+
+        // Profile image
+        Image(
+            painter = if (image.isNotEmpty()) {
+                rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current).data(image)
+                        .placeholder(R.drawable.dummy_image)
+                        .error(R.drawable.dummy_image).crossfade(true).build()
+                )
+            } else {
+                painterResource(R.drawable.dummy_image)
+            },
+            contentDescription = IMG_DESCRIPTION,
+            modifier = Modifier
+                .size(100.dp) // Add size modifier to make the image visible
+                .clip(CircleShape) // Add clip modifier to make the image circular
+                .background(shape = CircleShape, color = White)
+                .border( // Add border modifier to make image stand out
+                    width = 1.dp, color = White, shape = CircleShape
                 ),
             contentScale = ContentScale.Crop
         )

@@ -47,6 +47,7 @@ sealed class AppRoute(val route: String) {
     data object AdvanceScreening : AppRoute("advance_screening")
     data object AdvanceScreeningReport : AppRoute("advance_screening_report")
     data object ProfilerFormPage : AppRoute("profiler_form_page")
+    data object ViewScreeningProfileDetails : AppRoute("view_screening_profile_details")
 
     data object InterventionScreen : AppRoute("intervention_screen")
     data object InterventionStudentDetails : AppRoute("intervention_student_details")
