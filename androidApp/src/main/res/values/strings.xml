@@ -406,4 +406,8 @@ and make a difference together!</string>
     <string name="txt_permission_grant">Please grant all the permissions from settings.</string>
     <string name="txt_enter_udise">Enter UDISE Code</string>
     <string name="key_fcm_token">fcm_token</string>
+    <string name="key_name_change">Name Change Request</string>
+    <string name="key_school_change">School Name Change</string>
+    <string name="txt_done">done</string>
+    <string name="txt_reason">Reason: </string>
 </resources>

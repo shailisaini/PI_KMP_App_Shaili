@@ -6,12 +6,22 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,16 +31,27 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.Dark_01
+import com.pi.ProjectInclusion.LightGreen06
+import com.pi.ProjectInclusion.LightYellow02
+import com.pi.ProjectInclusion.PrimaryBlue
+import com.pi.ProjectInclusion.RedText
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
+import com.pi.ProjectInclusion.color_done
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetUserTypeResponse
@@ -96,7 +117,187 @@ fun TrackRequest(
                         }
                     )
             )
+            BodyUI(stringResource(R.string.txt_done))
         })
+}
+@Composable
+private fun BodyUI(status: String){
+    var showReason by remember { mutableStateOf(true) }
+
+
+    Column (){
+        Card(
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = stringResource(R.string.key_name_change),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = PrimaryBlue
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "15 April 2024",
+                        fontSize = 13.sp,
+                        color = Color.Gray
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = color_done,
+                            shape = RoundedCornerShape(50)
+                        )
+                        .padding(horizontal = 12.dp, vertical = 4.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = status,
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+        }
+        Card(
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = stringResource(R.string.key_school_change),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = PrimaryBlue
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "15 April 2024",
+                        fontSize = 13.sp,
+                        color = Color.Gray
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = LightGreen06,
+                            shape = RoundedCornerShape(50)
+                        )
+                        .padding(horizontal = 12.dp, vertical = 4.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = status,
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+        }
+            Card(
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.key_school_change),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PrimaryBlue
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "15 April 2024",
+                            fontSize = 13.sp,
+                            color = Color.Gray
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = RedText,
+                                shape = RoundedCornerShape(50)
+                            )
+                            .padding(horizontal = 12.dp, vertical = 4.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = status,
+                            color = Color.White,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+                if (showReason){
+                    Card (
+                        shape = RoundedCornerShape(4.dp),
+                        colors = CardDefaults.cardColors(containerColor = LightYellow02),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .padding( start = 12 .dp, top = 4.dp, bottom = 6.dp),
+                            text = stringResource(R.string.txt_reason)+" "+status,
+                            color = Black,
+                            fontSize = 13.sp
+                        )
+                    }
+                }
+            }
+    }
 }
 
 @Composable
@@ -107,3 +308,100 @@ fun TrackRequest() {
     val onBack: () -> Unit = {}
     TrackRequest(context, onNext, onBack)
 }
+
+@Composable
+private fun ChangeCard(name: String, status: String,date: String,reason: String?,showReason: Boolean){
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = name,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = PrimaryBlue
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = date,
+                    fontSize = 13.sp,
+                    color = Color.Gray
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .background(
+                        color = RedText,
+                        shape = RoundedCornerShape(50)
+                    )
+                    .padding(horizontal = 12.dp, vertical = 4.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = status,
+                    color = Color.White,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+        if (showReason){
+            Card (
+                shape = RoundedCornerShape(4.dp),
+                colors = CardDefaults.cardColors(containerColor = LightYellow02),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    modifier = Modifier
+                        .padding( start = 12 .dp, top = 4.dp, bottom = 6.dp),
+                    text = stringResource(R.string.txt_reason)+" "+reason,
+                    color = Black,
+                    fontSize = 13.sp
+                )
+            }
+        }
+    }
+}
+
+/* this code will be required during API */
+
+//@Composable
+//fun ChangesListScreen(viewModel: MyViewModel) {
+//    val schoolChanges by viewModel.schoolChangeList.collectAsState()
+//
+//    LazyColumn(
+//        modifier = Modifier.fillMaxSize()
+//    ) {
+//        items(schoolChanges) { item ->
+//            SchoolChangeCard(
+//                name = item.name,
+//                status = item.status,
+//                date = item.date,
+//                reason = item.reason,
+//                showReason = item.reason.isNotEmpty()
+//            )
+//        }
+//    }
+//}
+
+
+
