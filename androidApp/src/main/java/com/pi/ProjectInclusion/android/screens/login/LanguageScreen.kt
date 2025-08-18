@@ -311,10 +311,10 @@ fun ItemLanguageCard(
                         .background(Color.Unspecified)
                         .size(45.dp),
                     contentScale = ContentScale.Fit,
-                    painter = if (!languageIndex.lang_icon.isNullOrEmpty()) {
+                    painter = if (!languageIndex.langIcon.isNullOrEmpty()) {
                         rememberAsyncImagePainter(
                             model = ImageRequest.Builder(LocalContext.current)
-                                .data(languageIndex.lang_icon)
+                                .data(languageIndex.langIcon)
                                 .decoderFactory(SvgDecoder.Factory())
                                 .size(Size.ORIGINAL)
                                 .placeholder(R.drawable.ic_hindi)

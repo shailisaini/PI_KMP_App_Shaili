@@ -170,16 +170,17 @@ fun PasswordUI(
     var sendOtpViaCall by remember { mutableStateOf(false) }
     var loginWithPassword by remember { mutableStateOf(false) }
     var sendOtpViaWhatsApp by remember { mutableStateOf(false) }
-    var languageId = viewModel.getPrefData(USER_TYPE_ID)
-    var userTypeId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
+    var languageId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
+    var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
     var mobileNo = viewModel.mobileNumber
     val encryptedPhoneNo = mobNo?.encryptAES().toString().trim()
     val encryptedPassword = passwordText.value.encryptAES().toString().trim()
 
     if (loginWithPassword) {
-    LaunchedEffect(Unit) {
+        LoggerProvider.logger.d("LoginWithPassword: $languageId .. $userTypeId .. $mobileNo")
+
+        LaunchedEffect(Unit) {
         isDialogVisible = true
-            LoggerProvider.logger.d("LoginWithPassword: $languageId .. $userTypeId .. $mobileNo")
             viewModel.loginWithPasswordViewModel(
                 LoginRequest(
                     encryptedPhoneNo,
@@ -188,6 +189,41 @@ fun PasswordUI(
                     languageId.toInt()
                 )
             )
+        }
+
+        // Handle login response state
+        LaunchedEffect(loginResponse) {
+            when {
+                loginResponse.isLoading -> {
+                    isDialogVisible = true
+                }
+
+                loginResponse.error.isNotEmpty() -> {
+                    loginWithPassword = false
+                    LoggerProvider.logger.d("Error: ${loginResponse.error}")
+                    isDialogVisible = false
+                    isValidMobNo = true
+                    invalidMobNo = loginResponse.error.toString()
+                }
+
+                loginResponse.success != null -> {
+                    loginWithPassword = false
+                    if (loginResponse.success!!.statusCode == 201){
+                        context.toast(loginSuccess)
+                        context.startActivity(
+                            Intent(
+                                context,
+                                StudentDashboardActivity::class.java
+                            )
+                        )
+                    }
+                    else{
+                        isValidMobNo = true
+                        invalidMobNo = loginResponse.success!!.message.toString()
+                    }
+                    isDialogVisible = false
+                }
+            }
         }
     }
 
@@ -248,41 +284,6 @@ fun PasswordUI(
                     context.toast(sendOtpState.success!!.response!!.message.toString())
                 }
 
-                isDialogVisible = false
-            }
-        }
-    }
-
-    // Handle login response state
-    LaunchedEffect(loginResponse) {
-        when {
-            loginResponse.isLoading -> {
-                isDialogVisible = true
-            }
-
-            loginResponse.error.isNotEmpty() -> {
-                loginWithPassword = false
-                LoggerProvider.logger.d("Error: ${loginResponse.error}")
-                isDialogVisible = false
-                isValidMobNo = true
-                invalidMobNo = loginResponse.error.toString()
-            }
-
-            loginResponse.success != null -> {
-                loginWithPassword = false
-                if (loginResponse.success!!.statusCode == 201){
-                    context.toast(loginSuccess)
-                    context.startActivity(
-                        Intent(
-                            context,
-                            StudentDashboardActivity::class.java
-                        )
-                    )
-                }
-                else{
-                    isValidMobNo = true
-                    invalidMobNo = loginResponse.success!!.message.toString()
-                }
                 isDialogVisible = false
             }
         }

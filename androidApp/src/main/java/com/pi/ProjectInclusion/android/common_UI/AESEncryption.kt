@@ -9,7 +9,7 @@ object AESEncryption {
 
     const val ALGORITHM = "AES"
     const val TRANSFORMATION = "AES/CBC/PKCS5Padding"
-    const val KEY = "F97766C2-6F778-9574-B47018A9F400" // Use the same key on both ends
+    const val KEY = "hVmYq3t6w9zB&E)H@McQfTjWnZr4u7x(" // Use the same key on both ends
     const val INITVECTOR = "0000000000000000" // Use the same IV on both ends
 
     fun String.encryptAES(
