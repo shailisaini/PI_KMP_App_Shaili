@@ -173,7 +173,6 @@ private fun TrackListCard(item: TrackListModel){
                 modifier = Modifier
                     .background(
                         color =item.statusColor.toComposeColor() ,
-//                        color =LightGreen06,
                         shape = RoundedCornerShape(50)
                     )
                     .padding(horizontal = 12.dp, vertical = 4.dp),
