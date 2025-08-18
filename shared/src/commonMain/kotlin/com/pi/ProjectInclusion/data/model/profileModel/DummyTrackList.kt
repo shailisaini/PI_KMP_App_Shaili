@@ -6,28 +6,28 @@ val dummyTrackList = listOf(
         name = "Name Change Request",
         reviewStatus = "In Review",
         date = "15 April 2024",
-        statusColor = "0xFFE99050",
+        statusColor = "#E99050",
         reason = null
     ),
     TrackListModel(
         name = "School Name Change",
         reviewStatus = "Approved",
         date = "16 April 2024",
-        statusColor = "0xFF56A42F",
+        statusColor = "#56A42F",
         reason = null
     ),
     TrackListModel(
         name = "School Name Change",
         reviewStatus = "Rejected",
         date = "15 April 2024",
-        statusColor = "0xFFFF1A1A",
+        statusColor = "#FF1A1A",
         reason = "Document unclear"
     ),
     TrackListModel(
         name = "Name Change Request",
-        reviewStatus = "Rejected",
+        reviewStatus = "UnKnown",
         date = "15 April 2024",
-        statusColor = "0xFF101942",
+        statusColor = "#101942",
         reason = "Invalid documents"
     )
 )

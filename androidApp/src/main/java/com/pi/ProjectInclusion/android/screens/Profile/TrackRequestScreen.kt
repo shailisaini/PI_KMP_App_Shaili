@@ -172,8 +172,8 @@ private fun TrackListCard(item: TrackListModel){
             Box(
                 modifier = Modifier
                     .background(
-//                        color =item.statusColor.toComposeColor() ,
-                        color =LightGreen06,
+                        color =item.statusColor.toComposeColor() ,
+//                        color =LightGreen06,
                         shape = RoundedCornerShape(50)
                     )
                     .padding(horizontal = 12.dp, vertical = 4.dp),
@@ -220,15 +220,15 @@ fun TrackListScreen() {
     }
 }
 
-//fun String.toComposeColor(): Color {
-//    val clean = replace("#", "")
-//    val argb = when (clean.length) {
-//        6 -> "FF$clean"
-//        8 -> clean
-//        else -> "0xFF56A42F"
-//    }
-//    return Color(argb.toLong(16))
-//}
+private fun String.toComposeColor(): Color {
+    val clean = replace("#", "")
+    val argb = when (clean.length) {
+        6 -> "FF$clean"
+        8 -> clean
+        else -> "0xFF56A42F"
+    }
+    return Color(argb.toLong(16))
+}
 
 
 
