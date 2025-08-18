@@ -45,6 +45,7 @@ import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.MobileTextField
 import com.pi.ProjectInclusion.android.common_UI.TermsAndPrivacyText
+import com.pi.ProjectInclusion.android.common_UI.UserNameTextField
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
@@ -52,6 +53,7 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.USER_EXIST
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.NEW_USER
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_MOBILE_NO
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
@@ -109,7 +111,7 @@ fun LoginUI(
     val tvMobNo = stringResource(id = R.string.text_mobile_no_user)
 
     val uiState by viewModel.validateUserResponse.collectAsStateWithLifecycle()
-    var mobNo = rememberSaveable { mutableStateOf("") }
+    var userName = rememberSaveable { mutableStateOf("") }
     val enterMobile = stringResource(R.string.txt_enter_mobile_no_)
     var showError by remember { mutableStateOf(false) }
     var inValidMobNo by remember { mutableStateOf(false) }
@@ -122,8 +124,9 @@ fun LoginUI(
     var languageId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
 
     if (isApiCalled) {
-        // saving mobile no as a local variable in view Model
-        viewModel.saveMobileNumber(mobNo.value)
+        // saving userName & mobile no as a local variable in view Model
+
+        viewModel.saveUserName(userName.value)
         onNext()
 
         // commenting this as API is not provided. need it later
@@ -154,6 +157,7 @@ fun LoginUI(
                         onRegister()
                     } else if (apiResponse == USER_EXIST) {
                         // if login with password
+                        viewModel.savePrefData(USER_MOBILE_NO, apiResponse.toString())
                         onNext()
                     } else {
                         // if account deactivated
@@ -170,7 +174,7 @@ fun LoginUI(
             onRestore = {
                 confirmRecoverState = false
 //                LoggerProvider.logger.d("Screen: Moving to$onRegister.route")
-                viewModel.getOTPViewModel(mobNo.value)
+                viewModel.getOTPViewModel(userName.value)
             },
             onDismiss = {
                 confirmRecoverState = false
@@ -239,11 +243,11 @@ fun LoginUI(
                         }
                     )
 
-                    MobileTextField(
+                    UserNameTextField(
                         isIcon = false,
                         icon = null,
                         colors = colors,
-                        number = mobNo,
+                        number = userName,
                         trueFalse = true,
                         hint = enterMobile.toString()
                     )
@@ -259,13 +263,13 @@ fun LoginUI(
 
                     Spacer(modifier = Modifier.height(15.dp))
                     BtnUi(
-                        enabled = mobNo.value.length >= 10,
+                        enabled = userName.value.length >= 6,
                         title = txtContinue,
                         onClick = {
-                            if (mobNo.value.isEmpty()) {
+                            if (userName.value.isEmpty()) {
                                 inValidMobNo = true
                             } else {
-                                if (showError || mobNo.value.length < 6) {
+                                if (showError || userName.value.length < 6) {
                                     inValidMobNo = true
                                 } else {
                                     // if first digit of mobile is less than 6 then error will show

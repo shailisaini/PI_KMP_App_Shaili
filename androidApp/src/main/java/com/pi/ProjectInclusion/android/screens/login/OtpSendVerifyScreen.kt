@@ -80,10 +80,10 @@ fun OtpSendVerifyScreen(
     var isDialogVisible by remember { mutableStateOf(false) }
     var isFinished by remember { mutableStateOf(false) }
 
-    val mobNo = viewModel.mobileNumber
-    val encryptedPhoneNo = mobNo?.encryptAES().toString().trim()
+//    val mobNo = viewModel.mobileNumber
+    /*val encryptedPhoneNo = mobNo?.encryptAES().toString().trim()
 
-    logger.d("User Data fetched: $mobNo")
+    logger.d("User Data fetched: $mobNo")*/
 
     CustomDialog(
         isVisible = isDialogVisible,

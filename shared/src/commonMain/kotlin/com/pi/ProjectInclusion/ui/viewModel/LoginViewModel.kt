@@ -55,12 +55,13 @@ class LoginViewModel(
 
     private val query = MutableStateFlow("")
 
-    // getting mobile no from intent
-    private val _mobileNumber = MutableStateFlow<String?>(null)
-    val mobileNumber: String? get() = _mobileNumber.value
+    // getting userName from intent
 
-    fun saveMobileNumber(number: String) {
-        _mobileNumber.value = number
+    private val userName = MutableStateFlow<String?>(null)
+    val userNameValue: String? get() = userName.value
+
+    fun saveUserName(number: String) {
+        userName.value = number
     }
 
     fun savePrefData(key: String, value: String) {

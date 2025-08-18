@@ -477,15 +477,99 @@ fun MobileTextField(
     TextField(
         value = number.value,
         onValueChange = {
-//           commenting it might need later
-//            if (it.length <= 10 && it.all { char -> char.isDigit() }) {
-            if (it.length <= 10) {
+            if (it.length <= 10 && it.all { char -> char.isDigit() }) {
                 number.value = it
 
                 //  Hide keyboard on 10 digits
                 if (it.length == 10) {
                     keyboardController?.hide()
                 }
+            }
+        },
+        enabled = trueFalse,
+        placeholder = { Text(hint, color = GrayLight01, fontSize = 14.sp) },
+        shape = RoundedCornerShape(8.dp),
+        singleLine = true,
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+        visualTransformation = VisualTransformation.None,
+
+        leadingIcon = if (isIcon) {
+            {
+                Icon(
+                    imageVector = icon!!,
+                    contentDescription = null,
+                    tint = if (isSystemInDarkTheme()) White else Gray
+                )
+            }
+        } else null,
+
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .drawBehind {
+                if (isFocused) {
+                    drawRoundRect(
+                        color = LightBlue.copy(alpha = 0.4f),
+                        cornerRadius = CornerRadius(8.dp.toPx(), 8.dp.toPx()),
+                        style = Stroke(width = 4.dp.toPx())
+                    )
+                }
+            }
+            .border(
+                width = 1.dp, color = when {
+                    isFocused -> LightBlue
+                    isSystemInDarkTheme() -> Dark_02
+                    else -> GrayLight02
+                }, shape = RoundedCornerShape(8.dp)
+            ),
+        interactionSource = interactionSource,
+        textStyle = TextStyle(
+            fontFamily = fontSemiBold, fontSize = 14.sp, color = if (isSystemInDarkTheme()) {
+                DARK_DEFAULT_BUTTON_TEXT
+            } else {
+                Black
+            }
+        ),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = if (isSystemInDarkTheme()) {
+                Dark_02
+            } else {
+                White
+            },
+            focusedTextColor = Gray,
+            unfocusedTextColor = colors.onSurface,
+            focusedIndicatorColor = Transparent,
+            unfocusedContainerColor = if (isSystemInDarkTheme()) {
+                Dark_02
+            } else {
+                White
+            },
+            unfocusedIndicatorColor = Transparent,
+            disabledContainerColor = GrayLight03
+        ))
+}
+
+@Composable
+fun UserNameTextField(
+    isIcon: Boolean = false,
+    icon: ImageVector?,
+    colors: ColorScheme,
+    trueFalse: Boolean,
+    modifier: Modifier = Modifier,
+    number: MutableState<String> = remember { mutableStateOf("") },
+    hint: String = remember { mutableStateOf("") }.toString(),
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    TextField(
+        value = number.value,
+        onValueChange = {
+
+            if (it.length <= 10) {
+                number.value = it
             }
         },
         enabled = trueFalse,
