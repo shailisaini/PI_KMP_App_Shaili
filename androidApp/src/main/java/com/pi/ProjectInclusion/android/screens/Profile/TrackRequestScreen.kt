@@ -55,6 +55,10 @@ import com.pi.ProjectInclusion.color_done
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.profileModel.TrackListModel
+import com.pi.ProjectInclusion.data.model.profileModel.dummyTrackList
+import androidx.compose.foundation.lazy.items
+
 
 @Composable
 fun TrackRequestScreen(onNext: () -> Unit,onBack: () -> Unit) {
@@ -117,7 +121,8 @@ fun TrackRequest(
                         }
                     )
             )
-            BodyUI(stringResource(R.string.txt_done))
+//            BodyUI(stringResource(R.string.txt_approved))
+            TrackListScreen()
         })
 }
 @Composable
@@ -384,24 +389,104 @@ private fun ChangeCard(name: String, status: String,date: String,reason: String?
 
 /* this code will be required during API */
 
-//@Composable
-//fun ChangesListScreen(viewModel: MyViewModel) {
-//    val schoolChanges by viewModel.schoolChangeList.collectAsState()
-//
-//    LazyColumn(
-//        modifier = Modifier.fillMaxSize()
-//    ) {
-//        items(schoolChanges) { item ->
-//            SchoolChangeCard(
-//                name = item.name,
-//                status = item.status,
-//                date = item.date,
-//                reason = item.reason,
-//                showReason = item.reason.isNotEmpty()
-//            )
-//        }
+@Composable
+private fun TrackListCard(item: TrackListModel){
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = item.name.toString(),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = PrimaryBlue
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = item.date,
+                    fontSize = 13.sp,
+                    color = Color.Gray
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .background(
+//                        color =item.statusColor.toComposeColor() ,
+                        color =LightGreen06,
+                        shape = RoundedCornerShape(50)
+                    )
+                    .padding(horizontal = 12.dp, vertical = 4.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = item.reviewStatus,
+                    color = White,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+        if (!item.reason.isNullOrBlank()){
+            Card (
+                shape = RoundedCornerShape(4.dp),
+                colors = CardDefaults.cardColors(containerColor = LightYellow02),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    modifier = Modifier
+                        .padding( start = 12 .dp, top = 4.dp, bottom = 6.dp),
+                    text = stringResource(R.string.txt_reason)+" "+item.reason,
+                    color = Black,
+                    fontSize = 13.sp
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+fun TrackListScreen() {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        items(dummyTrackList) { item ->
+            TrackListCard(item = item)
+        }
+    }
+}
+
+//fun String.toComposeColor(): Color {
+//    val clean = replace("#", "")
+//    val argb = when (clean.length) {
+//        6 -> "FF$clean"
+//        8 -> clean
+//        else -> "0xFF56A42F"
 //    }
+//    return Color(argb.toLong(16))
 //}
+
+
+
 
 
 
