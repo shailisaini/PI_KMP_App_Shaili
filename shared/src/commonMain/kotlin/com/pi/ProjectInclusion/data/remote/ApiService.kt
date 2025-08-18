@@ -1,16 +1,21 @@
 package com.pi.ProjectInclusion.data.remote
 
-import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetLanguageListResponse
-import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetUserTypeResponse
-import com.pi.ProjectInclusion.data.model.AuthenticationModel.SendOTPResponse
-import com.pi.ProjectInclusion.data.model.AuthenticationModel.ValidateUserResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.LoginApiResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.SendOTPResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateUserResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.appendPathSegments
+import io.ktor.http.contentType
 import io.ktor.http.takeFrom
 
 class ApiService(private val client: HttpClient) {
@@ -65,6 +70,18 @@ class ApiService(private val client: HttpClient) {
             append(HttpHeaders.Accept, "application/json")
         }
     }.body<ValidateUserResponse>()
+
+    suspend fun getUserLoginWithPassword(request: LoginRequest): LoginApiResponse = client.post {
+        url {
+            takeFrom(STUDENT_BASE_URL)
+            appendPathSegments(appendUser, "login") // api end points
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+        contentType(ContentType.Application.Json)
+        setBody(request)
+    }.body<LoginApiResponse>()
 
     suspend fun getOTPOnCall(mobNo : String): SendOTPResponse = client.post {
         url {

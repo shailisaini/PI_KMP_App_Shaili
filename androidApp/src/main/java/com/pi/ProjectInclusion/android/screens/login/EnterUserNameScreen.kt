@@ -51,6 +51,7 @@ import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_EXIST
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.NEW_USER
+import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
@@ -102,7 +103,7 @@ fun LoginUI(
     val internetMessage = stringResource(R.string.txt_oops_no_internet)
     var apiResponse = stringResource(R.string.txt_oops_no_internet)
     val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
-    val invalidMobNo = stringResource(id = R.string.text_enter_no)
+    val invalidMobNo = stringResource(id = R.string.txt_enter_valid_mob_user)
 
     val txtContinue = stringResource(id = R.string.text_continue)
     val tvMobNo = stringResource(id = R.string.text_mobile_no_user)
@@ -118,12 +119,18 @@ fun LoginUI(
 
     // user Type Id
     var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
+    var languageId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
 
     if (isApiCalled) {
-        LaunchedEffect(Unit) {
+        // saving mobile no as a local variable in view Model
+        viewModel.saveMobileNumber(mobNo.value)
+        onNext()
+
+        // commenting this as API is not provided. need it later
+        /*LaunchedEffect(Unit) {
             LoggerProvider.logger.d("ValidateUserParams: " + mobNo.value +" .. "+userTypeId)
             viewModel.getValidateUser(mobNo.value, userTypeId)
-        }
+        }*/
 
         LaunchedEffect(uiState) {
             when {
@@ -162,7 +169,6 @@ fun LoginUI(
         AccountRecoverDialog(
             onRestore = {
                 confirmRecoverState = false
-                viewModel.saveMobileNumber(mobNo.value)
 //                LoggerProvider.logger.d("Screen: Moving to$onRegister.route")
                 viewModel.getOTPViewModel(mobNo.value)
             },
@@ -259,17 +265,22 @@ fun LoginUI(
                             if (mobNo.value.isEmpty()) {
                                 inValidMobNo = true
                             } else {
-                                if (showError || mobNo.value.length < 10) {
+                                if (showError || mobNo.value.length < 6) {
                                     inValidMobNo = true
-                                } else { // if first digit of mobile is less than 6 then error will show
-                                    showError = mobNo.value.isEmpty()
+                                } else {
+                                    // if first digit of mobile is less than 6 then error will show
+
+                                // commenting this as old user needs char, it might need later.
+                                    /*showError = mobNo.value.isEmpty()
                                     val firstDigitChar = mobNo.value.toString().first()
                                     val firstDigit = firstDigitChar.digitToInt()
                                     if (firstDigit < 6) {
                                         inValidMobNo = true
                                     } else {
                                         isApiCalled = true
-                                    }
+                                    }*/
+
+                                    isApiCalled = true
                                 }
                             }
                         },

@@ -1,4 +1,4 @@
-package com.pi.ProjectInclusion.data.model.AuthenticationModel
+package com.pi.ProjectInclusion.data.model.authenticationModel.Response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
