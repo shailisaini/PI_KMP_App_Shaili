@@ -62,6 +62,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import coil.util.Logger
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.BannerColor03
 import com.pi.ProjectInclusion.Bg1_Gray
@@ -108,14 +109,6 @@ fun ScreeningHomeScreen(
 ) {
 
     logger.d("Screen: " + "ScreeningHomeScreen()")
-
-    val selectedBorder = BorderStroke(
-        width = 0.5.dp, if (isSystemInDarkTheme()) {
-            BlueBackground3
-        } else {
-            BlueBackground3
-        }
-    )
 
     BackHandler {
         onBack()
@@ -473,6 +466,125 @@ fun ScreeningFirst(
 }
 
 @Composable
+fun ProfilerScreening(
+    profilerStr: String,
+    screeningOne: () -> Unit,
+    profilerForm: () -> Unit,
+    advanceScreening: () -> Unit,
+) {
+    val screeningListData = listOf(
+        ScreeningData(
+            stringResource(R.string.txt_Abhisheki_Muthuswami),
+            stringResource(R.string.txt_Class_6),
+            stringResource(R.string.txt_Start_screening),
+            stringResource(R.string.txt_Continue_with_screening_1),
+            stringResource(R.string.txt_Completed_screening),
+            stringResource(R.string.txt_Inprogress),
+            6,
+            painterResource(id = R.drawable.dummy_image)
+        ), ScreeningData(
+            stringResource(R.string.txt_Abhi_Kothari),
+            stringResource(R.string.txt_Class_4),
+            stringResource(R.string.txt_Start_screening),
+            stringResource(R.string.txt_Continue_with_screening_1),
+            stringResource(R.string.txt_Completed_screening),
+            stringResource(R.string.txt_Inprogress),
+            4,
+            painterResource(id = R.drawable.dummy_image)
+        ), ScreeningData(
+            stringResource(R.string.txt_Hare_Krishna),
+            stringResource(R.string.txt_Class_2),
+            stringResource(R.string.txt_Start_screening),
+            stringResource(R.string.txt_Continue_with_screening_1),
+            stringResource(R.string.txt_Completed_screening),
+            stringResource(R.string.txt_Inprogress),
+            2,
+            painterResource(id = R.drawable.dummy_image)
+        )
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(start = 8.dp, end = 8.dp, bottom = 8.dp, top = 8.dp)
+            .background(
+                if (isSystemInDarkTheme()) {
+                    Dark_01
+                } else {
+                    White
+                }
+            )
+    ) {
+        LazyColumn {
+            items(screeningListData) { screeningData ->
+                ScreeningFirstDataUI(
+                    profilerStr,
+                    screeningData,
+                    screeningOne,
+                    profilerForm,
+                    advanceScreening
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun AdvanceScreening(
+    advanceScreeningStr: String,
+    screeningOne: () -> Unit,
+    profilerForm: () -> Unit,
+    advanceScreening: () -> Unit,
+) {
+    val screeningListData = listOf(
+        ScreeningData(
+            stringResource(R.string.txt_Abhisheki_Muthuswami),
+            stringResource(R.string.txt_Class_6),
+            stringResource(R.string.txt_Start_screening),
+            stringResource(R.string.txt_Continue_with_screening_1),
+            stringResource(R.string.txt_Completed_screening),
+            stringResource(R.string.txt_Inprogress),
+            6,
+            painterResource(id = R.drawable.dummy_image)
+        ), ScreeningData(
+            stringResource(R.string.txt_Hare_Krishna),
+            stringResource(R.string.txt_Class_2),
+            stringResource(R.string.txt_Start_screening),
+            stringResource(R.string.txt_Continue_with_screening_1),
+            stringResource(R.string.txt_Completed_screening),
+            stringResource(R.string.txt_Inprogress),
+            100,
+            painterResource(id = R.drawable.dummy_image)
+        )
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(start = 8.dp, end = 8.dp, bottom = 8.dp, top = 8.dp)
+            .background(
+                if (isSystemInDarkTheme()) {
+                    Dark_01
+                } else {
+                    White
+                }
+            )
+    ) {
+        LazyColumn {
+            items(screeningListData) { screeningData ->
+                ScreeningFirstDataUI(
+                    advanceScreeningStr,
+                    screeningData,
+                    screeningOne,
+                    profilerForm,
+                    advanceScreening
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun ScreeningFirstDataUI(
     screeningStr: String,
     screeningData: ScreeningData,
@@ -482,6 +594,7 @@ fun ScreeningFirstDataUI(
 ) {
     val tabStr = stringResource(R.string.ScreeningOne)
     val tabProfilerStr = stringResource(R.string.txt_Profiler)
+    val tabAdvanceStr = stringResource(R.string.txt_Advance_Screening)
     val selectedBorder = BorderStroke(
         width = 0.5.dp, if (isSystemInDarkTheme()) {
             Dark_02
@@ -502,6 +615,8 @@ fun ScreeningFirstDataUI(
                 }
             )
     ) {
+        val num: Float = (screeningData.inProgressNum.toFloat() / 100)
+
         Card(
             shape = RoundedCornerShape(8.dp),
             modifier = Modifier
@@ -509,14 +624,27 @@ fun ScreeningFirstDataUI(
                 .fillMaxWidth()
                 .wrapContentHeight(),
             colors = if (isSystemInDarkTheme()) {
-                CardDefaults.cardColors(Yellow)
+                if (num.toDouble() != 1.0) {
+                    CardDefaults.cardColors(Yellow)
+                } else {
+                    CardDefaults.cardColors(LightGreen06)
+                }
             } else {
-                CardDefaults.cardColors(
-                    containerColor = Yellow,
-                    contentColor = Yellow,
-                    disabledContentColor = Yellow,
-                    disabledContainerColor = Yellow
-                )
+                if (num.toDouble() != 1.0) {
+                    CardDefaults.cardColors(
+                        containerColor = Yellow,
+                        contentColor = Yellow,
+                        disabledContentColor = Yellow,
+                        disabledContainerColor = Yellow
+                    )
+                } else {
+                    CardDefaults.cardColors(
+                        containerColor = LightGreen06,
+                        contentColor = LightGreen06,
+                        disabledContentColor = LightGreen06,
+                        disabledContainerColor = LightGreen06
+                    )
+                }
             }
         ) {
             Card(
@@ -662,30 +790,46 @@ fun ScreeningFirstDataUI(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = screeningData.inProgressAchieved,
+                                    text = if (num.toDouble() != 1.0) {
+                                        screeningData.inProgressAchieved
+                                    } else {
+                                        stringResource(R.string.txt_Completed)
+                                    },
                                     modifier = Modifier.wrapContentWidth(),
-                                    fontFamily = fontRegular,
+                                    fontFamily = if (num.toDouble() != 1.0) {
+                                        fontRegular
+                                    } else {
+                                        fontMedium
+                                    },
                                     fontSize = 14.sp,
                                     color = if (isSystemInDarkTheme()) {
                                         DARK_TITLE_TEXT
                                     } else {
-                                        Black
+                                        if (num.toDouble() != 1.0) {
+                                            Black
+                                        } else {
+                                            LightGreen06
+                                        }
                                     },
                                     textAlign = TextAlign.Start
                                 )
 
-                                Text(
-                                    text = "${screeningData.inProgressNum}%",
-                                    modifier = Modifier.wrapContentWidth(),
-                                    fontFamily = fontMedium,
-                                    fontSize = 14.sp,
-                                    color = if (isSystemInDarkTheme()) {
-                                        DARK_TITLE_TEXT
-                                    } else {
-                                        Black
-                                    },
-                                    textAlign = TextAlign.Start
-                                )
+                                if (num.toDouble() != 1.0) {
+                                    Text(
+                                        text = "${screeningData.inProgressNum}%",
+                                        modifier = Modifier.wrapContentWidth(),
+                                        fontFamily = fontMedium,
+                                        fontSize = 14.sp,
+                                        color = if (isSystemInDarkTheme()) {
+                                            DARK_TITLE_TEXT
+                                        } else {
+                                            Black
+                                        },
+                                        textAlign = TextAlign.Start
+                                    )
+                                } else {
+                                    logger.d(stringResource(R.string.all_screening_completed))
+                                }
                             }
 
                             Column(
@@ -696,11 +840,22 @@ fun ScreeningFirstDataUI(
                                 horizontalAlignment = Alignment.Start,
                                 verticalArrangement = Arrangement.SpaceBetween
                             ) {
-                                if (screeningData.inProgressNum != null) {
-                                    val num: Float = (screeningData.inProgressNum.toFloat() / 100)
-                                    CustomHorizontalProgressBar(num, LightGreen06, BannerColor03)
+                                if (num.toDouble() != 1.0) {
+                                    if (screeningData.inProgressNum != null) {
+                                        CustomHorizontalProgressBar(
+                                            num,
+                                            LightGreen06,
+                                            BannerColor03
+                                        )
+                                    } else {
+                                        CustomHorizontalProgressBar(
+                                            0.0f,
+                                            LightGreen06,
+                                            BannerColor03
+                                        )
+                                    }
                                 } else {
-                                    CustomHorizontalProgressBar(0.0f, LightGreen06, BannerColor03)
+                                    logger.d(stringResource(R.string.all_screening_completed))
                                 }
                             }
                         }
@@ -709,186 +864,73 @@ fun ScreeningFirstDataUI(
             }
         }
 
-        Card(
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp)
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            colors = if (isSystemInDarkTheme()) {
-                CardDefaults.cardColors(PrimaryBlue3)
-            } else {
-                CardDefaults.cardColors(
-                    containerColor = PrimaryBlue3,
-                    contentColor = PrimaryBlue3,
-                    disabledContentColor = PrimaryBlue3,
-                    disabledContainerColor = PrimaryBlue3
-                )
-            }
-        ) {
-            Row(
+        if (num.toDouble() != 1.0) {
+            Card(
+                shape = RoundedCornerShape(8.dp),
                 modifier = Modifier
+                    .padding(start = 16.dp, end = 16.dp)
                     .fillMaxWidth()
-                    .height(45.dp)
-                    .background(PrimaryBlue3),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .wrapContentHeight(),
+                colors = if (isSystemInDarkTheme()) {
+                    CardDefaults.cardColors(PrimaryBlue3)
+                } else {
+                    CardDefaults.cardColors(
+                        containerColor = PrimaryBlue3,
+                        contentColor = PrimaryBlue3,
+                        disabledContentColor = PrimaryBlue3,
+                        disabledContainerColor = PrimaryBlue3
+                    )
+                }
             ) {
-                Text(
-                    text = if (screeningStr.contains(tabStr)) {
-                        screeningData.interventionContinueStatus
-                    } else if (screeningStr.contains(tabProfilerStr)) {
-                        stringResource(R.string.txt_Continue_Profiler)
-                    } else {
-                        stringResource(R.string.txt_Continue_advance_screening)
-                    },
+                Row(
                     modifier = Modifier
-                        .wrapContentWidth()
-                        .padding(start = 16.dp, end = 8.dp),
-                    fontFamily = fontMedium,
-                    fontSize = 12.sp,
-                    color = if (isSystemInDarkTheme()) {
-                        DARK_TITLE_TEXT
-                    } else {
-                        Black
-                    },
-                    textAlign = TextAlign.Start
-                )
+                        .fillMaxWidth()
+                        .height(45.dp)
+                        .background(PrimaryBlue3),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (screeningStr.contains(tabStr)) {
+                            screeningData.interventionContinueStatus
+                        } else if (screeningStr.contains(tabProfilerStr)) {
+                            stringResource(R.string.txt_Continue_Profiler)
+                        } else {
+                            stringResource(R.string.txt_Continue_advance_screening)
+                        },
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .padding(start = 16.dp, end = 8.dp),
+                        fontFamily = fontMedium,
+                        fontSize = 12.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_TITLE_TEXT
+                        } else {
+                            Black
+                        },
+                        textAlign = TextAlign.Start
+                    )
 
-                Image(
-                    painter = painterResource(R.drawable.round_right_arrow_img),
-                    contentDescription = IMG_DESCRIPTION,
-                    modifier = Modifier
-                        .size(50.dp)
-                        .padding(start = 8.dp, end = 16.dp)
-                        .background(Color.Unspecified)
-                        .clickable {
-                            if (screeningStr.contains(tabStr)) {
-                                screeningOne()
-                            } else {
-                                profilerForm()
-                            }
-                        })
-            }
-        }
-    }
-}
-
-@Composable
-fun ProfilerScreening(
-    profilerStr: String,
-    screeningOne: () -> Unit,
-    profilerForm: () -> Unit,
-    advanceScreening: () -> Unit,
-) {
-    val screeningListData = listOf(
-        ScreeningData(
-            stringResource(R.string.txt_Abhisheki_Muthuswami),
-            stringResource(R.string.txt_Class_6),
-            stringResource(R.string.txt_Start_screening),
-            stringResource(R.string.txt_Continue_with_screening_1),
-            stringResource(R.string.txt_Completed_screening),
-            stringResource(R.string.txt_Inprogress),
-            6,
-            painterResource(id = R.drawable.dummy_image)
-        ), ScreeningData(
-            stringResource(R.string.txt_Abhi_Kothari),
-            stringResource(R.string.txt_Class_4),
-            stringResource(R.string.txt_Start_screening),
-            stringResource(R.string.txt_Continue_with_screening_1),
-            stringResource(R.string.txt_Completed_screening),
-            stringResource(R.string.txt_Inprogress),
-            4,
-            painterResource(id = R.drawable.dummy_image)
-        ), ScreeningData(
-            stringResource(R.string.txt_Hare_Krishna),
-            stringResource(R.string.txt_Class_2),
-            stringResource(R.string.txt_Start_screening),
-            stringResource(R.string.txt_Continue_with_screening_1),
-            stringResource(R.string.txt_Completed_screening),
-            stringResource(R.string.txt_Inprogress),
-            2,
-            painterResource(id = R.drawable.dummy_image)
-        )
-    )
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(start = 8.dp, end = 8.dp, bottom = 8.dp, top = 8.dp)
-            .background(
-                if (isSystemInDarkTheme()) {
-                    Dark_01
-                } else {
-                    White
+                    Image(
+                        painter = painterResource(R.drawable.round_right_arrow_img),
+                        contentDescription = IMG_DESCRIPTION,
+                        modifier = Modifier
+                            .size(50.dp)
+                            .padding(start = 8.dp, end = 16.dp)
+                            .background(Color.Unspecified)
+                            .clickable {
+                                if (screeningStr.contains(tabStr)) {
+                                    screeningOne()
+                                } else if (screeningStr.contains(tabAdvanceStr)) {
+                                    advanceScreening()
+                                } else {
+                                    profilerForm()
+                                }
+                            })
                 }
-            )
-    ) {
-        LazyColumn {
-            items(screeningListData) { screeningData ->
-                ScreeningFirstDataUI(
-                    profilerStr,
-                    screeningData,
-                    screeningOne,
-                    profilerForm,
-                    advanceScreening
-                )
             }
-        }
-    }
-}
-
-@Composable
-fun AdvanceScreening(
-    advanceScreeningStr: String,
-    screeningOne: () -> Unit,
-    profilerForm: () -> Unit,
-    advanceScreening: () -> Unit,
-) {
-    val screeningListData = listOf(
-        ScreeningData(
-            stringResource(R.string.txt_Abhisheki_Muthuswami),
-            stringResource(R.string.txt_Class_6),
-            stringResource(R.string.txt_Start_screening),
-            stringResource(R.string.txt_Continue_with_screening_1),
-            stringResource(R.string.txt_Completed_screening),
-            stringResource(R.string.txt_Inprogress),
-            6,
-            painterResource(id = R.drawable.dummy_image)
-        ), ScreeningData(
-            stringResource(R.string.txt_Hare_Krishna),
-            stringResource(R.string.txt_Class_2),
-            stringResource(R.string.txt_Start_screening),
-            stringResource(R.string.txt_Continue_with_screening_1),
-            stringResource(R.string.txt_Completed_screening),
-            stringResource(R.string.txt_Inprogress),
-            2,
-            painterResource(id = R.drawable.dummy_image)
-        )
-    )
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(start = 8.dp, end = 8.dp, bottom = 8.dp, top = 8.dp)
-            .background(
-                if (isSystemInDarkTheme()) {
-                    Dark_01
-                } else {
-                    White
-                }
-            )
-    ) {
-        LazyColumn {
-            items(screeningListData) { screeningData ->
-                ScreeningFirstDataUI(
-                    advanceScreeningStr,
-                    screeningData,
-                    screeningOne,
-                    profilerForm,
-                    advanceScreening
-                )
-            }
+        } else {
+            logger.d(stringResource(R.string.all_screening_completed))
         }
     }
 }

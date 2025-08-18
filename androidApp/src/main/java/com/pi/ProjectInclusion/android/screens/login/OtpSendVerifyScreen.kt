@@ -51,6 +51,7 @@ import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.INVITE_LIGHT_01
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.CustomProgressBar
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
@@ -78,7 +79,10 @@ fun OtpSendVerifyScreen(
     val invalidOtpText = stringResource(R.string.txt_Enter_valid_OTP)
     var isDialogVisible by remember { mutableStateOf(false) }
     var isFinished by remember { mutableStateOf(false) }
+
     val mobNo = viewModel.mobileNumber
+    val encryptedPhoneNo = mobNo?.encryptAES().toString().trim()
+
     logger.d("User Data fetched: $mobNo")
 
     CustomDialog(

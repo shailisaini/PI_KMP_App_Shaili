@@ -50,7 +50,6 @@ class LoginViewModel(
 
     private val query = MutableStateFlow("")
 
-
     // getting mobile no from intent
     private val _mobileNumber = MutableStateFlow<String?>(null)
     val mobileNumber: String? get() = _mobileNumber.value
