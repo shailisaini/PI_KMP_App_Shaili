@@ -5,6 +5,7 @@
     <string name="choose_hindi_english">Choose Language Hindi &amp; English</string>
     <string name="select_userType">Select an user type</string>
     <string name="text_enter_no">Please enter valid mobile number</string>
+    <string name="txt_enter_valid_mob_user">Please enter valid username or mobile number</string>
     <string name="text_mobile_no_user">Mobile Number/Username</string>
     <string name="text_continue">Continue</string>
     <string name="select_userType_subtitle">Select your user type to continue. This helps us tailor your experience</string>
@@ -97,7 +98,7 @@ and make a difference together!</string>
     <string name="txt_Including_one_uppercase_letter">Including one uppercase letter</string>
     <string name="txt_Must_include_at_least_one_number">Must include at least one number</string>
     <string name="txt_Must_include_one_special_characters">Must include one special characters</string>
-    <string name="txt_Please_enter_password_">Please enter password.</string>
+    <string name="txt_Please_enter_valid_password_">Please enter valid password.</string>
     <string name="txt_Contact_us">Contact us</string>
     <string name="txt_Password_updated_successfully">Your password has been updated successfully.</string>
     <string name="txt_Ok_Got_it">Ok! Got it.</string>
@@ -437,4 +438,5 @@ and make a difference together!</string>
     <string name="key_dots">•</string>
     <string name="key_academic">Academic</string>
     <string name="key_it_Submit_data">It will Submit all data here</string>
+    <string name="txt_login_success">Login Successfully!</string>
 </resources>

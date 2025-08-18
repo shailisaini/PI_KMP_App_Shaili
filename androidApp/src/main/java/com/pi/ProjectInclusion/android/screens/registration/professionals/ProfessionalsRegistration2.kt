@@ -25,7 +25,6 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -71,8 +70,8 @@ import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.CustomDialog
-import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetLanguageListResponse
-import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel

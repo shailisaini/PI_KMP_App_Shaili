@@ -1,9 +1,11 @@
 package com.pi.ProjectInclusion.data.repository
 
-import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetLanguageListResponse
-import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetUserTypeResponse
-import com.pi.ProjectInclusion.data.model.AuthenticationModel.SendOTPResponse
-import com.pi.ProjectInclusion.data.model.AuthenticationModel.ValidateUserResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.LoginApiResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.SendOTPResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateUserResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.data.remote.ApiService
 import com.pi.ProjectInclusion.domain.repository.AuthenticationRepository
 
@@ -18,6 +20,10 @@ class AuthenticationRepoImpl(private val apiService: ApiService) : Authenticatio
 
     override suspend fun getValidate(userName : String, userTypeId : String): ValidateUserResponse {
         return apiService.getValidateUser(userName, userTypeId)
+    }
+
+    override suspend fun getUserLoginPasswordRepo(loginRequest: LoginRequest): LoginApiResponse {
+        return apiService.getUserLoginWithPassword(loginRequest)
     }
 
     override suspend fun getOTPOnCall(mobNo : String): SendOTPResponse {

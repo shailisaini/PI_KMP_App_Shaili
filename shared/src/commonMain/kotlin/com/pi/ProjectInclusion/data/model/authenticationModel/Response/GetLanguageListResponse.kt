@@ -1,4 +1,4 @@
-package com.pi.ProjectInclusion.data.model.AuthenticationModel
+package com.pi.ProjectInclusion.data.model.authenticationModel.Response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -30,8 +30,8 @@ data class GetLanguageListResponse(
             @SerialName("translated_name")
             val translated_name: String? = null,
 
-            @SerialName("lang_icon")
-            val lang_icon: String? = null,
+            @SerialName("langIcon")
+            val langIcon: String? = null,
 
             @SerialName("status")
             val status: Int? = null,

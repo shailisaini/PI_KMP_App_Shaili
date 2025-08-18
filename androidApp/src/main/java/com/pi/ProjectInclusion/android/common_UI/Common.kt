@@ -477,7 +477,9 @@ fun MobileTextField(
     TextField(
         value = number.value,
         onValueChange = {
-            if (it.length <= 10 && it.all { char -> char.isDigit() }) {
+//           commenting it might need later
+//            if (it.length <= 10 && it.all { char -> char.isDigit() }) {
+            if (it.length <= 10) {
                 number.value = it
 
                 //  Hide keyboard on 10 digits
@@ -490,7 +492,7 @@ fun MobileTextField(
         placeholder = { Text(hint, color = GrayLight01, fontSize = 14.sp) },
         shape = RoundedCornerShape(8.dp),
         singleLine = true,
-        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
         visualTransformation = VisualTransformation.None,
 
         leadingIcon = if (isIcon) {

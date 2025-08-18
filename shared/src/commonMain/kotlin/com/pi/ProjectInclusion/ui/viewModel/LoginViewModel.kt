@@ -3,10 +3,12 @@ package com.pi.ProjectInclusion.ui.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kmptemplate.logger.LoggerProvider
-import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetLanguageListResponse
-import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetUserTypeResponse
-import com.pi.ProjectInclusion.data.model.AuthenticationModel.SendOTPResponse
-import com.pi.ProjectInclusion.data.model.AuthenticationModel.ValidateUserResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.LoginApiResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.SendOTPResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateUserResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.database.LocalDataSource
 import com.pi.ProjectInclusion.domain.ConnectivityObserver
 import com.pi.ProjectInclusion.domain.useCases.AuthenticationUsesCases
@@ -47,6 +49,9 @@ class LoginViewModel(
 
     private val _uiStateSendOtp = MutableStateFlow(UiState<SendOTPResponse>())
     val uiStateSendOtpResponse: StateFlow<UiState<SendOTPResponse>> = _uiStateSendOtp
+
+    private val _uiStateLogin = MutableStateFlow(UiState<LoginApiResponse>())
+    val uiStateLoginResponse: StateFlow<UiState<LoginApiResponse>> = _uiStateLogin
 
     private val query = MutableStateFlow("")
 
@@ -186,6 +191,29 @@ class LoginViewModel(
                     },
                     onFailure = { exception ->
                         _uiStateValidateUser.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun loginWithPasswordViewModel(loginRequest: LoginRequest) = viewModelScope.launch {
+//        no need to data sync
+        _uiStateLogin.update { UiState(isLoading = true) }
+        getLanguageUsesCases.getUserLoginPassword(loginRequest)
+            .catch { exception ->
+                _uiStateLogin.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        _uiStateLogin.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        _uiStateLogin.update {
                             UiState(error = exception.message ?: somethingWentWrong)
                         }
                     }

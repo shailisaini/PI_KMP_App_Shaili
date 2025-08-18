@@ -59,7 +59,7 @@ class LoginNavigationScreen : ComponentActivity() {
             val currentDestination = navBackStackEntry?.destination?.route
 //            val loadScreenName = intent.getStringExtra(screenName.screenName)
 //            val startDestination = if (viewModel.getScreenName() == onboarding2) {
-            val startDestination = AppRoute.EnterUserProfileScreen.route
+            val startDestination = AppRoute.LanguageSelect.route
 //            } else if (loadScreenName == onboarding1 || viewModel.getScreenName() == onboarding1) {
 //                AppRoute.RegistrationStep1()
 
@@ -116,11 +116,8 @@ class LoginNavigationScreen : ComponentActivity() {
 
                         AppRoute.UserTypeSelect.route -> UserTypeScreen(
                             viewModel = viewModel,
-                            onNext = { /*navigateTo(AppRoute.UserNameScreen.route)*/
-                                context.startActivity(
-                                    Intent(context, StudentDashboardActivity::class.java)
-                                )
-                                (context as? Activity)?.finish()
+                            onNext = {
+                            navigateTo(AppRoute.UserNameScreen.route)
                             },
                             onBack = { navigateBack(AppRoute.LanguageSelect.route) }
                         )
