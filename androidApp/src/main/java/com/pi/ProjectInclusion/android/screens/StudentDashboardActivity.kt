@@ -64,8 +64,10 @@ import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.ChangePasswo
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.FaqActivity
 import com.pi.ProjectInclusion.android.screens.login.EnterUserNameScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.AdvanceScreening
+import com.pi.ProjectInclusion.android.screens.screeningScreen.AdvanceScreeningScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ProfilerFormPageScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ReportAdvanceScreen
+import com.pi.ProjectInclusion.android.screens.screeningScreen.ViewScreeningProfileDetailsScreen
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -278,7 +280,7 @@ class StudentDashboardActivity : ComponentActivity() {
                                         addStudent = { navigateTo(AppRoute.AddStudentRegister.route) },
                                         screeningOne = { navigateTo(AppRoute.ScreeningOne.route) },
                                         profilerForm = { navigateTo(AppRoute.ProfilerFormPage.route) },
-                                        advanceScreening = { navigateTo(AppRoute.ProfilerFormPage.route) },
+                                        advanceScreening = { navigateTo(AppRoute.AdvanceScreening.route) },
                                         onBack = { navigateBack(AppRoute.DashboardScreen.route) }
                                     )
 
@@ -303,9 +305,22 @@ class StudentDashboardActivity : ComponentActivity() {
                                         )
                                     }
 
+                                    AppRoute.AdvanceScreening.route -> AdvanceScreeningScreen(
+                                        onNext = { navigateTo(AppRoute.AdvanceScreeningReport.route) },
+                                        onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
+                                    )
+
                                     AppRoute.AdvanceScreeningReport.route -> {
                                         ReportAdvanceScreen(
-                                            onNext = { navigateTo(AppRoute.ProfilerFormPage.route) },
+                                            onNext = { navigateTo(AppRoute.InterventionScreen.route) },
+                                            onViewProfileDetails = { navigateTo(AppRoute.ViewScreeningProfileDetails.route) },
+                                            onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
+                                        )
+                                    }
+
+                                    AppRoute.ViewScreeningProfileDetails.route -> {
+                                        ViewScreeningProfileDetailsScreen(
+                                            onNext = { navigateTo(AppRoute.ScreeningScreen.route) },
                                             onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
                                         )
                                     }

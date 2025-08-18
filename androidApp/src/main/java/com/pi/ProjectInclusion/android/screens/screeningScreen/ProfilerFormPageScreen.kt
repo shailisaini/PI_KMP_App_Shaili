@@ -70,7 +70,12 @@ fun ProfilerFormPageScreen(onNext: () -> Unit, onBack: () -> Unit) {
 
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
-    val steps = listOf("Academic", "Interest", "Strength", "Temperament")
+    val steps = listOf(
+        stringResource(R.string.key_academic),
+        stringResource(R.string.key_interests),
+        stringResource(R.string.key_strength),
+        stringResource(R.string.key_temperament)
+    )
     var stepTitle by remember { mutableStateOf(0) }
     val totalSteps = steps.size
 
@@ -148,7 +153,6 @@ fun ProfilerFormPageScreen(onNext: () -> Unit, onBack: () -> Unit) {
                     0 -> {
                         AcademicScreenUI(selectedAns = { option ->
                             option.toString()
-                            println("Selected Answer A :- $option")
                             answerQ1 = option.toString()
                         })
                     }
@@ -156,7 +160,6 @@ fun ProfilerFormPageScreen(onNext: () -> Unit, onBack: () -> Unit) {
                     1 -> {
                         InterestScreenUI(selectedAns = { option ->
                             option.toString()
-                            println("Selected Answer B :- $option")
                             answerQ2 = option.toString()
                         })
                     }
@@ -164,7 +167,6 @@ fun ProfilerFormPageScreen(onNext: () -> Unit, onBack: () -> Unit) {
                     2 -> {
                         StrengthScreenUI(selectedAns = { option ->
                             option.toString()
-                            println("Selected Answer C :- $option")
                             answerQ3 = option.toString()
 
                         })
@@ -173,7 +175,6 @@ fun ProfilerFormPageScreen(onNext: () -> Unit, onBack: () -> Unit) {
                     3 -> {
                         TemperamentScreenUI(selectedAns = { option ->
                             option.toString()
-                            println("Selected Answer D :- $option")
                             answerQ4 = option.toString()
                         })
                     }
