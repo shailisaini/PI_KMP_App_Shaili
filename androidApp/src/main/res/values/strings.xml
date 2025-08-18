@@ -53,6 +53,7 @@ and make a difference together!</string>
     <string name="user_name">Aman Sharma</string>
     <string name="user_profile">Teacher</string>
     <string name="edit_profile">Edit Profile</string>
+    <string name="track_request">Track Request</string>
     <string name="nav_home">Home</string>
     <string name="nav_course">Courses</string>
     <string name="nav_screening">Screening</string>
@@ -438,5 +439,10 @@ and make a difference together!</string>
     <string name="key_dots">•</string>
     <string name="key_academic">Academic</string>
     <string name="key_it_Submit_data">It will Submit all data here</string>
+    <string name="key_name_change">Name Change Request</string>
+    <string name="key_school_change">School Name Change</string>
+    <string name="txt_approved">Approved</string>
+    <string name="txt_rejected">Rejected</string>
+    <string name="txt_reason">Reason: </string>
     <string name="txt_login_success">Login Successfully!</string>
 </resources>

@@ -44,6 +44,7 @@ import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen1
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentDetailsScreen
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentMoreDetailsScreen
 import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen2
+import com.pi.ProjectInclusion.android.screens.Profile.TrackRequestScreen
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.CertificateListActivity
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.DashboardScreen
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.ViewProfileScreen
@@ -242,6 +243,7 @@ class StudentDashboardActivity : ComponentActivity() {
 
                                     AppRoute.ProfileScreen.route -> ViewProfileScreen(
                                         onNext = { navigateTo(AppRoute.EditProfileScreen.route) },
+                                        onTrackRequest = { navigateTo(AppRoute.TrackRequestScreen.route) },
                                         onBackLogin = { navigateTo(AppRoute.UserNameScreen.route) },
                                         onBack = {
                                             context.startActivity(
@@ -292,6 +294,13 @@ class StudentDashboardActivity : ComponentActivity() {
                                         onNext = { navigateTo(AppRoute.ScreeningOneReport.route) },
                                         onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
                                     )
+
+                                    AppRoute.TrackRequestScreen.route -> {
+                                        TrackRequestScreen(
+                                            onNext = {},
+                                            onBack = { navigateBack(AppRoute.ProfileScreen.route) }
+                                        )
+                                    }
 
                                     AppRoute.ScreeningOneReport.route -> {
                                         ScreeningOneReportScreen(
