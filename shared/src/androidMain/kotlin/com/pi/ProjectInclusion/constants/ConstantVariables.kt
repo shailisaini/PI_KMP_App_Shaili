@@ -13,6 +13,7 @@ object ConstantVariables {
     var SHARED_PREF_KEY: String = "PI_PREF"
     var TOKEN_PREF_KEY: String = "user_token"
     var USER_TYPE_ID: String = "userTypeId"
+    var SELECTED_LANGUAGE_ID: String = "selectedLanguageId"
 
     // for language Screen
     var IMG_DESCRIPTION: String = "img"

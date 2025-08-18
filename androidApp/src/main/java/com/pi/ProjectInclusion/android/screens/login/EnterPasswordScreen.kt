@@ -1,6 +1,7 @@
 package com.pi.ProjectInclusion.android.screens.login
 
 import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,7 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
-import com.pi.ProjectInclusion.android.common_UI.AESEncryption.decrypt
 import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
 import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Bg_Gray1
@@ -57,23 +56,26 @@ import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.OTPBtnUi
 import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
 import com.pi.ProjectInclusion.android.common_UI.SurfaceLine
+import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
 import com.pi.ProjectInclusion.constants.ConstantVariables.SUCCESS
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
-import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun EnterPasswordScreen(
     viewModel: LoginViewModel,
-    onNext: (String) -> Unit, //OtpSendVerifyUI
+    onNext: () -> Unit, //OtpSendVerifyUI
     onBack: () -> Unit,
-    isForgetPassword: () -> Unit,
-    mobileNo: String = "8851291824" // keeping it static wil change after login API
+    isForgetPassword: () -> Unit
 ) {
     var isDialogVisible by remember { mutableStateOf(false) }
     val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
@@ -91,9 +93,7 @@ fun EnterPasswordScreen(
         onBack()
     }
     LoggerProvider.logger.d("Screen: " + "EnterPasswordScreen()")
-    LaunchedEffect(Unit) {
-        viewModel.getUserType()
-    }
+
 
     LaunchedEffect(uiState) {
         when {
@@ -127,11 +127,10 @@ fun EnterPasswordScreen(
         ) {
             PasswordUI(
                 context,
-                onNext = { onNext("") },
+                onNext = { onNext() },
                 onBack = onBack,
                 isForgetPassword = isForgetPassword,
                 viewModel = viewModel,
-                mobileNo = mobileNo
             )
         }
     }
@@ -141,61 +140,128 @@ fun EnterPasswordScreen(
 fun PasswordUI(
     context: Context,
     onBack: () -> Unit,
-    mobileNo: String = "",
     viewModel: LoginViewModel,
     isForgetPassword: () -> Unit,
-    onNext: (String) -> Unit,    // OtpSendVerifyUI
+    onNext: () -> Unit,    // OtpSendVerifyUI
 ) {
     val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
-    val coroutineScope = rememberCoroutineScope()
+    val loginResponse by viewModel.uiStateLoginResponse.collectAsStateWithLifecycle()
+    val loginWithPasswordState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
+
     val isInternetAvailable by remember { mutableStateOf(true) }
-    var isApiResponded by remember { mutableStateOf(false) }
     val internetMessage by remember { mutableStateOf("") }
     var showBottomSheet by remember { mutableStateOf(false) }
-    var enterPasswordStr = rememberSaveable { mutableStateOf("") }
-    var enterConfirmPasswordStr = rememberSaveable { mutableStateOf("") }
     val enterPassword = stringResource(R.string.txt_Enter_your_password)
     val showPassword = remember { mutableStateOf(false) }
 
     val mobNo = viewModel.mobileNumber
 
-    val isEncrypted = remember { isEncrypted(viewModel.getUserEmail()) }
-    if (isEncrypted) {
-        decrypt(viewModel.getUserEmail())
-    } else {
-        viewModel.getUserEmail()
-    }
-
-    val encryptedPhoneNo = mobNo?.encryptAES().toString().trim()
-
     var isDialogVisible by remember { mutableStateOf(false) }
-    var selectedIndex by remember { mutableStateOf<Int?>(null) }
-    val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
-    val invalidMobNo = stringResource(id = R.string.txt_Please_enter_password_)
+    var invalidMob = stringResource(id = R.string.txt_Please_enter_valid_password_)
+    var invalidMobNo by remember { mutableStateOf(invalidMob)}
 //  languageData[LanguageTranslationsResponse.KEY_INVALID_MOBILE_NO_ERROR].toString()
     val txtContinue = stringResource(id = R.string.txt_login)
     val tvPassword = stringResource(id = R.string.txt_password)
     val forgotPassword = stringResource(id = R.string.txt_Forgot_Password_q)
+    val loginSuccess = stringResource(id = R.string.txt_login_success)
 
     var passwordText = rememberSaveable { mutableStateOf("") }
-    val enterMobile = stringResource(R.string.txt_enter_mobile_no_)
     var isValidMobNo by remember { mutableStateOf(false) }
     var sendOtpViaCall by remember { mutableStateOf(false) }
+    var loginWithPassword by remember { mutableStateOf(false) }
     var sendOtpViaWhatsApp by remember { mutableStateOf(false) }
+    var languageId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
+    var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
+    var mobileNo = viewModel.mobileNumber
+    val encryptedPhoneNo = mobNo?.encryptAES().toString().trim()
+    val encryptedPassword = passwordText.value.encryptAES().toString().trim()
 
+    if (loginWithPassword) {
+        LoggerProvider.logger.d("LoginWithPassword: $languageId .. $userTypeId .. $mobileNo")
 
-    if (sendOtpViaCall) {
-        // api for otp on call
         LaunchedEffect(Unit) {
-            viewModel.getOTPViewModel(mobileNo)
+        isDialogVisible = true
+            viewModel.loginWithPasswordViewModel(
+                LoginRequest(
+                    encryptedPhoneNo,
+                    encryptedPassword,
+                    userTypeId.toInt(),
+                    languageId.toInt()
+                )
+            )
+        }
+
+        // Handle login response state
+        LaunchedEffect(loginResponse) {
+            when {
+                loginResponse.isLoading -> {
+                    isDialogVisible = true
+                }
+
+                loginResponse.error.isNotEmpty() -> {
+                    loginWithPassword = false
+                    LoggerProvider.logger.d("Error: ${loginResponse.error}")
+                    isDialogVisible = false
+                    isValidMobNo = true
+                    invalidMobNo = loginResponse.error.toString()
+                }
+
+                loginResponse.success != null -> {
+                    loginWithPassword = false
+                    if (loginResponse.success!!.statusCode == 201){
+                        context.toast(loginSuccess)
+                        context.startActivity(
+                            Intent(
+                                context,
+                                StudentDashboardActivity::class.java
+                            )
+                        )
+                    }
+                    else{
+                        isValidMobNo = true
+                        invalidMobNo = loginResponse.success!!.message.toString()
+                    }
+                    isDialogVisible = false
+                }
+            }
+        }
+    }
+
+    // api for otp on call
+    if (sendOtpViaCall) {
+    LaunchedEffect(Unit) {
+            viewModel.getOTPViewModel(mobileNo.toString())
             sendOtpViaCall = false
         }
     }
+    // api for otp on Whatsapp
     if (sendOtpViaWhatsApp) {
-        // api for otp on Whatsapp
-        LaunchedEffect(Unit) {
-            viewModel.getOTPWhatsappViewModel(mobileNo)
+    LaunchedEffect(Unit) {
+            viewModel.getOTPWhatsappViewModel(mobileNo.toString())
             sendOtpViaWhatsApp = false
+        }
+    }
+    LaunchedEffect(loginWithPasswordState) {
+        when {
+            sendOtpState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            sendOtpState.error.isNotEmpty() -> {
+                LoggerProvider.logger.d("Error: ${sendOtpState.error}")
+                isDialogVisible = false
+            }
+
+            sendOtpState.success != null -> {
+//                LoggerProvider.logger.d("Languages fetched: ${list.size}")
+                if (sendOtpState.success!!.response!!.message.equals(SUCCESS)) {
+                    onNext()
+                } else {
+                    context.toast(sendOtpState.success!!.response!!.message.toString())
+                }
+
+                isDialogVisible = false
+            }
         }
     }
 
@@ -213,7 +279,7 @@ fun PasswordUI(
             sendOtpState.success != null -> {
 //                LoggerProvider.logger.d("Languages fetched: ${list.size}")
                 if (sendOtpState.success!!.response!!.message.equals(SUCCESS)) {
-                    onNext(mobileNo)
+                    onNext()
                 } else {
                     context.toast(sendOtpState.success!!.response!!.message.toString())
                 }
@@ -273,7 +339,7 @@ fun PasswordUI(
                     )
 
                     PasswordTextField(
-                        password = enterPasswordStr,
+                        password = passwordText,
                         showPassword = showPassword,
                         hint = enterPassword
                     )
@@ -319,10 +385,8 @@ fun PasswordUI(
                                 } else {
                                     if (passwordText.value.length < 6) {
                                         isValidMobNo = true
-                                    } else { // if first digit of mobile is less than 6 then error will show
-//                                        isDialogVisible = true
-                                        onNext("")
-
+                                    } else {
+                                        loginWithPassword = true
                                     }
                                 }
                             },
@@ -368,9 +432,13 @@ fun PasswordUI(
 fun LoginPassScreen() {
     val navController = rememberNavController()
     val context = LocalContext.current
-    val onNext: (String) -> Unit = {}
+    val onNext: () -> Unit = {}
     val onBack: () -> Unit = {}
     val isForgetPassword: () -> Unit = {}
-    val viewModel: LoginViewModel =  koinViewModel()
-    PasswordUI(context, onNext = { onNext("") }, onBack = onBack, isForgetPassword= isForgetPassword,viewModel = viewModel, mobileNo = "")
+    val viewModel: LoginViewModel = koinViewModel()
+    PasswordUI(
+        context,
+        onNext = { onNext() },
+        onBack = onBack, isForgetPassword = isForgetPassword, viewModel = viewModel
+    )
 }
