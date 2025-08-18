@@ -76,8 +76,9 @@ import com.pi.ProjectInclusion.constants.CommonFunction.NoDataFound
 import com.pi.ProjectInclusion.constants.CommonFunction.ShowError
 import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
-import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetLanguageListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
 import kotlinx.coroutines.launch
 
 @Composable
@@ -111,7 +112,6 @@ import kotlinx.coroutines.launch
                 LoggerProvider.logger.d("Error: ${uiState.error}")
                 context.toast(uiState.error)
                 isDialogVisible = false
-                onNext()
             }
 
             uiState.success != null -> {
@@ -138,7 +138,7 @@ import kotlinx.coroutines.launch
                 .background(color = Bg_Gray1),
             verticalArrangement = Arrangement.Top
         ) {
-            LanguageResponseUI(context, languageData, onNext)
+            LanguageResponseUI(context, languageData, onNext, viewModel)
         }
     }
 }
@@ -149,12 +149,12 @@ fun LanguageResponseUI(
     context: Context,
     languageData: MutableList<GetLanguageListResponse.LanguageResponse>,
     onNext: () -> Unit,
+    viewModel: LoginViewModel,
 ) {
     val errColor = PrimaryBlue
     val scrollState = rememberLazyGridState()
     val coroutineScope = rememberCoroutineScope()
     var isInternetAvailable by remember { mutableStateOf(true) }
-    var isApiResponded by remember { mutableStateOf(false) }
     val internetMessage = stringResource(R.string.txt_oops_no_internet)
     val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
@@ -211,8 +211,8 @@ fun LanguageResponseUI(
                                 onItemClicked = {
                                     selectedIndex =
                                         if (selectedIndex == index) null else index // Toggle selection
-                                    selectedLanguage.value =
-                                        languageData[index].id.toString()
+                                    selectedLanguage.value = languageData[index].id.toString()
+                                    viewModel.savePrefData(SELECTED_LANGUAGE_ID, languageData[index].id.toString())
                                 }
                             )
                         }
@@ -311,10 +311,10 @@ fun ItemLanguageCard(
                         .background(Color.Unspecified)
                         .size(45.dp),
                     contentScale = ContentScale.Fit,
-                    painter = if (!languageIndex.lang_icon.isNullOrEmpty()) {
+                    painter = if (!languageIndex.langIcon.isNullOrEmpty()) {
                         rememberAsyncImagePainter(
                             model = ImageRequest.Builder(LocalContext.current)
-                                .data(languageIndex.lang_icon)
+                                .data(languageIndex.langIcon)
                                 .decoderFactory(SvgDecoder.Factory())
                                 .size(Size.ORIGINAL)
                                 .placeholder(R.drawable.ic_hindi)
