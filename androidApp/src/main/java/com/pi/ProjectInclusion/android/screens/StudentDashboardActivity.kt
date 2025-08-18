@@ -62,6 +62,7 @@ import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneRepor
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneScreen
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.ChangePasswordActivity
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.FaqActivity
+import com.pi.ProjectInclusion.android.screens.dashboardScreen.LMSCourseHomeScreen
 import com.pi.ProjectInclusion.android.screens.login.EnterUserNameScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.AdvanceScreening
 import com.pi.ProjectInclusion.android.screens.screeningScreen.AdvanceScreeningScreen
@@ -236,6 +237,9 @@ class StudentDashboardActivity : ComponentActivity() {
                             ) { route ->
                                 when (route) {
                                     AppRoute.DashboardScreen.route -> DashboardScreen()
+
+                                    AppRoute.CourseScreen.route -> LMSCourseHomeScreen()
+
                                     AppRoute.ProfileScreen.route -> ViewProfileScreen(
                                         onNext = { navigateTo(AppRoute.EditProfileScreen.route) },
                                         onBackLogin = { navigateTo(AppRoute.UserNameScreen.route) },
@@ -379,12 +383,6 @@ fun onMenuItemClick(
     // Handle the click event here
     val context = studentDashboardActivity as Context
     when (itemId) {
-        AppRoute.CourseScreen.route -> {
-            startActivity(
-                context, Intent(context, StudentDashboardActivity::class.java), null
-            ).apply { (context as? Activity)?.finish() }
-        }
-
         AppRoute.CertificateScreen.route -> {
             startActivity(
                 context, Intent(context, CertificateListActivity::class.java), null
