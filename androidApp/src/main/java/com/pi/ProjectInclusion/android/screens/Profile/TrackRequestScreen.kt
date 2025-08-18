@@ -54,7 +54,6 @@ import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.color_done
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.CustomDialog
-import com.pi.ProjectInclusion.data.model.AuthenticationModel.GetUserTypeResponse
 import com.pi.ProjectInclusion.data.model.profileModel.TrackListModel
 import com.pi.ProjectInclusion.data.model.profileModel.dummyTrackList
 import androidx.compose.foundation.lazy.items
@@ -64,7 +63,7 @@ import androidx.compose.foundation.lazy.items
 fun TrackRequestScreen(onNext: () -> Unit,onBack: () -> Unit) {
     var isDialogVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val userType = remember { mutableStateListOf<GetUserTypeResponse.UserTypeResponse>() }
+
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
