@@ -159,12 +159,6 @@ fun PasswordUI(
 
     val mobNo = viewModel.mobileNumber
 
-    val isEncrypted = remember { isEncrypted(viewModel.getUserEmail()) }
-    if (isEncrypted) {
-        decrypt(viewModel.getUserEmail())
-    } else {
-        viewModel.getUserEmail()
-    }
 
     val encryptedPhoneNo = mobNo?.encryptAES().toString().trim()
 
