@@ -120,7 +120,8 @@ import kotlin.Unit
 fun ViewProfileScreen(
     onNext: () -> Unit,  //EnterUserProfileScreen
     onBackLogin: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onTrackRequest: () -> Unit
 ) {
 
     var isDialogVisible by remember { mutableStateOf(false) }
@@ -167,7 +168,7 @@ fun ViewProfileScreen(
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            ProfileViewUI(context, onNext = onNext, onBack = onBack, onBackLogin = onBackLogin)
+            ProfileViewUI(context, onNext = onNext, onBack = onBack, onBackLogin = onBackLogin,onTrackRequest =onTrackRequest)
         }
     }
 }
@@ -177,7 +178,8 @@ fun ProfileViewUI(
     context: Context,
     onBack: () -> Unit,
     onBackLogin: () -> Unit,
-    onNext: () -> Unit
+    onNext: () -> Unit,
+    onTrackRequest: () -> Unit
 ) {
     val scrollState = rememberScrollState()
     var isApiResponded by remember { mutableStateOf(false) }
@@ -203,7 +205,7 @@ fun ProfileViewUI(
     }
 
     if (isChangeRequestBottomSheet) {
-        ChangeRequestSheet {
+        ChangeRequestSheet(onTrackRequest = onTrackRequest) {
             isChangeRequestBottomSheet = false
         }
     }
@@ -606,7 +608,8 @@ fun ProfileUI() {
     val onNext: () -> Unit = {}
     val onBackLogin: () -> Unit = {}
     val onBack: () -> Unit = {}
-    ProfileViewUI(context, onNext, onBack,onBackLogin)
+    val onTrackRequest: () -> Unit = {}
+    ProfileViewUI(context, onNext, onBack,onBackLogin,onTrackRequest)
 }
 
 @Preview
@@ -749,7 +752,8 @@ fun ProfileBottomSheetMenu(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChangeRequestSheet(
-    onDismiss: () -> Unit = {},
+    onTrackRequest: () -> Unit = {},
+    onDismiss: () -> Unit = {}
 ) {
     val sheetState = rememberModalBottomSheetState()
     var isSelectedSchool by remember { mutableStateOf(false) }
@@ -758,11 +762,11 @@ fun ChangeRequestSheet(
     var uploadShowDialog by remember { mutableStateOf(false) }
     if (uploadShowDialog) {
         if (isSelectedSchool) {
-            UploadIdDialog(stringResource(R.string.txt_upload_clear_id_school)) {
+            UploadIdDialog(stringResource(R.string.txt_upload_clear_id_school),onTrackRequest =onTrackRequest) {
                 uploadShowDialog = false
             }
         } else {
-            NameRequestDialog(stringResource(R.string.txt_name_change)) {
+            NameRequestDialog(stringResource(R.string.txt_name_change), onTrackRequest = onTrackRequest) {
                 uploadShowDialog = false
             }
         }
@@ -887,14 +891,15 @@ fun ChangeRequestSheet(
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Preview
 @Composable
-fun UploadIdDialog(subText: String = "", onDismiss: () -> Unit = {}) {
+fun UploadIdDialog(subText: String = "",onTrackRequest: () -> Unit={}, onDismiss: () -> Unit = {}) {
     val context = LocalContext.current
 
     var isSubmitted by remember { mutableStateOf(false) }
     if (isSubmitted) {
         RequestSubmittedDialog(
             stringResource(R.string.txt_request_submitted),
-            stringResource(R.string.txt_submit_review)
+            stringResource(R.string.txt_submit_review),
+            onTrackRequest = onTrackRequest,
         ) {
             isSubmitted = false
         }
@@ -1153,7 +1158,7 @@ fun Modifier.drawDashedBorder(
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Preview
 @Composable
-fun RequestSubmittedDialog(title: String = "", subText: String = "", onDismiss: () -> Unit = {}) {
+fun RequestSubmittedDialog(title: String = "", subText: String = "",onTrackRequest: ()  -> Unit = {}, onDismiss: () -> Unit = {}) {
     val context = LocalContext.current
 
     Dialog(onDismissRequest = { onDismiss() }) {
@@ -1239,7 +1244,9 @@ fun RequestSubmittedDialog(title: String = "", subText: String = "", onDismiss: 
                         }
                         // check Status
                         Button(
-                            onClick = { },
+                            onClick = {
+                                onTrackRequest()
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f)
@@ -1270,11 +1277,14 @@ fun RequestSubmittedDialog(title: String = "", subText: String = "", onDismiss: 
 
 @Preview
 @Composable
-fun NameRequestDialog(title: String = "", onDismiss: () -> Unit = {}) {
+fun NameRequestDialog(title: String = "",
+                      onTrackRequest: () -> Unit = {},
+                      onDismiss: () -> Unit = {}
+) {
     val context = LocalContext.current
     var uploadShowDialog by remember { mutableStateOf(false) }
     if (uploadShowDialog) {
-        UploadIdDialog(stringResource(R.string.txt_upload_clear_id_school)) {
+        UploadIdDialog(stringResource(R.string.txt_upload_clear_id_school), onTrackRequest = onTrackRequest) {
             uploadShowDialog = false
         }
     }
