@@ -1,10 +1,12 @@
 package com.pi.ProjectInclusion.data.repository
 
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.LoginApiResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.SendOTPResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateUserResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.data.remote.ApiService
 import com.pi.ProjectInclusion.domain.repository.AuthenticationRepository
@@ -35,10 +37,10 @@ class AuthenticationRepoImpl(private val apiService: ApiService) : Authenticatio
     }
 
    override suspend fun forgetPassword(
-        strNewPassword: String,
-        strUpdatedBy: String
-    ): SendOTPResponse {
-        return apiService.forgetPassword(strNewPassword, strUpdatedBy)
+       passwordRequest: ForgetPasswordRequest,
+       strToken: String,
+    ): ForgetPasswordResponse {
+        return apiService.forgetPassword(passwordRequest, strToken)
     }
 }
 

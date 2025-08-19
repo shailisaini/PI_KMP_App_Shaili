@@ -3,11 +3,13 @@ package com.pi.ProjectInclusion.ui.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kmptemplate.logger.LoggerProvider
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.LoginApiResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.SendOTPResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateUserResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.database.LocalDataSource
 import com.pi.ProjectInclusion.domain.ConnectivityObserver
@@ -52,6 +54,9 @@ class LoginViewModel(
 
     private val _uiStateLogin = MutableStateFlow(UiState<LoginApiResponse>())
     val uiStateLoginResponse: StateFlow<UiState<LoginApiResponse>> = _uiStateLogin
+
+    private val forgetPassword = MutableStateFlow(UiState<ForgetPasswordResponse>())
+    val forgetPasswordResponse: StateFlow<UiState<ForgetPasswordResponse>> = forgetPassword
 
     private val query = MutableStateFlow("")
 
@@ -270,23 +275,23 @@ class LoginViewModel(
     }
 
     fun forgetPassword(
-        strNewPassword: String,
-        strUpdatedBy: String,
+        passwordRequest: ForgetPasswordRequest,
+        strToken: String,
     ) = viewModelScope.launch {
-        _uiStateSendOtp.update { UiState(isLoading = true) }
-        getLanguageUsesCases.forgetPassword(strNewPassword, strUpdatedBy)
+        forgetPassword.update { UiState(isLoading = true) }
+        getLanguageUsesCases.forgetPassword(passwordRequest, strToken)
             .catch { exception ->
-                _uiStateSendOtp.update {
+                forgetPassword.update {
                     UiState(error = exception.message ?: somethingWentWrong)
                 }
             }
             .collect { result ->
                 result.fold(
                     onSuccess = { data ->
-                        _uiStateSendOtp.update { UiState(success = data) }
+                        forgetPassword.update { UiState(success = data) }
                     },
                     onFailure = { exception ->
-                        _uiStateSendOtp.update {
+                        forgetPassword.update {
                             UiState(error = exception.message ?: somethingWentWrong)
                         }
                     }
