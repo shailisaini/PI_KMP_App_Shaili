@@ -32,6 +32,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -48,6 +49,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SpanStyle
@@ -64,10 +66,12 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.BorderBlue
+import com.pi.ProjectInclusion.DarkGrey02
 import com.pi.ProjectInclusion.Dark_02
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight04
 import com.pi.ProjectInclusion.LightRed01
+import com.pi.ProjectInclusion.LightText
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.RedLogout
 import com.pi.ProjectInclusion.android.R
@@ -846,5 +850,163 @@ fun AlreadyRequested(onDismiss: () -> Unit = {}) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun TransferSuccessfulDialogPreview() {
-    TransferSuccessfulDialog(name = "Student name") {}
+    TransferSuccessfulDialog(name = stringResource(R.string.user_name)) {}
+}
+
+
+@SuppressLint("UnusedBoxWithConstraintsScope")
+@Composable
+fun AlreadyAssessedDialog(
+    assessorName: String,
+    schoolName: String,
+    onCancel: () -> Unit = {},
+    onTransferRequest: () -> Unit = {}
+) {
+    Dialog(
+        onDismissRequest = { onCancel() },
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .padding(20.dp)
+                    .clip(RoundedCornerShape(21.dp))
+                    .background(if (isSystemInDarkTheme()) Dark_02 else White)
+                    .fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(vertical = 20.dp, horizontal = 15.dp)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    // Top Icon
+                    Icon(
+                        painter = painterResource(id = R.drawable.already_ass_img), // replace with your vector
+                        contentDescription = null,
+                        modifier = Modifier.size(90.dp),
+                        tint = Color.Unspecified
+                    )
+
+                    // Title
+                    Text(
+                        text = stringResource(R.string.txt_already_assessed),
+                        modifier = Modifier
+                            .padding(top = 12.dp),
+                        fontFamily = fontBold,
+                        fontSize = 18.sp,
+                        color = Black,
+                        textAlign = TextAlign.Center
+                    )
+
+                    // Description
+                    Text(
+                        text = stringResource(R.string.txt_already_assessed_desc),
+                        modifier = Modifier
+                            .padding(top = 6.dp)
+                            .fillMaxWidth(),
+                        fontFamily = fontRegular,
+                        fontSize = 14.sp,
+                        color = GrayLight04,
+                        textAlign = TextAlign.Center
+                    )
+
+                    // Assessor Info Card
+                    Box(
+                        modifier = Modifier
+                            .padding(top = 12.dp)
+                            .fillMaxWidth()
+                            .drawDashedBorder(
+                                color = LightText,
+                                strokeWidth = 1.dp,
+                                dashLength = 4.dp,
+                                gapLength = 5.dp,
+                                cornerRadius = 12.dp
+                            )
+                            .padding(12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = assessorName,
+                                fontSize = 16.sp,
+                                fontFamily = fontMedium,
+                                color = BorderBlue
+                            )
+                            Text(
+                                text = schoolName,
+                                fontSize = 14.sp,
+                                fontFamily = fontRegular,
+                                color = DarkGrey02
+                            )
+                        }
+                    }
+
+                    // Bottom Description
+                    Text(
+                        text = stringResource(R.string.txt_transfer_request_msg),
+                        modifier = Modifier
+                            .padding(top = 15.dp, start = 12.dp, end = 12.dp),
+                        fontFamily = fontRegular,
+                        fontSize = 14.sp,
+                        color = GrayLight04,
+                        textAlign = TextAlign.Center
+                    )
+
+                    // Buttons
+                    Row(
+                        modifier = Modifier
+                            .padding(top = 20.dp, bottom = 10.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        // Cancel
+                        OutlinedButton(
+                            onClick = { onCancel() },
+                            modifier = Modifier.weight(0.8f),
+                            shape = RoundedCornerShape(9.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = BorderBlue
+                            ),
+                            border = BorderStroke(1.dp, BorderBlue)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.txt_cancel),
+                                fontSize = 15.sp,
+                                fontFamily = fontMedium
+                            )
+                        }
+
+                        // Send Transfer Request
+                        Button(
+                            onClick = { onTransferRequest() },
+                            modifier = Modifier.weight(1.2f),
+                            shape = RoundedCornerShape(9.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = PrimaryBlue,
+                                contentColor = White
+                            )
+                        ) {
+                            Text(
+                                text = stringResource(R.string.txt_send_transfer_request),
+                                fontSize = 15.sp,
+                                fontFamily = fontMedium,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun AlreadyAssessedDialogPreview() {
+    AlreadyAssessedDialog(
+        assessorName = stringResource(R.string.txt_dummy_name),
+        schoolName = stringResource(R.string.txt_dummy_school)
+    )
 }
