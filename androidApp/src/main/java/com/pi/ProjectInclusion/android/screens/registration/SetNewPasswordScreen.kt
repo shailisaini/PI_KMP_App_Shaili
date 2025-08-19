@@ -16,6 +16,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.kmptemplate.logger.LoggerProvider
 import com.example.kmptemplate.logger.LoggerProvider.logger
@@ -44,19 +46,25 @@ import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
+import com.pi.ProjectInclusion.constants.ConstantVariables.SUCCESS
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import okhttp3.Route
+import java.util.regex.Pattern
 
 @Composable
-fun SetNewPasswordScreen(onNext: () -> Unit,
-                         onBack: () -> Unit,
-                         viewModel: LoginViewModel) {
+fun SetNewPasswordScreen(
+    onNext: () -> Unit,
+    onBack: () -> Unit,
+    viewModel: LoginViewModel,
+) {
 
     logger.d("Screen: " + "SetNewPasswordScreen()")
 
@@ -85,10 +93,47 @@ fun SetNewPasswordScreen(onNext: () -> Unit,
     var isCheckedAtleastOne by remember { mutableStateOf(false) }
     var isCheckedSpecialCharacter by remember { mutableStateOf(false) }
 
-    LoggerProvider.logger.d("Screen: " + "SetNewPasswordScreen()")
+    logger.d("Screen: " + "SetNewPasswordScreen()")
+
+    val minLength = enterConfirmPasswordStr.value.length >= 8 || enterPasswordStr.value.length >= 8
+    val hasLetter =
+        enterConfirmPasswordStr.value.any { it.isLetter() } || enterPasswordStr.value.any { it.isLetter() }
+    val hasDigit =
+        enterConfirmPasswordStr.value.any { it.isDigit() } || enterPasswordStr.value.any { it.isDigit() }
+    val hasSymbol = Pattern.compile("[^a-zA-Z0-9]").matcher(enterConfirmPasswordStr.value)
+        .find() || Pattern.compile("[^a-zA-Z0-9]").matcher(enterPasswordStr.value).find()
+
+    val forgetPasswordState by viewModel.forgetPasswordResponse.collectAsStateWithLifecycle()
+    val encryptedPassword = enterConfirmPasswordStr.value.encryptAES().toString().trim()
+    val strToken: String =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjR5QW9PaGdVQnJyOUVkdXVvbHFvSVE9PSIsInN1YiI6IjEiLCJpYXQiOjE3NTU1OTYyNTIsImV4cCI6MTc1NTY4MjY1Mn0.xC1TkBEv391O5VJaM4MoOr-kRp6THY4Q8xcpAxN-DZ0"
+
+    LaunchedEffect(forgetPasswordState) {
+        when {
+            forgetPasswordState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            forgetPasswordState.error.isNotEmpty() -> {
+                logger.d("Forget Password Error: ${forgetPasswordState.error}")
+                isDialogVisible = false
+            }
+
+            forgetPasswordState.success != null -> {
+                logger.d("Forget Password Response :- ${forgetPasswordState.success!!.response}")
+                if (forgetPasswordState.success!!.status == true) {
+                    context.toast(forgetPasswordState.success!!.response!!)
+                    onNext()
+                } else {
+                    context.toast(forgetPasswordState.success!!.response!!)
+                }
+                isDialogVisible = false
+            }
+        }
+    }
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
-       onBack()
+        onBack()
     }, content = {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -179,21 +224,13 @@ fun SetNewPasswordScreen(onNext: () -> Unit,
                     hint = enterConfirmPassword
                 )
 
-                /*PasswordCheckField(isChecked, txtCharacter, Modifier.padding(
-                    top = 16.dp,
-                    start = 12.dp,
-                    end = 12.dp,
-                    bottom = 8.dp
-                ))*/
-
                 Row(
                     verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(
                         top = 16.dp, start = 12.dp, end = 12.dp, bottom = 8.dp
                     )
                 ) {
                     Checkbox(
-                        checked = isCheckedCharacter,
-                        onCheckedChange = { isCheckedCharacter = it }, // Disabled for display-only
+                        checked = minLength, onCheckedChange = null, // Disabled for display-only
                         colors = if (isSystemInDarkTheme()) {
                             CheckboxDefaults.colors(
                                 checkedColor = Color.Transparent,     // Light purple-gray
@@ -206,8 +243,7 @@ fun SetNewPasswordScreen(onNext: () -> Unit,
                                 uncheckedColor = Color.LightGray,   // Same for unchecked
                                 checkmarkColor = PrimaryBlue
                             )
-                        },
-                        modifier = Modifier.size(20.dp)
+                        }, modifier = Modifier.size(20.dp)
                     )
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -232,8 +268,7 @@ fun SetNewPasswordScreen(onNext: () -> Unit,
                     modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
                 ) {
                     Checkbox(
-                        checked = isCheckedUppercase,
-                        onCheckedChange = { isCheckedUppercase = it }, // Disabled for display-only
+                        checked = hasLetter, onCheckedChange = null, // Disabled for display-only
                         colors = if (isSystemInDarkTheme()) {
                             CheckboxDefaults.colors(
                                 checkedColor = Color.Transparent,     // Light purple-gray
@@ -246,8 +281,7 @@ fun SetNewPasswordScreen(onNext: () -> Unit,
                                 uncheckedColor = Color.LightGray,   // Same for unchecked
                                 checkmarkColor = PrimaryBlue
                             )
-                        },
-                        modifier = Modifier.size(20.dp)
+                        }, modifier = Modifier.size(20.dp)
                     )
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -272,8 +306,7 @@ fun SetNewPasswordScreen(onNext: () -> Unit,
                     modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
                 ) {
                     Checkbox(
-                        checked = isCheckedAtleastOne,
-                        onCheckedChange = { isCheckedAtleastOne = it }, // Disabled for display-only
+                        checked = hasDigit, onCheckedChange = null, // Disabled for display-only
                         colors = if (isSystemInDarkTheme()) {
                             CheckboxDefaults.colors(
                                 checkedColor = Color.Transparent,     // Light purple-gray
@@ -286,8 +319,7 @@ fun SetNewPasswordScreen(onNext: () -> Unit,
                                 uncheckedColor = Color.LightGray,   // Same for unchecked
                                 checkmarkColor = PrimaryBlue
                             )
-                        },
-                        modifier = Modifier.size(20.dp)
+                        }, modifier = Modifier.size(20.dp)
                     )
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -312,9 +344,7 @@ fun SetNewPasswordScreen(onNext: () -> Unit,
                     modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
                 ) {
                     Checkbox(
-                        checked = isCheckedSpecialCharacter, onCheckedChange = {
-                            isCheckedSpecialCharacter = it
-                        }, // Disabled for display-only
+                        checked = hasSymbol, onCheckedChange = null, // Disabled for display-only
                         colors = if (isSystemInDarkTheme()) {
                             CheckboxDefaults.colors(
                                 checkedColor = Color.Transparent,     // Light purple-gray
@@ -374,12 +404,10 @@ fun SetNewPasswordScreen(onNext: () -> Unit,
                                 context.toast(enterPasswordMsgStr)
                             } else if (enterConfirmPasswordStr.value.isEmpty()) {
                                 context.toast(enterConfirmPasswordMsgStr)
-                            } else if (enterConfirmPasswordStr.value.isEmpty() != enterPasswordStr.value.isEmpty()) {
+                            } else if (enterConfirmPasswordStr.value != enterPasswordStr.value) {
                                 context.toast(enterConfirmPasswordSameMsgStr)
                             } else {
                                 showError = enterConfirmPasswordStr.value.isEmpty()
-//                                val firstDigitChar = enterConfirmPasswordStr.value.toString().first()
-//                                val firstDigit = firstDigitChar.digitToInt()
                                 if (showError || enterConfirmPasswordStr.value.length < 10) {
                                     inValidPassword = true
                                 } else { // if first digit of mobile is less than 6 then error will show
@@ -387,9 +415,11 @@ fun SetNewPasswordScreen(onNext: () -> Unit,
                                         inValidPassword = true
                                     } else {
                                         isDialogVisible = true
-//                                viewModel.saveUserPhoneNo(mobNo.value)
                                         buttonClicked = true
-                                       onNext()
+                                        isDialogVisible = true
+                                        val passwordRequest =
+                                            ForgetPasswordRequest("", 3, encryptedPassword)
+                                        viewModel.forgetPassword(passwordRequest, strToken)
                                     }
                                 }
                             }

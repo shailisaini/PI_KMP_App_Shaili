@@ -1,10 +1,12 @@
 package com.pi.ProjectInclusion.domain.repository
 
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.LoginApiResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.SendOTPResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateUserResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.VerifyOtpResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
@@ -18,4 +20,8 @@ interface AuthenticationRepository {
     suspend fun getValidate(userName : String, userTypeId : String) : ValidateUserResponse
     suspend fun getVerifyOtpRepo(userName : String, userTypeId : String) : VerifyOtpResponse
     suspend fun getLoginWithOTPRepo(request: LoginWithOtpRequest) : LoginApiResponse
+    suspend fun forgetPassword(
+        passwordRequest: ForgetPasswordRequest,
+        strToken: String,
+    ): ForgetPasswordResponse
 }
