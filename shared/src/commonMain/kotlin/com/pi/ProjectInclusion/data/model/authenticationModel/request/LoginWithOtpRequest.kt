@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class LoginWithOtpRequest(
-    val userName: String? = null,
+    val username: String? = null,
     val otp: String? = null,
     val userTypeId: Int? = null,
 
