@@ -14,9 +14,10 @@ object ConstantVariables {
     var TOKEN_PREF_KEY: String = "user_token"
     var USER_TYPE_ID: String = "userTypeId"
     var SELECTED_LANGUAGE_ID: String = "selectedLanguageId"
+    var IS_COMING_FROM: String = "isComingFrom"
     var USER_MOBILE_NO: String = "userMobileNo"
 
-    // for language Screen
+    // for Screens
     var IMG_DESCRIPTION: String = "img"
     var KEY_LOADING: String = "Loading..."
     var KEY_ACTIVE: String = "Active"
@@ -33,6 +34,9 @@ object ConstantVariables {
     var JPG: String = ".jpg"
     var IMAGE_MIME: String = "image/jpeg"
     var IMAGE_ALL_TYPE: String = "image/*"
+
+    // screens Name
+    var LOGIN_WITH_OTP: String = "loginWithOtp"
 
     // Tabs
     var ALL: String = "All"

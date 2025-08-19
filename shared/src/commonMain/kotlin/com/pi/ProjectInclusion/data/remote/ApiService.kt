@@ -8,7 +8,9 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.Response.SendOTPRe
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateUserResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ChangePasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.VerifyOtpResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -111,6 +113,32 @@ class ApiService(private val client: HttpClient) {
             append(HttpHeaders.Accept, "application/json")
         }
     }.body<SendOTPResponse>()
+
+    // registration, forgot password & recover user
+    suspend fun getVerifyOTP(mobNo: String, otpValue: String): VerifyOtpResponse = client.post {
+        url {
+            takeFrom(STUDENT_BASE_URL)
+            appendPathSegments(appendUser, "verify-otp") // → /language/get-all
+            parameters.append("mobileNo", mobNo)
+            parameters.append("otp", otpValue)
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+    }.body<VerifyOtpResponse>()
+
+    suspend fun getLoginWithOTP(request: LoginWithOtpRequest): LoginApiResponse = client.post {
+        url {
+            takeFrom(STUDENT_BASE_URL)
+            appendPathSegments(appendUser, "login-with-otp") // → /language/get-all
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+//            append(HttpHeaders.Authorization, "Bearer $token")
+        }
+        contentType(ContentType.Application.Json)
+        setBody(request)
+    }.body<LoginApiResponse>()
 
     suspend fun forgetPassword(
         passwordRequest: ForgetPasswordRequest,

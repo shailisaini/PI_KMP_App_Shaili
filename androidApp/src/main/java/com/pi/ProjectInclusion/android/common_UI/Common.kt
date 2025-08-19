@@ -144,6 +144,7 @@ import com.pi.ProjectInclusion.Bg_Gray4
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.BodyTextLight
 import com.pi.ProjectInclusion.BorderBlue
+import com.pi.ProjectInclusion.CardColor01
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
 import com.pi.ProjectInclusion.DARK_TITLE_TEXT
@@ -1021,9 +1022,14 @@ fun OtpInputField(
                 }
             }
         },
-        visualTransformation = if (otpText.length > 0) VisualTransformation.None else PasswordVisualTransformation(
-            '*'
-        ),
+        visualTransformation = if (otpText.isNotEmpty()) {
+            VisualTransformation.None
+        }
+        else {
+            PasswordVisualTransformation(
+                '*'
+            )
+        },
 
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number
@@ -1144,21 +1150,18 @@ internal fun CharacterContainer(
             modifier = Modifier
                 .size(45.dp) // Ensure this is wide enough
                 .border(
-                    width = if (isFocused) 2.dp else 1.dp, color = if (isFocused) {
+                    width = if (isFocused) 2.dp else 1.dp,
+                    color = if (isFocused) {
                         if (isSystemInDarkTheme()) {
                             Dark_03
                         } else {
-                            if (isSystemInDarkTheme()) {
-                                PRIMARY_AURO_BLUE
-                            } else {
-                                PrimaryBlue
+                            LightBlue
                             }
-                        }
                     } else {
                         if (isSystemInDarkTheme()) {
                             LightBlue
                         } else {
-                            LightBlue
+                            CardColor01
                         }
                     }, shape = RoundedCornerShape(6.dp)
                 )

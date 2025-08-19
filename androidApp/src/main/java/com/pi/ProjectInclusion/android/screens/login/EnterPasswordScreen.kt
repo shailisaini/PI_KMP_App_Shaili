@@ -62,6 +62,8 @@ import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.IS_COMING_FROM
+import com.pi.ProjectInclusion.constants.ConstantVariables.LOGIN_WITH_OTP
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
 import com.pi.ProjectInclusion.constants.ConstantVariables.SUCCESS
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
@@ -147,7 +149,7 @@ fun PasswordUI(
 ) {
     val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
     val loginResponse by viewModel.uiStateLoginResponse.collectAsStateWithLifecycle()
-    val loginWithPasswordState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
+   /* val loginWithPasswordState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()*/
 
     val isInternetAvailable by remember { mutableStateOf(true) }
     val internetMessage by remember { mutableStateOf("") }
@@ -214,7 +216,7 @@ fun PasswordUI(
 
                 loginResponse.success != null -> {
                     loginWithPassword = false
-                    if (loginResponse.success!!.statusCode == 201){
+                    if (loginResponse.success!!.status == true){
                         context.toast(loginSuccess)
                         context.startActivity(
                             Intent(
@@ -247,30 +249,8 @@ fun PasswordUI(
             sendOtpViaWhatsApp = false
         }
     }
-    LaunchedEffect(loginWithPasswordState) {
-        when {
-            sendOtpState.isLoading -> {
-                isDialogVisible = true
-            }
 
-            sendOtpState.error.isNotEmpty() -> {
-                LoggerProvider.logger.d("Error: ${sendOtpState.error}")
-                isDialogVisible = false
-            }
-
-            sendOtpState.success != null -> {
-//                LoggerProvider.logger.d("Languages fetched: ${list.size}")
-                if (sendOtpState.success!!.response!!.message.equals(SUCCESS)) {
-                    onNext()
-                } else {
-                    context.toast(sendOtpState.success!!.response!!.message.toString())
-                }
-
-                isDialogVisible = false
-            }
-        }
-    }
-
+    // send otp response
     LaunchedEffect(sendOtpState) {
         when {
             sendOtpState.isLoading -> {
@@ -285,6 +265,7 @@ fun PasswordUI(
             sendOtpState.success != null -> {
 //                LoggerProvider.logger.d("Languages fetched: ${list.size}")
                 if (sendOtpState.success!!.response!!.message.equals(SUCCESS)) {
+                    viewModel.savePrefData(IS_COMING_FROM, LOGIN_WITH_OTP)
                     onNext()
                 } else {
                     context.toast(sendOtpState.success!!.response!!.message.toString())

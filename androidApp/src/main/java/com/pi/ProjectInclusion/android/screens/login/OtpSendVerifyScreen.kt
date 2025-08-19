@@ -1,5 +1,6 @@
 package com.pi.ProjectInclusion.android.screens.login
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -40,7 +42,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
 import com.example.kmptemplate.logger.LoggerProvider
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Black
@@ -49,17 +50,27 @@ import com.pi.ProjectInclusion.DARK_TITLE_TEXT
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.INVITE_LIGHT_01
+import com.pi.ProjectInclusion.LightRed01
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
+import com.pi.ProjectInclusion.android.common_UI.ChooseOneBottomSheet
 import com.pi.ProjectInclusion.android.common_UI.CustomProgressBar
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
+import com.pi.ProjectInclusion.android.common_UI.EncryptedCommonFunction.isEncryptedPhone
 import com.pi.ProjectInclusion.android.common_UI.OtpInputField
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
-import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
+import com.pi.ProjectInclusion.constants.ConstantVariables.IS_COMING_FROM
+import com.pi.ProjectInclusion.constants.ConstantVariables.LOGIN_WITH_OTP
+import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
+import com.pi.ProjectInclusion.constants.ConstantVariables.SUCCESS
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.delay
 
@@ -70,20 +81,51 @@ fun OtpSendVerifyScreen(
     viewModel: LoginViewModel
 ) {
     val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
+    val verifyOtpState by viewModel.verifyLoginResponse.collectAsStateWithLifecycle()
+    val loginWithOtp by viewModel.uiStateLoginResponse.collectAsStateWithLifecycle()
     logger.d("Screen: " + "OtpSendVerifyScreen()")
 
     var otpValue by remember { mutableStateOf("") }
     var phoneNo by remember { mutableStateOf("") }
     var inValidOTP by remember { mutableStateOf(false) }
-    var showError by remember { mutableStateOf(false) }
-    val invalidOtpText = stringResource(R.string.txt_Enter_valid_OTP)
+    var isVerifyOtpApi by remember { mutableStateOf(false) }
+    var invalidText by remember { mutableStateOf(R.string.txt_Enter_valid_OTP) }
     var isDialogVisible by remember { mutableStateOf(false) }
     var isFinished by remember { mutableStateOf(false) }
+    var showBottomSheet by remember { mutableStateOf(false) }
+    var sendOtpViaCall by remember { mutableStateOf(false) }
+    var sendOtpViaWhatsApp by remember { mutableStateOf(false) }
+    var languageId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
+    var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
+    val loginSuccess = stringResource(id = R.string.txt_login_success)
 
-//    val mobNo = viewModel.mobileNumber
-    /*val encryptedPhoneNo = mobNo?.encryptAES().toString().trim()
+    var isInternetAvailable by remember { mutableStateOf(true) }
 
-    logger.d("User Data fetched: $mobNo")*/
+    val context = LocalContext.current
+    isInternetAvailable = isNetworkAvailable(context)
+
+    var mobileNo = "8851291824"  // will remove this after Api implementation
+
+    val encryptedPhoneNo = if (isEncryptedPhone(mobileNo.toString().trim())) {
+        mobileNo
+    } else {
+        mobileNo.encryptAES().toString().trim()
+    }
+
+    val encryptedOtp = otpValue.encryptAES().toString().trim()
+
+    // dialog to show otp on whatsapp or call
+    if (showBottomSheet) {
+        ChooseOneBottomSheet(onCallClick = {
+            isDialogVisible = true
+            sendOtpViaCall = true
+        }, onWhatsappClick = {
+            isDialogVisible = true
+            sendOtpViaWhatsApp = true
+        }, onDismiss = {
+            showBottomSheet = false
+        })
+    }
 
     CustomDialog(
         isVisible = isDialogVisible,
@@ -91,26 +133,117 @@ fun OtpSendVerifyScreen(
         message = stringResource(R.string.txt_loading)
     )
 
-    LaunchedEffect(sendOtpState) {
-//        viewModel.getOTPViewModel(otpValue)
+    // api for otp on call
+    if (sendOtpViaCall) {
+        LaunchedEffect(Unit) {
+            viewModel.getOTPViewModel(encryptedPhoneNo)
+            sendOtpViaCall = false
+        }
+    }
+    // api for otp on Whatsapp
+    if (sendOtpViaWhatsApp) {
+        LaunchedEffect(Unit) {
+            viewModel.getOTPWhatsappViewModel(encryptedPhoneNo)
+            sendOtpViaWhatsApp = false
+        }
+    }
 
+    // send otp response
+    LaunchedEffect(sendOtpState) {
         when {
             sendOtpState.isLoading -> {
                 isDialogVisible = true
             }
 
             sendOtpState.error.isNotEmpty() -> {
-                LoggerProvider.logger.d("Error: ${sendOtpState.error}")
+                logger.d("ResendOtp: ${sendOtpState.success}")
                 isDialogVisible = false
             }
 
             sendOtpState.success != null -> {
-//                val list = sendOtpState.success?.response ?: emptyList()
-//                LoggerProvider.logger.d("Languages fetched: ${list.size}")
+                logger.d("ResendOtp: ${sendOtpState.success}")
+                if (sendOtpState.success!!.status != true){
+                    context.toast(sendOtpState.success!!.response!!.message.toString())
+                }
 
                 isDialogVisible = false
             }
         }
+    }
+
+    // verify Api request & response
+    if (isVerifyOtpApi) {
+        isDialogVisible = true
+        if (viewModel.getPrefData(IS_COMING_FROM) == LOGIN_WITH_OTP) {
+            viewModel.getLoginWithOtpViewModel(
+                LoginWithOtpRequest(
+                    encryptedPhoneNo,
+                    encryptedOtp,
+                    userTypeId.toInt()
+                )
+            )
+        } else {
+            viewModel.getVerifyOtpViewModel(encryptedPhoneNo, encryptedOtp)
+        }
+
+        // verify otp response
+        LaunchedEffect(verifyOtpState) {
+            when {
+                verifyOtpState.isLoading -> {
+                    isDialogVisible = true
+                }
+
+                verifyOtpState.error.isNotEmpty() -> {
+                    logger.d("VerifyOtp Error: ${verifyOtpState.error}")
+                    isDialogVisible = false
+                }
+
+                verifyOtpState.success != null -> {
+                    logger.d("VerifyOtp: ${verifyOtpState.success!!.response!!.message}")
+                    if (verifyOtpState.success!!.status == true){
+                        onNext()
+                    } else {
+                        invalidText = R.string.txt_Enter_valid_OTP
+                        inValidOTP = true
+                    }
+
+                    isDialogVisible = false
+                }
+            }
+        }
+
+        // Handle login response state
+        LaunchedEffect(loginWithOtp) {
+            when {
+                loginWithOtp.isLoading -> {
+                    isDialogVisible = true
+                }
+
+                loginWithOtp.error.isNotEmpty() -> {
+                   logger.d("Error: ${loginWithOtp.error}")
+                    isDialogVisible = false
+                }
+
+                loginWithOtp.success != null -> {
+                    if (loginWithOtp.success!!.status == true){
+                        context.toast(loginSuccess)
+                        context.startActivity(
+                            Intent(
+                                context,
+                                StudentDashboardActivity::class.java
+                            )
+                        )
+                    }
+                    else{
+//                        invalidText = loginWithOtp.success!!.message.toString()
+                        inValidOTP = true
+                    }
+                    isDialogVisible = false
+                }
+            }
+        }
+
+        isVerifyOtpApi = false
     }
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
@@ -123,7 +256,7 @@ fun OtpSendVerifyScreen(
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = stringResource(R.string.txt_OTP_Sent),
+                    text = stringResource(R.string.txt_verify_otp),
                     modifier = Modifier
                         .padding(start = 10.dp, end = 10.dp)
                         .fillMaxWidth(),
@@ -154,6 +287,15 @@ fun OtpSendVerifyScreen(
 
                 otpValue = otpTextField()
 
+                if (inValidOTP) {
+                    Text(
+                        invalidText.toString(),
+                        color = LightRed01,
+                        modifier = Modifier.padding(horizontal = 10.dp),
+                        fontSize = 10.sp
+                    )
+                }
+
                 if (isFinished) {
                     Row(
                         modifier = Modifier
@@ -178,10 +320,7 @@ fun OtpSendVerifyScreen(
                             modifier = Modifier.padding(top = 16.dp),
                             onClick = {
                                 isFinished = false
-//                            loginViewModel.setGradeReportPage("")
-//                            loginViewModel.setSelectedTabId(0)
-//                            loginViewModel.setGradeId("")
-//                            navHostController.navigate(AppRoute.TeacherQuizReports.route)
+                                showBottomSheet = true
                             })
 
                         Spacer(modifier = Modifier.weight(1f))
@@ -238,29 +377,24 @@ fun OtpSendVerifyScreen(
                         .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    var countNumber by remember { mutableStateOf<Int?>(null) }
-                    if (otpValue.length == 6) {
-                        countNumber = 1
-                    } else {
-                        countNumber = null
-                    }
 
                     BtnUi(
                         stringResource(R.string.txt_Verify_proceed),
                         onClick = {
-//                            navController.navigate(AppRoute.SetNewPasswordUI.route)
-                            onNext()
-
-                            showError = otpValue.isEmpty()
-                            inValidOTP = showError || otpValue.length < 6
-                            if (!inValidOTP) {
-                                if (phoneNo != null) {
-                                    isDialogVisible = true
-//                                    viewModel.verifyOtp(otp, phoneNo.encryptAES().toString())
+                            if (otpValue.trim().length < 6) {
+                                inValidOTP = true
+                                invalidText = R.string.txt_Enter_valid_OTP
+                            } else {
+                                if (!isInternetAvailable) {
+                                    inValidOTP = true
+                                    invalidText = R.string.txt_oops_no_internet
+                                } else {
+                                    // call Api
+                                    isVerifyOtpApi = true
                                 }
                             }
                         },
-                        countNumber != null
+                        enabled = otpValue.trim().length == 6
                     )
                 }
             }
