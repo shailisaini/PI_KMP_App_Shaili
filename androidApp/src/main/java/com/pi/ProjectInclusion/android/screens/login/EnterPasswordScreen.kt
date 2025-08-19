@@ -53,6 +53,7 @@ import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.ChooseOneBottomSheet
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
+import com.pi.ProjectInclusion.android.common_UI.EncryptedCommonFunction.isEncryptedPhone
 import com.pi.ProjectInclusion.android.common_UI.OTPBtnUi
 import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
 import com.pi.ProjectInclusion.android.common_UI.SurfaceLine
@@ -154,8 +155,6 @@ fun PasswordUI(
     val enterPassword = stringResource(R.string.txt_Enter_your_password)
     val showPassword = remember { mutableStateOf(false) }
 
-    val mobNo = viewModel.mobileNumber
-
     var isDialogVisible by remember { mutableStateOf(false) }
     var invalidMob = stringResource(id = R.string.txt_Please_enter_valid_password_)
     var invalidMobNo by remember { mutableStateOf(invalidMob)}
@@ -172,8 +171,15 @@ fun PasswordUI(
     var sendOtpViaWhatsApp by remember { mutableStateOf(false) }
     var languageId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
     var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
-    var mobileNo = viewModel.mobileNumber
-    val encryptedPhoneNo = mobNo?.encryptAES().toString().trim()
+    var mobileNo = "8851291824"  // will remove this after Api implementation
+    var userName = viewModel.userNameValue
+    val encryptedPhoneNo = if (isEncryptedPhone(mobileNo.toString().trim())){
+        mobileNo
+    }
+    else {
+        mobileNo.encryptAES().toString().trim()
+    }
+    val encryptedUserName = userName?.encryptAES().toString().trim()
     val encryptedPassword = passwordText.value.encryptAES().toString().trim()
 
     if (loginWithPassword) {
@@ -183,7 +189,7 @@ fun PasswordUI(
         isDialogVisible = true
             viewModel.loginWithPasswordViewModel(
                 LoginRequest(
-                    encryptedPhoneNo,
+                    encryptedUserName,
                     encryptedPassword,
                     userTypeId.toInt(),
                     languageId.toInt()
@@ -230,14 +236,14 @@ fun PasswordUI(
     // api for otp on call
     if (sendOtpViaCall) {
     LaunchedEffect(Unit) {
-            viewModel.getOTPViewModel(mobileNo.toString())
+            viewModel.getOTPViewModel(encryptedPhoneNo)
             sendOtpViaCall = false
         }
     }
     // api for otp on Whatsapp
     if (sendOtpViaWhatsApp) {
     LaunchedEffect(Unit) {
-            viewModel.getOTPWhatsappViewModel(mobileNo.toString())
+            viewModel.getOTPWhatsappViewModel(encryptedPhoneNo)
             sendOtpViaWhatsApp = false
         }
     }
