@@ -1,5 +1,6 @@
 package com.pi.ProjectInclusion.domain.repository
 
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CreateRegisterPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
@@ -28,5 +29,5 @@ interface AuthenticationRepository {
     suspend fun createRegisterPasswordRepo(
         passwordRequest: CreatePasswordRequest,
         strToken: String,
-    ): ForgetPasswordResponse
+    ): CreateRegisterPasswordResponse
 }

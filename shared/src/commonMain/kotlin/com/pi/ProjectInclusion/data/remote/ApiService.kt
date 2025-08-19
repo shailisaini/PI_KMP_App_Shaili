@@ -1,5 +1,6 @@
 package com.pi.ProjectInclusion.data.remote
 
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CreateRegisterPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
@@ -162,7 +163,7 @@ class ApiService(private val client: HttpClient) {
     suspend fun createRegisterPassword(
         changeRequest: CreatePasswordRequest,
         strToken: String,
-    ): ForgetPasswordResponse =
+    ): CreateRegisterPasswordResponse =
         client.post {
 
             url {
@@ -175,5 +176,5 @@ class ApiService(private val client: HttpClient) {
             }
             contentType(ContentType.Application.Json)
             setBody(changeRequest)
-        }.body<ForgetPasswordResponse>()
+        }.body<CreateRegisterPasswordResponse>()
 }

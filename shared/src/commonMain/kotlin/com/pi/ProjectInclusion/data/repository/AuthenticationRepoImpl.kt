@@ -1,5 +1,6 @@
 package com.pi.ProjectInclusion.data.repository
 
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CreateRegisterPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
@@ -49,7 +50,7 @@ class AuthenticationRepoImpl(private val apiService: ApiService) : Authenticatio
     override suspend fun createRegisterPasswordRepo(
         passwordRequest: CreatePasswordRequest,
         strToken: String,
-    ): ForgetPasswordResponse {
+    ): CreateRegisterPasswordResponse {
         return apiService.createRegisterPassword(passwordRequest, strToken)
     }
 

@@ -1,6 +1,7 @@
 package com.pi.ProjectInclusion.domain.useCases
 
 import com.example.kmptemplate.logger.LoggerProvider
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CreateRegisterPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
@@ -109,7 +110,7 @@ class AuthenticationUsesCases(private val repository: AuthenticationRepository) 
     fun createRegisterPassword(
         passwordRequest: CreatePasswordRequest,
         strToken: String,
-    ): Flow<Result<ForgetPasswordResponse>> = flow {
+    ): Flow<Result<CreateRegisterPasswordResponse>> = flow {
         try {
             val response = repository.createRegisterPasswordRepo(passwordRequest, strToken)
             emit(Result.success(response))
