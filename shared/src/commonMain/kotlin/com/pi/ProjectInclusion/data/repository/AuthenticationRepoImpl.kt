@@ -9,7 +9,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginReque
 import com.pi.ProjectInclusion.data.remote.ApiService
 import com.pi.ProjectInclusion.domain.repository.AuthenticationRepository
 
-class AuthenticationRepoImpl(private val apiService: ApiService) : AuthenticationRepository{
+class AuthenticationRepoImpl(private val apiService: ApiService) : AuthenticationRepository {
     override suspend fun getLanguage(): GetLanguageListResponse {
         return apiService.getLanguages()
     }
@@ -18,7 +18,7 @@ class AuthenticationRepoImpl(private val apiService: ApiService) : Authenticatio
         return apiService.getUserType()
     }
 
-    override suspend fun getValidate(userName : String, userTypeId : String): ValidateUserResponse {
+    override suspend fun getValidate(userName: String, userTypeId: String): ValidateUserResponse {
         return apiService.getValidateUser(userName, userTypeId)
     }
 
@@ -26,12 +26,19 @@ class AuthenticationRepoImpl(private val apiService: ApiService) : Authenticatio
         return apiService.getUserLoginWithPassword(loginRequest)
     }
 
-    override suspend fun getOTPOnCall(mobNo : String): SendOTPResponse {
+    override suspend fun getOTPOnCall(mobNo: String): SendOTPResponse {
         return apiService.getOTPOnCall(mobNo)
     }
 
-    override suspend fun getOTPOnWhatsapp(mobNo : String): SendOTPResponse {
+    override suspend fun getOTPOnWhatsapp(mobNo: String): SendOTPResponse {
         return apiService.getOTPOnWhatsapp(mobNo)
+    }
+
+   override suspend fun forgetPassword(
+        strNewPassword: String,
+        strUpdatedBy: String
+    ): SendOTPResponse {
+        return apiService.forgetPassword(strNewPassword, strUpdatedBy)
     }
 }
 

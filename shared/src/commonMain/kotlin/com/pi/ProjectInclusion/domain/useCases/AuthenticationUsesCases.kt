@@ -40,7 +40,10 @@ class AuthenticationUsesCases(private val repository: AuthenticationRepository) 
         }
     }.flowOn(Dispatchers.IO)
 
-    fun getValidateUserCase(userName : String, userTypeId : String): Flow<Result<ValidateUserResponse>> = flow {
+    fun getValidateUserCase(
+        userName: String,
+        userTypeId: String,
+    ): Flow<Result<ValidateUserResponse>> = flow {
         try {
             val response = repository.getValidate(userName, userTypeId)
             emit(Result.success(response))
@@ -51,7 +54,7 @@ class AuthenticationUsesCases(private val repository: AuthenticationRepository) 
         }
     }.flowOn(Dispatchers.IO)
 
-    fun getOtpOnCall(mobNo : String): Flow<Result<SendOTPResponse>> = flow {
+    fun getOtpOnCall(mobNo: String): Flow<Result<SendOTPResponse>> = flow {
         try {
             val response = repository.getOTPOnCall(mobNo)
             emit(Result.success(response))
@@ -73,9 +76,23 @@ class AuthenticationUsesCases(private val repository: AuthenticationRepository) 
         }
     }.flowOn(Dispatchers.IO)
 
-    fun getOTPOnWhatsapp(mobNo : String): Flow<Result<SendOTPResponse>> = flow {
+    fun getOTPOnWhatsapp(mobNo: String): Flow<Result<SendOTPResponse>> = flow {
         try {
             val response = repository.getOTPOnWhatsapp(mobNo)
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            LoggerProvider.logger.d("Exception in otpOnWhatsapp() $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun forgetPassword(
+        strNewPassword: String,
+        strUpdatedBy: String,
+    ): Flow<Result<SendOTPResponse>> = flow {
+        try {
+            val response = repository.forgetPassword(strNewPassword, strUpdatedBy)
             emit(Result.success(response))
         } catch (e: Exception) {
             val errorMessage = e.message ?: unableToConnectServer

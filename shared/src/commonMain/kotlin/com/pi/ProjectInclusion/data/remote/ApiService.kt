@@ -104,4 +104,16 @@ class ApiService(private val client: HttpClient) {
             append(HttpHeaders.Accept, "application/json")
         }
     }.body<SendOTPResponse>()
+
+    suspend fun forgetPassword(strNewPassword : String, strUpdatedBy : String): SendOTPResponse = client.post {
+        url {
+            takeFrom(STUDENT_BASE_URL)
+            appendPathSegments(appendUser, "forget-password") // → /language/get-all
+            parameters.append("newPassword", strNewPassword)
+            parameters.append("updatedBy", strUpdatedBy)
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+    }.body<SendOTPResponse>()
 }

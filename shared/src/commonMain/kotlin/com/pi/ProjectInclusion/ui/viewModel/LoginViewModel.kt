@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 class LoginViewModel(
     private val getLanguageUsesCases: AuthenticationUsesCases,
     private val localData: LocalDataSource,
-    private val connectivityObserver: ConnectivityObserver //  to check network
+    private val connectivityObserver: ConnectivityObserver, //  to check network
 ) : ViewModel() {
     var noInternetConnection: String = "No Internet Found!"
     var somethingWentWrong: String = "Something went wrong"
@@ -174,7 +174,7 @@ class LoginViewModel(
             }
     }
 
-    fun getValidateUser(userName : String, userTypeId : String) = viewModelScope.launch {
+    fun getValidateUser(userName: String, userTypeId: String) = viewModelScope.launch {
         // no need to sync data
 
         _uiStateValidateUser.update { UiState(isLoading = true) }
@@ -221,7 +221,7 @@ class LoginViewModel(
             }
     }
 
-    fun getOTPViewModel(mobNo : String) = viewModelScope.launch {
+    fun getOTPViewModel(mobNo: String) = viewModelScope.launch {
 //        no need to data sync
         _uiStateSendOtp.update { UiState(isLoading = true) }
         getLanguageUsesCases.getOtpOnCall(mobNo)
@@ -244,11 +244,36 @@ class LoginViewModel(
             }
     }
 
-    fun getOTPWhatsappViewModel(mobNo : String) = viewModelScope.launch {
+    fun getOTPWhatsappViewModel(mobNo: String) = viewModelScope.launch {
         // no need to sync data
 
         _uiStateSendOtp.update { UiState(isLoading = true) }
         getLanguageUsesCases.getOTPOnWhatsapp(mobNo)
+            .catch { exception ->
+                _uiStateSendOtp.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        _uiStateSendOtp.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        _uiStateSendOtp.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun forgetPassword(
+        strNewPassword: String,
+        strUpdatedBy: String,
+    ) = viewModelScope.launch {
+        _uiStateSendOtp.update { UiState(isLoading = true) }
+        getLanguageUsesCases.forgetPassword(strNewPassword, strUpdatedBy)
             .catch { exception ->
                 _uiStateSendOtp.update {
                     UiState(error = exception.message ?: somethingWentWrong)
@@ -272,5 +297,5 @@ class LoginViewModel(
 data class UiState<T>(
     val isLoading: Boolean = false,
     val error: String = "",
-    val success: T? = null
+    val success: T? = null,
 )

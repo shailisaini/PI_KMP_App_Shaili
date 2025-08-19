@@ -14,4 +14,5 @@ interface AuthenticationRepository {
     suspend fun getUserLoginPasswordRepo(loginRequest: LoginRequest) : LoginApiResponse
     suspend fun getOTPOnWhatsapp(mobNo : String) : SendOTPResponse
     suspend fun getValidate(userName : String, userTypeId : String) : ValidateUserResponse
+    suspend fun forgetPassword(strNewPassword : String, strUpdatedBy : String) : SendOTPResponse
 }
