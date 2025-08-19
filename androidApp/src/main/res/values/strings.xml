@@ -445,4 +445,9 @@ and make a difference together!</string>
     <string name="txt_rejected">Rejected</string>
     <string name="txt_reason">Reason: </string>
     <string name="txt_login_success">Login Successfully!</string>
+    <string name="txt_trans_success">Transfer Successful</string>
+    <string name="txt_already_requested">Already requested</string>
+    <string name="txt_already_requested_dec">You’ve already requested a transfer for this student. You will be notified if the transfer is approved </string>
+    <string name="txt_trans_success_dec1">Your request to transfer </string>
+    <string name="txt_trans_success_dec2">  is confirmed. Student has been assigned to you. </string>
 </resources>
