@@ -3,12 +3,16 @@ package com.pi.ProjectInclusion.ui.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kmptemplate.logger.LoggerProvider
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.LoginApiResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.SendOTPResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateUserResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.VerifyOtpResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
 import com.pi.ProjectInclusion.database.LocalDataSource
 import com.pi.ProjectInclusion.domain.ConnectivityObserver
 import com.pi.ProjectInclusion.domain.useCases.AuthenticationUsesCases
@@ -25,7 +29,7 @@ import kotlinx.coroutines.launch
 class LoginViewModel(
     private val getLanguageUsesCases: AuthenticationUsesCases,
     private val localData: LocalDataSource,
-    private val connectivityObserver: ConnectivityObserver //  to check network
+    private val connectivityObserver: ConnectivityObserver, //  to check network
 ) : ViewModel() {
     var noInternetConnection: String = "No Internet Found!"
     var somethingWentWrong: String = "Something went wrong"
@@ -52,6 +56,12 @@ class LoginViewModel(
 
     private val _uiStateLogin = MutableStateFlow(UiState<LoginApiResponse>())
     val uiStateLoginResponse: StateFlow<UiState<LoginApiResponse>> = _uiStateLogin
+
+    private val verifyLogin = MutableStateFlow(UiState<VerifyOtpResponse>())
+    val verifyLoginResponse: StateFlow<UiState<VerifyOtpResponse>> = verifyLogin
+
+    private val forgetPassword = MutableStateFlow(UiState<ForgetPasswordResponse>())
+    val forgetPasswordResponse: StateFlow<UiState<ForgetPasswordResponse>> = forgetPassword
 
     private val query = MutableStateFlow("")
 
@@ -175,7 +185,7 @@ class LoginViewModel(
             }
     }
 
-    fun getValidateUser(userName : String, userTypeId : String) = viewModelScope.launch {
+    fun getValidateUser(userName: String, userTypeId: String) = viewModelScope.launch {
         // no need to sync data
 
         _uiStateValidateUser.update { UiState(isLoading = true) }
@@ -222,7 +232,7 @@ class LoginViewModel(
             }
     }
 
-    fun getOTPViewModel(mobNo : String) = viewModelScope.launch {
+    fun getOTPViewModel(mobNo: String) = viewModelScope.launch {
 //        no need to data sync
         _uiStateSendOtp.update { UiState(isLoading = true) }
         getLanguageUsesCases.getOtpOnCall(mobNo)
@@ -245,7 +255,7 @@ class LoginViewModel(
             }
     }
 
-    fun getOTPWhatsappViewModel(mobNo : String) = viewModelScope.launch {
+    fun getOTPWhatsappViewModel(mobNo: String) = viewModelScope.launch {
         // no need to sync data
 
         _uiStateSendOtp.update { UiState(isLoading = true) }
@@ -268,10 +278,83 @@ class LoginViewModel(
                 )
             }
     }
+
+    fun forgetPassword(
+        passwordRequest: ForgetPasswordRequest,
+        strToken: String,
+    ) = viewModelScope.launch {
+        forgetPassword.update { UiState(isLoading = true) }
+        getLanguageUsesCases.forgetPassword(passwordRequest, strToken)
+            .catch { exception ->
+                forgetPassword.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        forgetPassword.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        forgetPassword.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun getVerifyOtpViewModel(mobNo: String, otpValue: String) = viewModelScope.launch {
+        // no need to sync data
+
+        verifyLogin.update { UiState(isLoading = true) }
+        getLanguageUsesCases.getVerifyOtp(mobNo, otpValue)
+            .catch { exception ->
+                verifyLogin.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        verifyLogin.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        verifyLogin.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun getLoginWithOtpViewModel(request: LoginWithOtpRequest) = viewModelScope.launch {
+        // no need to sync data
+
+        _uiStateLogin.update { UiState(isLoading = true) }
+        getLanguageUsesCases.getLoginWithOtp(request)
+            .catch { exception ->
+                _uiStateLogin.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        _uiStateLogin.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        _uiStateLogin.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
 }
 
 data class UiState<T>(
     val isLoading: Boolean = false,
     val error: String = "",
-    val success: T? = null
+    val success: T? = null,
 )

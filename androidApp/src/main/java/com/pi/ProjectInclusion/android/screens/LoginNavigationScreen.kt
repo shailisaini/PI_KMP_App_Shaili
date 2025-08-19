@@ -117,7 +117,7 @@ class LoginNavigationScreen : ComponentActivity() {
                         AppRoute.UserTypeSelect.route -> UserTypeScreen(
                             viewModel = viewModel,
                             onNext = {
-                            navigateTo(AppRoute.UserNameScreen.route)
+                                navigateTo(AppRoute.UserNameScreen.route)
                             },
                             onBack = { navigateBack(AppRoute.LanguageSelect.route) }
                         )
@@ -211,7 +211,7 @@ class LoginNavigationScreen : ComponentActivity() {
                         AppRoute.SetNewPasswordUI.route -> SetNewPasswordScreen(
                             onNext = { navigateTo(AppRoute.UserNameScreen.route) },
                             onBack = {
-//                                navigateBack(AppRoute.OtpSendVerifyUI.route)
+                                navigateBack(AppRoute.ForgetPasswordUI.route)
                             },
                             viewModel = viewModel
                         )
