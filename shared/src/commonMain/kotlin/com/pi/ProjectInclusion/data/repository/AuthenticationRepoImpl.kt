@@ -1,5 +1,6 @@
 package com.pi.ProjectInclusion.data.repository
 
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CreateRegisterPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
@@ -8,6 +9,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.Response.SendOTPRe
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateUserResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.VerifyOtpResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.CreatePasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
 import com.pi.ProjectInclusion.data.remote.ApiService
@@ -38,16 +40,24 @@ class AuthenticationRepoImpl(private val apiService: ApiService) : Authenticatio
         return apiService.getOTPOnWhatsapp(mobNo)
     }
 
-   override suspend fun forgetPassword(
-       passwordRequest: ForgetPasswordRequest,
-       strToken: String,
+    override suspend fun forgetPasswordRepo(
+        passwordRequest: ForgetPasswordRequest,
+        strToken: String,
     ): ForgetPasswordResponse {
         return apiService.forgetPassword(passwordRequest, strToken)
     }
 
-    override suspend fun getVerifyOtpRepo(mobNo : String, otpValue : String): VerifyOtpResponse {
+    override suspend fun createRegisterPasswordRepo(
+        passwordRequest: CreatePasswordRequest,
+        strToken: String,
+    ): CreateRegisterPasswordResponse {
+        return apiService.createRegisterPassword(passwordRequest, strToken)
+    }
+
+    override suspend fun getVerifyOtpRepo(mobNo: String, otpValue: String): VerifyOtpResponse {
         return apiService.getVerifyOTP(mobNo, otpValue)
     }
+
     override suspend fun getLoginWithOTPRepo(request: LoginWithOtpRequest): LoginApiResponse {
         return apiService.getLoginWithOTP(request)
     }

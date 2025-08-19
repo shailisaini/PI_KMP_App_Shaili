@@ -451,4 +451,10 @@ and make a difference together!</string>
     <string name="txt_already_requested_dec">You’ve already requested a transfer for this student. You will be notified if the transfer is approved </string>
     <string name="txt_trans_success_dec1">Your request to transfer </string>
     <string name="txt_trans_success_dec2">  is confirmed. Student has been assigned to you. </string>
+    <string name="txt_already_assessed">Already assessed</string>
+    <string name="txt_already_assessed_desc">This student has already been assessed by</string>
+    <string name="txt_transfer_request_msg">Would you like to request transfer of student to your Screening record?</string>
+    <string name="txt_send_transfer_request">Request Transfer</string>
+    <string name="txt_dummy_name">Prasad Mishra</string>
+    <string name="txt_dummy_school">Kendriya Vidyalya, Delhi</string>
 </resources>

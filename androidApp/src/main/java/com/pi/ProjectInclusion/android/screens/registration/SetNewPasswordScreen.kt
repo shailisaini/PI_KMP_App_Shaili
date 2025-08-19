@@ -88,10 +88,6 @@ fun SetNewPasswordScreen(
     val enterConfirmPasswordMsgStr = stringResource(R.string.txt_Please_enter_confirm_Password)
     val enterConfirmPasswordSameMsgStr =
         stringResource(R.string.txt_Please_enter_confirm_Password_same)
-    var isCheckedCharacter by remember { mutableStateOf(false) }
-    var isCheckedUppercase by remember { mutableStateOf(false) }
-    var isCheckedAtleastOne by remember { mutableStateOf(false) }
-    var isCheckedSpecialCharacter by remember { mutableStateOf(false) }
 
     logger.d("Screen: " + "SetNewPasswordScreen()")
 
@@ -104,7 +100,10 @@ fun SetNewPasswordScreen(
         .find() || Pattern.compile("[^a-zA-Z0-9]").matcher(enterPasswordStr.value).find()
 
     val forgetPasswordState by viewModel.forgetPasswordResponse.collectAsStateWithLifecycle()
+
     val encryptedPassword = enterConfirmPasswordStr.value.encryptAES().toString().trim()
+    val encryptedUserName = viewModel.userNameValue!!.encryptAES().toString().trim()
+    val encryptedMobile = enterConfirmPasswordStr.value.encryptAES().toString().trim()
     val strToken: String =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjR5QW9PaGdVQnJyOUVkdXVvbHFvSVE9PSIsInN1YiI6IjEiLCJpYXQiOjE3NTU1OTYyNTIsImV4cCI6MTc1NTY4MjY1Mn0.xC1TkBEv391O5VJaM4MoOr-kRp6THY4Q8xcpAxN-DZ0"
 
@@ -230,17 +229,17 @@ fun SetNewPasswordScreen(
                     )
                 ) {
                     Checkbox(
-                        checked = minLength, onCheckedChange = null, // Disabled for display-only
+                        checked = minLength, onCheckedChange = null,
                         colors = if (isSystemInDarkTheme()) {
                             CheckboxDefaults.colors(
-                                checkedColor = Color.Transparent,     // Light purple-gray
-                                uncheckedColor = Color.LightGray,   // Same for unchecked
+                                checkedColor = Color.Transparent,
+                                uncheckedColor = Color.LightGray,
                                 checkmarkColor = PrimaryBlue
                             )
                         } else {
                             CheckboxDefaults.colors(
-                                checkedColor = Color.Transparent,     // Light purple-gray
-                                uncheckedColor = Color.LightGray,   // Same for unchecked
+                                checkedColor = Color.Transparent,
+                                uncheckedColor = Color.LightGray,
                                 checkmarkColor = PrimaryBlue
                             )
                         }, modifier = Modifier.size(20.dp)
@@ -268,17 +267,17 @@ fun SetNewPasswordScreen(
                     modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
                 ) {
                     Checkbox(
-                        checked = hasLetter, onCheckedChange = null, // Disabled for display-only
+                        checked = hasLetter, onCheckedChange = null,
                         colors = if (isSystemInDarkTheme()) {
                             CheckboxDefaults.colors(
-                                checkedColor = Color.Transparent,     // Light purple-gray
-                                uncheckedColor = Color.LightGray,   // Same for unchecked
+                                checkedColor = Color.Transparent,
+                                uncheckedColor = Color.LightGray,
                                 checkmarkColor = PrimaryBlue
                             )
                         } else {
                             CheckboxDefaults.colors(
-                                checkedColor = Color.Transparent,     // Light purple-gray
-                                uncheckedColor = Color.LightGray,   // Same for unchecked
+                                checkedColor = Color.Transparent,
+                                uncheckedColor = Color.LightGray,
                                 checkmarkColor = PrimaryBlue
                             )
                         }, modifier = Modifier.size(20.dp)
@@ -306,17 +305,17 @@ fun SetNewPasswordScreen(
                     modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
                 ) {
                     Checkbox(
-                        checked = hasDigit, onCheckedChange = null, // Disabled for display-only
+                        checked = hasDigit, onCheckedChange = null,
                         colors = if (isSystemInDarkTheme()) {
                             CheckboxDefaults.colors(
-                                checkedColor = Color.Transparent,     // Light purple-gray
-                                uncheckedColor = Color.LightGray,   // Same for unchecked
+                                checkedColor = Color.Transparent,
+                                uncheckedColor = Color.LightGray,
                                 checkmarkColor = PrimaryBlue
                             )
                         } else {
                             CheckboxDefaults.colors(
-                                checkedColor = Color.Transparent,     // Light purple-gray
-                                uncheckedColor = Color.LightGray,   // Same for unchecked
+                                checkedColor = Color.Transparent,
+                                uncheckedColor = Color.LightGray,
                                 checkmarkColor = PrimaryBlue
                             )
                         }, modifier = Modifier.size(20.dp)
@@ -344,17 +343,17 @@ fun SetNewPasswordScreen(
                     modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
                 ) {
                     Checkbox(
-                        checked = hasSymbol, onCheckedChange = null, // Disabled for display-only
+                        checked = hasSymbol, onCheckedChange = null,
                         colors = if (isSystemInDarkTheme()) {
                             CheckboxDefaults.colors(
-                                checkedColor = Color.Transparent,     // Light purple-gray
-                                uncheckedColor = Color.LightGray,   // Same for unchecked
+                                checkedColor = Color.Transparent,
+                                uncheckedColor = Color.LightGray,
                                 checkmarkColor = PrimaryBlue
                             )
                         } else {
                             CheckboxDefaults.colors(
-                                checkedColor = Color.Transparent,     // Light purple-gray
-                                uncheckedColor = Color.LightGray,   // Same for unchecked
+                                checkedColor = Color.Transparent,
+                                uncheckedColor = Color.LightGray,
                                 checkmarkColor = PrimaryBlue
                             )
                         }, modifier = Modifier.size(20.dp)
@@ -410,7 +409,7 @@ fun SetNewPasswordScreen(
                                 showError = enterConfirmPasswordStr.value.isEmpty()
                                 if (showError || enterConfirmPasswordStr.value.length < 10) {
                                     inValidPassword = true
-                                } else { // if first digit of mobile is less than 6 then error will show
+                                } else {
                                     if (enterConfirmPasswordStr.value.length < 6) {
                                         inValidPassword = true
                                     } else {
