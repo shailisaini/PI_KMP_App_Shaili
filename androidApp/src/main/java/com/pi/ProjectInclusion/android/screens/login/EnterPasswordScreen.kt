@@ -66,6 +66,7 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IS_COMING_FROM
 import com.pi.ProjectInclusion.constants.ConstantVariables.LOGIN_WITH_OTP
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
 import com.pi.ProjectInclusion.constants.ConstantVariables.SUCCESS
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_MOBILE_NO
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
@@ -149,7 +150,6 @@ fun PasswordUI(
 ) {
     val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
     val loginResponse by viewModel.uiStateLoginResponse.collectAsStateWithLifecycle()
-   /* val loginWithPasswordState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()*/
 
     val isInternetAvailable by remember { mutableStateOf(true) }
     val internetMessage by remember { mutableStateOf("") }
@@ -173,19 +173,14 @@ fun PasswordUI(
     var sendOtpViaWhatsApp by remember { mutableStateOf(false) }
     var languageId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
     var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
-    var mobileNo = "8851291824"  // will remove this after Api implementation
+    var encryptedPhoneNo = viewModel.getPrefData(USER_MOBILE_NO)  // encrypted from shared Pref
     var userName = viewModel.userNameValue
-    val encryptedPhoneNo = if (isEncryptedPhone(mobileNo.toString().trim())){
-        mobileNo
-    }
-    else {
-        mobileNo.encryptAES().toString().trim()
-    }
+
     val encryptedUserName = userName?.encryptAES().toString().trim()
     val encryptedPassword = passwordText.value.encryptAES().toString().trim()
 
     if (loginWithPassword) {
-        LoggerProvider.logger.d("LoginWithPassword: $languageId .. $userTypeId .. $mobileNo")
+        LoggerProvider.logger.d("LoginWithPassword: $languageId .. $userTypeId .. $encryptedPhoneNo")
 
         LaunchedEffect(Unit) {
         isDialogVisible = true

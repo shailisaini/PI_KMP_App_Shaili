@@ -5,24 +5,49 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ValidateUserResponse(
-    @SerialName("message")
-    val message: String? = null,
-
-    @SerialName("statusCode")
-    val statusCode: Int? = null,
+    @SerialName("methodType")
+    val methodType: String? = null,
 
     @SerialName("status")
     val status: Boolean? = null,
 
-    @SerialName("response")
-    val response: ValidateResponse? = null
-) {
+    @SerialName("statusCode")
+    val statusCode: Int? = null,
 
+    @SerialName("message")
+    val message: String? = null,
+
+    @SerialName("error")
+    val error: String? = null,
+
+    @SerialName("response")
+    val response: ValidateResponse? = null,
+
+    ) {
     @Serializable
     data class ValidateResponse(
-
         @SerialName("message")
         val message: String? = null,
 
-        )
+        @SerialName("user")
+        val user: ValidateUser? = null
+    )
+
+    @Serializable
+    data class ValidateUser(
+        @SerialName("id")
+        val id: String? = null,
+
+        @SerialName("username")
+        val username: String? = null,
+
+        @SerialName("password")
+        val password: String? = null,
+
+        @SerialName("email")
+        val email: String? = null,
+
+        @SerialName("mobile")
+        val mobile: String? = null
+    )
 }

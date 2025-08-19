@@ -40,6 +40,7 @@ import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.LightRed01
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
 import com.pi.ProjectInclusion.android.common_UI.AccountRecoverDialog
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
@@ -103,7 +104,6 @@ fun LoginUI(
     val colors = MaterialTheme.colorScheme
     var isDialogVisible by remember { mutableStateOf(false) }
     val internetMessage = stringResource(R.string.txt_oops_no_internet)
-    var apiResponse = stringResource(R.string.txt_oops_no_internet)
     val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
     val invalidMobNo = stringResource(id = R.string.txt_enter_valid_mob_user)
 
@@ -122,55 +122,58 @@ fun LoginUI(
     // user Type Id
     var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
     var languageId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
+    val encryptedPhoneNo = userName.value.encryptAES().toString().trim()
 
     if (isApiCalled) {
         // saving userName & mobile no as a local variable in view Model
-
         viewModel.saveUserName(userName.value)
-        onNext()
 
         // commenting this as API is not provided. need it later
-        /*LaunchedEffect(Unit) {
-            LoggerProvider.logger.d("ValidateUserParams: " + mobNo.value +" .. "+userTypeId)
-            viewModel.getValidateUser(mobNo.value, userTypeId)
-        }*/
+            LoggerProvider.logger.d("ValidateUserParams: ${userName.value} .. $userTypeId")
+            viewModel.getValidateUser(encryptedPhoneNo, userTypeId)
 
-        LaunchedEffect(uiState) {
-            when {
-                uiState.isLoading -> {
-                    isDialogVisible = true
-                }
+            LaunchedEffect(uiState) {
+                when {
+                    uiState.isLoading -> {
+                        isDialogVisible = true
+                    }
 
-                uiState.error.isNotEmpty() -> {
-                    isDialogVisible = false
-                    LoggerProvider.logger.d("Error: ${uiState.error}")
-                    context.toast(uiState.error)
-                }
+                    uiState.error.isNotEmpty() -> {
+                        isDialogVisible = false
+                        LoggerProvider.logger.d("Error: ${uiState.error}")
+                        context.toast(uiState.error)
+                    }
 
-                uiState.success != null -> {
-                    isDialogVisible = false
-                    apiResponse = uiState.success!!.response?.message.toString()
-//                    LoggerProvider.logger.d("User Data fetched: ${uiState.success!!.response}")
-                    isApiCalled = false
-                    if (apiResponse == NEW_USER) {
-                        // if new User
-                        onRegister()
-                    } else if (apiResponse == USER_EXIST) {
-                        // if login with password
-                        viewModel.savePrefData(USER_MOBILE_NO, apiResponse.toString())
-                        onNext()
-                    } else {
-                        // if account deactivated
-                        confirmRecoverState = true
+                    uiState.success != null -> {
+                        if (uiState.success!!.status == true) {
+                            var apiResponse = uiState.success!!.response
+                            LoggerProvider.logger.d("User ValidateResponse: ${uiState.success!!.response}")
+                            isApiCalled = false
+                            if (apiResponse?.message == NEW_USER) {
+                                // if new User
+                                onRegister()
+                            } else if (apiResponse?.message == USER_EXIST) {
+                                // if login with password
+                                viewModel.savePrefData(USER_MOBILE_NO, apiResponse.user!!.mobile.toString())
+                                onNext()
+                            } else {
+                                // if account deactivated
+                                confirmRecoverState = true
+                            }
+                        }
+                        else{
+                            context.toast(uiState.success!!.message.toString())
+                        }
+                        isDialogVisible = false
                     }
                 }
             }
         }
-    }
 
     // recover dialog
     if (confirmRecoverState) {
         AccountRecoverDialog(
+            msg = uiState.success?.response?.message.toString(),
             onRestore = {
                 confirmRecoverState = false
 //                LoggerProvider.logger.d("Screen: Moving to$onRegister.route")

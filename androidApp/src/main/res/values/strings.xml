@@ -383,7 +383,7 @@ and make a difference together!</string>
     <string name="txt_subcategory">Subcategory</string>
     <string name="txt_account_delete">Account Deletion</string>
     <string name="txt_delete">Delete</string>
-    <string name="txt_90_days_left">90 Days Left</string>
+    <string name="txt_90_days_left">Days Left</string>
     <string name="txt_account_found">An Account Found</string>
     <string name="txt_logout_desc">Are you sure you want to logout?</string>
     <string name="txt_restore">Restore</string>

@@ -43,5 +43,4 @@ object EncryptedCommonFunction {
         val phonePattern = Regex("^\\+?[0-9]{10,15}$")
         return !(phonePattern.matches(data))
     }
-
 }

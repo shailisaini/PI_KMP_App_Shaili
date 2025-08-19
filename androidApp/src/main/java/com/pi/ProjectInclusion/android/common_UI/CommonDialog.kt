@@ -431,7 +431,7 @@ fun LogoutDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Preview
 @Composable
-fun AccountRecoverDialog(onDismiss: () -> Unit = {}, onRestore: () -> Unit = {}) {
+fun AccountRecoverDialog(msg: String = "", onDismiss: () -> Unit = {}, onRestore: () -> Unit = {}) {
     Dialog(onDismissRequest = { onDismiss() },
         properties = DialogProperties(usePlatformDefaultWidth = false, dismissOnClickOutside = false)) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
