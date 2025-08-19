@@ -71,6 +71,7 @@ import com.pi.ProjectInclusion.android.common_UI.MobileTextField
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.ChooseOneBottomSheet
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.contactUsTxt
@@ -81,7 +82,7 @@ import kotlinx.coroutines.launch
 fun ForgetPasswordScreen(
     onNext: () -> Unit,  //OtpSendVerifyUI
     onBack: () -> Unit,
-    viewModel: LoginViewModel
+    viewModel: LoginViewModel,
 ) {
 
     logger.d("Screen: " + "ForgetPasswordScreen()")
@@ -102,6 +103,10 @@ fun ForgetPasswordScreen(
     var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true, confirmValueChange = { it != SheetValue.Hidden })
+
+    var showBottomSheet by remember { mutableStateOf(false) }
+    var sendOtpViaWhatsApp by remember { mutableStateOf(false) }
+    var sendOtpViaCall by remember { mutableStateOf(false) }
 
     BottomSheetContactUsScreen(
         isBottomSheetVisible = isBottomSheetVisible,
@@ -218,14 +223,9 @@ fun ForgetPasswordScreen(
                                      sheetState.expand()
                                  }*/
                                 context.toast(enterMobileNoStr)
-
-                                /*context.startActivity(
-                                    Intent(
-                                        context, ChangePasswordActivity::class.java
-                                    ).apply {
-                                        putExtra("", "")
-                                    })*/
                             } else {
+//                                showBottomSheet = true
+
                                 showError = mobNo.value.isEmpty()
                                 val firstDigitChar = mobNo.value.toString().first()
                                 val firstDigit = firstDigitChar.digitToInt()
@@ -248,6 +248,18 @@ fun ForgetPasswordScreen(
             }
         }
     })
+
+    // dialog to show otp on whatsapp or call
+    if (showBottomSheet) {
+        ChooseOneBottomSheet(onCallClick = {
+            sendOtpViaCall = true
+        }, onWhatsappClick = {
+            sendOtpViaWhatsApp = true
+        }, onDismiss = {
+            showBottomSheet = false
+        })
+    }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

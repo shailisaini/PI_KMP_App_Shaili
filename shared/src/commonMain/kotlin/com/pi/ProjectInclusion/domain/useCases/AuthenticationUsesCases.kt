@@ -1,11 +1,13 @@
 package com.pi.ProjectInclusion.domain.useCases
 
 import com.example.kmptemplate.logger.LoggerProvider
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.LoginApiResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.SendOTPResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateUserResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.domain.repository.AuthenticationRepository
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +42,10 @@ class AuthenticationUsesCases(private val repository: AuthenticationRepository) 
         }
     }.flowOn(Dispatchers.IO)
 
-    fun getValidateUserCase(userName : String, userTypeId : String): Flow<Result<ValidateUserResponse>> = flow {
+    fun getValidateUserCase(
+        userName: String,
+        userTypeId: String,
+    ): Flow<Result<ValidateUserResponse>> = flow {
         try {
             val response = repository.getValidate(userName, userTypeId)
             emit(Result.success(response))
@@ -51,7 +56,7 @@ class AuthenticationUsesCases(private val repository: AuthenticationRepository) 
         }
     }.flowOn(Dispatchers.IO)
 
-    fun getOtpOnCall(mobNo : String): Flow<Result<SendOTPResponse>> = flow {
+    fun getOtpOnCall(mobNo: String): Flow<Result<SendOTPResponse>> = flow {
         try {
             val response = repository.getOTPOnCall(mobNo)
             emit(Result.success(response))
@@ -73,9 +78,23 @@ class AuthenticationUsesCases(private val repository: AuthenticationRepository) 
         }
     }.flowOn(Dispatchers.IO)
 
-    fun getOTPOnWhatsapp(mobNo : String): Flow<Result<SendOTPResponse>> = flow {
+    fun getOTPOnWhatsapp(mobNo: String): Flow<Result<SendOTPResponse>> = flow {
         try {
             val response = repository.getOTPOnWhatsapp(mobNo)
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            LoggerProvider.logger.d("Exception in otpOnWhatsapp() $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun forgetPassword(
+        passwordRequest: ForgetPasswordRequest,
+        strToken: String,
+    ): Flow<Result<ForgetPasswordResponse>> = flow {
+        try {
+            val response = repository.forgetPassword(passwordRequest, strToken)
             emit(Result.success(response))
         } catch (e: Exception) {
             val errorMessage = e.message ?: unableToConnectServer
