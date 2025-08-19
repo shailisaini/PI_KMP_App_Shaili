@@ -75,7 +75,7 @@ and make a difference together!</string>
     <string name="txt_enter_mobile_number_receive_OTP">Please enter your mobile number to receive OTP for reset password.</string>
     <string name="txt_Mobile_Number">Mobile Number</string>
     <string name="txt_OTP_Sent">OTP Sent</string>
-    <string name="txt_OTP_received_phone">Please enter the OTP received on phone number XXXXXX9168</string>
+    <string name="txt_OTP_received_phone">Please enter the OTP received on phone number XXXXXX</string>
     <string name="txt_Resend_OTP">Resend OTP</string>
     <string name="txt_OTP_call">OTP on call</string>
     <string name="txt_change_user">You can change user type now. It locks after password creation.</string>
@@ -445,4 +445,5 @@ and make a difference together!</string>
     <string name="txt_rejected">Rejected</string>
     <string name="txt_reason">Reason: </string>
     <string name="txt_login_success">Login Successfully!</string>
+    <string name="txt_verify_otp">Verify OTP</string>
 </resources>

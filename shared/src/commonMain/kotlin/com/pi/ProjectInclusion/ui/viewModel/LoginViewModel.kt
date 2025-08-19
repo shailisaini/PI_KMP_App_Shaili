@@ -8,7 +8,9 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTy
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.LoginApiResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.SendOTPResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateUserResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.VerifyOtpResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
 import com.pi.ProjectInclusion.database.LocalDataSource
 import com.pi.ProjectInclusion.domain.ConnectivityObserver
 import com.pi.ProjectInclusion.domain.useCases.AuthenticationUsesCases
@@ -52,6 +54,9 @@ class LoginViewModel(
 
     private val _uiStateLogin = MutableStateFlow(UiState<LoginApiResponse>())
     val uiStateLoginResponse: StateFlow<UiState<LoginApiResponse>> = _uiStateLogin
+
+    private val verifyLogin = MutableStateFlow(UiState<VerifyOtpResponse>())
+    val verifyLoginResponse: StateFlow<UiState<VerifyOtpResponse>> = verifyLogin
 
     private val query = MutableStateFlow("")
 
@@ -262,6 +267,54 @@ class LoginViewModel(
                     },
                     onFailure = { exception ->
                         _uiStateSendOtp.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun getVerifyOtpViewModel(mobNo : String, otpValue : String) = viewModelScope.launch {
+        // no need to sync data
+
+        verifyLogin.update { UiState(isLoading = true) }
+        getLanguageUsesCases.getVerifyOtp(mobNo, otpValue)
+            .catch { exception ->
+                verifyLogin.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        verifyLogin.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        verifyLogin.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun getLoginWithOtpViewModel(request: LoginWithOtpRequest) = viewModelScope.launch {
+        // no need to sync data
+
+        _uiStateLogin.update { UiState(isLoading = true) }
+        getLanguageUsesCases.getLoginWithOtp(request)
+            .catch { exception ->
+                _uiStateLogin.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        _uiStateLogin.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        _uiStateLogin.update {
                             UiState(error = exception.message ?: somethingWentWrong)
                         }
                     }

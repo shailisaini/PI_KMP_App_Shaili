@@ -5,7 +5,9 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTy
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.LoginApiResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.SendOTPResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateUserResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.VerifyOtpResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
 import com.pi.ProjectInclusion.data.remote.ApiService
 import com.pi.ProjectInclusion.domain.repository.AuthenticationRepository
 
@@ -32,6 +34,13 @@ class AuthenticationRepoImpl(private val apiService: ApiService) : Authenticatio
 
     override suspend fun getOTPOnWhatsapp(mobNo : String): SendOTPResponse {
         return apiService.getOTPOnWhatsapp(mobNo)
+    }
+
+    override suspend fun getVerifyOtpRepo(mobNo : String, otpValue : String): VerifyOtpResponse {
+        return apiService.getVerifyOTP(mobNo, otpValue)
+    }
+    override suspend fun getLoginWithOTPRepo(request: LoginWithOtpRequest): LoginApiResponse {
+        return apiService.getLoginWithOTP(request)
     }
 }
 

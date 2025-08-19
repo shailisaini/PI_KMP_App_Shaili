@@ -6,7 +6,9 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTy
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.LoginApiResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.SendOTPResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateUserResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.VerifyOtpResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
 import com.pi.ProjectInclusion.domain.repository.AuthenticationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -76,6 +78,28 @@ class AuthenticationUsesCases(private val repository: AuthenticationRepository) 
     fun getOTPOnWhatsapp(mobNo : String): Flow<Result<SendOTPResponse>> = flow {
         try {
             val response = repository.getOTPOnWhatsapp(mobNo)
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            LoggerProvider.logger.d("Exception in otpOnWhatsapp() $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getVerifyOtp(mobNo : String, otpValue : String): Flow<Result<VerifyOtpResponse>> = flow {
+        try {
+            val response = repository.getVerifyOtpRepo(mobNo, otpValue)
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            LoggerProvider.logger.d("Exception in otpOnWhatsapp() $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getLoginWithOtp(request: LoginWithOtpRequest): Flow<Result<LoginApiResponse>> = flow {
+        try {
+            val response = repository.getLoginWithOTPRepo(request)
             emit(Result.success(response))
         } catch (e: Exception) {
             val errorMessage = e.message ?: unableToConnectServer
