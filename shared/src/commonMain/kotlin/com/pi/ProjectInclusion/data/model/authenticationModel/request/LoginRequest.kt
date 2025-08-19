@@ -23,3 +23,12 @@ data class ChangePasswordRequest(
     val oldPassword: String? = null,
     val newPassword: String? = null,
 )
+
+@Serializable
+data class CreatePasswordRequest(
+    val userName: String? = null,
+    val password: String? = null,
+    val mobile: String? = null,
+    val usertypeId: Int? = null,
+    val languageId: Int? = null,
+)

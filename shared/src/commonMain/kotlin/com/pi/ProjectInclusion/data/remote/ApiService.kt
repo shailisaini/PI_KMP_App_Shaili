@@ -9,6 +9,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateU
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ChangePasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.VerifyOtpResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.CreatePasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
 import io.ktor.client.HttpClient
@@ -158,17 +159,21 @@ class ApiService(private val client: HttpClient) {
             setBody(passwordRequest)
         }.body<ForgetPasswordResponse>()
 
-    suspend fun changePassword(changeRequest: ChangePasswordRequest): SendOTPResponse =
-        client.patch {
+    suspend fun createRegisterPassword(
+        changeRequest: CreatePasswordRequest,
+        strToken: String,
+    ): ForgetPasswordResponse =
+        client.post {
 
             url {
                 takeFrom(STUDENT_BASE_URL)
-                appendPathSegments(appendUser, "change-password")
+                appendPathSegments(appendUser, "register-user")
             }
             headers {
                 append(HttpHeaders.Accept, "application/json")
+                append(HttpHeaders.Authorization, "Bearer $strToken")
             }
             contentType(ContentType.Application.Json)
             setBody(changeRequest)
-        }.body<SendOTPResponse>()
+        }.body<ForgetPasswordResponse>()
 }

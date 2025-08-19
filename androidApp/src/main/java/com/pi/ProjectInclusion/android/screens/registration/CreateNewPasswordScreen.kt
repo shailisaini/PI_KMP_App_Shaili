@@ -28,6 +28,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,12 +50,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import coil.size.Size
 import com.example.kmptemplate.logger.LoggerProvider
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Bg_Gray
 import com.pi.ProjectInclusion.Bg_Gray1
 import com.pi.ProjectInclusion.Black
@@ -67,15 +70,23 @@ import com.pi.ProjectInclusion.PrimaryBlueLt1
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
+import com.pi.ProjectInclusion.android.common_UI.EncryptedCommonFunction.isEncryptedPhone
+import com.pi.ProjectInclusion.android.common_UI.EncryptedCommonFunction.phoneNo
 import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.CreatePasswordRequest
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
+import java.util.regex.Pattern
 
 @Composable
 fun CreateNewPasswordScreen(
@@ -85,7 +96,7 @@ fun CreateNewPasswordScreen(
     viewModel: LoginViewModel,
 ) {
 
-    LoggerProvider.logger.d("Screen: " + "CreateNewPasswordScreen()")
+    logger.d("Screen: " + "CreateNewPasswordScreen()")
 
     Column(
         modifier = Modifier
@@ -96,7 +107,12 @@ fun CreateNewPasswordScreen(
         DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
             onBack()
         }, content = {
-            CreateNewPasswordUI(onNext = onNext, onBack = onBack, otpSendVerify = otpSendVerify)
+            CreateNewPasswordUI(
+                onNext = onNext,
+                onBack = onBack,
+                otpSendVerify = otpSendVerify,
+                viewModel = viewModel
+            )
         })
     }
 }
@@ -106,7 +122,13 @@ fun CreateNewPasswordUI(
     onBack: () -> Unit,
     otpSendVerify: () -> Unit,
     onNext: () -> Unit,
+    viewModel: LoginViewModel,
 ) {
+
+    BackHandler {
+        onBack()
+    }
+
     val context = LocalContext.current
     var showBottomSheet by remember { mutableStateOf(false) }
     var enterPasswordStr = rememberSaveable { mutableStateOf("") }
@@ -128,10 +150,48 @@ fun CreateNewPasswordUI(
     val enterConfirmPasswordMsgStr = stringResource(R.string.txt_Please_enter_confirm_Password)
     val enterConfirmPasswordSameMsgStr =
         stringResource(R.string.txt_Please_enter_confirm_Password_same)
-    var isCheckedCharacter by remember { mutableStateOf(false) }
-    var isCheckedUppercase by remember { mutableStateOf(false) }
-    var isCheckedAtleastOne by remember { mutableStateOf(false) }
-    var isCheckedSpecialCharacter by remember { mutableStateOf(false) }
+
+    val minLength = enterConfirmPasswordStr.value.length >= 8 || enterPasswordStr.value.length >= 8
+    val hasLetter =
+        enterConfirmPasswordStr.value.any { it.isLetter() } || enterPasswordStr.value.any { it.isLetter() }
+    val hasDigit =
+        enterConfirmPasswordStr.value.any { it.isDigit() } || enterPasswordStr.value.any { it.isDigit() }
+    val hasSymbol = Pattern.compile("[^a-zA-Z0-9]").matcher(enterConfirmPasswordStr.value)
+        .find() || Pattern.compile("[^a-zA-Z0-9]").matcher(enterPasswordStr.value).find()
+
+    var mobileNo = "8851291824"  // will remove this after Api implementation
+    val createRegisterPasswordState by viewModel.createRegPasswordResponse.collectAsStateWithLifecycle()
+    val encryptedPassword = enterConfirmPasswordStr.value.encryptAES().toString().trim()
+    val encryptedUserName = viewModel.userNameValue!!.encryptAES().toString().trim()
+    val encryptedMobile = isEncryptedPhone(mobileNo.encryptAES().toString().trim())
+    var languageId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
+    var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
+    val strToken: String =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjR5QW9PaGdVQnJyOUVkdXVvbHFvSVE9PSIsInN1YiI6IjEiLCJpYXQiOjE3NTU1OTYyNTIsImV4cCI6MTc1NTY4MjY1Mn0.xC1TkBEv391O5VJaM4MoOr-kRp6THY4Q8xcpAxN-DZ0"
+
+    LaunchedEffect(createRegisterPasswordState) {
+        when {
+            createRegisterPasswordState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            createRegisterPasswordState.error.isNotEmpty() -> {
+                logger.d("Create/Register Password Error: ${createRegisterPasswordState.error}")
+                isDialogVisible = false
+            }
+
+            createRegisterPasswordState.success != null -> {
+                logger.d("Create/Register Password Response :- ${createRegisterPasswordState.success!!.response}")
+                if (createRegisterPasswordState.success!!.status == true) {
+                    context.toast(createRegisterPasswordState.success!!.message!!)
+                    onNext()
+                } else {
+                    context.toast(createRegisterPasswordState.success!!.message!!)
+                }
+                isDialogVisible = false
+            }
+        }
+    }
 
     if (showBottomSheet) {
         SelectUserBottomSheet(onClick = {
@@ -315,13 +375,6 @@ fun CreateNewPasswordUI(
                 hint = enterConfirmPassword
             )
 
-            /*PasswordCheckField(isChecked, txtCharacter, Modifier.padding(
-                top = 16.dp,
-                start = 12.dp,
-                end = 12.dp,
-                bottom = 8.dp
-            ))*/
-
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(
@@ -332,18 +385,18 @@ fun CreateNewPasswordUI(
                 )
             ) {
                 Checkbox(
-                    checked = isCheckedCharacter,
-                    onCheckedChange = { isCheckedCharacter = it }, // Disabled for display-only
+                    checked = minLength,
+                    onCheckedChange = null,
                     colors = if (isSystemInDarkTheme()) {
                         CheckboxDefaults.colors(
-                            checkedColor = Color.Transparent,     // Light purple-gray
-                            uncheckedColor = Color.LightGray,   // Same for unchecked
+                            checkedColor = Color.Transparent,
+                            uncheckedColor = Color.LightGray,
                             checkmarkColor = PrimaryBlue
                         )
                     } else {
                         CheckboxDefaults.colors(
-                            checkedColor = Color.Transparent,     // Light purple-gray
-                            uncheckedColor = Color.LightGray,   // Same for unchecked
+                            checkedColor = Color.Transparent,
+                            uncheckedColor = Color.LightGray,
                             checkmarkColor = PrimaryBlue
                         )
                     },
@@ -372,18 +425,18 @@ fun CreateNewPasswordUI(
                 modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
             ) {
                 Checkbox(
-                    checked = isCheckedUppercase,
-                    onCheckedChange = { isCheckedUppercase = it }, // Disabled for display-only
+                    checked = hasLetter,
+                    onCheckedChange = null,
                     colors = if (isSystemInDarkTheme()) {
                         CheckboxDefaults.colors(
-                            checkedColor = Color.Transparent,     // Light purple-gray
-                            uncheckedColor = Color.LightGray,   // Same for unchecked
+                            checkedColor = Color.Transparent,
+                            uncheckedColor = Color.LightGray,
                             checkmarkColor = PrimaryBlue
                         )
                     } else {
                         CheckboxDefaults.colors(
-                            checkedColor = Color.Transparent,     // Light purple-gray
-                            uncheckedColor = Color.LightGray,   // Same for unchecked
+                            checkedColor = Color.Transparent,
+                            uncheckedColor = Color.LightGray,
                             checkmarkColor = PrimaryBlue
                         )
                     },
@@ -412,18 +465,18 @@ fun CreateNewPasswordUI(
                 modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
             ) {
                 Checkbox(
-                    checked = isCheckedAtleastOne,
-                    onCheckedChange = { isCheckedAtleastOne = it }, // Disabled for display-only
+                    checked = hasDigit,
+                    onCheckedChange = null,
                     colors = if (isSystemInDarkTheme()) {
                         CheckboxDefaults.colors(
-                            checkedColor = Color.Transparent,     // Light purple-gray
-                            uncheckedColor = Color.LightGray,   // Same for unchecked
+                            checkedColor = Color.Transparent,
+                            uncheckedColor = Color.LightGray,
                             checkmarkColor = PrimaryBlue
                         )
                     } else {
                         CheckboxDefaults.colors(
-                            checkedColor = Color.Transparent,     // Light purple-gray
-                            uncheckedColor = Color.LightGray,   // Same for unchecked
+                            checkedColor = Color.Transparent,
+                            uncheckedColor = Color.LightGray,
                             checkmarkColor = PrimaryBlue
                         )
                     },
@@ -453,20 +506,18 @@ fun CreateNewPasswordUI(
                 modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
             ) {
                 Checkbox(
-                    checked = isCheckedSpecialCharacter,
-                    onCheckedChange = {
-                        isCheckedSpecialCharacter = it
-                    }, // Disabled for display-only
+                    checked = hasSymbol,
+                    onCheckedChange = null,
                     colors = if (isSystemInDarkTheme()) {
                         CheckboxDefaults.colors(
-                            checkedColor = Color.Transparent,     // Light purple-gray
-                            uncheckedColor = Color.LightGray,   // Same for unchecked
+                            checkedColor = Color.Transparent,
+                            uncheckedColor = Color.LightGray,
                             checkmarkColor = PrimaryBlue
                         )
                     } else {
                         CheckboxDefaults.colors(
-                            checkedColor = Color.Transparent,     // Light purple-gray
-                            uncheckedColor = Color.LightGray,   // Same for unchecked
+                            checkedColor = Color.Transparent,
+                            uncheckedColor = Color.LightGray,
                             checkmarkColor = PrimaryBlue
                         )
                     },
@@ -519,18 +570,24 @@ fun CreateNewPasswordUI(
                             context.toast(enterPasswordMsgStr)
                         } else if (enterConfirmPasswordStr.value.isEmpty()) {
                             context.toast(enterConfirmPasswordMsgStr)
-                        } else if (enterConfirmPasswordStr.value.isEmpty() != enterPasswordStr.value.isEmpty()) {
+                        } else if (enterConfirmPasswordStr.value != enterPasswordStr.value) {
                             context.toast(enterConfirmPasswordSameMsgStr)
                         } else {
                             showError = enterConfirmPasswordStr.value.isEmpty()
-//                                val firstDigitChar = enterConfirmPasswordStr.value.toString().first()
-//                                val firstDigit = firstDigitChar.digitToInt()
                             if (showError || enterConfirmPasswordStr.value.length < 8) {
                                 inValidPassword = true
-                            } else { // if first digit of mobile is less than 6 then error will show
+                            } else {
                                 isDialogVisible = true
                                 buttonClicked = true
                                 onNext()
+                                val passwordRequest = CreatePasswordRequest(
+                                    encryptedUserName,
+                                    encryptedPassword,
+                                    encryptedMobile.toString(),
+                                    userTypeId.toInt(),
+                                    languageId.toInt()
+                                )
+                                viewModel.createRegisterPassword(passwordRequest, strToken)
                             }
                         }
                     }, true
@@ -653,5 +710,5 @@ fun NewPasswordScreen() {
     val onNext: () -> Unit = {}
     val onBack: () -> Unit = {}
     val isForgetPassword: () -> Unit = {}
-    CreateNewPasswordUI(onNext, onBack, isForgetPassword)
+//    CreateNewPasswordUI(onNext, onBack, isForgetPassword)
 }
