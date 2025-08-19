@@ -14,6 +14,7 @@ object ConstantVariables {
     var TOKEN_PREF_KEY: String = "user_token"
     var USER_TYPE_ID: String = "userTypeId"
     var SELECTED_LANGUAGE_ID: String = "selectedLanguageId"
+    var USER_MOBILE_NO: String = "userMobileNo"
 
     // for language Screen
     var IMG_DESCRIPTION: String = "img"
