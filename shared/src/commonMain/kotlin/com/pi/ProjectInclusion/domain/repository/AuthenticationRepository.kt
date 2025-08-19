@@ -12,14 +12,14 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginReque
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
 
 interface AuthenticationRepository {
-    suspend fun getLanguage() :GetLanguageListResponse
-    suspend fun getUserType() :GetUserTypeResponse
-    suspend fun getOTPOnCall(mobNo : String) : SendOTPResponse
-    suspend fun getUserLoginPasswordRepo(loginRequest: LoginRequest) : LoginApiResponse
-    suspend fun getOTPOnWhatsapp(mobNo : String) : SendOTPResponse
-    suspend fun getValidate(userName : String, userTypeId : String) : ValidateUserResponse
-    suspend fun getVerifyOtpRepo(userName : String, userTypeId : String) : VerifyOtpResponse
-    suspend fun getLoginWithOTPRepo(request: LoginWithOtpRequest) : LoginApiResponse
+    suspend fun getLanguage(): GetLanguageListResponse
+    suspend fun getUserType(): GetUserTypeResponse
+    suspend fun getOTPOnCall(mobNo: String): SendOTPResponse
+    suspend fun getUserLoginPasswordRepo(loginRequest: LoginRequest): LoginApiResponse
+    suspend fun getOTPOnWhatsapp(mobNo: String): SendOTPResponse
+    suspend fun getValidate(userName: String, userTypeId: String): ValidateUserResponse
+    suspend fun getVerifyOtpRepo(userName: String, userTypeId: String): VerifyOtpResponse
+    suspend fun getLoginWithOTPRepo(request: LoginWithOtpRequest): LoginApiResponse
     suspend fun forgetPassword(
         passwordRequest: ForgetPasswordRequest,
         strToken: String,

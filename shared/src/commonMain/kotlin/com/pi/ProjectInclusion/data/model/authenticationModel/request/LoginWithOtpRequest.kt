@@ -6,6 +6,5 @@ import kotlinx.serialization.Serializable
 data class LoginWithOtpRequest(
     val username: String? = null,
     val otp: String? = null,
-    val userTypeId: Int? = null,
-
-)
+    val userTypeId: Int? = null
+    )

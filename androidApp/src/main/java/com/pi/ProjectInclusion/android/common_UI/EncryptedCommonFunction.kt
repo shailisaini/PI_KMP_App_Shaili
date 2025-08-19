@@ -8,7 +8,7 @@ object EncryptedCommonFunction {
 
     // check if encryptedEmail
     @Composable
-    fun email(email: String) : String{
+    fun email(email: String): String {
         var shownEmail = ""
 
         val isEncrypted = remember { isEncryptedEmail(email) }
@@ -22,7 +22,7 @@ object EncryptedCommonFunction {
 
     // check if encryptedPhone
     @Composable
-    fun phoneNo(phoneNo: String) : String{
+    fun phoneNo(phoneNo: String): String {
         var shownPhoneNo = ""
 
         val isEncrypted = remember { isEncryptedPhone(phoneNo) }

@@ -23,7 +23,7 @@ data class LoginApiResponse(
     @SerialName("response")
     val response: LoginResponse? = null,
 
-) {
+    ) {
     @Serializable
     data class LoginResponse(
         @SerialName("access_token")

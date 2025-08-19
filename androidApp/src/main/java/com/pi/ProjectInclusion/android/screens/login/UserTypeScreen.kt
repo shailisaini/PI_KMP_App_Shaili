@@ -237,7 +237,11 @@ fun UserTypeResponseUI(
                         }
                     } else {
                         if (!isInternetAvailable) {
-                            ShowError(internetMessage, errColor, painterResource(R.drawable.sad_emoji))
+                            ShowError(
+                                internetMessage,
+                                errColor,
+                                painterResource(R.drawable.sad_emoji)
+                            )
                         } else {
                             NoDataFound(noDataMessage, painterResource(R.drawable.sad_emoji))
                         }

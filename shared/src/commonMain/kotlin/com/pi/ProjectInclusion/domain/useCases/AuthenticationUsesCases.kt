@@ -105,7 +105,7 @@ class AuthenticationUsesCases(private val repository: AuthenticationRepository) 
         }
     }.flowOn(Dispatchers.IO)
 
-    fun getVerifyOtp(mobNo : String, otpValue : String): Flow<Result<VerifyOtpResponse>> = flow {
+    fun getVerifyOtp(mobNo: String, otpValue: String): Flow<Result<VerifyOtpResponse>> = flow {
         try {
             val response = repository.getVerifyOtpRepo(mobNo, otpValue)
             emit(Result.success(response))

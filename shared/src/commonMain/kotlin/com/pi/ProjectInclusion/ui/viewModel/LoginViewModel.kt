@@ -304,7 +304,7 @@ class LoginViewModel(
             }
     }
 
-    fun getVerifyOtpViewModel(mobNo : String, otpValue : String) = viewModelScope.launch {
+    fun getVerifyOtpViewModel(mobNo: String, otpValue: String) = viewModelScope.launch {
         // no need to sync data
 
         verifyLogin.update { UiState(isLoading = true) }

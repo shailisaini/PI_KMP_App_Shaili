@@ -115,7 +115,7 @@ class ApiService(private val client: HttpClient) {
     }.body<SendOTPResponse>()
 
     // registration, forgot password & recover user
-    suspend fun getVerifyOTP(mobNo : String, otpValue: String): VerifyOtpResponse = client.post {
+    suspend fun getVerifyOTP(mobNo: String, otpValue: String): VerifyOtpResponse = client.post {
         url {
             takeFrom(STUDENT_BASE_URL)
             appendPathSegments(appendUser, "verify-otp") // → /language/get-all
