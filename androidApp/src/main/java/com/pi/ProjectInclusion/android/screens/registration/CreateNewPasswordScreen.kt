@@ -579,7 +579,6 @@ fun CreateNewPasswordUI(
                             } else {
                                 isDialogVisible = true
                                 buttonClicked = true
-                                onNext()
                                 val passwordRequest = CreatePasswordRequest(
                                     encryptedUserName,
                                     encryptedPassword,
