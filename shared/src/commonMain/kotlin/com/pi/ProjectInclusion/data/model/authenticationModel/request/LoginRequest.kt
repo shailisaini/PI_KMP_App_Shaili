@@ -11,6 +11,13 @@ data class LoginRequest(
 )
 
 @Serializable
+data class LoginWithOtpRequest(
+    val username: String? = null,
+    val otp: String? = null,
+    val userTypeId: Int? = null
+)
+
+@Serializable
 data class ForgetPasswordRequest(
     val username: String? = null,
     val userTypeId: Int? = null,
@@ -31,4 +38,10 @@ data class CreatePasswordRequest(
     val mobile: String? = null,
     val usertypeId: Int? = null,
     val languageId: Int? = null,
+)
+
+@Serializable
+data class CertificateRequest(
+    val partnerID: Int? = null,
+    val piUserID: Int? = null,
 )
