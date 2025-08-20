@@ -1,15 +1,14 @@
 package com.pi.ProjectInclusion.data.remote
 
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CreateRegisterPasswordResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ForgetPasswordResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.LoginApiResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.SendOTPResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateUserResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.request.ChangePasswordRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CreateRegisterPasswordResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetLanguageListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.LoginApiResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SendOTPResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ValidateUserResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.VerifyOtpResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.VerifyOtpResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CreatePasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
@@ -19,14 +18,12 @@ import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.patch
 import io.ktor.client.request.post
-import io.ktor.client.request.request
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.appendPathSegments
 import io.ktor.http.contentType
 import io.ktor.http.takeFrom
-import kotlinx.serialization.json.JsonObject
 
 class ApiService(private val client: HttpClient) {
 
@@ -132,11 +129,10 @@ class ApiService(private val client: HttpClient) {
     suspend fun getLoginWithOTP(request: LoginWithOtpRequest): LoginApiResponse = client.post {
         url {
             takeFrom(STUDENT_BASE_URL)
-            appendPathSegments(appendUser, "login-with-otp") // → /language/get-all
+            appendPathSegments(appendUser, "login-with-otp")
         }
         headers {
             append(HttpHeaders.Accept, "application/json")
-//            append(HttpHeaders.Authorization, "Bearer $token")
         }
         contentType(ContentType.Application.Json)
         setBody(request)
@@ -177,4 +173,17 @@ class ApiService(private val client: HttpClient) {
             contentType(ContentType.Application.Json)
             setBody(changeRequest)
         }.body<CreateRegisterPasswordResponse>()
+
+    // user Profile
+    suspend fun getViewUserProfile(username : String): LoginApiResponse =
+        client.get {
+            url {
+                takeFrom(STUDENT_BASE_URL)
+                appendPathSegments(appendUser, "get-user-by-username")
+                parameters.append("username", username)
+            }
+            headers {
+                append(HttpHeaders.Accept, "application/json")
+            }
+        }.body<LoginApiResponse>()
 }

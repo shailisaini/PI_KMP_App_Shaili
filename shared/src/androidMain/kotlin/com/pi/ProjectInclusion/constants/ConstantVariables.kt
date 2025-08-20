@@ -16,6 +16,7 @@ object ConstantVariables {
     var SELECTED_LANGUAGE_ID: String = "selectedLanguageId"
     var IS_COMING_FROM: String = "isComingFrom"
     var USER_MOBILE_NO: String = "userMobileNo"
+    var USER_NAME: String = "userName"
 
     // for Screens
     var IMG_DESCRIPTION: String = "img"
