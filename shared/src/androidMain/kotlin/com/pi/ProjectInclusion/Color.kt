@@ -141,3 +141,4 @@ val DashboardCard4 = Color(0xFFE5FFED)
 val GreenGradient1 = Color(0x32C7F15C)
 val GreenGradient2 = Color(0x80FCE2B8)
 val DarkGrey02 = Color(0xFF333333) // #333333
+val LightYellow2 = Color(0xFFFFF4DB) //#FFF4DB
