@@ -1041,7 +1041,7 @@ fun TransferConfirmationDialog(
 
                     // Top Warning Icon
                     Icon(
-                        painter = painterResource(id = R.drawable.warning_img), // apna warning icon lagao
+                        painter = painterResource(id = R.drawable.warning_img),
                         contentDescription = null,
                         modifier = Modifier.size(70.dp),
                         tint = Color.Unspecified
@@ -1105,7 +1105,6 @@ fun TransferConfirmationDialog(
                             .fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        // Cancel (chhota)
                         OutlinedButton(
                             onClick = { onCancel() },
                             modifier = Modifier.weight(0.8f),
@@ -1121,8 +1120,6 @@ fun TransferConfirmationDialog(
                                 fontFamily = fontMedium
                             )
                         }
-
-                        // Confirm Transfer (bada)
                         Button(
                             onClick = { onConfirmTransfer() },
                             modifier = Modifier.weight(1.2f),
