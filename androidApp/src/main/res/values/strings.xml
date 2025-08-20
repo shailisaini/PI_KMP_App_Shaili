@@ -54,6 +54,7 @@ and make a difference together!</string>
     <string name="user_profile">Teacher</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="track_request">Track Request</string>
+    <string name="notification_screen">Notification</string>
     <string name="nav_home">Home</string>
     <string name="nav_course">Courses</string>
     <string name="nav_screening">Screening</string>
@@ -150,6 +151,7 @@ and make a difference together!</string>
     <string name="txt_View_All">View All</string>
     <string name="txt_ScreeningReport_doc">ScreeningReport.doc</string>
     <string name="txt_date">28 July 2025</string>
+    <string name="txt_time">12:54 AM</string>
     <string name="txt_ScreeningReport_pdf">ScreeningReport.pdf</string>
     <string name="txt_ScreeningReport_jpg">ScreeningReport.jpg</string>
     <string name="txt_ScreeningReport_mp4">ScreeningReport.mp4</string>
@@ -462,5 +464,7 @@ and make a difference together!</string>
     <string name="txt_transfer_note">Note: Upon transfer, all other transfer requests for this student will be automatically canceled.</string>
     <string name="txt_confirm_transfer">Confirm Transfer</string>
     <string name="txt_confirm_dec">You are about to transfer this student to </string>
+    <string name="txt_noti_case_trans">has sent a student transfer request. </string>
+    <string name="txt_transfer">Transfer</string>
 
 </resources>

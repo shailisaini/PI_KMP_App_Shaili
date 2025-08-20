@@ -68,6 +68,7 @@ val LightGreen05 = Color(0xFFECFAED)
 val LightGreen06 = Color(0xFF56A42F) // #56A42F
 
 val Yellow = Color(0xFFFFDD00) // #FFDD00
+val Yellow1 = Color(0xFFFE9607) //#FE9607
 val LightYellow = Color(0xFFFBDE9D)
 val LightYellow02 = Color(0xFFFFFCEB)
 val LightYellow03 = Color(0xFFFCF6EC)
@@ -80,6 +81,8 @@ val FaqColor3 = Color(0xFF3A7F17)
 val FaqColor4 = Color(0xFF9FD882)
 val FaqColor5 = Color(0xFF8D7A00)
 val FaqColor6 = Color(0xFFD3B700)
+val CancelColor7 = Color(0xFFFD0000) //#FD0000
+val TransferColor7 = Color(0xFF00C32E) //#00C32E
 
 val Pink = Color(0xFFEE89DF)
 val LightPink = Color(0xFFF7AAED)
