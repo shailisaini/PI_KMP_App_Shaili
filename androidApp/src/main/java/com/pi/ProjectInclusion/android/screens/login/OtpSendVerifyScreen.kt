@@ -68,6 +68,7 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IS_COMING_FROM
 import com.pi.ProjectInclusion.constants.ConstantVariables.LOGIN_WITH_OTP
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
 import com.pi.ProjectInclusion.constants.ConstantVariables.SUCCESS
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_MOBILE_NO
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
@@ -104,13 +105,7 @@ fun OtpSendVerifyScreen(
     val context = LocalContext.current
     isInternetAvailable = isNetworkAvailable(context)
 
-    var mobileNo = "8851291824"  // will remove this after Api implementation
-
-    val encryptedPhoneNo = if (isEncryptedPhone(mobileNo.toString().trim())) {
-        mobileNo
-    } else {
-        mobileNo.encryptAES().toString().trim()
-    }
+    var encryptedPhoneNo = viewModel.getPrefData(USER_MOBILE_NO)  // encrypted from shared Pref
 
     val encryptedOtp = otpValue.encryptAES().toString().trim()
 
@@ -132,6 +127,8 @@ fun OtpSendVerifyScreen(
         onDismiss = { isDialogVisible = false },
         message = stringResource(R.string.txt_loading)
     )
+
+    logger.d("OtpSendVerify: $languageId .. $userTypeId .. $encryptedPhoneNo")
 
     // api for otp on call
     if (sendOtpViaCall) {
@@ -165,7 +162,6 @@ fun OtpSendVerifyScreen(
                 if (sendOtpState.success!!.status != true){
                     context.toast(sendOtpState.success!!.response!!.message.toString())
                 }
-
                 isDialogVisible = false
             }
         }

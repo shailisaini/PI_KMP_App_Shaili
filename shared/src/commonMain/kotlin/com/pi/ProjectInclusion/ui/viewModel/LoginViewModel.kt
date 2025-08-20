@@ -3,6 +3,7 @@ package com.pi.ProjectInclusion.ui.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kmptemplate.logger.LoggerProvider
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CreateRegisterPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
@@ -11,6 +12,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.Response.SendOTPRe
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateUserResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.VerifyOtpResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.CreatePasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
 import com.pi.ProjectInclusion.database.LocalDataSource
@@ -62,6 +64,10 @@ class LoginViewModel(
 
     private val forgetPassword = MutableStateFlow(UiState<ForgetPasswordResponse>())
     val forgetPasswordResponse: StateFlow<UiState<ForgetPasswordResponse>> = forgetPassword
+
+    private val createRegPassword = MutableStateFlow(UiState<CreateRegisterPasswordResponse>())
+    val createRegPasswordResponse: StateFlow<UiState<CreateRegisterPasswordResponse>> =
+        createRegPassword
 
     private val query = MutableStateFlow("")
 
@@ -297,6 +303,31 @@ class LoginViewModel(
                     },
                     onFailure = { exception ->
                         forgetPassword.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun createRegisterPassword(
+        passwordRequest: CreatePasswordRequest,
+        strToken: String,
+    ) = viewModelScope.launch {
+        createRegPassword.update { UiState(isLoading = true) }
+        getLanguageUsesCases.createRegisterPassword(passwordRequest, strToken)
+            .catch { exception ->
+                createRegPassword.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        createRegPassword.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        createRegPassword.update {
                             UiState(error = exception.message ?: somethingWentWrong)
                         }
                     }
