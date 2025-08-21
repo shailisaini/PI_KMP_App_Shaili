@@ -1152,3 +1152,90 @@ fun TransferConfirmationDialogPreview() {
     )
 }
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
+@Preview
+@Composable
+fun RequestSendDialog(onDismiss: () -> Unit = {}) {
+    Dialog(onDismissRequest = { onDismiss() },
+        properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .padding(20.dp)
+                    .clip(RoundedCornerShape(21.dp))
+                    .background(if (isSystemInDarkTheme()) Dark_02 else White)
+                    .fillMaxWidth()
+
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(vertical = 15.dp, horizontal = 9.dp)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.check_box),
+                        contentDescription = IMG_DESCRIPTION,
+                        modifier = Modifier.size(121.dp),
+                        tint = Color.Unspecified
+                    )
+
+                    Text(
+                        text = stringResource(R.string.txt_request_sent_head),
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .padding(top = 17.dp, start = 9.dp, end = 9.dp),
+                        fontFamily = fontBold,
+                        fontSize = 19.sp,
+                        color = Black,
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        text = stringResource(R.string.txt_request_sent_dec),
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .padding(top = 3.dp, start = 9.dp, end = 9.dp),
+                        fontFamily = fontRegular,
+                        fontSize = 15.sp,
+                        color = GrayLight04,
+                        textAlign = TextAlign.Center
+                    )
+                    Row(
+                        modifier = Modifier
+                            .padding(vertical = 15.dp, horizontal = 5.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Button(
+                            onClick = {
+                                onDismiss()
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .padding(end = 9.dp)
+                                .clip(RoundedCornerShape(9.dp)),
+                            shape = RoundedCornerShape(9.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = PrimaryBlue,
+                                contentColor = White
+                            ),
+                            border = BorderStroke(1.dp, BorderBlue)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.txt_Got_It),
+                                fontSize = 15.sp,
+                                fontFamily = fontMedium,
+                                color = White,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+

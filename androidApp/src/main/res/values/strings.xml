@@ -450,6 +450,8 @@ and make a difference together!</string>
     <string name="txt_verify_otp">Verify OTP</string>
     <string name="txt_trans_success">Transfer Successful</string>
     <string name="txt_already_requested">Already requested</string>
+    <string name="txt_request_sent_head">Request sent successfully</string>
+    <string name="txt_request_sent_dec">Your request to transfer the student has been successfully submitted. You will be notified once the request is reviewed and accepted.</string>
     <string name="txt_already_requested_dec">You’ve already requested a transfer for this student. You will be notified if the transfer is approved </string>
     <string name="txt_trans_success_dec1">Your request to transfer </string>
     <string name="txt_trans_success_dec2">  is confirmed. Student has been assigned to you. </string>
