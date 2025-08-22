@@ -3,6 +3,7 @@ package com.pi.ProjectInclusion.android.screens.menu
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -65,6 +66,7 @@ import kotlinx.coroutines.launch
 fun OpenDashboardHeader(
     onNavigationIconClick: () -> Unit = {},
     isNotification: Boolean = true,
+    onNotificationClick: () -> Unit = {},
 ) {
     Box(
         modifier = Modifier
@@ -83,7 +85,10 @@ fun OpenDashboardHeader(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Image(
-                        modifier = Modifier.padding(end = 10.dp),
+                        modifier = Modifier.padding(end = 10.dp)
+                            .clickable{
+                                onNotificationClick()
+                            },
                         painter = if (isNotification) painterResource(R.drawable.ic_notification) else painterResource(
                             R.drawable.ic_bell
                         ),
@@ -201,10 +206,11 @@ fun AppBar(
     isNotification: Boolean,
     onNavigationIconClick: () -> Unit = {},
     currentRoute: String? = "",
+    onNotificationClick: () -> Unit = {}
 ) {
     when (currentRoute) {
         AppRoute.DashboardScreen.route -> {
-            OpenDashboardHeader(onNavigationIconClick, isNotification)
+            OpenDashboardHeader(onNavigationIconClick, isNotification,onNotificationClick)
         }
 
         AppRoute.ScreeningScreen.route -> {
