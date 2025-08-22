@@ -75,7 +75,7 @@ fun EditProfileScreen2(onNext: () -> Unit,  //EditProfileScreen2
     var isDialogVisible by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    val userType = remember { mutableStateListOf<GetUserTypeResponse.UserTypeResponse>() }
+
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },

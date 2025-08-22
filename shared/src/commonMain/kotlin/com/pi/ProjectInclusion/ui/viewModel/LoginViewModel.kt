@@ -3,14 +3,7 @@ package com.pi.ProjectInclusion.ui.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kmptemplate.logger.LoggerProvider
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CreateFirstStepProfileResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CreateRegisterPasswordResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ForgetPasswordResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.LoginApiResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.SendOTPResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateUserResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CreateFirstStepProfileResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CreateRegisterPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetLanguageListResponse
@@ -428,7 +421,7 @@ class LoginViewModel(
         strToken: String,
     ) = viewModelScope.launch {
         firstStepProfilePassword.update { UiState(isLoading = true) }
-        getLanguageUsesCases.createFirstStepProfileRepo(firstStepProfileRequest, strToken)
+        getAuthViewModel.createFirstStepProfileRepo(firstStepProfileRequest, strToken)
             .catch { exception ->
                 firstStepProfilePassword.update {
                     UiState(error = exception.message ?: somethingWentWrong)

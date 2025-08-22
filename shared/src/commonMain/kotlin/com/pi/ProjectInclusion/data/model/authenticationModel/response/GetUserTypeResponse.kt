@@ -15,9 +15,8 @@ data class GetUserTypeResponse(
     val status: Boolean? = null,
 
     @SerialName("response")
-    val response: List<UserTypeResponse>? = null,
-
-    ) {
+    val response: List<UserTypeResponse>? = null)
+{
     @Serializable
     data class UserTypeResponse(
         @SerialName("id")

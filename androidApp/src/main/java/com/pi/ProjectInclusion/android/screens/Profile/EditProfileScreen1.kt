@@ -83,7 +83,6 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_FEMALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_MALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_OTHER
 import com.pi.ProjectInclusion.constants.CustomDialog
-import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetUserTypeResponse
 
 @Composable
 fun EditProfileScreen1(onNext: () -> Unit,  //EditProfileScreen2
@@ -91,7 +90,7 @@ fun EditProfileScreen1(onNext: () -> Unit,  //EditProfileScreen2
     var isDialogVisible by remember { mutableStateOf(false) }
 //    val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val userType = remember { mutableStateListOf<GetUserTypeResponse.UserTypeResponse>() }
+
 
     var hasAllPermissions = remember { mutableStateOf(false) }
 

@@ -78,7 +78,6 @@ class SplashActivity : ComponentActivity() {
 //                            navigateTo(AppRoute.LanguageSelect.route)
 
                             // for abhishek & aashish
-                           context.startActivity(
                             context.startActivity(
                                 Intent(context, StudentDashboardActivity::class.java)
                             )

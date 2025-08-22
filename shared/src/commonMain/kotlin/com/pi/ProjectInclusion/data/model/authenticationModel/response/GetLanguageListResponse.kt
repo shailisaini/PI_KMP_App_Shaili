@@ -19,25 +19,25 @@ data class GetLanguageListResponse(
     val response: List<LanguageResponse>? = null,
 
     ) {
-        @Serializable
-        data class LanguageResponse(
-            @SerialName("id")
-            val id: String? = null,
+    @Serializable
+    data class LanguageResponse(
+        @SerialName("id")
+        val id: String? = null,
 
-            @SerialName("name")
-            val name: String? = null,
+        @SerialName("name")
+        val name: String? = null,
 
-            @SerialName("translated_name")
-            val translated_name: String? = null,
+        @SerialName("translated_name")
+        val translated_name: String? = null,
 
-            @SerialName("langIcon")
-            val langIcon: String? = null,
+        @SerialName("langIcon")
+        val langIcon: String? = null,
 
-            @SerialName("status")
-            val status: Int? = null,
+        @SerialName("status")
+        val status: Int? = null,
 
-            @SerialName("createdBy")
-            val createdBy: String? = null,
+        @SerialName("createdBy")
+        val createdBy: String? = null,
 
         )
-    }
+}
