@@ -21,8 +21,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -119,7 +117,6 @@ fun Notifications(
             onBack()
         },
         onMoreInfoClick = {
-//            showSheetMenu = true
         },
         content = {
             Box(
@@ -154,18 +151,29 @@ fun NotificationList() {
         modifier = Modifier.fillMaxSize()
     ) {
         items(dummyTrackList) { item ->
-//            NotificationCard(item = item)
-            StudentTransferRequestCard(
-                date = stringResource(R.string.txt_date),
-                time = stringResource(R.string.txt_time),
-                senderName = stringResource(R.string.user_name),
-                senderSchool = stringResource(R.string.txt_dummy_school),
-                studentImage = R.drawable.profile_user_icon,
-                studentName = stringResource(R.string.txt_dummy_name),
-                studentClass = stringResource(R.string.txt_class_name),
-                onCancel = {},
-                onTransfer = {}
-            )
+            if (item.title==stringResource(R.string.txt_case_transfer)){
+                StudentTransferRequestCard(
+                    date = stringResource(R.string.txt_date),
+                    time = stringResource(R.string.txt_time),
+                    senderName = stringResource(R.string.user_name),
+                    senderSchool = stringResource(R.string.txt_dummy_school),
+                    studentImage = R.drawable.profile_user_icon,
+                    studentName = stringResource(R.string.txt_dummy_name),
+                    studentClass = stringResource(R.string.txt_class_name),
+                    onCancel = {},
+                    onTransfer = {}
+                )
+            }
+            else{
+               NotificationCard(
+                   date = stringResource(R.string.txt_date),
+                   time = stringResource(R.string.txt_time),
+                   senderName = stringResource(R.string.user_name),
+                   senderSchool = stringResource(R.string.txt_dummy_school),
+                   studentImage = R.drawable.profile_user_icon
+               )
+            }
+
         }
     }
 }
@@ -204,8 +212,6 @@ fun StudentTransferRequestCard(
             )
 
             Spacer(modifier = Modifier.width(6.dp))
-
-            // Dot
             Box(
                 modifier = Modifier
                     .size(6.dp)
@@ -224,7 +230,6 @@ fun StudentTransferRequestCard(
                 color = BorderBlue
             )
         }
-        // Request Text
         Text(
             text = buildAnnotatedString {
                 withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = Black)) {
@@ -236,7 +241,6 @@ fun StudentTransferRequestCard(
                 }
                 append(stringResource(R.string.txt_noti_case_trans))
             },
-//            text = "$senderName from $senderSchool, has sent a student transfer request.",
             fontSize = 14.sp,
             fontFamily = fontRegular,
             color = GrayLight04
@@ -261,7 +265,6 @@ fun StudentTransferRequestCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    // Student Image
                     Image(
                         painter = painterResource(id = studentImage),
                         contentDescription = null,
@@ -272,7 +275,6 @@ fun StudentTransferRequestCard(
 
                     Spacer(modifier = Modifier.width(10.dp))
 
-                    // Student Info
                     Column(
                         modifier = Modifier.weight(1f)
                     ) {
@@ -299,7 +301,6 @@ fun StudentTransferRequestCard(
                                 .padding(start = 4.dp, top = 16 .dp),
                             horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            // Cancel
                             OutlinedButton(
                                 onClick = { onCancel() },
                                 modifier = Modifier.height(36.dp),
@@ -316,13 +317,11 @@ fun StudentTransferRequestCard(
                                     color = Color.Red
                                 )
                             }
-
-                            // Transfer
                             OutlinedButton(
                                 onClick = { onTransfer() },
                                 modifier = Modifier.height(36.dp),
                                 shape = RoundedCornerShape(20.dp),
-                                border = BorderStroke(1.dp, Color(0xFF28A745)), // Green
+                                border = BorderStroke(1.dp, Color(0xFF28A745)),
                                 colors = ButtonDefaults.outlinedButtonColors(
                                     contentColor = CancelColor7
                                 )
@@ -346,3 +345,106 @@ fun StudentTransferRequestCard(
     }
 }
 
+@Composable
+fun NotificationCard(
+    date: String,
+    time: String,
+    senderName: String,
+    senderSchool: String,
+    studentImage: Int,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(12.dp)
+    ) {
+        Divider(
+            color = Color.LightGray,
+            thickness = 0.7.dp,
+            modifier = Modifier.padding(vertical = 6.dp)
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(top = 4 .dp, bottom = 6.dp)
+        ) {
+            Text(
+                text = date,
+                fontSize = 12.sp,
+                fontFamily = fontRegular,
+                color = BorderBlue
+            )
+
+            Spacer(modifier = Modifier.width(6.dp))
+            Box(
+                modifier = Modifier
+                    .size(6.dp)
+                    .clip(CircleShape)
+                    .background(
+                        color = Yellow1
+                    )
+            )
+
+            Spacer(modifier = Modifier.width(6.dp))
+
+            Text(
+                text = time,
+                fontSize = 12.sp,
+                fontFamily = fontRegular,
+                color = BorderBlue
+            )
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(12.dp))
+                .border(1.dp, Color.LightGray, RoundedCornerShape(12.dp))
+                .background(White)
+                .fillMaxWidth()
+                .padding(12.dp)
+        ) {
+            Column (
+                modifier = Modifier
+                    .fillMaxWidth()
+            ){
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Image(
+                        painter = painterResource(id = studentImage),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(CircleShape)
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        text = buildAnnotatedString {
+
+                            append(stringResource(R.string.txt_first_noti)+" ")
+
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = Black)) {
+                                append(senderName)
+                            }
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = Black)) {
+                                append("$senderSchool ")
+                            }
+                            append(stringResource(R.string.txt_last_noti))
+                        },
+                        fontSize = 14.sp,
+                        fontFamily = fontRegular,
+                        color = GrayLight04
+                    )
+
+                }
+
+            }
+
+
+
+        }
+    }
+}
