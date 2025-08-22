@@ -338,6 +338,8 @@ and make a difference together!</string>
     <string name="txt_view">View</string>
     <string name="txt_download">Download</string>
     <string name="txt_coming_soon">Coming Soon…</string>
+    <string name="txt_not_downloadable">This certificate is not available for download</string>
+    <string name="txt_not_share">This certificate is not available for share</string>
     <string name="txt_cert_desc">Every certificate here is proof of your dedication and expertise. Keep learning, keep growing!</string>
     <string name="txt_Question">Questions</string>
     <string name="txt_35_Question">35 Questions</string>
@@ -462,5 +464,8 @@ and make a difference together!</string>
     <string name="txt_transfer_note">Note: Upon transfer, all other transfer requests for this student will be automatically canceled.</string>
     <string name="txt_confirm_transfer">Confirm Transfer</string>
     <string name="txt_confirm_dec">You are about to transfer this student to </string>
+    <string name="txt_et_first_name">Enter first name</string>
+    <string name="txt_et_last_name">Enter last name</string>
+    <string name="txt_date_birth">Enter your date of birth</string>
 
 </resources>
