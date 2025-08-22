@@ -1,10 +1,10 @@
-package com.pi.ProjectInclusion.data.model.authenticationModel.Response
+package com.pi.ProjectInclusion.data.model.authenticationModel.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class VerifyOtpResponse(
+data class SendOTPResponse(
     @SerialName("message")
     val message: String? = null,
 
@@ -15,18 +15,18 @@ data class VerifyOtpResponse(
     val status: Boolean? = null,
 
     @SerialName("response")
-    val response: LoginResponse? = null,
+    val response: OTPResponse? = null,
 
     ) {
     @Serializable
-    data class LoginResponse(
+    data class OTPResponse(
+        @SerialName("mobileNo")
+        val mobileNo: String? = null,
 
-        // token will come in case of Forget/Change/Reset password else empty
-        @SerialName("token")
-        val token: String? = null,
+        @SerialName("otp")
+        val otp: String? = null,
 
         @SerialName("message")
         val message: String? = null
-
         )
 }

@@ -211,7 +211,7 @@ fun OtpSendVerifyScreen(
             }
         }
 
-        // Handle login response state
+        // Handle login with otp response state
         LaunchedEffect(loginWithOtp) {
             when {
                 loginWithOtp.isLoading -> {

@@ -89,7 +89,7 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.COURSE
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.MODULE
 import com.pi.ProjectInclusion.constants.CustomDialog
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CertificateListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
 import com.pi.ProjectInclusion.ui.viewModel.DashboardViewModel
 import org.koin.androidx.compose.koinViewModel

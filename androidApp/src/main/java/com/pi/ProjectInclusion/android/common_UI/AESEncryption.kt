@@ -1,7 +1,9 @@
 package com.pi.ProjectInclusion.android.common_UI
 
+import android.R
 import javax.crypto.Cipher
 import android.util.Base64
+import androidx.compose.ui.res.stringResource
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
@@ -44,7 +46,8 @@ object AESEncryption {
 
     // Decrypt the provided encrypted text
     fun decrypt(
-        encryptedText: String, key: String = KEY,
+        encryptedText: String? = "Name",
+        key: String = KEY,
         initVector: String = INITVECTOR,
     ): String {
         try {

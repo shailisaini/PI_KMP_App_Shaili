@@ -2,7 +2,7 @@ package com.pi.ProjectInclusion.ui.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CertificateListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
 import com.pi.ProjectInclusion.database.LocalDataSource
 import com.pi.ProjectInclusion.domain.ConnectivityObserver
@@ -70,4 +70,5 @@ class DashboardViewModel(
                 )
             }
     }
+
 }

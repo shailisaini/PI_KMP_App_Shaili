@@ -84,8 +84,6 @@ class StudentDashboardActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
 
-            val colors = MaterialTheme.colorScheme
-            val navController = rememberNavController()
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
             val scope = rememberCoroutineScope()
             val coroutineScope = rememberCoroutineScope()
@@ -243,6 +241,7 @@ class StudentDashboardActivity : ComponentActivity() {
                                     AppRoute.CourseScreen.route -> LMSCourseHomeScreen()
 
                                     AppRoute.ProfileScreen.route -> ViewProfileScreen(
+                                        viewModel = viewModel,
                                         onNext = { navigateTo(AppRoute.EditProfileScreen.route) },
                                         onTrackRequest = { navigateTo(AppRoute.TrackRequestScreen.route) },
                                         onBackLogin = { navigateTo(AppRoute.UserNameScreen.route) },

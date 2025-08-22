@@ -2,15 +2,10 @@
 
 package com.pi.ProjectInclusion.android.screens.dashboardScreen
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.provider.MediaStore
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,7 +25,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -47,10 +41,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -75,9 +69,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.example.kmptemplate.logger.LoggerProvider
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Bg_Gray1
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.BorderBlue
@@ -85,7 +80,6 @@ import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Dark_02
 import com.pi.ProjectInclusion.Dark_03
 import com.pi.ProjectInclusion.Gray
-import com.pi.ProjectInclusion.GrayLight01
 import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.GrayLight04
 import com.pi.ProjectInclusion.LightText
@@ -96,9 +90,12 @@ import com.pi.ProjectInclusion.PrimaryBlue3
 import com.pi.ProjectInclusion.RedBgColor
 import com.pi.ProjectInclusion.RedText
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.AESEncryption.decrypt
+import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
 import com.pi.ProjectInclusion.android.common_UI.AccountDeleteDialog
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.CameraGalleryButtons
+import com.pi.ProjectInclusion.android.common_UI.CameraPermission
 import com.pi.ProjectInclusion.android.common_UI.DeleteAccountPasswordDialog
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.LogoutDialog
@@ -108,16 +105,18 @@ import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
-import com.pi.ProjectInclusion.constants.ConstantVariables.IMAGE_ALL_TYPE
-import com.pi.ProjectInclusion.constants.ConstantVariables.IMAGE_MIME
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
-import com.pi.ProjectInclusion.constants.ConstantVariables.JPG
-import com.pi.ProjectInclusion.constants.ConstantVariables.PI_DOCUMENT
+import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.LoginApiResponse
+import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlin.Unit
 
 @Composable
 fun ViewProfileScreen(
+    viewModel: LoginViewModel,
     onNext: () -> Unit,  //EnterUserProfileScreen
     onBackLogin: () -> Unit,
     onBack: () -> Unit,
@@ -126,38 +125,50 @@ fun ViewProfileScreen(
 
     var isDialogVisible by remember { mutableStateOf(false) }
 
-    val query by rememberSaveable {
-        mutableStateOf("")
-    }
-    var selectedIndex by remember { mutableStateOf<Int?>(null) }
-    val scrollState = rememberLazyGridState()
     val context = LocalContext.current
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
         message = "Loading your data..."
     )
-    val selectedLanguage = remember { mutableStateOf<String?>(null) }
-    val coroutineScope = rememberCoroutineScope()
-    var hasCameraPermission by remember { mutableStateOf(false) }
-
     var showDialog by remember { mutableStateOf(false) }
-    val cameraPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        hasCameraPermission = isGranted
-    }
-    if (hasCameraPermission) {
+    var languageId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
 
-    } else {
-        try {
-            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-        } catch (exc: Exception) {
-            // Handle exception
+    var encryptedUserName = viewModel.getPrefData(USER_NAME)
+
+
+    var hasAllPermissions = remember { mutableStateOf(false) }
+    CameraPermission(hasAllPermissions, context)
+    var profileData by remember { mutableStateOf<LoginApiResponse.LoginResponse?>(null) }
+
+    logger.d("Screen: " + "ViewProfileScreen()")
+
+    val sendOtpState by viewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
+    logger.d("OtpSendVerify: $languageId  .. $encryptedUserName")
+    viewModel.getUserProfileViewModel(encryptedUserName)
+
+    LaunchedEffect(sendOtpState) {
+        when {
+            sendOtpState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            sendOtpState.error.isNotEmpty() -> {
+                logger.d("ResendOtp: ${sendOtpState.success}")
+                isDialogVisible = false
+            }
+
+            sendOtpState.success != null -> {
+                logger.d("ResendOtp: ${sendOtpState.success}")
+                if (sendOtpState.success!!.status != true){
+                    profileData = sendOtpState.success!!.response
+//                    context.toast(sendOtpState.success!!.response!!.message.toString())
+                }
+                isDialogVisible = false
+            }
         }
     }
 
-    LoggerProvider.logger.d("Screen: " + "ViewProfileScreen()")
     Surface(
         modifier = Modifier.fillMaxWidth(), color = White
     ) {
@@ -168,7 +179,8 @@ fun ViewProfileScreen(
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            ProfileViewUI(context, onNext = onNext, onBack = onBack, onBackLogin = onBackLogin,onTrackRequest =onTrackRequest)
+            ProfileViewUI(context, onNext = onNext, onBack = onBack, onBackLogin = onBackLogin,
+                onTrackRequest =onTrackRequest, profileData = profileData,viewModel = viewModel)
         }
     }
 }
@@ -179,24 +191,17 @@ fun ProfileViewUI(
     onBack: () -> Unit,
     onBackLogin: () -> Unit,
     onNext: () -> Unit,
-    onTrackRequest: () -> Unit
+    onTrackRequest: () -> Unit,
+    profileData: LoginApiResponse.LoginResponse?,
+    viewModel: LoginViewModel,
 ) {
+
+    val decryptUserName = decrypt(profileData?.user?.username.toString().trim())
     val scrollState = rememberScrollState()
-    var isApiResponded by remember { mutableStateOf(false) }
-    val internetMessage by remember { mutableStateOf("") }
-
-    var isDialogVisible by remember { mutableStateOf(false) }
-    val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
-    val invalidMobNo = stringResource(id = R.string.text_enter_no)
-//  languageData[LanguageTranslationsResponse.KEY_INVALID_MOBILE_NO_ERROR].toString()
-    val txtContinue = stringResource(id = R.string.text_continue)
-    val tvMobNo = stringResource(id = R.string.text_mobile_no_user)
-
-    var mobNo = rememberSaveable { mutableStateOf("") }
-    var firstName = rememberSaveable { mutableStateOf("") }
     val textNameEg = stringResource(R.string.txt_eg_first_name)
     var showSheetMenu by remember { mutableStateOf(false) }
     var isChangeRequestBottomSheet by remember { mutableStateOf(false) }
+    var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
 
     if (showSheetMenu) {
         ProfileBottomSheetMenu(onBackLogin = onBackLogin) {
@@ -240,7 +245,7 @@ fun ProfileViewUI(
                     ProfileWithProgress(image = "", progress = 0.8f)
 
                     Text(
-                        text = textNameEg,
+                        text = decryptUserName,
                         fontSize = 19.sp,
                         fontFamily = fontBold,
                         color = Black,
@@ -249,7 +254,14 @@ fun ProfileViewUI(
                     )
 
                     Text(
-                        stringResource(R.string.txt_teacher),
+                        if (userTypeId == "7") {
+                            stringResource(R.string.txt_special_educator)
+                        } else if (userTypeId == "8") {
+                            stringResource(R.string.txt_Professional)
+                        } else{
+                            // teacher
+                            stringResource(R.string.txt_teacher)
+                        } ,
                         textAlign = TextAlign.Center,
                         fontSize = 13.sp,
                         fontFamily = fontMedium,
@@ -609,7 +621,8 @@ fun ProfileUI() {
     val onBackLogin: () -> Unit = {}
     val onBack: () -> Unit = {}
     val onTrackRequest: () -> Unit = {}
-    ProfileViewUI(context, onNext, onBack,onBackLogin,onTrackRequest)
+    var profileData by remember { mutableStateOf<LoginApiResponse.LoginResponse?>(null) }
+//    ProfileViewUI(context, onNext, onBack, onBackLogin, onTrackRequest, profileData)
 }
 
 @Preview

@@ -86,8 +86,8 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_MALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_OTHER
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetUserTypeResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -395,6 +395,7 @@ fun ProfileScreenUI(
                     hint = textNameEg.toString()
                 )
 
+                // Last Name
                 Text(
                     text = buildAnnotatedString {
                         append(stringResource(R.string.txt_last_name))
@@ -423,6 +424,7 @@ fun ProfileScreenUI(
                     hint = textLastNameEg.toString()
                 )
 
+                // Date of birth
                 Text(
                     text = buildAnnotatedString {
                         append(stringResource(R.string.txt_date_of_birth))
@@ -484,6 +486,7 @@ fun ProfileScreenUI(
                     }
                 }
 
+                // whatsapp
                 Text(
                     text = buildAnnotatedString {
                         append(stringResource(R.string.txt_whatsapp))
@@ -513,6 +516,7 @@ fun ProfileScreenUI(
                     hint = textWhatsappEg.toString()
                 )
 
+                // Email
                 Text(
                     text = buildAnnotatedString {
                         append(stringResource(R.string.txt_email))

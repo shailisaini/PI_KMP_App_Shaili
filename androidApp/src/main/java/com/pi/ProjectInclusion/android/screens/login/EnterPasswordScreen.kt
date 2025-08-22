@@ -53,7 +53,6 @@ import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.ChooseOneBottomSheet
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
-import com.pi.ProjectInclusion.android.common_UI.EncryptedCommonFunction.isEncryptedPhone
 import com.pi.ProjectInclusion.android.common_UI.OTPBtnUi
 import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
 import com.pi.ProjectInclusion.android.common_UI.SurfaceLine
@@ -69,7 +68,7 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.SUCCESS
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_MOBILE_NO
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetUserTypeResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel

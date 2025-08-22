@@ -1,7 +1,7 @@
 package com.pi.ProjectInclusion.domain.useCases
 
 import com.example.kmptemplate.logger.LoggerProvider.logger
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CertificateListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
 import com.pi.ProjectInclusion.domain.repository.DashboardRepository
 import kotlinx.coroutines.Dispatchers

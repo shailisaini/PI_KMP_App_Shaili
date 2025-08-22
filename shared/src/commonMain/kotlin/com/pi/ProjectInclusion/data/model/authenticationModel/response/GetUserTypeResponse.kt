@@ -1,4 +1,4 @@
-package com.pi.ProjectInclusion.data.model.authenticationModel.Response
+package com.pi.ProjectInclusion.data.model.authenticationModel.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -15,9 +15,8 @@ data class GetUserTypeResponse(
     val status: Boolean? = null,
 
     @SerialName("response")
-    val response: List<UserTypeResponse>? = null,
-
-    ) {
+    val response: List<UserTypeResponse>? = null)
+{
     @Serializable
     data class UserTypeResponse(
         @SerialName("id")

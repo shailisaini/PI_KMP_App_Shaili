@@ -3,16 +3,16 @@ package com.pi.ProjectInclusion.ui.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kmptemplate.logger.LoggerProvider
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CreateFirstStepProfileResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CreateRegisterPasswordResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ForgetPasswordResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.LoginApiResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.SendOTPResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateUserResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CreateFirstStepProfileResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CreateRegisterPasswordResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetLanguageListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.LoginApiResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SendOTPResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ValidateUserResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.VerifyOtpResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.VerifyOtpResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CreatePasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
-    private val getLanguageUsesCases: AuthenticationUsesCases,
+    private val getAuthViewModel: AuthenticationUsesCases,
     private val localData: LocalDataSource,
     private val connectivityObserver: ConnectivityObserver, //  to check network
 ) : ViewModel() {
@@ -60,6 +60,9 @@ class LoginViewModel(
 
     private val _uiStateLogin = MutableStateFlow(UiState<LoginApiResponse>())
     val uiStateLoginResponse: StateFlow<UiState<LoginApiResponse>> = _uiStateLogin
+
+    private val viewUserProfile = MutableStateFlow(UiState<LoginApiResponse>())
+    val viewUserProfileResponse: StateFlow<UiState<LoginApiResponse>> = viewUserProfile
 
     private val verifyLogin = MutableStateFlow(UiState<VerifyOtpResponse>())
     val verifyLoginResponse: StateFlow<UiState<VerifyOtpResponse>> = verifyLogin
@@ -92,7 +95,7 @@ class LoginViewModel(
     }
 
     fun getPrefData(key: String): String {
-        return localData.getValue(key, "")
+        return localData.getValue(key, "N/A")
     }
 
     init {
@@ -146,7 +149,7 @@ class LoginViewModel(
 
         _uiState.update { it.copy(isLoading = true, error = "") }
 
-        getLanguageUsesCases.getLanguage()
+        getAuthViewModel.getLanguage()
             .catch { exception ->
                 _uiState.update {
                     UiState(error = exception.message ?: somethingWentWrong)
@@ -178,7 +181,7 @@ class LoginViewModel(
         shouldRefreshUserType = false
 
         _uiStateUserType.update { UiState(isLoading = true) }
-        getLanguageUsesCases.getUserType()
+        getAuthViewModel.getUserType()
             .catch { exception ->
                 _uiStateUserType.update {
                     UiState(error = exception.message ?: somethingWentWrong)
@@ -202,7 +205,7 @@ class LoginViewModel(
         // no need to sync data
 
         _uiStateValidateUser.update { UiState(isLoading = true) }
-        getLanguageUsesCases.getValidateUserCase(userName, userTypeId)
+        getAuthViewModel.getValidateUserCase(userName, userTypeId)
             .catch { exception ->
                 _uiStateValidateUser.update {
                     UiState(error = exception.message ?: somethingWentWrong)
@@ -225,7 +228,7 @@ class LoginViewModel(
     fun loginWithPasswordViewModel(loginRequest: LoginRequest) = viewModelScope.launch {
 //        no need to data sync
         _uiStateLogin.update { UiState(isLoading = true) }
-        getLanguageUsesCases.getUserLoginPassword(loginRequest)
+        getAuthViewModel.getUserLoginPassword(loginRequest)
             .catch { exception ->
                 _uiStateLogin.update {
                     UiState(error = exception.message ?: somethingWentWrong)
@@ -248,7 +251,7 @@ class LoginViewModel(
     fun getOTPViewModel(mobNo: String) = viewModelScope.launch {
 //        no need to data sync
         _uiStateSendOtp.update { UiState(isLoading = true) }
-        getLanguageUsesCases.getOtpOnCall(mobNo)
+        getAuthViewModel.getOtpOnCall(mobNo)
             .catch { exception ->
                 _uiStateSendOtp.update {
                     UiState(error = exception.message ?: somethingWentWrong)
@@ -272,7 +275,7 @@ class LoginViewModel(
         // no need to sync data
 
         _uiStateSendOtp.update { UiState(isLoading = true) }
-        getLanguageUsesCases.getOTPOnWhatsapp(mobNo)
+        getAuthViewModel.getOTPOnWhatsapp(mobNo)
             .catch { exception ->
                 _uiStateSendOtp.update {
                     UiState(error = exception.message ?: somethingWentWrong)
@@ -297,7 +300,7 @@ class LoginViewModel(
         strToken: String,
     ) = viewModelScope.launch {
         forgetPassword.update { UiState(isLoading = true) }
-        getLanguageUsesCases.forgetPassword(passwordRequest, strToken)
+        getAuthViewModel.forgetPassword(passwordRequest, strToken)
             .catch { exception ->
                 forgetPassword.update {
                     UiState(error = exception.message ?: somethingWentWrong)
@@ -322,7 +325,7 @@ class LoginViewModel(
         strToken: String,
     ) = viewModelScope.launch {
         createRegPassword.update { UiState(isLoading = true) }
-        getLanguageUsesCases.createRegisterPassword(passwordRequest, strToken)
+        getAuthViewModel.createRegisterPassword(passwordRequest, strToken)
             .catch { exception ->
                 createRegPassword.update {
                     UiState(error = exception.message ?: somethingWentWrong)
@@ -346,7 +349,7 @@ class LoginViewModel(
         // no need to sync data
 
         verifyLogin.update { UiState(isLoading = true) }
-        getLanguageUsesCases.getVerifyOtp(mobNo, otpValue)
+        getAuthViewModel.getVerifyOtp(mobNo, otpValue)
             .catch { exception ->
                 verifyLogin.update {
                     UiState(error = exception.message ?: somethingWentWrong)
@@ -370,7 +373,7 @@ class LoginViewModel(
         // no need to sync data
 
         _uiStateLogin.update { UiState(isLoading = true) }
-        getLanguageUsesCases.getLoginWithOtp(request)
+        getAuthViewModel.getLoginWithOtp(request)
             .catch { exception ->
                 _uiStateLogin.update {
                     UiState(error = exception.message ?: somethingWentWrong)
@@ -390,12 +393,35 @@ class LoginViewModel(
             }
     }
 
+    fun getUserProfileViewModel(data: String) = viewModelScope.launch {
+        // no need to sync data
+        viewUserProfile.update { UiState(isLoading = true) }
+        getAuthViewModel.getViewUserProfile(data)
+            .catch { exception ->
+                viewUserProfile.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        viewUserProfile.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        viewUserProfile.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
     fun createFirstStepProfileRepo(
         firstStepProfileRequest: FirstStepProfileRequest,
         strToken: String,
     ) = viewModelScope.launch {
         firstStepProfilePassword.update { UiState(isLoading = true) }
-        getLanguageUsesCases.createFirstStepProfileRepo(firstStepProfileRequest, strToken)
+        getAuthViewModel.createFirstStepProfileRepo(firstStepProfileRequest, strToken)
             .catch { exception ->
                 firstStepProfilePassword.update {
                     UiState(error = exception.message ?: somethingWentWrong)

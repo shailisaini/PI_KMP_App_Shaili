@@ -1,16 +1,16 @@
 package com.pi.ProjectInclusion.domain.useCases
 
 import com.example.kmptemplate.logger.LoggerProvider
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CreateFirstStepProfileResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CreateRegisterPasswordResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ForgetPasswordResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.LoginApiResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.SendOTPResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateUserResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CreateFirstStepProfileResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CreateRegisterPasswordResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetLanguageListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.LoginApiResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SendOTPResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ValidateUserResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.VerifyOtpResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.VerifyOtpResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CreatePasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
@@ -137,6 +137,17 @@ class AuthenticationUsesCases(private val repository: AuthenticationRepository) 
     fun getLoginWithOtp(request: LoginWithOtpRequest): Flow<Result<LoginApiResponse>> = flow {
         try {
             val response = repository.getLoginWithOTPRepo(request)
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            LoggerProvider.logger.d("Exception in otpOnWhatsapp() $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getViewUserProfile(userName: String): Flow<Result<LoginApiResponse>> = flow {
+        try {
+            val response = repository.getUserProfileRepo(userName)
             emit(Result.success(response))
         } catch (e: Exception) {
             val errorMessage = e.message ?: unableToConnectServer

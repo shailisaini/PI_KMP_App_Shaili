@@ -65,8 +65,8 @@ import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.CustomDialog
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetLanguageListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetUserTypeResponse
 import kotlinx.coroutines.launch
 
 @Composable
@@ -75,7 +75,7 @@ fun EditProfileScreen2(onNext: () -> Unit,  //EditProfileScreen2
     var isDialogVisible by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    val userType = remember { mutableStateListOf<GetUserTypeResponse.UserTypeResponse>() }
+
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
