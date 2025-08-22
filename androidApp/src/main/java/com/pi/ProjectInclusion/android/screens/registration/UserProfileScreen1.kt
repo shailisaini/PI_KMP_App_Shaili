@@ -395,7 +395,6 @@ fun ProfileScreenUI(
                     hint = textNameEg.toString()
                 )
 
-                // Last Name
                 Text(
                     text = buildAnnotatedString {
                         append(stringResource(R.string.txt_last_name))
@@ -424,7 +423,6 @@ fun ProfileScreenUI(
                     hint = textLastNameEg.toString()
                 )
 
-                // Date of birth
                 Text(
                     text = buildAnnotatedString {
                         append(stringResource(R.string.txt_date_of_birth))
