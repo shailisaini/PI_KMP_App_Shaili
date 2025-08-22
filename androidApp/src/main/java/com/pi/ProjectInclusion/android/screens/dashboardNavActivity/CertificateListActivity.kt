@@ -1,9 +1,12 @@
 package com.pi.ProjectInclusion.android.screens.dashboardNavActivity
 
 import android.app.Activity
+import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -22,11 +25,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,9 +52,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat.startActivity
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.kmptemplate.logger.LoggerProvider
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.SvgDecoder
+import coil.request.ImageRequest
+import coil.size.Size
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Bg_Gray2
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.BorderBlue
@@ -72,6 +82,11 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.ALL
 import com.pi.ProjectInclusion.constants.ConstantVariables.COURSE
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.MODULE
+import com.pi.ProjectInclusion.constants.CustomDialog
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CertificateListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
+import com.pi.ProjectInclusion.ui.viewModel.DashboardViewModel
+import org.koin.androidx.compose.koinViewModel
 
 class CertificateListActivity : ComponentActivity() {
 
@@ -80,21 +95,23 @@ class CertificateListActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
             val context = LocalContext.current
+            val viewModel: DashboardViewModel = koinViewModel()
 
-            BackHandler{
+            BackHandler {
                 startActivity(
                     context, Intent(context, StudentDashboardActivity::class.java), null
                 ).apply { (context as? Activity)?.finish() }
             }
+
             MyApplicationTheme {
-                LoggerProvider.logger.d("Screen: CertificateListActivity()")
+                logger.d("Screen: CertificateListActivity()")
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(color = White),
                     verticalArrangement = Arrangement.Top
                 ) {
-                    ShowCertificateData(navController, context)
+                    ShowCertificateData(navController, context, viewModel)
                 }
             }
         }
@@ -102,12 +119,60 @@ class CertificateListActivity : ComponentActivity() {
 }
 
 @Composable
-fun ShowCertificateData(navController: NavHostController, context : Context) {
+fun ShowCertificateData(
+    navController: NavHostController,
+    context: Context,
+    viewModel: DashboardViewModel,
+) {
 
-    BackHandler{
+    BackHandler {
         startActivity(
             context, Intent(context, StudentDashboardActivity::class.java), null
         ).apply { (context as? Activity)?.finish() }
+    }
+
+    val certificateState by viewModel.getCertificateResponse.collectAsStateWithLifecycle()
+    var isDialogVisible by remember { mutableStateOf(false) }
+    var certificateData by remember { mutableStateOf(mutableListOf<CertificateListResponse.CertificateResponse>()) }
+
+    CustomDialog(
+        isVisible = isDialogVisible,
+        onDismiss = { isDialogVisible = false },
+        message = stringResource(R.string.txt_loading)
+    )
+
+    LaunchedEffect(Unit) {
+        isDialogVisible = true
+        val certificateRequest = CertificateRequest(2, 29185)
+        viewModel.getLMSUserCertificate(certificateRequest, "")
+    }
+
+    LaunchedEffect(certificateState) {
+        when {
+            certificateState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            certificateState.error.isNotEmpty() -> {
+                logger.d("Certificate Error: ${certificateState.error}")
+                isDialogVisible = false
+            }
+
+            certificateState.success != null -> {
+                logger.d("Certificate Response :- ${certificateState.success!!.response}")
+                if (certificateState.success!!.response != null) {
+                    if (certificateState.success!!.response?.size != 0) {
+                        certificateData = certificateState.success!!.response!!
+                        println("Certificate Data :- $certificateData")
+                    } else {
+                        context.toast(certificateState.success!!.message!!)
+                    }
+                } else {
+                    context.toast(certificateState.success!!.message!!)
+                }
+                isDialogVisible = false
+            }
+        }
     }
 
     Column(
@@ -141,8 +206,7 @@ fun ShowCertificateData(navController: NavHostController, context : Context) {
                     SectionDivider()
 
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(
                             modifier = Modifier
@@ -150,8 +214,7 @@ fun ShowCertificateData(navController: NavHostController, context : Context) {
                                 .padding(15.dp)
                         ) {
                             Row(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
@@ -159,8 +222,7 @@ fun ShowCertificateData(navController: NavHostController, context : Context) {
                                     fontSize = 19.sp,
                                     fontFamily = fontBold,
                                     color = Gray,
-                                    modifier = Modifier
-                                        .padding(top = 10.dp)
+                                    modifier = Modifier.padding(top = 10.dp)
                                 )
 
                                 Text(
@@ -168,8 +230,7 @@ fun ShowCertificateData(navController: NavHostController, context : Context) {
                                     fontSize = 19.sp,
                                     fontFamily = fontBold,
                                     color = BorderBlue,
-                                    modifier = Modifier
-                                        .padding(top = 10.dp, start = 5.dp)
+                                    modifier = Modifier.padding(top = 10.dp, start = 5.dp)
                                 )
                             }
 
@@ -178,12 +239,11 @@ fun ShowCertificateData(navController: NavHostController, context : Context) {
                                 fontSize = 13.sp,
                                 fontFamily = fontRegular,
                                 color = Gray,
-                                modifier = Modifier
-                                    .padding(vertical = 5.dp)
+                                modifier = Modifier.padding(vertical = 5.dp)
                             )
                         }
                         // Module/Courses Tab
-                        ThreeTabButtons()
+                        ThreeTabButtons(certificateData)
                     }
                 }
             })
@@ -191,7 +251,7 @@ fun ShowCertificateData(navController: NavHostController, context : Context) {
 }
 
 @Composable
-fun ThreeTabButtons() {
+fun ThreeTabButtons(certificateData: MutableList<CertificateListResponse.CertificateResponse>) {
     val tabTitles = listOf(ALL, MODULE, COURSE)
     var selectedTabIndex by remember { mutableStateOf(0) }
 
@@ -225,101 +285,68 @@ fun ThreeTabButtons() {
 
         // Tab content
         when (selectedTabIndex) {
-            0 ->
-                TabContent(selectedTabIndex, ALL)
+            0 -> TabContent(selectedTabIndex, ALL, certificateData)
 
-            1 ->
-                TabContent(selectedTabIndex, MODULE)
+            1 -> TabContent(selectedTabIndex, MODULE, certificateData)
 
-            2 ->
-                TabContent(selectedTabIndex, COURSE)
+            2 -> TabContent(selectedTabIndex, COURSE, certificateData)
 
         }
     }
 }
 
 @Composable
-fun TabContent(selectedTabIndex: Int, tabName: String) {
+fun TabContent(
+    selectedTabIndex: Int,
+    tabName: String,
+    certificateData: MutableList<CertificateListResponse.CertificateResponse>,
+) {
     var showFullScreen by remember { mutableStateOf(false) }
     val context = LocalContext.current
     var textComingSoon = stringResource(R.string.txt_coming_soon)
 
-    // Full Screen Image Dialog
-    if (showFullScreen) {
-        Dialog(onDismissRequest = { showFullScreen = false }) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Black),
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .padding(20.dp)
-                        .clickable {
-                            showFullScreen = false
-                        }
-                        .align(Alignment.TopEnd),
-                    painter = painterResource(id = R.drawable.close_img),
-                    contentDescription = IMG_DESCRIPTION
-                )
-                Image(
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.FillWidth,
-                    painter = painterResource(id = R.drawable.certificate),
-                    contentDescription = IMG_DESCRIPTION
-                )
-
-                Button(
-                    onClick = {
-                        context.toast(textComingSoon)
-                    }, modifier = Modifier
-                        .wrapContentWidth()
-                        .padding(20.dp)
-                        .align(Alignment.BottomCenter)
-                        .clip(RoundedCornerShape(4.dp)),
-
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = White,
-                        contentColor = BorderBlue
-                    )
-                ) {
-                    TextWithIconOnLeft(
-                        text = stringResource(R.string.txt_download),
-                        icon = ImageVector.vectorResource(id = R.drawable.ic_download),
-                        textColor = Black,
-                        textSize = 14.sp,
-                        iconColor = Color.Unspecified,
-                        onClick = {
-                            context.toast(textComingSoon)
-                        })
-                }
-            }
-        }
-    } else {
+    if (certificateData.size != 0) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(3) { index ->
+            items(items = certificateData) { item ->
                 Column(
                     modifier = Modifier
                         .padding(15.dp)
                         .fillMaxWidth()
                 ) {
+                    if (item.category.equals(tabName)) {
+                        Text(
+                            text = item.category.toString(),
+                            modifier = Modifier.padding(5.dp),
+                            color = if (selectedTabIndex == 2 || tabName == COURSE) {
+                                LightOrange2
+                            } else {
+                                TextPurple
+                            },
+                            fontSize = 15.sp,
+                            fontFamily = fontRegular
+                        )
+                    } else {
+                        Text(
+                            tabName,
+                            modifier = Modifier.padding(5.dp),
+                            color = if (selectedTabIndex == 2 || tabName == COURSE) {
+                                LightOrange2
+                            } else {
+                                TextPurple
+                            },
+                            fontSize = 15.sp,
+                            fontFamily = fontRegular
+                        )
+                    }
 
                     Text(
-                        tabName, modifier = Modifier.padding(5.dp),
-                        color = if (selectedTabIndex == 2 || tabName == COURSE) {
-                            LightOrange2
+                        text = if (item.moduleID == 0) {
+                            item.courseTitle.toString()
+                                ?: stringResource(R.string.txt_learning_difficulties)
                         } else {
-                            TextPurple
+                            item.moduleTitle.toString()
+                                ?: stringResource(R.string.txt_learning_difficulties)
                         },
-                        fontSize = 15.sp,
-                        fontFamily = fontRegular
-                    )
-
-                    Text(
-                        stringResource(R.string.txt_learning_difficulties),
                         modifier = Modifier.padding(5.dp),
                         color = Black,
                         fontFamily = fontBold,
@@ -336,7 +363,19 @@ fun TabContent(selectedTabIndex: Int, tabName: String) {
                                 .fillMaxSize()
                                 .height(220.dp),
                             contentScale = ContentScale.FillWidth,
-                            painter = painterResource(id = R.drawable.certificate),
+                            painter = if (item.certificatePath != null) {
+                                rememberAsyncImagePainter(
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data(item.certificatePath.toString())
+                                        .decoderFactory(SvgDecoder.Factory()) // Adds SVG support
+                                        .size(Size.ORIGINAL) // Use original or specify size
+                                        .placeholder(R.drawable.certificate)
+                                        .error(R.drawable.certificate)
+                                        .build()
+                                )
+                            } else {
+                                painterResource(R.drawable.certificate)
+                            },
                             contentDescription = IMG_DESCRIPTION
                         )
 
@@ -352,15 +391,15 @@ fun TabContent(selectedTabIndex: Int, tabName: String) {
                             Button(
                                 onClick = {
                                     showFullScreen = true
-                                }, modifier = Modifier
+                                },
+                                modifier = Modifier
                                     .wrapContentSize()
                                     .padding(end = 2.dp)
                                     .clip(RoundedCornerShape(8.dp)),
 
                                 shape = RoundedCornerShape(8.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = White,
-                                    contentColor = BorderBlue
+                                    containerColor = White, contentColor = BorderBlue
                                 )
                             ) {
                                 TextWithIconOnLeft(
@@ -376,15 +415,15 @@ fun TabContent(selectedTabIndex: Int, tabName: String) {
                             Button(
                                 onClick = {
                                     context.toast(textComingSoon)
-                                }, modifier = Modifier
+                                },
+                                modifier = Modifier
                                     .wrapContentWidth()
                                     .padding(end = 2.dp)
                                     .clip(RoundedCornerShape(4.dp)),
 
                                 shape = RoundedCornerShape(8.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = White,
-                                    contentColor = BorderBlue
+                                    containerColor = White, contentColor = BorderBlue
                                 )
                             ) {
                                 TextWithIconOnLeft(
@@ -394,19 +433,31 @@ fun TabContent(selectedTabIndex: Int, tabName: String) {
                                     textSize = 14.sp,
                                     iconColor = Color.Unspecified,
                                     onClick = {
-                                        context.toast(textComingSoon)
+                                        val filename =
+                                            "Course_certificate" + ((0..400).random()).toString()
+                                        downloadFileTest(
+                                            filename,
+                                            "Downloading",
+                                            if (item.appCertificatePath != null) {
+                                                item.appCertificatePath.toString()
+                                            } else {
+                                                ""
+                                            },
+                                            context
+                                        )
+//                                        context.toast(textComingSoon)
                                     })
                             }
                             Button(
                                 onClick = {
                                     context.toast(textComingSoon)
-                                }, modifier = Modifier
+                                },
+                                modifier = Modifier
                                     .wrapContentSize()
                                     .clip(RoundedCornerShape(8.dp)),
                                 shape = RoundedCornerShape(8.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = White,
-                                    contentColor = Black
+                                    containerColor = White, contentColor = Black
                                 )
                             ) {
                                 TextWithIconOnLeft(
@@ -421,6 +472,101 @@ fun TabContent(selectedTabIndex: Int, tabName: String) {
                         }
                     }
                 }
+                // Full Screen Image Dialog
+                if (showFullScreen) {
+                    ViewCertificate(item.appCertificatePath) {
+                        showFullScreen = false
+                    }
+                }
+            }
+        }
+    }
+}
+
+fun downloadFileTest(fileName: String, desc: String, url: String, context: Context) {
+    val request = DownloadManager.Request(Uri.parse(url))
+        .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
+        .setTitle(fileName)
+        .setDescription(desc)
+        .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+        .setAllowedOverMetered(true)
+        .setAllowedOverRoaming(false)
+        .setDestinationInExternalFilesDir(
+            context,
+            Environment.DIRECTORY_DOWNLOADS,
+            ".pdf"
+        )
+    val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+    val downloadIds = downloadManager.enqueue(request)
+}
+
+@Composable
+fun ViewCertificate(certificate: String?, showFullScreen: () -> Unit) {
+
+    val context = LocalContext.current
+    var textComingSoon = stringResource(R.string.txt_coming_soon)
+
+    Dialog(onDismissRequest = { showFullScreen() }) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Black),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(20.dp)
+                    .clickable {
+                        showFullScreen()
+                    }
+                    .align(Alignment.TopEnd),
+                painter = painterResource(id = R.drawable.close_img),
+                contentDescription = IMG_DESCRIPTION)
+
+            Image(
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.FillWidth,
+                painter = if (certificate != null) {
+                    rememberAsyncImagePainter(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(certificate.toString())
+                            .decoderFactory(SvgDecoder.Factory()) // Adds SVG support
+                            .size(Size.ORIGINAL) // Use original or specify size
+                            .placeholder(R.drawable.certificate)
+                            .error(R.drawable.certificate)
+                            .build()
+                    )
+                } else {
+                    painterResource(R.drawable.certificate)
+                },
+                contentDescription = IMG_DESCRIPTION
+            )
+
+            Button(
+                onClick = {
+                    context.toast(textComingSoon)
+                },
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .padding(20.dp)
+                    .align(Alignment.BottomCenter)
+                    .clip(RoundedCornerShape(4.dp)),
+
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = White, contentColor = BorderBlue
+                )
+            ) {
+                TextWithIconOnLeft(
+                    text = stringResource(R.string.txt_download),
+                    icon = ImageVector.vectorResource(id = R.drawable.ic_download),
+                    textColor = Black,
+                    textSize = 14.sp,
+                    iconColor = Color.Unspecified,
+                    onClick = {
+                        context.toast(textComingSoon)
+                    })
             }
         }
     }
@@ -431,5 +577,6 @@ fun TabContent(selectedTabIndex: Int, tabName: String) {
 fun UserCertificatesUI() {
     val navController = rememberNavController()
     val context = LocalContext.current
-    ShowCertificateData(navController, context)
+    val viewModel: DashboardViewModel = koinViewModel()
+    ShowCertificateData(navController, context, viewModel)
 }

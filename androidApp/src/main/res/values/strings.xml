@@ -80,7 +80,7 @@ and make a difference together!</string>
     <string name="txt_Resend_OTP">Resend OTP</string>
     <string name="txt_OTP_call">OTP on call</string>
     <string name="txt_change_user">You can change user type now. It locks after password creation.</string>
-    <string name="txt_Resend_otp_in">Resend otp in</string>
+    <string name="txt_Resend_otp_in">Resend OTP in</string>
     <string name="txt_Verify_proceed">Verify &amp; proceed</string>
     <string name="txt_Enter_valid_OTP">Please Enter valid OTP</string>
     <string name="txt_Enter_your_password">Enter your password</string>

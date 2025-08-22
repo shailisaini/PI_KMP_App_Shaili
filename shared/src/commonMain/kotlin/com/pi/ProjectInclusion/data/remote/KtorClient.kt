@@ -22,7 +22,7 @@ import io.ktor.http.path
 
 object KtorClient {
 
-    private val timeOut :Long = 3000
+    private val timeOut :Long = 10000
 
     val client = HttpClient {
             install(ContentNegotiation) {
@@ -45,7 +45,6 @@ object KtorClient {
                 override fun log(message: String) {
                     LoggerProvider.logger.d(message)
                 }
-
             }
         }
     }
