@@ -65,6 +65,7 @@ import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.ChangePasswo
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.FaqActivity
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.LMSCourseHomeScreen
 import com.pi.ProjectInclusion.android.screens.login.EnterUserNameScreen
+import com.pi.ProjectInclusion.android.screens.notification.NotificationScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.AdvanceScreening
 import com.pi.ProjectInclusion.android.screens.screeningScreen.AdvanceScreeningScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ProfilerFormPageScreen
@@ -298,6 +299,13 @@ class StudentDashboardActivity : ComponentActivity() {
                                         TrackRequestScreen(
                                             onNext = {},
                                             onBack = { navigateBack(AppRoute.ProfileScreen.route) }
+                                        )
+                                    }
+
+                                    AppRoute.NotificationScreen.route -> {
+                                        NotificationScreen(
+                                            onNext = {},
+                                            onBack = { navigateBack(AppRoute.DashboardScreen.route) }
                                         )
                                     }
 

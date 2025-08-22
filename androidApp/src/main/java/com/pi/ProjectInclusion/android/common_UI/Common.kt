@@ -219,7 +219,6 @@ fun ChooseOneBottomSheet(
             onDismiss()
         }, sheetState = sheetState
     ) {
-        // Sheet content
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -249,7 +248,10 @@ fun ChooseOneBottomSheet(
                         .wrapContentHeight()
                         .padding(horizontal = 10.dp)
                         .weight(1f)
-                        .clickable { onCallClick() },
+                        .clickable {
+                            onCallClick()
+                            onDismiss()
+                        },
                     colors = if (isSystemInDarkTheme()) {
                         CardDefaults.cardColors(Dark_01)
                     } else {
@@ -268,7 +270,10 @@ fun ChooseOneBottomSheet(
                         textColor = Black,
                         iconColor = Color.Unspecified,
                         modifier = Modifier.padding(10.dp),
-                        onClick = { onCallClick() })
+                        onClick = {
+                            onCallClick()
+                            onDismiss()
+                        })
                 }
                 Card(
                     shape = RoundedCornerShape(12.dp),
@@ -296,6 +301,7 @@ fun ChooseOneBottomSheet(
                         modifier = Modifier.padding(10.dp),
                         onClick = {
                             onWhatsappClick()
+                            onDismiss()
                         })
                 }
             }
@@ -1024,8 +1030,7 @@ fun OtpInputField(
         },
         visualTransformation = if (otpText.isNotEmpty()) {
             VisualTransformation.None
-        }
-        else {
+        } else {
             PasswordVisualTransformation(
                 '*'
             )
@@ -1156,7 +1161,7 @@ internal fun CharacterContainer(
                             Dark_03
                         } else {
                             LightBlue
-                            }
+                        }
                     } else {
                         if (isSystemInDarkTheme()) {
                             LightBlue
@@ -2411,10 +2416,14 @@ fun DropdownMenuUi(
             ) {
                 options.forEach { option ->
                     DropdownMenuItem(
-                        text = { Text(option,
-                            fontSize = 15.sp,
-                            fontFamily = fontSemiBold,
-                            color = Black) },
+                        text = {
+                            Text(
+                                option,
+                                fontSize = 15.sp,
+                                fontFamily = fontSemiBold,
+                                color = Black
+                            )
+                        },
                         onClick = {
                             onItemSelected(option)
                             selectedOption = option
@@ -3086,7 +3095,7 @@ fun SubmissionDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
 @Composable
 fun ThemeSwitch(
     isLightSelected: Boolean = false,
-    onToggle: (Boolean) -> Unit ={}
+    onToggle: (Boolean) -> Unit = {},
 ) {
     val backgroundColor = Bg_Gray2
     val selectedColor = White
@@ -3151,7 +3160,7 @@ fun ThemeSwitch(
 
 @Composable
 fun CameraGalleryButtons(
-    onImageUri: (Uri?) -> Unit
+    onImageUri: (Uri?) -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -3246,7 +3255,7 @@ fun CameraGalleryButtons(
 
 @Composable
 fun BottomSheetCameraGallery(
-    onImageUri: (Uri?) -> Unit
+    onImageUri: (Uri?) -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -3285,7 +3294,7 @@ fun BottomSheetCameraGallery(
         Column(
             modifier = Modifier
                 .wrapContentWidth()
-                .clickable{
+                .clickable {
                     val uri = createImageUri()
                     cameraImageUri.value = uri
                     uri?.let { cameraLauncher.launch(it) }
@@ -3314,7 +3323,7 @@ fun BottomSheetCameraGallery(
             modifier = Modifier
                 .wrapContentWidth()
                 .padding(start = 15.dp)
-                .clickable{
+                .clickable {
                     galleryLauncher.launch(IMAGE_ALL_TYPE)
                 },
             horizontalAlignment = Alignment.CenterHorizontally

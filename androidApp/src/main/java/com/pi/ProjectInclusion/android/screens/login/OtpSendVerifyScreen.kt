@@ -2,6 +2,7 @@ package com.pi.ProjectInclusion.android.screens.login
 
 import android.content.Intent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -62,6 +63,8 @@ import com.pi.ProjectInclusion.android.common_UI.EncryptedCommonFunction.isEncry
 import com.pi.ProjectInclusion.android.common_UI.OtpInputField
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
 import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
+import com.pi.ProjectInclusion.android.utils.fontBold
+import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.IS_COMING_FROM
@@ -79,7 +82,7 @@ import kotlinx.coroutines.delay
 fun OtpSendVerifyScreen(
     onNext: () -> Unit,
     onBack: () -> Unit,
-    viewModel: LoginViewModel
+    viewModel: LoginViewModel,
 ) {
     val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
     val verifyOtpState by viewModel.verifyLoginResponse.collectAsStateWithLifecycle()
@@ -159,7 +162,7 @@ fun OtpSendVerifyScreen(
 
             sendOtpState.success != null -> {
                 logger.d("ResendOtp: ${sendOtpState.success}")
-                if (sendOtpState.success!!.status != true){
+                if (sendOtpState.success!!.status != true) {
                     context.toast(sendOtpState.success!!.response!!.message.toString())
                 }
                 isDialogVisible = false
@@ -196,7 +199,7 @@ fun OtpSendVerifyScreen(
 
                 verifyOtpState.success != null -> {
                     logger.d("VerifyOtp: ${verifyOtpState.success!!.response!!.message}")
-                    if (verifyOtpState.success!!.status == true){
+                    if (verifyOtpState.success!!.status == true) {
                         onNext()
                     } else {
                         invalidText = R.string.txt_Enter_valid_OTP
@@ -216,12 +219,12 @@ fun OtpSendVerifyScreen(
                 }
 
                 loginWithOtp.error.isNotEmpty() -> {
-                   logger.d("Error: ${loginWithOtp.error}")
+                    logger.d("Error: ${loginWithOtp.error}")
                     isDialogVisible = false
                 }
 
                 loginWithOtp.success != null -> {
-                    if (loginWithOtp.success!!.status == true){
+                    if (loginWithOtp.success!!.status == true) {
                         context.toast(loginSuccess)
                         context.startActivity(
                             Intent(
@@ -229,8 +232,7 @@ fun OtpSendVerifyScreen(
                                 StudentDashboardActivity::class.java
                             )
                         )
-                    }
-                    else{
+                    } else {
 //                        invalidText = loginWithOtp.success!!.message.toString()
                         inValidOTP = true
                     }
@@ -293,55 +295,30 @@ fun OtpSendVerifyScreen(
                 }
 
                 if (isFinished) {
-                    Row(
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding()
-                            .padding(top = 16.dp, start = 16.dp, end = 16.dp),
-                        horizontalArrangement = Arrangement.Center
+                            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                     ) {
-                        TextWithIconOnLeft(
+                        Text(
                             text = stringResource(R.string.txt_Resend_OTP),
-                            icon = ImageVector.vectorResource(id = R.drawable.message_square),
-                            textColor = if (isSystemInDarkTheme()) {
+                            modifier = Modifier
+                                .padding(start = 12.dp, end = 12.dp, top = 16.dp)
+                                .fillMaxWidth()
+                                .clickable {
+                                    isFinished = false
+                                    showBottomSheet = true
+                                },
+                            fontFamily = fontBold,
+                            textAlign = TextAlign.Center,
+                            fontSize = 15.sp,
+                            color = if (isSystemInDarkTheme()) {
                                 INVITE_LIGHT_01
                             } else {
                                 PrimaryBlue
-                            },
-                            iconColor = if (isSystemInDarkTheme()) {
-                                INVITE_LIGHT_01
-                            } else {
-                                PrimaryBlue
-                            },
-                            modifier = Modifier.padding(top = 16.dp),
-                            onClick = {
-                                isFinished = false
-                                showBottomSheet = true
-                            })
-
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        TextWithIconOnLeft(
-                            text = stringResource(R.string.txt_OTP_call),
-                            icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
-                            textColor = if (isSystemInDarkTheme()) {
-                                INVITE_LIGHT_01
-                            } else {
-                                PrimaryBlue
-                            },
-                            iconColor = if (isSystemInDarkTheme()) {
-                                INVITE_LIGHT_01
-                            } else {
-                                PrimaryBlue
-                            },
-                            modifier = Modifier.padding(top = 16.dp),
-                            onClick = {
-                                isFinished = false
-//                            loginViewModel.setGradeReportPage("")
-//                            loginViewModel.setSelectedTabId(0)
-//                            loginViewModel.setGradeId("")
-//                            navHostController.navigate(AppRoute.TeacherQuizReports.route)
-                            })
+                            }
+                        )
                     }
                 } else {
                     CountdownTimer(
@@ -373,7 +350,6 @@ fun OtpSendVerifyScreen(
                         .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-
                     BtnUi(
                         stringResource(R.string.txt_Verify_proceed),
                         onClick = {

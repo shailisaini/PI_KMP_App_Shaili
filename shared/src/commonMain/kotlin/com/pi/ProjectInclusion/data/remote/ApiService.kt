@@ -1,5 +1,15 @@
 package com.pi.ProjectInclusion.data.remote
 
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CertificateListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CreateRegisterPasswordResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ForgetPasswordResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.LoginApiResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.SendOTPResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateUserResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.VerifyOtpResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CreateRegisterPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetLanguageListResponse
@@ -10,10 +20,12 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.ValidateU
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.VerifyOtpResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CreatePasswordRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.patch
@@ -31,7 +43,9 @@ class ApiService(private val client: HttpClient) {
         //    private val STUDENT_BASE_URL = "https://staging-api-pi.projectinclusion.in/api/"   // Production BASE URL
 //        const val STUDENT_BASE_URL = "https://student-api.auroscholar.org/api/"                         // Production
         const val STUDENT_BASE_URL = "https://staging-pi-api.projectinclusion.in/api/v2"
+        const val CERTIFICATE_BASE_URL = "https://lmsapi.projectinclusion.in/api"
         const val appendUser = "users"
+        const val appendCertificate = "Certificate"
     }
 
     suspend fun getLanguages(): GetLanguageListResponse = client.get {
@@ -173,6 +187,24 @@ class ApiService(private val client: HttpClient) {
             contentType(ContentType.Application.Json)
             setBody(changeRequest)
         }.body<CreateRegisterPasswordResponse>()
+
+    suspend fun getLMSUserCertificate(
+        certificateRequest: CertificateRequest,
+        strToken: String,
+    ): CertificateListResponse =
+        client.post {
+
+            url {
+                takeFrom(CERTIFICATE_BASE_URL)
+                appendPathSegments(appendCertificate, "GetLMSUserCertificate")
+            }
+            headers {
+                append(HttpHeaders.Accept, "application/json")
+//                append(HttpHeaders.Authorization, "Bearer $strToken")
+            }
+            contentType(ContentType.Application.Json)
+            setBody(certificateRequest)
+        }.body<CertificateListResponse>()
 
     // user Profile
     suspend fun getViewUserProfile(username : String): LoginApiResponse =

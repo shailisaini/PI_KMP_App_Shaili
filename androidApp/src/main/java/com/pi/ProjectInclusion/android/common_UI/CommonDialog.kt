@@ -72,6 +72,7 @@ import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight04
 import com.pi.ProjectInclusion.LightRed01
 import com.pi.ProjectInclusion.LightText
+import com.pi.ProjectInclusion.LightYellow2
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.RedLogout
 import com.pi.ProjectInclusion.android.R
@@ -1010,3 +1011,231 @@ fun AlreadyAssessedDialogPreview() {
         schoolName = stringResource(R.string.txt_dummy_school)
     )
 }
+
+@SuppressLint("UnusedBoxWithConstraintsScope")
+@Composable
+fun TransferConfirmationDialog(
+    studentName: String,
+    schoolName: String,
+    onCancel: () -> Unit = {},
+    onConfirmTransfer: () -> Unit = {}
+) {
+    Dialog(
+        onDismissRequest = { onCancel() },
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .padding(20.dp)
+                    .clip(RoundedCornerShape(21.dp))
+                    .background(if (isSystemInDarkTheme()) Dark_02 else White)
+                    .fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(vertical = 20.dp, horizontal = 15.dp)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    // Top Warning Icon
+                    Icon(
+                        painter = painterResource(id = R.drawable.warning_img),
+                        contentDescription = null,
+                        modifier = Modifier.size(70.dp),
+                        tint = Color.Unspecified
+                    )
+
+                    // Title
+                    Text(
+                        text = stringResource(R.string.txt_transfer_confirmation),
+                        modifier = Modifier.padding(top = 12.dp),
+                        fontFamily = fontBold,
+                        fontSize = 19.sp,
+                        color = Black,
+                        textAlign = TextAlign.Center
+                    )
+
+                    // Description
+                    Text(
+                        text = buildAnnotatedString {
+                            append(stringResource(R.string.txt_confirm_dec))
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = Black)) {
+                                append(" "+studentName)
+                            }
+                            append(" from ")
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = Black)) {
+                                append(schoolName)
+                            }
+                            append(".")
+                        },
+                        modifier = Modifier
+                            .padding(top = 6.dp)
+                            .fillMaxWidth(),
+                        fontFamily = fontRegular,
+                        fontSize = 15.sp,
+                        color = GrayLight04,
+                        textAlign = TextAlign.Center
+                    )
+
+                    // Warning Note Box
+                    Box(
+                        modifier = Modifier
+                            .padding(top = 15.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(LightYellow2)
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.txt_transfer_note),
+                            fontSize = 13.sp,
+                            fontFamily = fontRegular,
+                            color = GrayLight04,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+                    // Buttons
+                    Row(
+                        modifier = Modifier
+                            .padding(top = 20.dp, bottom = 10.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = { onCancel() },
+                            modifier = Modifier.weight(0.8f),
+                            shape = RoundedCornerShape(9.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = PrimaryBlue
+                            ),
+                            border = BorderStroke(1.dp, PrimaryBlue)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.txt_cancel),
+                                fontSize = 15.sp,
+                                fontFamily = fontMedium
+                            )
+                        }
+                        Button(
+                            onClick = { onConfirmTransfer() },
+                            modifier = Modifier.weight(1.2f),
+                            shape = RoundedCornerShape(9.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = PrimaryBlue,
+                                contentColor = White
+                            )
+                        ) {
+                            Text(
+                                text = stringResource(R.string.txt_confirm_transfer),
+                                fontSize = 15.sp,
+                                fontFamily = fontMedium,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun TransferConfirmationDialogPreview() {
+    TransferConfirmationDialog(
+        studentName = stringResource(R.string.txt_dummy_name),
+        schoolName = stringResource(R.string.txt_dummy_school)
+    )
+}
+
+@SuppressLint("UnusedBoxWithConstraintsScope")
+@Preview
+@Composable
+fun RequestSendDialog(onDismiss: () -> Unit = {}) {
+    Dialog(onDismissRequest = { onDismiss() },
+        properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .padding(20.dp)
+                    .clip(RoundedCornerShape(21.dp))
+                    .background(if (isSystemInDarkTheme()) Dark_02 else White)
+                    .fillMaxWidth()
+
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(vertical = 15.dp, horizontal = 9.dp)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.check_box),
+                        contentDescription = IMG_DESCRIPTION,
+                        modifier = Modifier.size(121.dp),
+                        tint = Color.Unspecified
+                    )
+
+                    Text(
+                        text = stringResource(R.string.txt_request_sent_head),
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .padding(top = 17.dp, start = 9.dp, end = 9.dp),
+                        fontFamily = fontBold,
+                        fontSize = 19.sp,
+                        color = Black,
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        text = stringResource(R.string.txt_request_sent_dec),
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .padding(top = 3.dp, start = 9.dp, end = 9.dp),
+                        fontFamily = fontRegular,
+                        fontSize = 15.sp,
+                        color = GrayLight04,
+                        textAlign = TextAlign.Center
+                    )
+                    Row(
+                        modifier = Modifier
+                            .padding(vertical = 15.dp, horizontal = 5.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Button(
+                            onClick = {
+                                onDismiss()
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .padding(end = 9.dp)
+                                .clip(RoundedCornerShape(9.dp)),
+                            shape = RoundedCornerShape(9.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = PrimaryBlue,
+                                contentColor = White
+                            ),
+                            border = BorderStroke(1.dp, BorderBlue)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.txt_Got_It),
+                                fontSize = 15.sp,
+                                fontFamily = fontMedium,
+                                color = White,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+

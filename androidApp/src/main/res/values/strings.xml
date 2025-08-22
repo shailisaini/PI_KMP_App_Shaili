@@ -54,6 +54,7 @@ and make a difference together!</string>
     <string name="user_profile">Teacher</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="track_request">Track Request</string>
+    <string name="notification_screen">Notification</string>
     <string name="nav_home">Home</string>
     <string name="nav_course">Courses</string>
     <string name="nav_screening">Screening</string>
@@ -79,7 +80,7 @@ and make a difference together!</string>
     <string name="txt_Resend_OTP">Resend OTP</string>
     <string name="txt_OTP_call">OTP on call</string>
     <string name="txt_change_user">You can change user type now. It locks after password creation.</string>
-    <string name="txt_Resend_otp_in">Resend otp in</string>
+    <string name="txt_Resend_otp_in">Resend OTP in</string>
     <string name="txt_Verify_proceed">Verify &amp; proceed</string>
     <string name="txt_Enter_valid_OTP">Please Enter valid OTP</string>
     <string name="txt_Enter_your_password">Enter your password</string>
@@ -150,6 +151,7 @@ and make a difference together!</string>
     <string name="txt_View_All">View All</string>
     <string name="txt_ScreeningReport_doc">ScreeningReport.doc</string>
     <string name="txt_date">28 July 2025</string>
+    <string name="txt_time">12:54 AM</string>
     <string name="txt_ScreeningReport_pdf">ScreeningReport.pdf</string>
     <string name="txt_ScreeningReport_jpg">ScreeningReport.jpg</string>
     <string name="txt_ScreeningReport_mp4">ScreeningReport.mp4</string>
@@ -449,6 +451,8 @@ and make a difference together!</string>
     <string name="txt_verify_otp">Verify OTP</string>
     <string name="txt_trans_success">Transfer Successful</string>
     <string name="txt_already_requested">Already requested</string>
+    <string name="txt_request_sent_head">Request sent successfully</string>
+    <string name="txt_request_sent_dec">Your request to transfer the student has been successfully submitted. You will be notified once the request is reviewed and accepted.</string>
     <string name="txt_already_requested_dec">You’ve already requested a transfer for this student. You will be notified if the transfer is approved </string>
     <string name="txt_trans_success_dec1">Your request to transfer </string>
     <string name="txt_trans_success_dec2">  is confirmed. Student has been assigned to you. </string>
@@ -458,4 +462,12 @@ and make a difference together!</string>
     <string name="txt_send_transfer_request">Request Transfer</string>
     <string name="txt_dummy_name">Prasad Mishra</string>
     <string name="txt_dummy_school">Kendriya Vidyalya, Delhi</string>
+
+    <string name="txt_transfer_confirmation">Transfer Confirmation</string>
+    <string name="txt_transfer_note">Note: Upon transfer, all other transfer requests for this student will be automatically canceled.</string>
+    <string name="txt_confirm_transfer">Confirm Transfer</string>
+    <string name="txt_confirm_dec">You are about to transfer this student to </string>
+    <string name="txt_noti_case_trans">has sent a student transfer request. </string>
+    <string name="txt_transfer">Transfer</string>
+
 </resources>
