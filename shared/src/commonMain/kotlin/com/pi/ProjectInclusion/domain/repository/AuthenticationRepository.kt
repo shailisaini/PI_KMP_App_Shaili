@@ -1,5 +1,6 @@
 package com.pi.ProjectInclusion.domain.repository
 
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CreateFirstStepProfileResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CreateRegisterPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
@@ -10,6 +11,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateU
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.VerifyOtpResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CreatePasswordRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
 
@@ -26,8 +28,14 @@ interface AuthenticationRepository {
         passwordRequest: ForgetPasswordRequest,
         strToken: String,
     ): ForgetPasswordResponse
+
     suspend fun createRegisterPasswordRepo(
         passwordRequest: CreatePasswordRequest,
         strToken: String,
     ): CreateRegisterPasswordResponse
+
+    suspend fun createFirstStepProfileRepo(
+        firstStepProfileRequest: FirstStepProfileRequest,
+        strToken: String,
+    ): CreateFirstStepProfileResponse
 }

@@ -87,6 +87,7 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_OTHER
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -96,7 +97,7 @@ fun EnterUserScreen1(
     onBack: () -> Unit,  //UserNameScreen
     onNextSpecialEdu: () -> Unit,
     onNextProfessional: () -> Unit,
-    viewModel: LoginViewModel
+    viewModel: LoginViewModel,
 ) {
     var isDialogVisible by remember { mutableStateOf(false) }
 //    val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
@@ -159,7 +160,8 @@ fun EnterUserScreen1(
             verticalArrangement = Arrangement.Top
         ) {
             ProfileScreenUI(
-                context, onBack = onBack,
+                context,
+                onBack = onBack,
                 onNextTeacher = onNextTeacher,
                 onNextProfessional = onNextProfessional,
                 onNextSpecialEdu = onNextSpecialEdu,
@@ -211,6 +213,10 @@ fun ProfileScreenUI(
     var date by remember { mutableStateOf("") }
     var selectedUri = remember { mutableStateOf<Uri?>(null) }
     var hasAllPermissions = remember { mutableStateOf(false) }
+    val selectedGender = remember { mutableStateOf("") }
+    val genderOptions = listOf(KEY_MALE, KEY_FEMALE, KEY_OTHER)
+    val strToken =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjR5QW9PaGdVQnJyOUVkdXVvbHFvSVE9PSIsInN1YiI6IjEiLCJpYXQiOjE3NTU3NzQ4NDcsImV4cCI6MTc1NTg2MTI0N30.bjqUtT6SSrMRpNO4EiLgh6VhnJp54deOPvQBrjzbTGo"
 
     CameraPermission(hasAllPermissions, context)
 
@@ -219,8 +225,7 @@ fun ProfileScreenUI(
             CameraGalleryDialog(selectedUri) {
                 isAddImageClicked = false
             }
-        }
-        else{
+        } else {
             context.toast(context.getString(R.string.txt_permission_grant))
             isAddImageClicked = false
         }
@@ -238,13 +243,14 @@ fun ProfileScreenUI(
             )
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
         ) {
             RegistrationHeader(
-                stringResource(R.string.txt_create_profile), Black,
-                stringResource(R.string.txt_step_1), OrangeSubTitle, onBackButtonClick = {
+                stringResource(R.string.txt_create_profile),
+                Black,
+                stringResource(R.string.txt_step_1),
+                OrangeSubTitle,
+                onBackButtonClick = {
                     onBack()
                 })
             Column(
@@ -259,25 +265,20 @@ fun ProfileScreenUI(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
-                        .padding(vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically
                 ) {
                     Image(
-                        modifier = Modifier
-                            .size(90.dp), // adjust the size as needed,
-                        painter =
-                            if (selectedUri.value != null) {
-                                rememberAsyncImagePainter(
-                                    ImageRequest.Builder(LocalContext.current)
-                                        .data(selectedUri.value)
-                                        .placeholder(R.drawable.profile_user_icon)
-                                        .crossfade(true) // Optional: Add a fade transition
-                                        .build()
-                                )
-                            } else {
-                                painterResource(id = R.drawable.profile_user_icon)
-                            },
-                        contentDescription = IMG_DESCRIPTION
+                        modifier = Modifier.size(90.dp), // adjust the size as needed,
+                        painter = if (selectedUri.value != null) {
+                            rememberAsyncImagePainter(
+                                ImageRequest.Builder(LocalContext.current).data(selectedUri.value)
+                                    .placeholder(R.drawable.profile_user_icon)
+                                    .crossfade(true) // Optional: Add a fade transition
+                                    .build()
+                            )
+                        } else {
+                            painterResource(id = R.drawable.profile_user_icon)
+                        }, contentDescription = IMG_DESCRIPTION
                     )
                     Column(
                         modifier = Modifier
@@ -291,8 +292,7 @@ fun ProfileScreenUI(
                             fontSize = 12.sp,
                             fontFamily = fontRegular,
                             color = Black,
-                            modifier = Modifier
-                                .padding(start = 10.dp, bottom = 5.dp)
+                            modifier = Modifier.padding(start = 10.dp, bottom = 5.dp)
                         )
 
                         Row(
@@ -302,13 +302,13 @@ fun ProfileScreenUI(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Button(
-                                onClick = { isAddImageClicked = true }, modifier = Modifier
+                                onClick = { isAddImageClicked = true },
+                                modifier = Modifier
                                     .wrapContentSize()
                                     .clip(RoundedCornerShape(4.dp)),
                                 shape = RoundedCornerShape(4.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = White,
-                                    contentColor = PrimaryBlue
+                                    containerColor = White, contentColor = PrimaryBlue
                                 ),
                                 border = BorderStroke(1.dp, color = PrimaryBlue)
                             ) {
@@ -327,8 +327,7 @@ fun ProfileScreenUI(
                                     fontSize = 12.sp,
                                     fontFamily = fontMedium,
                                     color = PrimaryBlue,
-                                    textAlign = TextAlign.Center
-                                )
+                                    textAlign = TextAlign.Center)
                             }
                             if (selectedUri.value != null) {
                                 Image(
@@ -339,8 +338,7 @@ fun ProfileScreenUI(
                                         }
                                         .padding(start = 10.dp),
                                     painter = painterResource(id = R.drawable.ic_delete_red),
-                                    contentDescription = IMG_DESCRIPTION
-                                )
+                                    contentDescription = IMG_DESCRIPTION)
                             }
                         }
                     }
@@ -377,9 +375,7 @@ fun ProfileScreenUI(
                         pop()
                     },
                     modifier = Modifier.padding(
-                        top = 24.dp,
-                        bottom = 10.dp,
-                        start = 8.dp, end = 8.dp
+                        top = 24.dp, bottom = 10.dp, start = 8.dp, end = 8.dp
                     ),
                     textAlign = TextAlign.Start,
                     fontFamily = fontMedium,
@@ -399,7 +395,6 @@ fun ProfileScreenUI(
                     hint = textNameEg.toString()
                 )
 
-                // Last Name
                 Text(
                     text = buildAnnotatedString {
                         append(stringResource(R.string.txt_last_name))
@@ -408,9 +403,7 @@ fun ProfileScreenUI(
                         pop()
                     },
                     modifier = Modifier.padding(
-                        top = 24.dp,
-                        bottom = 10.dp,
-                        start = 8.dp, end = 8.dp
+                        top = 24.dp, bottom = 10.dp, start = 8.dp, end = 8.dp
                     ),
                     textAlign = TextAlign.Start,
                     fontFamily = fontMedium,
@@ -430,7 +423,6 @@ fun ProfileScreenUI(
                     hint = textLastNameEg.toString()
                 )
 
-                // Date of birth
                 Text(
                     text = buildAnnotatedString {
                         append(stringResource(R.string.txt_date_of_birth))
@@ -439,9 +431,7 @@ fun ProfileScreenUI(
                         pop()
                     },
                     modifier = Modifier.padding(
-                        top = 24.dp,
-                        bottom = 10.dp,
-                        start = 8.dp, end = 8.dp
+                        top = 24.dp, bottom = 10.dp, start = 8.dp, end = 8.dp
                     ),
                     textAlign = TextAlign.Start,
                     fontFamily = fontMedium,
@@ -452,6 +442,7 @@ fun ProfileScreenUI(
                         Bg_Gray
                     }
                 )
+
                 TextFieldWithLeftIcon(
                     modifier = Modifier.clickable {
                         showDatePickerDialog(context) { year, month, dayOfMonth ->
@@ -464,10 +455,6 @@ fun ProfileScreenUI(
                     placeholder = if (date.isEmpty()) stringResource(R.string.select_date_of_birth) else date
                 )
 
-                // Gender
-                val selectedGender = remember { mutableStateOf("") }
-                val genderOptions = listOf(KEY_MALE, KEY_FEMALE, KEY_OTHER)
-
                 Text(
                     text = buildAnnotatedString {
                         append(stringResource(R.string.student_gender))
@@ -476,9 +463,7 @@ fun ProfileScreenUI(
                         pop()
                     },
                     modifier = Modifier.padding(
-                        top = 24.dp,
-                        bottom = 10.dp,
-                        start = 8.dp, end = 8.dp
+                        top = 24.dp, bottom = 10.dp, start = 8.dp, end = 8.dp
                     ),
                     textAlign = TextAlign.Start,
                     fontFamily = fontMedium,
@@ -489,17 +474,16 @@ fun ProfileScreenUI(
                         Bg_Gray
                     }
                 )
+
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     genderOptions.forEach { gender ->
                         GenderOption(
                             gender = gender,
                             isSelected = selectedGender.value == gender,
-                            onSelected = { selectedGender.value = gender }
-                        )
+                            onSelected = { selectedGender.value = gender })
                     }
                 }
 
-                // whatsapp
                 Text(
                     text = buildAnnotatedString {
                         append(stringResource(R.string.txt_whatsapp))
@@ -508,9 +492,7 @@ fun ProfileScreenUI(
                         pop()
                     },
                     modifier = Modifier.padding(
-                        top = 24.dp,
-                        bottom = 10.dp,
-                        start = 8.dp, end = 8.dp
+                        top = 24.dp, bottom = 10.dp, start = 8.dp, end = 8.dp
                     ),
                     textAlign = TextAlign.Start,
                     fontFamily = fontMedium,
@@ -521,6 +503,7 @@ fun ProfileScreenUI(
                         Bg_Gray
                     }
                 )
+
                 MobileTextField(
                     isIcon = true,
                     icon = ImageVector.vectorResource(id = R.drawable.ic_whatsapp_otp),
@@ -530,7 +513,6 @@ fun ProfileScreenUI(
                     hint = textWhatsappEg.toString()
                 )
 
-                // Email
                 Text(
                     text = buildAnnotatedString {
                         append(stringResource(R.string.txt_email))
@@ -539,9 +521,7 @@ fun ProfileScreenUI(
                         pop()
                     },
                     modifier = Modifier.padding(
-                        top = 24.dp,
-                        bottom = 10.dp,
-                        start = 8.dp, end = 8.dp
+                        top = 24.dp, bottom = 10.dp, start = 8.dp, end = 8.dp
                     ),
                     textAlign = TextAlign.Start,
                     fontFamily = fontMedium,
@@ -588,37 +568,56 @@ fun ProfileScreenUI(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(color = White)
-                        .wrapContentHeight(),
-                    horizontalAlignment = Alignment.End
+                        .wrapContentHeight(), horizontalAlignment = Alignment.End
                 ) {
                     SmallBtnUi(
                         enabled = mobNo.value.length >= 10,
                         title = txtContinue,
                         onClick = {
-                            if (mobNo.value.isEmpty()) {
+                            if (mobNo.value.isEmpty() || mobNo.value.length < 10) {
                                 inValidMobNo = true
+                            } else if (firstName.value.toString().isEmpty()) {
+                                context.toast("Enter first name")
+                            } else if (lastName.value.toString().isEmpty()) {
+                                context.toast("Enter last name")
+                            } else if (date.toString().isEmpty()) {
+                                context.toast("Enter your date of birth")
+                            } else if (selectedGender.value.toString().isEmpty()) {
+                                context.toast("Select your gender")
+                            } else if (whatsappNo.value.toString().isEmpty()) {
+                                context.toast("Enter your whatsApp number")
+                            } else if (email.value.toString().isEmpty()) {
+                                context.toast("Enter your email")
                             } else {
-                                if (showError || mobNo.value.length < 10) {
-                                    inValidMobNo = true
-                                } else { // if first digit of mobile is less than 6 then error will show
-                                    showError = mobNo.value.isEmpty()
-                                    val firstDigitChar = mobNo.value.toString().first()
-                                    val firstDigit = firstDigitChar.digitToInt()
-                                    if (firstDigit < 6) {
-                                        inValidMobNo = true
-                                    } else {
-                                        isDialogVisible = true
-                                        if (viewModel.getPrefData(USER_TYPE_ID) == "7") {
-                                            onNextSpecialEdu()
-                                        } else if (viewModel.getPrefData(USER_TYPE_ID) == "8") {
-                                            onNextProfessional()
-                                        } else if (viewModel.getPrefData(USER_TYPE_ID) == "3") {
-                                            // teacher
-                                            onNextTeacher()
-                                        } else {
-                                            // reviewer
-                                        }
-                                    }
+                                if (mobNo.value.length == 10) {
+                                    inValidMobNo = false
+                                } else {
+                                    isDialogVisible = true
+                                    val firstStepProfileRequest = FirstStepProfileRequest(
+                                        firstName.value.toString(),
+                                        "",
+                                        lastName.value.toString(),
+                                        selectedGender.value.toString(),
+                                        mobNo.value.toString(),
+                                        whatsappNo.value.toString(),
+                                        date.toString(),
+                                        email.value.toString()
+                                    )
+                                    viewModel.createFirstStepProfileRepo(
+                                        firstStepProfileRequest,
+                                        strToken
+                                    )
+
+//                                    if (viewModel.getPrefData(USER_TYPE_ID) == "7") {
+//                                        onNextSpecialEdu()
+//                                    } else if (viewModel.getPrefData(USER_TYPE_ID) == "8") {
+//                                        onNextProfessional()
+//                                    } else if (viewModel.getPrefData(USER_TYPE_ID) == "3") {
+//                                        // teacher
+//                                        onNextTeacher()
+//                                    } else {
+//                                        // reviewer
+//                                    }
                                 }
                             }
                         },

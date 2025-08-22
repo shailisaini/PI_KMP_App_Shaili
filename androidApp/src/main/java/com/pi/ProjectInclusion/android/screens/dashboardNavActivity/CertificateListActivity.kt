@@ -1,5 +1,6 @@
 package com.pi.ProjectInclusion.android.screens.dashboardNavActivity
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DownloadManager
 import android.content.Context
@@ -7,6 +8,9 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -50,6 +54,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -74,6 +79,7 @@ import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.SectionDivider
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
 import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
+import com.pi.ProjectInclusion.android.screens.dashboardScreen.WebViewState
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
@@ -143,7 +149,7 @@ fun ShowCertificateData(
 
     LaunchedEffect(Unit) {
         isDialogVisible = true
-        val certificateRequest = CertificateRequest(2, 29185)
+        val certificateRequest = CertificateRequest(2, 270)
         viewModel.getLMSUserCertificate(certificateRequest, "")
     }
 
@@ -295,6 +301,7 @@ fun ThreeTabButtons(certificateData: MutableList<CertificateListResponse.Certifi
     }
 }
 
+@SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun TabContent(
     selectedTabIndex: Int,
@@ -303,41 +310,32 @@ fun TabContent(
 ) {
     var showFullScreen by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    var textComingSoon = stringResource(R.string.txt_coming_soon)
+    var textNotDownloadable = stringResource(R.string.txt_not_downloadable)
+    var textNotShare = stringResource(R.string.txt_not_share)
 
-    if (certificateData.size != 0) {
+    val filteredList = certificateData.filter {
+        it.category!!.contains(tabName, ignoreCase = true)
+    }
+
+    if (filteredList.size != 0) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(items = certificateData) { item ->
+            items(items = filteredList) { item ->
                 Column(
                     modifier = Modifier
                         .padding(15.dp)
                         .fillMaxWidth()
                 ) {
-                    if (item.category.equals(tabName)) {
-                        Text(
-                            text = item.category.toString(),
-                            modifier = Modifier.padding(5.dp),
-                            color = if (selectedTabIndex == 2 || tabName == COURSE) {
-                                LightOrange2
-                            } else {
-                                TextPurple
-                            },
-                            fontSize = 15.sp,
-                            fontFamily = fontRegular
-                        )
-                    } else {
-                        Text(
-                            tabName,
-                            modifier = Modifier.padding(5.dp),
-                            color = if (selectedTabIndex == 2 || tabName == COURSE) {
-                                LightOrange2
-                            } else {
-                                TextPurple
-                            },
-                            fontSize = 15.sp,
-                            fontFamily = fontRegular
-                        )
-                    }
+                    Text(
+                        text = item.category.toString(),
+                        modifier = Modifier.padding(5.dp),
+                        color = if (selectedTabIndex == 2 || tabName == COURSE) {
+                            LightOrange2
+                        } else {
+                            TextPurple
+                        },
+                        fontSize = 15.sp,
+                        fontFamily = fontRegular
+                    )
 
                     Text(
                         text = if (item.moduleID == 0) {
@@ -350,7 +348,7 @@ fun TabContent(
                         modifier = Modifier.padding(5.dp),
                         color = Black,
                         fontFamily = fontBold,
-                        fontSize = 19.sp
+                        fontSize = 14.sp
                     )
 
                     Box(
@@ -370,8 +368,7 @@ fun TabContent(
                                         .decoderFactory(SvgDecoder.Factory()) // Adds SVG support
                                         .size(Size.ORIGINAL) // Use original or specify size
                                         .placeholder(R.drawable.certificate)
-                                        .error(R.drawable.certificate)
-                                        .build()
+                                        .error(R.drawable.certificate).build()
                                 )
                             } else {
                                 painterResource(R.drawable.certificate)
@@ -414,7 +411,233 @@ fun TabContent(
                             }
                             Button(
                                 onClick = {
-                                    context.toast(textComingSoon)
+                                    if (item.isDownloadAvailable.toString() == "NO") {
+                                        context.toast(textNotDownloadable)
+                                    } else {
+                                        val filename =
+                                            "Course_certificate" + ((0..400).random()).toString()
+                                        downloadFileTest(
+                                            filename,
+                                            "Downloading",
+                                            if (item.appCertificatePath != null) {
+                                                item.appCertificatePath.toString()
+                                            } else {
+                                                ""
+                                            },
+                                            context
+                                        )
+                                    }
+                                },
+                                modifier = Modifier
+                                    .wrapContentWidth()
+                                    .padding(end = 2.dp)
+                                    .clip(RoundedCornerShape(4.dp)),
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = White, contentColor = BorderBlue
+                                )
+                            ) {
+                                TextWithIconOnLeft(
+                                    text = stringResource(R.string.txt_download),
+                                    icon = ImageVector.vectorResource(id = R.drawable.ic_download),
+                                    textColor = Black,
+                                    textSize = 14.sp,
+                                    iconColor = Color.Unspecified,
+                                    onClick = {
+                                        if (item.isDownloadAvailable.toString() == "NO") {
+                                            context.toast(textNotDownloadable)
+                                        } else {
+                                            val filename =
+                                                "Course_certificate" + ((0..400).random()).toString()
+                                            downloadFileTest(
+                                                filename,
+                                                "Downloading",
+                                                if (item.appCertificatePath != null) {
+                                                    item.appCertificatePath.toString()
+                                                } else {
+                                                    ""
+                                                },
+                                                context
+                                            )
+                                        }
+                                    })
+                            }
+
+                            Button(
+                                onClick = {
+                                    if (item.isDownloadAvailable.toString() == "NO") {
+                                        context.toast(textNotShare)
+                                    } else {
+                                        val sendIntent = Intent().apply {
+                                            action = Intent.ACTION_SEND
+                                            putExtra(
+                                                Intent.EXTRA_TEXT,
+                                                item.appCertificatePath.toString()
+                                            )
+                                            type = "text/plain"
+                                        }
+                                        val shareIntent =
+                                            Intent.createChooser(sendIntent, "Share via")
+                                        context.startActivity(shareIntent)
+                                    }
+                                },
+                                modifier = Modifier
+                                    .wrapContentSize()
+                                    .clip(RoundedCornerShape(8.dp)),
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = White, contentColor = Black
+                                )
+                            ) {
+                                TextWithIconOnLeft(
+                                    text = "",
+                                    icon = ImageVector.vectorResource(id = R.drawable.ic_share),
+                                    textColor = BorderBlue,
+                                    iconColor = Black,
+                                    onClick = {
+                                        if (item.isDownloadAvailable.toString() == "NO") {
+                                            context.toast(textNotShare)
+                                        } else {
+                                            val sendIntent = Intent().apply {
+                                                action = Intent.ACTION_SEND
+                                                putExtra(
+                                                    Intent.EXTRA_TEXT,
+                                                    item.appCertificatePath.toString()
+                                                )
+                                                type = "text/plain"
+                                            }
+                                            val shareIntent =
+                                                Intent.createChooser(sendIntent, "Share via")
+                                            context.startActivity(shareIntent)
+                                        }
+                                    })
+                            }
+                        }
+                    }
+                }
+
+                // Full Screen Image Dialog
+                if (showFullScreen) {
+                    ViewCertificate(
+                        item.certificatePath,
+                        item.isDownloadAvailable,
+                        item.appCertificatePath
+                    ) {
+                        showFullScreen = false
+                    }
+                }
+            }
+        }
+    } else {
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            items(items = certificateData) { item ->
+                Column(
+                    modifier = Modifier
+                        .padding(15.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        text = item.category.toString(),
+                        modifier = Modifier.padding(5.dp),
+                        color = if (selectedTabIndex == 2 || tabName == COURSE) {
+                            LightOrange2
+                        } else {
+                            TextPurple
+                        },
+                        fontSize = 15.sp,
+                        fontFamily = fontRegular
+                    )
+
+                    Text(
+                        text = if (item.moduleID == 0) {
+                            item.courseTitle.toString()
+                                ?: stringResource(R.string.txt_learning_difficulties)
+                        } else {
+                            item.moduleTitle.toString()
+                                ?: stringResource(R.string.txt_learning_difficulties)
+                        },
+                        modifier = Modifier.padding(5.dp),
+                        color = Black,
+                        fontFamily = fontBold,
+                        fontSize = 14.sp
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(8.dp))
+                    ) {
+                        Image(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .height(220.dp),
+                            contentScale = ContentScale.FillWidth,
+                            painter = if (item.certificatePath != null) {
+                                rememberAsyncImagePainter(
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data(item.certificatePath.toString())
+                                        .decoderFactory(SvgDecoder.Factory()) // Adds SVG support
+                                        .size(Size.ORIGINAL) // Use original or specify size
+                                        .placeholder(R.drawable.certificate)
+                                        .error(R.drawable.certificate).build()
+                                )
+                            } else {
+                                painterResource(R.drawable.certificate)
+                            },
+                            contentDescription = IMG_DESCRIPTION
+                        )
+
+                        Row(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .background(Transparent)
+                                .fillMaxWidth()
+                                .padding(4.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.Bottom
+                        ) {
+                            Button(
+                                onClick = {
+                                    showFullScreen = true
+                                },
+                                modifier = Modifier
+                                    .wrapContentSize()
+                                    .padding(end = 2.dp)
+                                    .clip(RoundedCornerShape(8.dp)),
+
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = White, contentColor = BorderBlue
+                                )
+                            ) {
+                                TextWithIconOnLeft(
+                                    text = stringResource(R.string.txt_view),
+                                    icon = ImageVector.vectorResource(id = R.drawable.ic_expand),
+                                    textColor = Black,
+                                    textSize = 14.sp,
+                                    iconColor = Color.Unspecified,
+                                    onClick = {
+                                        showFullScreen = true
+                                    })
+                            }
+                            Button(
+                                onClick = {
+                                    if (item.isDownloadAvailable.toString() == "NO") {
+                                        context.toast(textNotDownloadable)
+                                    } else {
+                                        val filename =
+                                            "Course_certificate" + ((0..400).random()).toString()
+                                        downloadFileTest(
+                                            filename,
+                                            "Downloading",
+                                            if (item.appCertificatePath != null) {
+                                                item.appCertificatePath.toString()
+                                            } else {
+                                                ""
+                                            },
+                                            context
+                                        )
+                                    }
                                 },
                                 modifier = Modifier
                                     .wrapContentWidth()
@@ -433,24 +656,42 @@ fun TabContent(
                                     textSize = 14.sp,
                                     iconColor = Color.Unspecified,
                                     onClick = {
-                                        val filename =
-                                            "Course_certificate" + ((0..400).random()).toString()
-                                        downloadFileTest(
-                                            filename,
-                                            "Downloading",
-                                            if (item.appCertificatePath != null) {
-                                                item.appCertificatePath.toString()
-                                            } else {
-                                                ""
-                                            },
-                                            context
-                                        )
-//                                        context.toast(textComingSoon)
+                                        if (item.isDownloadAvailable.toString() == "NO") {
+                                            context.toast(textNotDownloadable)
+                                        } else {
+                                            val filename =
+                                                "Course_certificate" + ((0..400).random()).toString()
+                                            downloadFileTest(
+                                                filename,
+                                                "Downloading",
+                                                if (item.appCertificatePath != null) {
+                                                    item.appCertificatePath.toString()
+                                                } else {
+                                                    ""
+                                                },
+                                                context
+                                            )
+                                        }
                                     })
                             }
+
                             Button(
                                 onClick = {
-                                    context.toast(textComingSoon)
+                                    if (item.isDownloadAvailable.toString() == "NO") {
+                                        context.toast(textNotShare)
+                                    } else {
+                                        val sendIntent = Intent().apply {
+                                            action = Intent.ACTION_SEND
+                                            putExtra(
+                                                Intent.EXTRA_TEXT,
+                                                item.appCertificatePath.toString()
+                                            )
+                                            type = "text/plain"
+                                        }
+                                        val shareIntent =
+                                            Intent.createChooser(sendIntent, "Share via")
+                                        context.startActivity(shareIntent)
+                                    }
                                 },
                                 modifier = Modifier
                                     .wrapContentSize()
@@ -466,15 +707,34 @@ fun TabContent(
                                     textColor = BorderBlue,
                                     iconColor = Black,
                                     onClick = {
-                                        context.toast(textComingSoon)
+                                        if (item.isDownloadAvailable.toString() == "NO") {
+                                            context.toast(textNotShare)
+                                        } else {
+                                            val sendIntent = Intent().apply {
+                                                action = Intent.ACTION_SEND
+                                                putExtra(
+                                                    Intent.EXTRA_TEXT,
+                                                    item.appCertificatePath.toString()
+                                                )
+                                                type = "text/plain"
+                                            }
+                                            val shareIntent =
+                                                Intent.createChooser(sendIntent, "Share via")
+                                            context.startActivity(shareIntent)
+                                        }
                                     })
                             }
                         }
                     }
                 }
+
                 // Full Screen Image Dialog
                 if (showFullScreen) {
-                    ViewCertificate(item.appCertificatePath) {
+                    ViewCertificate(
+                        item.certificatePath,
+                        item.isDownloadAvailable,
+                        item.appCertificatePath
+                    ) {
                         showFullScreen = false
                     }
                 }
@@ -486,25 +746,24 @@ fun TabContent(
 fun downloadFileTest(fileName: String, desc: String, url: String, context: Context) {
     val request = DownloadManager.Request(Uri.parse(url))
         .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
-        .setTitle(fileName)
-        .setDescription(desc)
+        .setTitle(fileName).setDescription(desc)
         .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-        .setAllowedOverMetered(true)
-        .setAllowedOverRoaming(false)
-        .setDestinationInExternalFilesDir(
-            context,
-            Environment.DIRECTORY_DOWNLOADS,
-            ".pdf"
+        .setAllowedOverMetered(true).setAllowedOverRoaming(false).setDestinationInExternalFilesDir(
+            context, Environment.DIRECTORY_DOWNLOADS, ".pdf"
         )
     val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
     val downloadIds = downloadManager.enqueue(request)
 }
 
 @Composable
-fun ViewCertificate(certificate: String?, showFullScreen: () -> Unit) {
-
+fun ViewCertificate(
+    certificate: String?,
+    isDownload: String?,
+    certificateDownloadPath: String?,
+    showFullScreen: () -> Unit,
+) {
     val context = LocalContext.current
-    var textComingSoon = stringResource(R.string.txt_coming_soon)
+    var textNotDownloadable = stringResource(R.string.txt_not_downloadable)
 
     Dialog(onDismissRequest = { showFullScreen() }) {
         Box(
@@ -533,8 +792,7 @@ fun ViewCertificate(certificate: String?, showFullScreen: () -> Unit) {
                             .data(certificate.toString())
                             .decoderFactory(SvgDecoder.Factory()) // Adds SVG support
                             .size(Size.ORIGINAL) // Use original or specify size
-                            .placeholder(R.drawable.certificate)
-                            .error(R.drawable.certificate)
+                            .placeholder(R.drawable.certificate).error(R.drawable.certificate)
                             .build()
                     )
                 } else {
@@ -545,7 +803,18 @@ fun ViewCertificate(certificate: String?, showFullScreen: () -> Unit) {
 
             Button(
                 onClick = {
-                    context.toast(textComingSoon)
+                    if (isDownload == "NO") {
+                        context.toast(textNotDownloadable)
+                    } else {
+                        val filename =
+                            "Course_certificate" + ((0..400).random()).toString()
+                        downloadFileTest(
+                            filename,
+                            "Downloading",
+                            certificateDownloadPath?.toString() ?: "",
+                            context
+                        )
+                    }
                 },
                 modifier = Modifier
                     .wrapContentWidth()
@@ -565,7 +834,18 @@ fun ViewCertificate(certificate: String?, showFullScreen: () -> Unit) {
                     textSize = 14.sp,
                     iconColor = Color.Unspecified,
                     onClick = {
-                        context.toast(textComingSoon)
+                        if (isDownload == "NO") {
+                            context.toast(textNotDownloadable)
+                        } else {
+                            val filename =
+                                "Course_certificate" + ((0..400).random()).toString()
+                            downloadFileTest(
+                                filename,
+                                "Downloading",
+                                certificateDownloadPath?.toString() ?: "",
+                                context
+                            )
+                        }
                     })
             }
         }

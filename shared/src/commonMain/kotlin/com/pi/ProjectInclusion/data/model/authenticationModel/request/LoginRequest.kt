@@ -14,7 +14,7 @@ data class LoginRequest(
 data class LoginWithOtpRequest(
     val username: String? = null,
     val otp: String? = null,
-    val userTypeId: Int? = null
+    val userTypeId: Int? = null,
 )
 
 @Serializable
@@ -44,4 +44,16 @@ data class CreatePasswordRequest(
 data class CertificateRequest(
     val partnerID: Int? = null,
     val piUserID: Int? = null,
+)
+
+@Serializable
+data class FirstStepProfileRequest(
+    val firstname: String? = null,
+    val middlename: String? = null,
+    val lastname: String? = null,
+    val gender: String? = null,
+    val mobile: String? = null,
+    val whatsapp: String? = null,
+    val dob: String? = null,
+    val email: String? = null,
 )
