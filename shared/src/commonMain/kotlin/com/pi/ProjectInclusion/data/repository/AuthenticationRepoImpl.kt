@@ -1,5 +1,13 @@
 package com.pi.ProjectInclusion.data.repository
 
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CreateFirstStepProfileResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CreateRegisterPasswordResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ForgetPasswordResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.LoginApiResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.SendOTPResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateUserResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CreateRegisterPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetLanguageListResponse
@@ -10,6 +18,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.ValidateU
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.VerifyOtpResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CreatePasswordRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
 import com.pi.ProjectInclusion.data.remote.ApiService
@@ -64,6 +73,13 @@ class AuthenticationRepoImpl(private val apiService: ApiService) : Authenticatio
 
     override suspend fun getUserProfileRepo(userName: String): LoginApiResponse {
         return apiService.getViewUserProfile(userName)
+    }
+
+    override suspend fun createFirstStepProfileRepo(
+        firstStepProfileRequest: FirstStepProfileRequest,
+        strToken: String,
+    ): CreateFirstStepProfileResponse {
+        return apiService.createFirstStepProfile(firstStepProfileRequest, strToken)
     }
 }
 

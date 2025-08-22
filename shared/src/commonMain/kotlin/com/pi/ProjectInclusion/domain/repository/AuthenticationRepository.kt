@@ -7,9 +7,18 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetUserTy
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.LoginApiResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SendOTPResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ValidateUserResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CreateFirstStepProfileResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CreateRegisterPasswordResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ForgetPasswordResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetUserTypeResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.LoginApiResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.SendOTPResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ValidateUserResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.VerifyOtpResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CreatePasswordRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
 
@@ -27,8 +36,14 @@ interface AuthenticationRepository {
         passwordRequest: ForgetPasswordRequest,
         strToken: String,
     ): ForgetPasswordResponse
+
     suspend fun createRegisterPasswordRepo(
         passwordRequest: CreatePasswordRequest,
         strToken: String,
     ): CreateRegisterPasswordResponse
+
+    suspend fun createFirstStepProfileRepo(
+        firstStepProfileRequest: FirstStepProfileRequest,
+        strToken: String,
+    ): CreateFirstStepProfileResponse
 }

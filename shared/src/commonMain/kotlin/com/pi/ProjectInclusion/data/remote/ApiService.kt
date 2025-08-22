@@ -1,6 +1,7 @@
 package com.pi.ProjectInclusion.data.remote
 
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CertificateListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CreateFirstStepProfileResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.CreateRegisterPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.Response.GetLanguageListResponse
@@ -20,12 +21,15 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.ValidateU
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.VerifyOtpResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CreatePasswordRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.patch
@@ -218,4 +222,53 @@ class ApiService(private val client: HttpClient) {
                 append(HttpHeaders.Accept, "application/json")
             }
         }.body<LoginApiResponse>()
+
+    suspend fun createFirstStepProfile(
+        firstStepProfileRequest: FirstStepProfileRequest,
+        strToken: String,
+//        file: File? = null,
+    ): CreateFirstStepProfileResponse =
+        client.post {
+
+            url {
+                takeFrom(STUDENT_BASE_URL)
+                appendPathSegments(appendUser, "update-basic-profile")
+            }
+            headers {
+                append(HttpHeaders.Accept, "application/json")
+                append(HttpHeaders.Authorization, "Bearer $strToken")
+            }
+            contentType(ContentType.Application.Json)
+            setBody(
+                MultiPartFormDataContent(
+                formData {
+                    append("firstname", firstStepProfileRequest.firstname.toString())
+                    append("middlename", firstStepProfileRequest.email.toString())
+                    append("lastname", firstStepProfileRequest.mobile.toString())
+                    append("gender", firstStepProfileRequest.mobile.toString())
+                    append("mobile", firstStepProfileRequest.mobile.toString())
+                    append("whatsapp", firstStepProfileRequest.mobile.toString())
+                    append("dob", firstStepProfileRequest.mobile.toString())
+                    append("email", firstStepProfileRequest.mobile.toString())
+
+                    // Example: Add file (if provided)
+                    /*file?.let {
+                        append(
+                            key = "profilepic", // <-- key expected by backend
+                            value = it.readBytes(),
+                            headers = Headers.build {
+                                append(
+                                    HttpHeaders.ContentType,
+                                    ContentType.Image.JPEG.toString()
+                                )
+                                append(
+                                    HttpHeaders.ContentDisposition,
+                                    "filename=${it.name}"
+                                )
+                            }
+                        )
+                    }*/
+                }
+            ))
+        }.body<CreateFirstStepProfileResponse>()
 }

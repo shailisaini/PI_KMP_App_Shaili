@@ -128,6 +128,7 @@ class LoginNavigationScreen : ComponentActivity() {
                             // for register & activate
                             onRegister = {
                                 navigateTo(AppRoute.OtpSendVerifyUI.route)
+//                                navigateTo(AppRoute.EnterUserProfileScreen.route)
                             },
 
                             onBack = { navigateBack(AppRoute.UserTypeSelect.route) }
