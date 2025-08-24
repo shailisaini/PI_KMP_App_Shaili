@@ -419,9 +419,11 @@ class LoginViewModel(
     fun createFirstStepProfileRepo(
         firstStepProfileRequest: FirstStepProfileRequest,
         strToken: String,
+        profilePic: ByteArray? = null,
+        fileName: String? = null
     ) = viewModelScope.launch {
         firstStepProfilePassword.update { UiState(isLoading = true) }
-        getAuthViewModel.createFirstStepProfileRepo(firstStepProfileRequest, strToken)
+        getAuthViewModel.createFirstStepProfileRepo(firstStepProfileRequest, strToken, profilePic, fileName)
             .catch { exception ->
                 firstStepProfilePassword.update {
                     UiState(error = exception.message ?: somethingWentWrong)

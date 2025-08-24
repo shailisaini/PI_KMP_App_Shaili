@@ -1833,6 +1833,7 @@ fun CustomCircularImageViewWithBorder(
 
 @Composable
 fun TextFieldWithLeftIcon(
+    text : String = "",
     modifier: Modifier = Modifier,
     value: MutableState<String> = remember { mutableStateOf("") },
     placeholder: String = stringResource(R.string.enter_here),
@@ -1876,7 +1877,12 @@ fun TextFieldWithLeftIcon(
                     .padding(start = 7.dp)
             )
             Text(
-                text = placeholder,
+                text =  if (text.isEmpty()){
+                    placeholder
+                }
+                else{
+                    text
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
@@ -1884,10 +1890,20 @@ fun TextFieldWithLeftIcon(
                 color = if (isSystemInDarkTheme()) {
                     DARK_DEFAULT_BUTTON_TEXT
                 } else {
-                    Black
+                    if (text.isEmpty()) {
+                        BodyTextLight
+                    }
+                    else{
+                        Black
+                    }
                 },
                 fontSize = 14.sp,
-                fontFamily = fontSemiBold
+                fontFamily = if (text.isEmpty()) {
+                    fontRegular
+                }
+                else {
+                    fontSemiBold
+                }
             )
         }
     }

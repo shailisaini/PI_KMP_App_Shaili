@@ -159,9 +159,11 @@ class AuthenticationUsesCases(private val repository: AuthenticationRepository) 
     fun createFirstStepProfileRepo(
         firstStepProfileRequest: FirstStepProfileRequest,
         strToken: String,
+        profilePic: ByteArray? = null,
+        fileName: String? = null
     ): Flow<Result<CreateFirstStepProfileResponse>> = flow {
         try {
-            val response = repository.createFirstStepProfileRepo(firstStepProfileRequest, strToken)
+            val response = repository.createFirstStepProfileRepo(firstStepProfileRequest, strToken, profilePic, fileName)
             emit(Result.success(response))
         } catch (e: Exception) {
             val errorMessage = e.message ?: unableToConnectServer

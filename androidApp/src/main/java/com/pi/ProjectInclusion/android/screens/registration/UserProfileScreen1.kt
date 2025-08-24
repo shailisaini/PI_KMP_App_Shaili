@@ -84,7 +84,6 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_FEMALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_MALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_OTHER
-import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetUserTypeResponse
@@ -446,6 +445,7 @@ fun ProfileScreenUI(
                 )
 
                 TextFieldWithLeftIcon(
+                    text = "",
                     modifier = Modifier.clickable {
                         showDatePickerDialog(context) { year, month, dayOfMonth ->
                             date = "$year-${
@@ -609,7 +609,7 @@ fun ProfileScreenUI(
                                     )
                                     viewModel.createFirstStepProfileRepo(
                                         firstStepProfileRequest,
-                                        strToken
+                                        strToken,""
                                     )
 
 //                                    if (viewModel.getPrefData(USER_TYPE_ID) == "7") {
