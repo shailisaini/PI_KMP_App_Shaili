@@ -476,4 +476,10 @@ and make a difference together!</string>
     <string name="txt_date_birth">Enter your date of birth</string>
     <string name="key_Reset">Reset</string>
 
+    <string name="txt_first_noti">Transfer request for</string>
+    <string name="txt_mid_noti">Abhishek Naidu, a Class 5</string>
+    <string name="txt_last_noti">has been accepted.</string>
+    <string name="txt_case_transfer">Case-Transfer</string>
+
+
 </resources>

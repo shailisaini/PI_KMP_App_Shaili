@@ -8,6 +8,9 @@ data class TrackListModel(
     @SerialName("name")
     val name: String? = null,
 
+    @SerialName("title")
+    val title: String,
+
     @SerialName("reviewStatus")
     val reviewStatus: String,
 
