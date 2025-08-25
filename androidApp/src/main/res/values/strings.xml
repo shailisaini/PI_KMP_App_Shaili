@@ -474,5 +474,6 @@ and make a difference together!</string>
     <string name="txt_et_first_name">Enter first name</string>
     <string name="txt_et_last_name">Enter last name</string>
     <string name="txt_date_birth">Enter your date of birth</string>
+    <string name="key_Reset">Reset</string>
 
 </resources>

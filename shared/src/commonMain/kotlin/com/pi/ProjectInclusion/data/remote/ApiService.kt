@@ -16,6 +16,12 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.CreatePass
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByUdiseCodeResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpTimeout
@@ -39,11 +45,14 @@ class ApiService(private val client: HttpClient) {
 //        const val STUDENT_BASE_URL = "https://student-api.auroscholar.org/api/"                         // Production
         const val STUDENT_BASE_URL = "https://staging-pi-api.projectinclusion.in/api/v2"
         const val CERTIFICATE_BASE_URL = "https://lmsapi.projectinclusion.in/api"
+        const val BASIC_LIVE_BASE_URL = "https://api-pi.projectinclusion.in"
+        const val SCHOOL_LIVE_BASE_URL = "https://api-school.projectinclusion.in"
         const val appendUser = "users"
         const val appendCertificate = "Certificate"
+        const val appendLive = "api"
     }
 
-    suspend fun getLanguages():     GetLanguageListResponse = client.get {
+    suspend fun getLanguages(): GetLanguageListResponse = client.get {
         url {
             takeFrom(STUDENT_BASE_URL)
             appendPathSegments("language", "get-all") // end points
@@ -202,7 +211,7 @@ class ApiService(private val client: HttpClient) {
         }.body<CertificateListResponse>()
 
     // user Profile
-    suspend fun getViewUserProfile(username : String): LoginApiResponse =
+    suspend fun getViewUserProfile(username: String): LoginApiResponse =
         client.get {
             url {
                 takeFrom(STUDENT_BASE_URL)
@@ -232,34 +241,107 @@ class ApiService(private val client: HttpClient) {
             contentType(ContentType.Application.Json)
             setBody(
                 MultiPartFormDataContent(
-                formData {
-                    append("firstname", firstStepProfileRequest.firstname.toString())
-                    append("middlename", firstStepProfileRequest.email.toString())
-                    append("lastname", firstStepProfileRequest.mobile.toString())
-                    append("gender", firstStepProfileRequest.mobile.toString())
-                    append("mobile", firstStepProfileRequest.mobile.toString())
-                    append("whatsapp", firstStepProfileRequest.mobile.toString())
-                    append("dob", firstStepProfileRequest.mobile.toString())
-                    append("email", firstStepProfileRequest.mobile.toString())
+                    formData {
+                        append("firstname", firstStepProfileRequest.firstname.toString())
+                        append("middlename", firstStepProfileRequest.email.toString())
+                        append("lastname", firstStepProfileRequest.mobile.toString())
+                        append("gender", firstStepProfileRequest.mobile.toString())
+                        append("mobile", firstStepProfileRequest.mobile.toString())
+                        append("whatsapp", firstStepProfileRequest.mobile.toString())
+                        append("dob", firstStepProfileRequest.mobile.toString())
+                        append("email", firstStepProfileRequest.mobile.toString())
 
-                    // Example: Add file (if provided)
-                    /*file?.let {
-                        append(
-                            key = "profilepic", // <-- key expected by backend
-                            value = it.readBytes(),
-                            headers = Headers.build {
-                                append(
-                                    HttpHeaders.ContentType,
-                                    ContentType.Image.JPEG.toString()
-                                )
-                                append(
-                                    HttpHeaders.ContentDisposition,
-                                    "filename=${it.name}"
-                                )
-                            }
-                        )
-                    }*/
-                }
-            ))
+                        // Example: Add file (if provided)
+                        /*file?.let {
+                            append(
+                                key = "profilepic", // <-- key expected by backend
+                                value = it.readBytes(),
+                                headers = Headers.build {
+                                    append(
+                                        HttpHeaders.ContentType,
+                                        ContentType.Image.JPEG.toString()
+                                    )
+                                    append(
+                                        HttpHeaders.ContentDisposition,
+                                        "filename=${it.name}"
+                                    )
+                                }
+                            )
+                        }*/
+                    }
+                ))
+        }.body<CreateFirstStepProfileResponse>()
+
+    suspend fun getAllStateList(): List<StateListResponse> =
+        client.get {
+            url {
+                takeFrom(BASIC_LIVE_BASE_URL)
+                appendPathSegments(appendLive, "State")
+            }
+            headers {
+                append(HttpHeaders.Accept, "application/json")
+            }
+        }.body<List<StateListResponse>>()
+
+    suspend fun getAllDistrictByStateId(stateId: Int): List<DistrictListResponse> =
+        client.get {
+            url {
+                takeFrom(BASIC_LIVE_BASE_URL)
+                appendPathSegments(appendLive, "District/GetDistrictByState/${stateId}")
+            }
+            headers {
+                append(HttpHeaders.Accept, "application/json")
+            }
+        }.body<List<DistrictListResponse>>()
+
+    suspend fun getAllBlockByDistrictId(districtId: Int): List<BlockListResponse> =
+        client.get {
+            url {
+                takeFrom(BASIC_LIVE_BASE_URL)
+                appendPathSegments(appendLive, "Block/GetBlockByDistrict/${districtId}")
+            }
+            headers {
+                append(HttpHeaders.Accept, "application/json")
+            }
+        }.body<List<BlockListResponse>>()
+
+    suspend fun getAllSchoolsByBlockId(blockId: Int): SchoolListResponse =
+        client.get {
+            url {
+                takeFrom(SCHOOL_LIVE_BASE_URL)
+                appendPathSegments(appendLive, "SchoolMaster/GetSchoolsByBlockId/${blockId}")
+            }
+            headers {
+                append(HttpHeaders.Accept, "application/json")
+            }
+        }.body<SchoolListResponse>()
+
+    suspend fun getAllDetailsByUdiseId(udiseCode: String): SchoolByUdiseCodeResponse =
+        client.get {
+            url {
+                takeFrom(SCHOOL_LIVE_BASE_URL)
+                appendPathSegments(appendLive, "SchoolMaster/GetSchoolByUdiseCode")
+                parameters.append("udiseCode", udiseCode)
+            }
+            headers {
+                append(HttpHeaders.Accept, "application/json")
+            }
+        }.body<SchoolByUdiseCodeResponse>()
+
+    suspend fun createProfessionalProfile(
+        professionalProfileRequest: ProfessionalProfileRequest,
+        strToken: String,
+    ): CreateFirstStepProfileResponse =
+        client.post {
+            url {
+                takeFrom(STUDENT_BASE_URL)
+                appendPathSegments(appendUser, "update-professional-profile")
+            }
+            headers {
+                append(HttpHeaders.Accept, "application/json")
+                append(HttpHeaders.Authorization, "Bearer $strToken")
+            }
+            contentType(ContentType.Application.Json)
+            setBody(professionalProfileRequest)
         }.body<CreateFirstStepProfileResponse>()
 }
