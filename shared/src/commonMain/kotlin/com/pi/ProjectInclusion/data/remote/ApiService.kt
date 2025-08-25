@@ -33,6 +33,7 @@ import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
+import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.appendPathSegments
 import io.ktor.http.contentType
@@ -226,9 +227,10 @@ class ApiService(private val client: HttpClient) {
     suspend fun createFirstStepProfile(
         firstStepProfileRequest: FirstStepProfileRequest,
         strToken: String,
-//        file: File? = null,
+        profilePic: ByteArray? = null,
+        fileName: String? = null
     ): CreateFirstStepProfileResponse =
-        client.post {
+        client.patch {
 
             url {
                 takeFrom(STUDENT_BASE_URL)
@@ -236,40 +238,35 @@ class ApiService(private val client: HttpClient) {
             }
             headers {
                 append(HttpHeaders.Accept, "application/json")
-                append(HttpHeaders.Authorization, "Bearer $strToken")
+                append(HttpHeaders.Authorization, strToken)
             }
             contentType(ContentType.Application.Json)
             setBody(
                 MultiPartFormDataContent(
-                    formData {
-                        append("firstname", firstStepProfileRequest.firstname.toString())
-                        append("middlename", firstStepProfileRequest.email.toString())
-                        append("lastname", firstStepProfileRequest.mobile.toString())
-                        append("gender", firstStepProfileRequest.mobile.toString())
-                        append("mobile", firstStepProfileRequest.mobile.toString())
-                        append("whatsapp", firstStepProfileRequest.mobile.toString())
-                        append("dob", firstStepProfileRequest.mobile.toString())
-                        append("email", firstStepProfileRequest.mobile.toString())
-
-                        // Example: Add file (if provided)
-                        /*file?.let {
-                            append(
-                                key = "profilepic", // <-- key expected by backend
-                                value = it.readBytes(),
-                                headers = Headers.build {
-                                    append(
-                                        HttpHeaders.ContentType,
-                                        ContentType.Image.JPEG.toString()
-                                    )
-                                    append(
-                                        HttpHeaders.ContentDisposition,
-                                        "filename=${it.name}"
-                                    )
-                                }
-                            )
-                        }*/
+                formData {
+                    append("firstname", firstStepProfileRequest.firstname.toString())
+                    append("middlename", firstStepProfileRequest.email.toString())
+                    append("lastname", firstStepProfileRequest.mobile.toString())
+                    append("gender", firstStepProfileRequest.mobile.toString())
+                    append("mobile", firstStepProfileRequest.mobile.toString())
+                    append("whatsapp", firstStepProfileRequest.mobile.toString())
+                    append("dob", firstStepProfileRequest.mobile.toString())
+                    append("email", firstStepProfileRequest.mobile.toString())
+                    profilePic?.let { bytes ->
+                        append(
+                            key = "profilepic", //params Name
+                            value = bytes,
+                            headers = Headers.build {
+                                append(HttpHeaders.ContentType, ContentType.Image.PNG.toString())
+                                append(
+                                    HttpHeaders.ContentDisposition,
+                                    "form-data; name=\"profilepic\"; filename=\"${fileName ?: "profile.jpg"}\""
+                                )
+                            }
+                        )
                     }
-                ))
+                }
+            ))
         }.body<CreateFirstStepProfileResponse>()
 
     suspend fun getAllStateList(): List<StateListResponse> =

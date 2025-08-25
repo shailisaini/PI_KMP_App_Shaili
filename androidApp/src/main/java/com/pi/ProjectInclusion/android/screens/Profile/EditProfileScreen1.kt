@@ -1,6 +1,8 @@
 package com.pi.ProjectInclusion.android.screens.Profile
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -29,10 +31,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -83,10 +83,17 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_FEMALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_MALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_OTHER
 import com.pi.ProjectInclusion.constants.CustomDialog
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
+import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import java.io.ByteArrayOutputStream
 
 @Composable
 fun EditProfileScreen1(onNext: () -> Unit,  //EditProfileScreen2
-                       onBack: () -> Unit) {
+                       onBack: () -> Unit,
+                       loginViewModel: LoginViewModel) {
     var isDialogVisible by remember { mutableStateOf(false) }
 //    val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -115,7 +122,7 @@ fun EditProfileScreen1(onNext: () -> Unit,  //EditProfileScreen2
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            EditProfileScreenUI(context, onBack = onBack, onNext = onNext)
+            EditProfileScreenUI(context, onBack = onBack, loginViewModel = loginViewModel, onNext = onNext)
         }
     }
 }
@@ -124,19 +131,14 @@ fun EditProfileScreen1(onNext: () -> Unit,  //EditProfileScreen2
 fun EditProfileScreenUI(
     context: Context,
     onBack: () -> Unit,
+    loginViewModel: LoginViewModel,
     onNext: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
-    val coroutineScope = rememberCoroutineScope()
     val isInternetAvailable by remember { mutableStateOf(true) }
-    var isApiResponded by remember { mutableStateOf(false) }
-    val internetMessage by remember { mutableStateOf("") }
 
     var isDialogVisible by remember { mutableStateOf(false) }
-    var selectedIndex by remember { mutableStateOf<Int?>(null) }
-
-    val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
     val invalidMobNo = stringResource(id = R.string.text_enter_no)
 //  languageData[LanguageTranslationsResponse.KEY_INVALID_MOBILE_NO_ERROR].toString()
     val txtContinue = stringResource(id = R.string.text_continue)
@@ -156,21 +158,43 @@ fun EditProfileScreenUI(
     var showError by remember { mutableStateOf(false) }
     var inValidMobNo by remember { mutableStateOf(false) }
     var date by remember { mutableStateOf("") }
+    var strToken by remember { mutableStateOf("") }
     var isAddImageClicked by remember { mutableStateOf(false) }
 
     var selectedUri = remember { mutableStateOf<Uri?>(null) }
     var hasAllPermissions = remember { mutableStateOf(false) }
 
+    // Gender
+    val selectedGender = remember { mutableStateOf("") }
+    val genderOptions = listOf(KEY_MALE, KEY_FEMALE, KEY_OTHER)
+    var byteArray: ByteArray? = null
+    var fileName: String? = null
+    lateinit var bitmap: Bitmap
+
     CameraPermission(hasAllPermissions, context)
 
     if (isAddImageClicked) {
-        if (hasAllPermissions.value) {
             CameraGalleryDialog(selectedUri) {
                 isAddImageClicked = false
             }
-        }
-        else{
-            context.toast(context.getString(R.string.txt_permission_grant))
+    }
+
+    if (selectedUri.value != null){
+        try {
+
+            val imagePath = selectedUri.value!!.path
+            bitmap = BitmapFactory.decodeFile(imagePath)
+            val stream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.PNG, 50, stream)
+            byteArray = stream.toByteArray()
+            //  mBinding.profileImg.setImageBitmap(bitmap)
+            fileName =
+                imagePath?.substring(imagePath.toString().lastIndexOf("/") + 1)
+
+        } catch (e: Exception) {
+            LoggerProvider.logger.d(
+                "FileNotConvertedException " + "1.. " +e.message
+            )
         }
     }
 
@@ -416,6 +440,10 @@ fun EditProfileScreenUI(
                             }
                         )
                         TextFieldWithLeftIcon(
+                            text = if (date.isEmpty()){
+                                date
+                            }
+                            else{""},
                             modifier = Modifier.clickable {
                                 showDatePickerDialog(context) { year, month, dayOfMonth ->
                                     date = "$year-${
@@ -426,10 +454,6 @@ fun EditProfileScreenUI(
                             value = remember { mutableStateOf(date) },
                             placeholder = if (date.isEmpty()) stringResource(R.string.select_date_of_birth) else date
                         )
-
-                        // Gender
-                        val selectedGender = remember { mutableStateOf("") }
-                        val genderOptions = listOf(KEY_MALE, KEY_FEMALE, KEY_OTHER)
 
                         Text(
                             text = buildAnnotatedString {
@@ -560,6 +584,19 @@ fun EditProfileScreenUI(
                                 onClick = {
                                     if (mobNo.value.isEmpty()) {
                                         inValidMobNo = true
+                                    }
+                                    else if (firstName.value.toString().isEmpty()) {
+                                        context.toast("Enter first name")
+                                    } else if (lastName.value.toString().isEmpty()) {
+                                        context.toast("Enter last name")
+                                    } else if (date.toString().isEmpty()) {
+                                        context.toast("Enter your date of birth")
+                                    } else if (selectedGender.value.toString().isEmpty()) {
+                                        context.toast("Select your gender")
+                                    } else if (whatsappNo.value.toString().isEmpty()) {
+                                        context.toast("Enter your whatsApp number")
+                                    } else if (email.value.toString().isEmpty()) {
+                                        context.toast("Enter your email")
                                     } else {
                                         if (showError || mobNo.value.length < 10) {
                                             inValidMobNo = true
@@ -571,10 +608,33 @@ fun EditProfileScreenUI(
                                                 inValidMobNo = true
                                             } else {
                                                 isDialogVisible = true
-                                               onNext()
+                                                val firstStepProfileRequest =
+                                                    FirstStepProfileRequest(
+                                                        firstName.value.toString(),
+                                                        "",
+                                                        lastName.value.toString(),
+                                                        selectedGender.value.toString(),
+                                                        mobNo.value.toString(),
+                                                        whatsappNo.value.toString(),
+                                                        date.toString(),
+                                                        email.value.toString()
+                                                    )
 
+//                                               onNext()
+                                                    LoggerProvider.logger.d(
+                                                        "EditProfile: " + "1.. " + firstName.value + " .. "
+                                                                + lastName.value + " .. " + date + " .. " + selectedGender.value + " .. "
+                                                    )
+
+
+                                                    loginViewModel.createFirstStepProfileRepo(
+                                                        firstStepProfileRequest,
+                                                        strToken,
+                                                        byteArray,
+                                                        fileName
+                                                    )
+                                                }
                                             }
-                                        }
                                     }
                                 },
                             )
@@ -591,5 +651,5 @@ fun EditProfileUI() {
     val context = LocalContext.current
     val onNext: () -> Unit = {}
     val onBack: () -> Unit = {}
-    EditProfileScreenUI(context, onNext, onBack)
+//    EditProfileScreenUI(context, onNext, onBack)
 }

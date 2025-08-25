@@ -646,11 +646,13 @@ fun CameraPermission(hasAllPermissions: MutableState<Boolean>, context: Context)
         }
     }
 
-    LaunchedEffect(Unit) {
-        if (checkAllPermissions()) {
-            hasAllPermissions.value = true
-        } else {
-            permissionsLauncher.launch(permissionsToCheck.toTypedArray())
+    LaunchedEffect(hasAllPermissions.value) {
+        if (!hasAllPermissions.value) {
+            if (checkAllPermissions()) {
+                hasAllPermissions.value = true
+            } else {
+                permissionsLauncher.launch(permissionsToCheck.toTypedArray())
+            }
         }
     }
 }

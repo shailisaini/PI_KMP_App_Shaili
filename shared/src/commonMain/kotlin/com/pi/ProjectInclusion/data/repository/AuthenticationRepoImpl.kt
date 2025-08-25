@@ -77,8 +77,10 @@ class AuthenticationRepoImpl(private val apiService: ApiService) : Authenticatio
     override suspend fun createFirstStepProfileRepo(
         firstStepProfileRequest: FirstStepProfileRequest,
         strToken: String,
+        profilePic: ByteArray?,
+        fileName: String?
     ): CreateFirstStepProfileResponse {
-        return apiService.createFirstStepProfile(firstStepProfileRequest, strToken)
+        return apiService.createFirstStepProfile(firstStepProfileRequest, strToken, profilePic, fileName)
     }
 
     override suspend fun getAllStateListRepo(): List<StateListResponse> {

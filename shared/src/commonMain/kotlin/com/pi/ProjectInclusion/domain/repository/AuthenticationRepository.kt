@@ -44,6 +44,8 @@ interface AuthenticationRepository {
     suspend fun createFirstStepProfileRepo(
         firstStepProfileRequest: FirstStepProfileRequest,
         strToken: String,
+        profilePic: ByteArray? = null,
+        fileName: String? = null
     ): CreateFirstStepProfileResponse
 
     suspend fun getAllStateListRepo(): List<StateListResponse>

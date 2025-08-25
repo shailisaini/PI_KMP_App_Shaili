@@ -61,6 +61,8 @@ kotlin {
         commonMain.dependencies {
             //put your multiplatform dependencies here
             implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.form)
+            implementation(libs.ktor.client.android)
             implementation(libs.ktor.logging)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.content.negotiation)
