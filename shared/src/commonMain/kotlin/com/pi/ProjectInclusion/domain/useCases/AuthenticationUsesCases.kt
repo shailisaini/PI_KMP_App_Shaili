@@ -15,6 +15,12 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.CreatePass
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByUdiseCodeResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
 import com.pi.ProjectInclusion.domain.repository.AuthenticationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -170,13 +176,75 @@ class AuthenticationUsesCases(private val repository: AuthenticationRepository) 
         }
     }.flowOn(Dispatchers.IO)
 
-}
+    fun getAllStateListRepo(): Flow<Result<List<StateListResponse>>> = flow {
+        try {
+            val response = repository.getAllStateListRepo()
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            LoggerProvider.logger.d("Exception in otpOnWhatsapp() $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
 
-//private fun getErrorMessage(errorBody: String?): String {
-//    return try {
-//        val jsonObject = JSONObject(errorBody ?: "")
-//        jsonObject.getString("error") ?: "Unknown error"
-//    } catch (e: JSONException) {
-//        "An error occurred."
-//    }
-//}
+    fun getAllDistrictByStateIdRepo(stateId: Int): Flow<Result<List<DistrictListResponse>>> = flow {
+        try {
+            val response = repository.getAllDistrictByStateIdRepo(stateId)
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            LoggerProvider.logger.d("Exception in otpOnWhatsapp() $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getAllBlockByDistrictIdRepo(districtId: Int): Flow<Result<List<BlockListResponse>>> = flow {
+        try {
+            val response = repository.getAllBlockByDistrictIdRepo(districtId)
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            LoggerProvider.logger.d("Exception in otpOnWhatsapp() $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getAllSchoolsByBlockIdRepo(blockId: Int): Flow<Result<SchoolListResponse>> = flow {
+        try {
+            val response = repository.getAllSchoolsByBlockIdRepo(blockId)
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            LoggerProvider.logger.d("Exception in otpOnWhatsapp() $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getAllDetailsByUdiseIdRepo(udiseCode: String): Flow<Result<SchoolByUdiseCodeResponse>> =
+        flow {
+            try {
+                val response = repository.getAllDetailsByUdiseIdRepo(udiseCode)
+                emit(Result.success(response))
+            } catch (e: Exception) {
+                val errorMessage = e.message ?: unableToConnectServer
+                LoggerProvider.logger.d("Exception in otpOnWhatsapp() $errorMessage")
+                emit(Result.failure(Exception(errorMessage)))
+            }
+        }.flowOn(Dispatchers.IO)
+
+    fun createProfessionalProfileRepo(
+        professionalProfileRequest: ProfessionalProfileRequest,
+        strToken: String,
+    ): Flow<Result<CreateFirstStepProfileResponse>> = flow {
+        try {
+            val response =
+                repository.createProfessionalProfileRepo(professionalProfileRequest, strToken)
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            LoggerProvider.logger.d("Exception in otpOnWhatsapp() $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+}

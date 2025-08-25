@@ -57,3 +57,12 @@ data class FirstStepProfileRequest(
     val dob: String? = null,
     val email: String? = null,
 )
+
+@Serializable
+data class ProfessionalProfileRequest(
+    val udiseCode: String? = null,
+    val state: Int? = null,
+    val district: Int? = null,
+    val block: Int? = null,
+    val school: Int? = null,
+)

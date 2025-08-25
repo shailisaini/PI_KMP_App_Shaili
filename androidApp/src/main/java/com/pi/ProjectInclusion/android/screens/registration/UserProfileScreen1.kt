@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -51,9 +52,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.kmptemplate.logger.LoggerProvider
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Bg_Gray
 import com.pi.ProjectInclusion.Bg_Gray1
 import com.pi.ProjectInclusion.Black
@@ -100,11 +103,7 @@ fun EnterUserScreen1(
     viewModel: LoginViewModel,
 ) {
     var isDialogVisible by remember { mutableStateOf(false) }
-//    val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
-
     val context = LocalContext.current
-    val userType = remember { mutableStateListOf<GetUserTypeResponse.UserTypeResponse>() }
-
     var hasAllPermissions = remember { mutableStateOf(false) }
 
     CameraPermission(hasAllPermissions, context)
@@ -117,38 +116,7 @@ fun EnterUserScreen1(
     BackHandler {
         onBack()
     }
-    LoggerProvider.logger.d("Screen: " + "EnterUserScreen1()")
-
-    // commenting it for now it will use after API
-
-    /*LaunchedEffect(Unit) {
-        viewModel.getUserType()
-    }
-
-    LaunchedEffect(uiState) {
-        when {
-            uiState.isLoading -> {
-                userType.clear()
-                isDialogVisible = true
-            }
-
-            uiState.error.isNotEmpty() -> {
-                userType.clear()
-                isDialogVisible = false
-                LoggerProvider.logger.d("Error: ${uiState.error}")
-                context.toast(uiState.error)
-            }
-
-            uiState.success != null -> {
-                isDialogVisible = false
-                uiState.success!!.data.let {
-                    userType.clear()
-                    userType.addAll(it)
-                }
-                LoggerProvider.logger.d("Languages fetched: ${uiState.success!!.data}")
-            }
-        }
-    }*/
+    logger.d("Screen: " + "EnterUserScreen1()")
 
     Surface(
         modifier = Modifier.fillMaxWidth(), color = White
@@ -217,6 +185,45 @@ fun ProfileScreenUI(
     val genderOptions = listOf(KEY_MALE, KEY_FEMALE, KEY_OTHER)
     val strToken =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjR5QW9PaGdVQnJyOUVkdXVvbHFvSVE9PSIsInN1YiI6IjEiLCJpYXQiOjE3NTU3NzQ4NDcsImV4cCI6MTc1NTg2MTI0N30.bjqUtT6SSrMRpNO4EiLgh6VhnJp54deOPvQBrjzbTGo"
+
+    val firstStepProfileState by viewModel.firstStepProfilePasswordResponse.collectAsStateWithLifecycle()
+
+    LaunchedEffect(firstStepProfileState) {
+        when {
+            firstStepProfileState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            firstStepProfileState.error.isNotEmpty() -> {
+                logger.d("First step profile state error : ${firstStepProfileState.success}")
+                isDialogVisible = false
+            }
+
+            firstStepProfileState.success != null -> {
+                logger.d("First step profile state response : ${firstStepProfileState.success}")
+                if (firstStepProfileState.success!!.status != true) {
+                    context.toast(firstStepProfileState.success!!.message.toString())
+                    if (viewModel.getPrefData(USER_TYPE_ID) == "7") {
+                        onNextSpecialEdu()
+                    } else if (viewModel.getPrefData(USER_TYPE_ID) == "8") {
+                        onNextProfessional()
+                    } else if (viewModel.getPrefData(USER_TYPE_ID) == "3") {
+                        // teacher
+                        onNextTeacher()
+                    } else {
+                        // reviewer
+                    }
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
+    CustomDialog(
+        isVisible = isDialogVisible,
+        onDismiss = { isDialogVisible = false },
+        message = "Loading your data..."
+    )
 
     CameraPermission(hasAllPermissions, context)
 
@@ -611,17 +618,6 @@ fun ProfileScreenUI(
                                         firstStepProfileRequest,
                                         strToken
                                     )
-
-//                                    if (viewModel.getPrefData(USER_TYPE_ID) == "7") {
-//                                        onNextSpecialEdu()
-//                                    } else if (viewModel.getPrefData(USER_TYPE_ID) == "8") {
-//                                        onNextProfessional()
-//                                    } else if (viewModel.getPrefData(USER_TYPE_ID) == "3") {
-//                                        // teacher
-//                                        onNextTeacher()
-//                                    } else {
-//                                        // reviewer
-//                                    }
                                 }
                             }
                         },
