@@ -129,6 +129,9 @@ class LoginNavigationScreen : ComponentActivity() {
                             onRegister = {
                                 navigateTo(AppRoute.OtpSendVerifyUI.route)
 //                                navigateTo(AppRoute.EnterUserProfileScreen.route)
+//                                navigateTo(AppRoute.EnterTeacherRegScreen.route)
+//                                navigateTo(AppRoute.SpecialEducatorRegistration2.route)
+//                                navigateTo(AppRoute.EnterProfessionalScreen2.route)
                             },
 
                             onBack = { navigateBack(AppRoute.UserTypeSelect.route) }
@@ -180,6 +183,7 @@ class LoginNavigationScreen : ComponentActivity() {
                         )
 
                         AppRoute.EnterTeacherRegScreen.route -> EnterUserScreen2(
+                            viewModel = viewModel,
                             onNext = {
                                 context.startActivity(
                                     Intent(context, StudentDashboardActivity::class.java)

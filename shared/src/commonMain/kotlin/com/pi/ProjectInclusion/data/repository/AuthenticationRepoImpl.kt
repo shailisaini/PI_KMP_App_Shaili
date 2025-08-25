@@ -14,6 +14,12 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.CreatePass
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByUdiseCodeResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
 import com.pi.ProjectInclusion.data.remote.ApiService
 import com.pi.ProjectInclusion.domain.repository.AuthenticationRepository
 
@@ -75,6 +81,33 @@ class AuthenticationRepoImpl(private val apiService: ApiService) : Authenticatio
         fileName: String?
     ): CreateFirstStepProfileResponse {
         return apiService.createFirstStepProfile(firstStepProfileRequest, strToken, profilePic, fileName)
+    }
+
+    override suspend fun getAllStateListRepo(): List<StateListResponse> {
+        return apiService.getAllStateList()
+    }
+
+    override suspend fun getAllDistrictByStateIdRepo(stateId: Int): List<DistrictListResponse> {
+        return apiService.getAllDistrictByStateId(stateId)
+    }
+
+    override suspend fun getAllBlockByDistrictIdRepo(districtId: Int): List<BlockListResponse> {
+        return apiService.getAllBlockByDistrictId(districtId)
+    }
+
+    override suspend fun getAllSchoolsByBlockIdRepo(blockId: Int): SchoolListResponse {
+        return apiService.getAllSchoolsByBlockId(blockId)
+    }
+
+    override suspend fun getAllDetailsByUdiseIdRepo(udiseCode: String): SchoolByUdiseCodeResponse {
+        return apiService.getAllDetailsByUdiseId(udiseCode)
+    }
+
+    override suspend fun createProfessionalProfileRepo(
+        professionalProfileRequest: ProfessionalProfileRequest,
+        strToken: String,
+    ): CreateFirstStepProfileResponse {
+        return apiService.createProfessionalProfile(professionalProfileRequest, strToken)
     }
 }
 

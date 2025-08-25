@@ -14,6 +14,12 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.CreatePass
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByUdiseCodeResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
 
 interface AuthenticationRepository {
     suspend fun getLanguage(): GetLanguageListResponse
@@ -40,5 +46,20 @@ interface AuthenticationRepository {
         strToken: String,
         profilePic: ByteArray? = null,
         fileName: String? = null
+    ): CreateFirstStepProfileResponse
+
+    suspend fun getAllStateListRepo(): List<StateListResponse>
+
+    suspend fun getAllDistrictByStateIdRepo(stateId: Int): List<DistrictListResponse>
+
+    suspend fun getAllBlockByDistrictIdRepo(stateId: Int): List<BlockListResponse>
+
+    suspend fun getAllSchoolsByBlockIdRepo(blockId: Int): SchoolListResponse
+
+    suspend fun getAllDetailsByUdiseIdRepo(udiseCode: String): SchoolByUdiseCodeResponse
+
+    suspend fun createProfessionalProfileRepo(
+        professionalProfileRequest: ProfessionalProfileRequest,
+        strToken: String,
     ): CreateFirstStepProfileResponse
 }

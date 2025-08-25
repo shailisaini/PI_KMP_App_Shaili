@@ -17,6 +17,12 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.CreatePass
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByUdiseCodeResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
 import com.pi.ProjectInclusion.database.LocalDataSource
 import com.pi.ProjectInclusion.domain.ConnectivityObserver
 import com.pi.ProjectInclusion.domain.useCases.AuthenticationUsesCases
@@ -78,6 +84,36 @@ class LoginViewModel(
         MutableStateFlow(UiState<CreateFirstStepProfileResponse>())
     val firstStepProfilePasswordResponse: StateFlow<UiState<CreateFirstStepProfileResponse>> =
         firstStepProfilePassword
+
+    private val allStates =
+        MutableStateFlow(UiState<List<StateListResponse>>())
+    val allStatesResponse: StateFlow<UiState<List<StateListResponse>>> =
+        allStates
+
+    private val allDistricts =
+        MutableStateFlow(UiState<List<DistrictListResponse>>())
+    val allDistrictsResponse: StateFlow<UiState<List<DistrictListResponse>>> =
+        allDistricts
+
+    private val allBlocks =
+        MutableStateFlow(UiState<List<BlockListResponse>>())
+    val allBlocksResponse: StateFlow<UiState<List<BlockListResponse>>> =
+        allBlocks
+
+    private val allSchools =
+        MutableStateFlow(UiState<SchoolListResponse>())
+    val allSchoolsResponse: StateFlow<UiState<SchoolListResponse>> =
+        allSchools
+
+    private val allUdiseCode =
+        MutableStateFlow(UiState<SchoolByUdiseCodeResponse>())
+    val allUdiseCodeResponse: StateFlow<UiState<SchoolByUdiseCodeResponse>> =
+        allUdiseCode
+
+    private val professionalProfile =
+        MutableStateFlow(UiState<CreateFirstStepProfileResponse>())
+    val professionalProfileResponse: StateFlow<UiState<CreateFirstStepProfileResponse>> =
+        professionalProfile
 
     private val query = MutableStateFlow("")
 
@@ -436,6 +472,141 @@ class LoginViewModel(
                     },
                     onFailure = { exception ->
                         firstStepProfilePassword.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun getAllStateList() = viewModelScope.launch {
+        allStates.update { UiState(isLoading = true) }
+        getAuthViewModel.getAllStateListRepo()
+            .catch { exception ->
+                allStates.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        allStates.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        allStates.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun getAllDistrictByStateId(stateId: Int) = viewModelScope.launch {
+        allDistricts.update { UiState(isLoading = true) }
+        getAuthViewModel.getAllDistrictByStateIdRepo(stateId)
+            .catch { exception ->
+                allDistricts.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        allDistricts.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        allDistricts.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun getAllBlockByDistrictId(districtId: Int) = viewModelScope.launch {
+        allBlocks.update { UiState(isLoading = true) }
+        getAuthViewModel.getAllBlockByDistrictIdRepo(districtId)
+            .catch { exception ->
+                allBlocks.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        allBlocks.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        allBlocks.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun getAllSchoolsByBlockId(blockId: Int) = viewModelScope.launch {
+        allSchools.update { UiState(isLoading = true) }
+        getAuthViewModel.getAllSchoolsByBlockIdRepo(blockId)
+            .catch { exception ->
+                allSchools.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        allSchools.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        allSchools.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun getAllDetailsByUdiseId(udiseCode: String) = viewModelScope.launch {
+        allUdiseCode.update { UiState(isLoading = true) }
+        getAuthViewModel.getAllDetailsByUdiseIdRepo(udiseCode)
+            .catch { exception ->
+                allUdiseCode.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        allUdiseCode.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        allUdiseCode.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun createProfessionalProfileRepo(
+        professionalProfileRequest: ProfessionalProfileRequest,
+        strToken: String,
+    ) = viewModelScope.launch {
+        professionalProfile.update { UiState(isLoading = true) }
+        getAuthViewModel.createProfessionalProfileRepo(professionalProfileRequest, strToken)
+            .catch { exception ->
+                professionalProfile.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        professionalProfile.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        professionalProfile.update {
                             UiState(error = exception.message ?: somethingWentWrong)
                         }
                     }

@@ -3,6 +3,7 @@ package com.pi.ProjectInclusion.data.model.profileModel
 
 val dummyTrackList = listOf(
     TrackListModel(
+        title = "PI-Notification",
         name = "Name Change Request",
         reviewStatus = "In Review",
         date = "15 April 2024",
@@ -10,6 +11,7 @@ val dummyTrackList = listOf(
         reason = null
     ),
     TrackListModel(
+        title = "Case-Transfer",
         name = "School Name Change",
         reviewStatus = "Approved",
         date = "16 April 2024",
@@ -17,6 +19,7 @@ val dummyTrackList = listOf(
         reason = null
     ),
     TrackListModel(
+        title = "PI-Notification",
         name = "School Name Change",
         reviewStatus = "Rejected",
         date = "15 April 2024",
@@ -24,6 +27,7 @@ val dummyTrackList = listOf(
         reason = "Document unclear"
     ),
     TrackListModel(
+        title = "PI-Notification",
         name = "Name Change Request",
         reviewStatus = "UnKnown",
         date = "15 April 2024",
