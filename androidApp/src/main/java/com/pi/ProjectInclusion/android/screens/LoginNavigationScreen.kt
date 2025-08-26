@@ -42,6 +42,8 @@ import com.pi.ProjectInclusion.android.screens.registration.EnterUserScreen1
 import com.pi.ProjectInclusion.android.screens.registration.EnterUserScreen2
 import com.pi.ProjectInclusion.android.screens.registration.professionals.ProfessionalsRegistration2
 import com.pi.ProjectInclusion.android.screens.registration.specialEdu.SpecialEducatorScreen2
+import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -53,15 +55,21 @@ class LoginNavigationScreen : ComponentActivity() {
         setContent {
             val context = LocalContext.current
             val navController = rememberNavController()
-//            val viewModel = koinViewModel<LoginViewModel>()
             val viewModel: LoginViewModel = koinViewModel()
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination?.route
-//            val loadScreenName = intent.getStringExtra(screenName.screenName)
-//            val startDestination = if (viewModel.getScreenName() == onboarding2) {
-            val startDestination = AppRoute.LanguageSelect.route
-//            } else if (loadScreenName == onboarding1 || viewModel.getScreenName() == onboarding1) {
-//                AppRoute.RegistrationStep1()
+
+            var startDestination = AppRoute.LanguageSelect.route
+
+            var encryptedUserName = viewModel.getPrefData(USER_NAME)
+            var userToken = viewModel.getPrefData(TOKEN_PREF_KEY)
+
+            if (userToken.isNotEmpty()){
+                startDestination = AppRoute.TeacherDashboard.route
+            }
+            else{
+                startDestination
+            }
 
             var currentRoute by remember { mutableStateOf(startDestination) }
             var isForward by remember { mutableStateOf(true) }
@@ -220,6 +228,13 @@ class LoginNavigationScreen : ComponentActivity() {
                             },
                             viewModel = viewModel
                         )
+
+                        AppRoute.TeacherDashboard.route ->{
+                            context.startActivity(
+                                Intent(context, StudentDashboardActivity::class.java)
+                            )
+                            (context as? Activity)?.finish()
+                        }
                     }
                 }
             }

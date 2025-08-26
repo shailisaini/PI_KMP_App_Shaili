@@ -175,7 +175,7 @@ fun ForgetPasswordScreen(
                 MobileTextField(
                     isIcon = false,
                     icon = null,
-                    colors = colors, number = mobNo, trueFalse = true, hint = enterMobile.toString()
+                    colors = colors, number = mobNo, enable = true, hint = enterMobile.toString()
                 )
 
                 if (inValidMobNo) {

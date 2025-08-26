@@ -20,6 +20,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictL
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByUdiseCodeResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
+import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
 
 interface AuthenticationRepository {
     suspend fun getLanguage(): GetLanguageListResponse
@@ -30,7 +31,7 @@ interface AuthenticationRepository {
     suspend fun getValidate(userName: String, userTypeId: String): ValidateUserResponse
     suspend fun getVerifyOtpRepo(userName: String, userTypeId: String): VerifyOtpResponse
     suspend fun getLoginWithOTPRepo(request: LoginWithOtpRequest): LoginApiResponse
-    suspend fun getUserProfileRepo(userName: String): LoginApiResponse
+    suspend fun getUserProfileRepo(userName: String): ViewProfileResponse
     suspend fun forgetPasswordRepo(
         passwordRequest: ForgetPasswordRequest,
         strToken: String,

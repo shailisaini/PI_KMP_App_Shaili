@@ -105,12 +105,15 @@ import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
+import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.LoginApiResponse
+import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlin.Unit
 
@@ -139,34 +142,41 @@ fun ViewProfileScreen(
 
     var hasAllPermissions = remember { mutableStateOf(false) }
     CameraPermission(hasAllPermissions, context)
-    var profileData by remember { mutableStateOf<LoginApiResponse.LoginResponse?>(null) }
+    var profileData by remember { mutableStateOf<ViewProfileResponse?>(null) }
 
     logger.d("Screen: " + "ViewProfileScreen()")
-
-    val sendOtpState by viewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
-    logger.d("OtpSendVerify: $languageId  .. $encryptedUserName")
+    logger.d("viewProfileUI: $languageId  .. $encryptedUserName")
     viewModel.getUserProfileViewModel(encryptedUserName)
 
-    LaunchedEffect(sendOtpState) {
+    val viewProfile by viewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
+    LaunchedEffect(viewProfile) {
         when {
-            sendOtpState.isLoading -> {
+            viewProfile.isLoading -> {
                 isDialogVisible = true
             }
 
-            sendOtpState.error.isNotEmpty() -> {
-                logger.d("ResendOtp: ${sendOtpState.success}")
+            viewProfile.error.isNotEmpty() -> {
+                logger.d("viewProfileData: ${viewProfile.success}")
                 isDialogVisible = false
             }
 
-            sendOtpState.success != null -> {
-                logger.d("ResendOtp: ${sendOtpState.success}")
-                if (sendOtpState.success!!.status != true){
-                    profileData = sendOtpState.success!!.response
+            viewProfile.success != null -> {
+                logger.d("viewProfileData: ${viewProfile.success}")
+                if (viewProfile.success!!.status == true){
+                    profileData = viewProfile.success!!
+                    logger.d("viewProfileData 1: ${viewProfile.success}")
 //                    context.toast(sendOtpState.success!!.response!!.message.toString())
+                }
+                else{
+                    context.toast(viewProfile.success!!.message.toString())
                 }
                 isDialogVisible = false
             }
         }
+    }
+
+    BackHandler {
+        onBack()
     }
 
     Surface(
@@ -179,8 +189,10 @@ fun ViewProfileScreen(
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            ProfileViewUI(context, onNext = onNext, onBack = onBack, onBackLogin = onBackLogin,
-                onTrackRequest =onTrackRequest, profileData = profileData,viewModel = viewModel)
+            profileData?.let {
+                ProfileViewUI(context, onNext = onNext, onBack = onBack, onBackLogin = onBackLogin,
+                    onTrackRequest = onTrackRequest, profileData = it,viewModel = viewModel)
+            }
         }
     }
 }
@@ -192,16 +204,16 @@ fun ProfileViewUI(
     onBackLogin: () -> Unit,
     onNext: () -> Unit,
     onTrackRequest: () -> Unit,
-    profileData: LoginApiResponse.LoginResponse?,
-    viewModel: LoginViewModel,
+    profileData: ViewProfileResponse,
+    viewModel: LoginViewModel?,
 ) {
 
-    val decryptUserName = decrypt(profileData?.user?.username.toString().trim())
+    val decryptUserName = decrypt(profileData.response?.username.toString().trim())
     val scrollState = rememberScrollState()
     val textNameEg = stringResource(R.string.txt_eg_first_name)
     var showSheetMenu by remember { mutableStateOf(false) }
     var isChangeRequestBottomSheet by remember { mutableStateOf(false) }
-    var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
+    var userTypeId = viewModel?.getPrefData(USER_TYPE_ID)
 
     if (showSheetMenu) {
         ProfileBottomSheetMenu(onBackLogin = onBackLogin) {

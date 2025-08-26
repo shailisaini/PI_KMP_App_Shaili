@@ -369,7 +369,7 @@ fun ProfileScreenUI(
                     icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
                     colors = colors,
                     number = mobNo,
-                    trueFalse = true,
+                    enable = true,
                     hint = enterMobile.toString()
                 )
 
@@ -520,7 +520,7 @@ fun ProfileScreenUI(
                     icon = ImageVector.vectorResource(id = R.drawable.ic_whatsapp_otp),
                     colors = colors,
                     number = whatsappNo,
-                    trueFalse = true,
+                    enable = true,
                     hint = textWhatsappEg.toString()
                 )
 

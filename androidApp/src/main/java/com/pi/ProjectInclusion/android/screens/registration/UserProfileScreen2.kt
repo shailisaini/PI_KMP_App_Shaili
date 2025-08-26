@@ -392,7 +392,7 @@ fun ProfileScreen2UI(
                             icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
                             colors = colors,
                             number = mobNo,
-                            trueFalse = true,
+                            enable = true,
                             hint = enterUdiseCode.toString()
                         )
                     }

@@ -22,6 +22,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictL
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByUdiseCodeResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
+import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpTimeout
@@ -212,17 +213,16 @@ class ApiService(private val client: HttpClient) {
         }.body<CertificateListResponse>()
 
     // user Profile
-    suspend fun getViewUserProfile(username: String): LoginApiResponse =
+    suspend fun getViewUserProfile(username: String): ViewProfileResponse =
         client.get {
             url {
                 takeFrom(STUDENT_BASE_URL)
-                appendPathSegments(appendUser, "get-user-by-username")
-                parameters.append("username", username)
+                appendPathSegments(appendUser, "get-user-by-username", username)
             }
             headers {
                 append(HttpHeaders.Accept, "application/json")
             }
-        }.body<LoginApiResponse>()
+        }.body<ViewProfileResponse>()
 
     suspend fun createFirstStepProfile(
         firstStepProfileRequest: FirstStepProfileRequest,

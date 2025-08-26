@@ -55,7 +55,7 @@ sealed class AppRoute(val route: String) {
     data object UploadedDocuments : AppRoute("intervention_uploaded_documents")
     data object TeachingPlan : AppRoute("intervention_teaching_plan")
 
-    data object StudentDashboardActivity : AppRoute("student_screen")
+    data object TeacherDashboard : AppRoute("teacher_dashboard")
     data object TrackRequestScreen : AppRoute("track_request_screen")
     data object NotificationScreen : AppRoute("notification_screen")
 }

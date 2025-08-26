@@ -20,6 +20,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictL
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByUdiseCodeResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
+import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
 import com.pi.ProjectInclusion.data.remote.ApiService
 import com.pi.ProjectInclusion.domain.repository.AuthenticationRepository
 
@@ -70,7 +71,7 @@ class AuthenticationRepoImpl(private val apiService: ApiService) : Authenticatio
         return apiService.getLoginWithOTP(request)
     }
 
-    override suspend fun getUserProfileRepo(userName: String): LoginApiResponse {
+    override suspend fun getUserProfileRepo(userName: String): ViewProfileResponse {
         return apiService.getViewUserProfile(userName)
     }
 
