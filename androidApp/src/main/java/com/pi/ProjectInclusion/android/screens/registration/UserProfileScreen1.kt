@@ -617,7 +617,7 @@ fun ProfileScreenUI(
                                     )
                                     viewModel.createFirstStepProfileRepo(
                                         firstStepProfileRequest,
-                                        strToken,
+                                        strToken
                                     )
                                 }
                             }
