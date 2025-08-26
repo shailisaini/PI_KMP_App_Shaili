@@ -674,12 +674,12 @@ fun EditProfileScreenUI(
                                                                 + strToken + " .. " + mobNo.value.toString() + " .. " + fileName + " .. "
                                                     )
 
-                                                    /*loginViewModel.createFirstStepProfileRepo(
+                                                    loginViewModel.createFirstStepProfileRepo(
                                                         firstStepProfileRequest,
                                                         strToken,
                                                         byteArray,
                                                         fileName
-                                                    )*/
+                                                    )
                                                 }
                                             }
                                         }
