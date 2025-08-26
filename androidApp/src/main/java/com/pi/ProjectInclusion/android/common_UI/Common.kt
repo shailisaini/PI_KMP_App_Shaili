@@ -413,7 +413,7 @@ fun TextViewField(
                 Icon(
                     imageVector = icon!!,
                     contentDescription = null,
-                    tint = if (isSystemInDarkTheme()) White else Black
+                    tint = if (isSystemInDarkTheme()) White else Gray
                 )
             }
         } else null,
@@ -498,7 +498,7 @@ fun TextViewFieldEmail(
                 Icon(
                     imageVector = icon!!,
                     contentDescription = null,
-                    tint = if (isSystemInDarkTheme()) White else Black
+                    tint = if (isSystemInDarkTheme()) White else Gray
                 )
             }
         } else null,

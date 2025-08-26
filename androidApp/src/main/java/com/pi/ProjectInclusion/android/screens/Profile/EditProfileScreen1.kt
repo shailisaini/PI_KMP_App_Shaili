@@ -557,7 +557,7 @@ fun EditProfileScreenUI(
                             )
                             MobileTextField(
                                 isIcon = true,
-                                icon = ImageVector.vectorResource(id = R.drawable.ic_whatsapp_otp),
+                                icon = ImageVector.vectorResource(id = R.drawable.ic_whatsapp_blue),
                                 colors = colors,
                                 number = whatsappNo,
                                 enable = whatsappNo.value.length <10,
@@ -588,7 +588,7 @@ fun EditProfileScreenUI(
                             )
                             TextViewFieldEmail(
                                 isIcon = true,
-                                icon = ImageVector.vectorResource(id = R.drawable.ic_mail),
+                                icon = ImageVector.vectorResource(id = R.drawable.baseline_email_24),
                                 colors = colors,
                                 text = email,
                                 trueFalse = true,
