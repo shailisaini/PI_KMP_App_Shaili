@@ -66,7 +66,6 @@ import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetLanguageListResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetUserTypeResponse
 import kotlinx.coroutines.launch
 
 @Composable
@@ -84,7 +83,7 @@ fun EditProfileScreen2(onNext: () -> Unit,  //EditProfileScreen2
     BackHandler {
        onBack()
     }
-    LoggerProvider.logger.d("Screen: " + "EnterUserNameScreen()")
+    LoggerProvider.logger.d("Screen: " + "EditProfileScreen2()")
 
     Surface(
         modifier = Modifier.fillMaxWidth(), color = White

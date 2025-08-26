@@ -180,6 +180,7 @@ fun EditProfileScreenUI(
     val email = remember { mutableStateOf("") }
     val mobNo = remember { mutableStateOf("") }
     val whatsappNo = remember { mutableStateOf("") }
+    val invalidMob = stringResource(id=R.string.txt_oops_no_internet)
 
     val viewProfile by loginViewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
     LaunchedEffect(viewProfile) {
@@ -674,12 +675,18 @@ fun EditProfileScreenUI(
                                                                 + strToken + " .. " + mobNo.value.toString() + " .. " + fileName + " .. "
                                                     )
 
-                                                    loginViewModel.createFirstStepProfileRepo(
-                                                        firstStepProfileRequest,
-                                                        strToken,
-                                                        byteArray,
-                                                        fileName
-                                                    )
+                                                    if (!isInternetAvailable) {
+                                                        context.toast(invalidMob)
+                                                    } else {
+                                                        // call Api
+                                                        isDialogVisible = true
+                                                        loginViewModel.createFirstStepProfileRepo(
+                                                            firstStepProfileRequest,
+                                                            strToken,
+                                                            byteArray,
+                                                            fileName
+                                                        )
+                                                    }
                                                 }
                                             }
                                         }
