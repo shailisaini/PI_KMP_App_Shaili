@@ -30,7 +30,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -55,7 +54,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.example.kmptemplate.logger.LoggerProvider
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Bg_Gray
 import com.pi.ProjectInclusion.Bg_Gray1
@@ -87,9 +85,9 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_FEMALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_MALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_OTHER
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
-import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetUserTypeResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -174,6 +172,12 @@ fun ProfileScreenUI(
     val textWhatsappEg = stringResource(R.string.txt_eg_whatsapp_name)
     val textLastNameEg = stringResource(R.string.txt_eg_last_name)
     val textEmailEg = stringResource(R.string.txt_eg_email_name)
+    val textFirstNameEg = stringResource(R.string.txt_et_first_name)
+    val lastNameEg = stringResource(R.string.txt_et_last_name)
+    val dobEg = stringResource(R.string.txt_date_birth)
+    val genderEg = stringResource(R.string.txt_select_your_gender_msg)
+    val whatsAppNumberEg = stringResource(R.string.txt_enter_whatsApp)
+    val mailEg = stringResource(R.string.txt_enter_mail)
     var showError by remember { mutableStateOf(false) }
     var inValidMobNo by remember { mutableStateOf(false) }
     var isAddImageClicked by remember { mutableStateOf(false) }
@@ -207,7 +211,6 @@ fun ProfileScreenUI(
                     } else if (viewModel.getPrefData(USER_TYPE_ID) == "8") {
                         onNextProfessional()
                     } else if (viewModel.getPrefData(USER_TYPE_ID) == "3") {
-                        // teacher
                         onNextTeacher()
                     } else {
                         // reviewer
@@ -588,17 +591,17 @@ fun ProfileScreenUI(
                             if (mobNo.value.isEmpty() || mobNo.value.length < 10) {
                                 inValidMobNo = true
                             } else if (firstName.value.toString().isEmpty()) {
-                                context.toast("Enter first name")
+                                context.toast(textFirstNameEg)
                             } else if (lastName.value.toString().isEmpty()) {
-                                context.toast("Enter last name")
+                                context.toast(lastNameEg)
                             } else if (date.toString().isEmpty()) {
-                                context.toast("Enter your date of birth")
+                                context.toast(dobEg)
                             } else if (selectedGender.value.toString().isEmpty()) {
-                                context.toast("Select your gender")
+                                context.toast(genderEg)
                             } else if (whatsappNo.value.toString().isEmpty()) {
-                                context.toast("Enter your whatsApp number")
+                                context.toast(whatsAppNumberEg)
                             } else if (email.value.toString().isEmpty()) {
-                                context.toast("Enter your email")
+                                context.toast(mailEg)
                             } else {
                                 if (mobNo.value.length == 10) {
                                     inValidMobNo = false
@@ -616,7 +619,7 @@ fun ProfileScreenUI(
                                     )
                                     viewModel.createFirstStepProfileRepo(
                                         firstStepProfileRequest,
-                                        strToken,""
+                                        strToken,
                                     )
                                 }
                             }
