@@ -221,7 +221,7 @@ fun EditProfileScreen2UI(
                             icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
                             colors = colors,
                             number = mobNo,
-                            trueFalse = true,
+                            enable = true,
                             hint = enterMobile.toString()
                         )
 

@@ -21,6 +21,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictL
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByUdiseCodeResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
+import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
 import com.pi.ProjectInclusion.domain.repository.AuthenticationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -151,7 +152,7 @@ class AuthenticationUsesCases(private val repository: AuthenticationRepository) 
         }
     }.flowOn(Dispatchers.IO)
 
-    fun getViewUserProfile(userName: String): Flow<Result<LoginApiResponse>> = flow {
+    fun getViewUserProfile(userName: String): Flow<Result<ViewProfileResponse>> = flow {
         try {
             val response = repository.getUserProfileRepo(userName)
             emit(Result.success(response))
