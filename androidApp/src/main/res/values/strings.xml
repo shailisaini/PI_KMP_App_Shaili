@@ -483,6 +483,8 @@ and make a difference together!</string>
     <string name="txt_re_screening_head">Re-screening Needed</string>
     <string name="txt_re_screening_btn">Start Re-screening</string>
     <string name="txt_re_screening_desc">The student has been promoted to higher grade level, so rescreening is required to ensure appropriate intervention.</string>
+    <string name="txt_enter_whatsApp">Enter your whatsApp number</string>
+    <string name="txt_enter_mail">Enter your email</string>
 
 
 </resources>
