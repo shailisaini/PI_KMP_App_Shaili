@@ -1,5 +1,3 @@
-@file:Suppress("UNCHECKED_CAST")
-
 package com.pi.ProjectInclusion.android.screens.registration
 
 import android.content.Context
@@ -41,7 +39,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -72,10 +69,10 @@ import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.DropdownMenuUi
-import com.pi.ProjectInclusion.android.common_UI.MobileTextField
 import com.pi.ProjectInclusion.android.common_UI.RegistrationHeader
 import com.pi.ProjectInclusion.android.common_UI.SchoolListBottomSheet
 import com.pi.ProjectInclusion.android.common_UI.SmallBtnUi
+import com.pi.ProjectInclusion.android.common_UI.UdiseTextField
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
@@ -135,6 +132,7 @@ fun ProfileScreen2UI(
     val internetMessage by remember { mutableStateOf("") }
 
     var isDialogVisible by remember { mutableStateOf(false) }
+    var isUdiseDetails by remember { mutableStateOf(false) }
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
 
     val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
@@ -142,7 +140,6 @@ fun ProfileScreen2UI(
 //  languageData[LanguageTranslationsResponse.KEY_INVALID_MOBILE_NO_ERROR].toString()
     val txtContinue = stringResource(id = R.string.text_continue)
     val tvUdise = stringResource(id = R.string.txt_udise_number)
-    val schoolList = remember { mutableStateListOf<GetLanguageListResponse.LanguageResponse>() }
     var mobNo = rememberSaveable { mutableStateOf("") }
     var firstName = rememberSaveable { mutableStateOf("") }
     var lastName = rememberSaveable { mutableStateOf("") }
@@ -158,21 +155,26 @@ fun ProfileScreen2UI(
     var inValidMobNo by remember { mutableStateOf(false) }
     var date by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
-    var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
+    var isBottomSheetStateVisible by rememberSaveable { mutableStateOf(false) }
+    var isBottomSheetDistrictVisible by rememberSaveable { mutableStateOf(false) }
+    var isBottomSheetBlockVisible by rememberSaveable { mutableStateOf(false) }
+    var isBottomSheetSchoolVisible by rememberSaveable { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true, confirmValueChange = { it != SheetValue.Hidden })
 
-    var selectedSchool = stringResource(R.string.choose_option)
+    var selectedState by remember { mutableStateOf("") }
+    var selectedDistrict by remember { mutableStateOf("") }
+    var selectedBlock by remember { mutableStateOf("") }
+    var selectedSchool by remember { mutableStateOf("") }
     val allStatesState by viewModel.allStatesResponse.collectAsStateWithLifecycle()
     val allDistrictsState by viewModel.allDistrictsResponse.collectAsStateWithLifecycle()
     val allBlocksState by viewModel.allBlocksResponse.collectAsStateWithLifecycle()
     val allSchoolsState by viewModel.allSchoolsResponse.collectAsStateWithLifecycle()
     val allUdiseState by viewModel.allUdiseCodeResponse.collectAsStateWithLifecycle()
     val professionalProfileState by viewModel.professionalProfileResponse.collectAsStateWithLifecycle()
-    var allState: List<StateListResponse>? = remember { mutableStateListOf<StateListResponse>() }
-    var allDistricts: List<DistrictListResponse>? =
-        remember { mutableStateListOf<DistrictListResponse>() }
-    var allBlocks: List<BlockListResponse>? = remember { mutableStateListOf<BlockListResponse>() }
+    var allState = remember { mutableStateListOf<StateListResponse>() }
+    var allDistricts = remember { mutableStateListOf<DistrictListResponse>() }
+    var allBlocks = remember { mutableStateListOf<BlockListResponse>() }
     var allSchools = remember { mutableStateListOf<SchoolListResponse.SchoolResponse>() }
     var allUdiseDetails =
         remember { mutableStateListOf<SchoolByUdiseCodeResponse.UdiseCodeResponse>() }
@@ -181,6 +183,8 @@ fun ProfileScreen2UI(
     var districtSelectedId = remember { mutableIntStateOf(-1) }
     var blockSelectedId = remember { mutableIntStateOf(-1) }
     var schoolSelectedId = remember { mutableIntStateOf(-1) }
+    val strToken =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjR5QW9PaGdVQnJyOUVkdXVvbHFvSVE9PSIsInN1YiI6IjEiLCJpYXQiOjE3NTU3NzQ4NDcsImV4cCI6MTc1NTg2MTI0N30.bjqUtT6SSrMRpNO4EiLgh6VhnJp54deOPvQBrjzbTGo"
 
     LaunchedEffect(Unit) {
         viewModel.getAllStateList()
@@ -200,7 +204,10 @@ fun ProfileScreen2UI(
             allStatesState.success != null -> {
                 logger.d("All state response : ${allStatesState.success}")
                 if (allStatesState.success?.size != 0) {
-                    allState = allStatesState.success
+                    allDistricts.clear()
+                    allStatesState.success.let {
+                        it.let { it1 -> allState.addAll(it1!!.toList()) }
+                    }
                     println("All states list data :- $allState")
                 }
                 isDialogVisible = false
@@ -222,7 +229,10 @@ fun ProfileScreen2UI(
             allDistrictsState.success != null -> {
                 logger.d("All district response : ${allDistrictsState.success}")
                 if (allDistrictsState.success?.size != 0) {
-                    allDistricts = allDistrictsState.success
+                    allBlocks.clear()
+                    allDistrictsState.success.let {
+                        it.let { it2 -> allDistricts.addAll(it2!!.toList()) }
+                    }
                     println("All district list data :- $allDistricts")
                 }
                 isDialogVisible = false
@@ -244,7 +254,10 @@ fun ProfileScreen2UI(
             allBlocksState.success != null -> {
                 logger.d("All Blocks response : ${allBlocksState.success}")
                 if (allBlocksState.success?.size != 0) {
-                    allBlocks = allBlocksState.success
+                    allSchools.clear()
+                    allBlocksState.success.let {
+                        it.let { it3 -> allBlocks.addAll(it3!!.toList()) }
+                    }
                     println("All Blocks list data :- $allBlocks")
                 }
                 isDialogVisible = false
@@ -266,8 +279,9 @@ fun ProfileScreen2UI(
             allSchoolsState.success != null -> {
                 logger.d("All Schools response : ${allSchoolsState.success}")
                 if (allSchoolsState.success?.status == 1) {
-                    allSchools =
-                        allSchoolsState.success!!.response as SnapshotStateList<SchoolListResponse.SchoolResponse>
+                    allSchoolsState.success!!.response.let {
+                        it.let { it4 -> allSchools.addAll(it4!!.toList()) }
+                    }
                     println("All Schools list data :- $allSchools")
                 }
                 isDialogVisible = false
@@ -289,9 +303,15 @@ fun ProfileScreen2UI(
             allUdiseState.success != null -> {
                 logger.d("All Udise response : ${allUdiseState.success}")
                 if (allUdiseState.success?.status == 1) {
-                    allUdiseDetails =
-                        allUdiseState.success!!.response as SnapshotStateList<SchoolByUdiseCodeResponse.UdiseCodeResponse>
-                    println("All Udise list data :- $allUdiseState")
+                    allUdiseState.success!!.response.let {
+                        it.let { it5 ->
+                            allUdiseDetails.addAll(
+                                it5!!.toList()
+                            )
+                        }
+                    }
+                    println("All Udise list data :- $allUdiseDetails")
+                    isUdiseDetails = true
                 }
                 isDialogVisible = false
             }
@@ -380,7 +400,7 @@ fun ProfileScreen2UI(
                         modifier = Modifier.weight(1f),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        MobileTextField(
+                        UdiseTextField(
                             isIcon = false,
                             icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
                             colors = colors,
@@ -414,34 +434,35 @@ fun ProfileScreen2UI(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(id = R.drawable.search_icon),
-                                tint = White,
-                                contentDescription = IMG_DESCRIPTION,
-                                modifier = Modifier
-                                    .background(Color.Unspecified)
-                                    .size(60.dp)
-                                    .align(Alignment.CenterHorizontally)
-                                    .padding(8.dp)
-                                    .clickable {
-                                        viewModel.getAllDetailsByUdiseId(mobNo.value.toString())
-                                    }
-                            )
-
-                            /*Text(
-                                text = stringResource(R.string.key_Reset),
-                                textAlign = TextAlign.Center,
-                                fontFamily = fontMedium,
-                                fontSize = 14.sp,
-                                color = White,
-                                modifier = Modifier
-                                    .padding(8.dp)
-                                    .fillMaxWidth()
-                                    .fillMaxHeight()
-                                    .clickable {
-                                        mobNo.value.clearQuotes()
-                                    }
-                            )*/
+                            if (isUdiseDetails) {
+                                Text(
+                                    text = stringResource(R.string.key_Reset),
+                                    textAlign = TextAlign.Center,
+                                    fontFamily = fontMedium,
+                                    fontSize = 14.sp,
+                                    color = White,
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                        .fillMaxWidth()
+                                        .fillMaxHeight()
+                                        .clickable {
+                                            mobNo.value.clearQuotes()
+                                            isUdiseDetails = false
+                                        })
+                            } else {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.search_icon),
+                                    tint = White,
+                                    contentDescription = IMG_DESCRIPTION,
+                                    modifier = Modifier
+                                        .background(Color.Unspecified)
+                                        .size(60.dp)
+                                        .align(Alignment.CenterHorizontally)
+                                        .padding(8.dp)
+                                        .clickable {
+                                            viewModel.getAllDetailsByUdiseId(mobNo.value.toString())
+                                        })
+                            }
                         }
                     }
                 }
@@ -468,42 +489,39 @@ fun ProfileScreen2UI(
                 )
 
                 DropdownMenuUi(
-                    allState?.map { it.name }?.toList() as List<String>,
-                    onItemSelected = { selected ->
-                        allState?.find { it.name == selected }?.id?.let {
-                            viewModel.getAllDistrictByStateId(it)
-                            stateSelectedId.intValue = it
-                        }
-                    },
+                    options = listOf(),
+                    onItemSelected = {},
                     modifier = Modifier.clickable {
-                        logger.d("Clicked state Id :- ${allState?.size}")
+                        logger.d("Clicked state Id :- ${allState.size}")
                     },
-                    placeholder = selectedSchool,
+                    placeholder = if (selectedState.isNotEmpty()) {
+                        selectedState.toString()
+                    } else {
+                        stringResource(R.string.choose_option)
+                    },
                     onClick = {
                         scope.launch {
-                            isBottomSheetVisible = true // true under development code
+                            isBottomSheetStateVisible = true // true under development code
                             sheetState.expand()
                         }
                     })
 
                 SchoolListBottomSheet(
-                    isBottomSheetVisible = isBottomSheetVisible,
+                    isBottomSheetVisible = isBottomSheetStateVisible,
                     sheetState = sheetState,
                     onDismiss = {
                         scope.launch { sheetState.hide() }
-                            .invokeOnCompletion { isBottomSheetVisible = false }
+                            .invokeOnCompletion { isBottomSheetStateVisible = false }
                     },
-                    onDecline = {
-
-                    },
-                    onTextSelected = { it ->
-                        selectedSchool = it
-                        allState?.find { it.name == selectedSchool }?.id?.let {
-                            stateSelectedId.value = it
+                    onDecline = {},
+                    onTextSelected = { state ->
+                        selectedState = state.toString()
+                        allState.find { it.name == state }?.id?.let {
+                            stateSelectedId.intValue = it
+                            viewModel.getAllDistrictByStateId(it)
                         }
-                        "State"
                     },
-                    allState?.map { it.name }?.toList() as List<String>
+                    allState.map { it.name }.toMutableList() as List<String>
                 )
 
                 // District
@@ -526,41 +544,39 @@ fun ProfileScreen2UI(
                         Bg_Gray
                     }
                 )
+
                 DropdownMenuUi(
-                    allDistricts?.map { it.name }?.toList() as List<String>,
-                    onItemSelected = { selected ->
-                        allDistricts?.find { it.name == selected }?.id?.let {
-                            viewModel.getAllBlockByDistrictId(it)
-                            districtSelectedId.intValue = it
-                        }
-                    },
+                    options = listOf(),
+                    onItemSelected = {},
                     modifier = Modifier.clickable {},
-                    placeholder = selectedSchool,
+                    placeholder = if (selectedDistrict.isNotEmpty()) {
+                        selectedDistrict.toString()
+                    } else {
+                        stringResource(R.string.choose_option)
+                    },
                     onClick = {
                         scope.launch {
-                            isBottomSheetVisible = true // true under development code
+                            isBottomSheetDistrictVisible = true // true under development code
                             sheetState.expand()
                         }
                     })
 
                 SchoolListBottomSheet(
-                    isBottomSheetVisible = isBottomSheetVisible,
+                    isBottomSheetVisible = isBottomSheetDistrictVisible,
                     sheetState = sheetState,
                     onDismiss = {
                         scope.launch { sheetState.hide() }
-                            .invokeOnCompletion { isBottomSheetVisible = false }
+                            .invokeOnCompletion { isBottomSheetDistrictVisible = false }
                     },
-                    onDecline = {
-
-                    },
-                    onTextSelected = { it ->
-                        selectedSchool = it
-                        allDistricts?.find { it.name == selectedSchool }?.id?.let {
-                            districtSelectedId.value = it
+                    onDecline = {},
+                    onTextSelected = { districts ->
+                        selectedDistrict = districts
+                        allDistricts.find { it.name == districts }?.id?.let {
+                            districtSelectedId.intValue = it
+                            viewModel.getAllBlockByDistrictId(it)
                         }
-                        "District"
                     },
-                    allDistricts?.map { it.name }?.toList() as List<String>
+                    allDistricts.map { it.name }.toList() as List<String>
                 )
 
                 // Block
@@ -585,40 +601,37 @@ fun ProfileScreen2UI(
                 )
 
                 DropdownMenuUi(
-                    allBlocks?.map { it.name }?.toList() as List<String>,
-                    onItemSelected = { selected ->
-                        allBlocks?.find { it.name == selected }?.id?.let {
-                            viewModel.getAllSchoolsByBlockId(it)
-                            blockSelectedId.intValue = it
-                        }
-                    },
+                    options = listOf(),
+                    onItemSelected = {},
                     modifier = Modifier.clickable {},
-                    placeholder = selectedSchool,
+                    placeholder = if (selectedBlock.isNotEmpty()) {
+                        selectedBlock.toString()
+                    } else {
+                        stringResource(R.string.choose_option)
+                    },
                     onClick = {
                         scope.launch {
-                            isBottomSheetVisible = true // true under development code
+                            isBottomSheetBlockVisible = true // true under development code
                             sheetState.expand()
                         }
                     })
 
                 SchoolListBottomSheet(
-                    isBottomSheetVisible = isBottomSheetVisible,
+                    isBottomSheetVisible = isBottomSheetBlockVisible,
                     sheetState = sheetState,
                     onDismiss = {
                         scope.launch { sheetState.hide() }
-                            .invokeOnCompletion { isBottomSheetVisible = false }
+                            .invokeOnCompletion { isBottomSheetBlockVisible = false }
                     },
-                    onDecline = {
-
-                    },
-                    onTextSelected = { it ->
-                        selectedSchool = it
-                        allBlocks?.find { it.name == selectedSchool }?.id?.let {
-                            blockSelectedId.value = it
+                    onDecline = {},
+                    onTextSelected = { block ->
+                        selectedBlock = block
+                        allBlocks.find { it.name == block }?.id?.let {
+                            blockSelectedId.intValue = it
+                            viewModel.getAllSchoolsByBlockId(it)
                         }
-                        "Block"
                     },
-                    allBlocks?.map { it.name }?.toList() as List<String>
+                    allBlocks.map { it.name }.toList() as List<String>
                 )
 
                 // School
@@ -642,37 +655,35 @@ fun ProfileScreen2UI(
                     }
                 )
                 DropdownMenuUi(
-                    allSchools.map { it.name }.toList() as List<String>,
-                    onItemSelected = { selected ->
-                        allSchools.find { it.name == selected }?.id?.let {
-                            schoolSelectedId.intValue = it
-                        }
+                    options = listOf(),
+                    onItemSelected = {
                     },
                     modifier = Modifier.clickable {},
-                    placeholder = selectedSchool,
+                    placeholder = if (selectedSchool.isNotEmpty()) {
+                        selectedSchool.toString()
+                    } else {
+                        stringResource(R.string.choose_option)
+                    },
                     onClick = {
                         scope.launch {
-                            isBottomSheetVisible = true // true under development code
+                            isBottomSheetSchoolVisible = true // true under development code
                             sheetState.expand()
                         }
                     })
 
                 SchoolListBottomSheet(
-                    isBottomSheetVisible = isBottomSheetVisible,
+                    isBottomSheetVisible = isBottomSheetSchoolVisible,
                     sheetState = sheetState,
                     onDismiss = {
                         scope.launch { sheetState.hide() }
-                            .invokeOnCompletion { isBottomSheetVisible = false }
+                            .invokeOnCompletion { isBottomSheetSchoolVisible = false }
                     },
-                    onDecline = {
-
-                    },
-                    onTextSelected = { it ->
-                        selectedSchool = it
-                        allSchools.find { it.name == selectedSchool }?.id?.let {
+                    onDecline = {},
+                    onTextSelected = { school ->
+                        selectedSchool = school
+                        allSchools.find { it.name == school }?.id?.let {
                             schoolSelectedId.intValue = it
                         }
-                        "School"
                     },
                     allSchools.map { it.name }.toList() as List<String>
                 )
@@ -724,17 +735,15 @@ fun ProfileScreen2UI(
                                     } else {
                                         isDialogVisible = true
 
-                                        val professionalProfileRequest =
-                                            ProfessionalProfileRequest(
-                                                mobNo.value.toString(),
-                                                stateSelectedId.value,
-                                                districtSelectedId.value,
-                                                blockSelectedId.value,
-                                                schoolSelectedId.value
-                                            )
+                                        val professionalProfileRequest = ProfessionalProfileRequest(
+                                            mobNo.value.toString(),
+                                            stateSelectedId.intValue,
+                                            districtSelectedId.intValue,
+                                            blockSelectedId.intValue,
+                                            schoolSelectedId.intValue
+                                        )
                                         viewModel.createProfessionalProfileRepo(
-                                            professionalProfileRequest,
-                                            ""
+                                            professionalProfileRequest, strToken
                                         )
                                     }
                                 }
