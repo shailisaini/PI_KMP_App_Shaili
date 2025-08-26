@@ -23,6 +23,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictL
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByUdiseCodeResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
+import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
 import com.pi.ProjectInclusion.database.LocalDataSource
 import com.pi.ProjectInclusion.domain.ConnectivityObserver
 import com.pi.ProjectInclusion.domain.useCases.AuthenticationUsesCases
@@ -67,8 +68,8 @@ class LoginViewModel(
     private val _uiStateLogin = MutableStateFlow(UiState<LoginApiResponse>())
     val uiStateLoginResponse: StateFlow<UiState<LoginApiResponse>> = _uiStateLogin
 
-    private val viewUserProfile = MutableStateFlow(UiState<LoginApiResponse>())
-    val viewUserProfileResponse: StateFlow<UiState<LoginApiResponse>> = viewUserProfile
+    private val viewUserProfile = MutableStateFlow(UiState<ViewProfileResponse>())
+    val viewUserProfileResponse: StateFlow<UiState<ViewProfileResponse>> = viewUserProfile
 
     private val verifyLogin = MutableStateFlow(UiState<VerifyOtpResponse>())
     val verifyLoginResponse: StateFlow<UiState<VerifyOtpResponse>> = verifyLogin
@@ -131,7 +132,7 @@ class LoginViewModel(
     }
 
     fun getPrefData(key: String): String {
-        return localData.getValue(key, "N/A")
+        return localData.getValue(key, "")
     }
 
     init {

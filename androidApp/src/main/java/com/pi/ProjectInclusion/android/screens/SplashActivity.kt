@@ -96,7 +96,7 @@ class SplashActivity : ComponentActivity() {
                             }
                         }
 
-                        AppRoute.StudentDashboardActivity.route ->{
+                        AppRoute.TeacherDashboard.route ->{
                             context.startActivity(
                                 Intent(context, StudentDashboardActivity::class.java)
                             )
