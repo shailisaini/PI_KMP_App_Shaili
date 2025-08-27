@@ -298,6 +298,7 @@ fun EditProfileScreen2UI(
                 }
             }
         }
+    }
 
     if (isUdiseCalled){
         loginViewModel.getAllDetailsByUdiseId(mobNo.value.toString())
