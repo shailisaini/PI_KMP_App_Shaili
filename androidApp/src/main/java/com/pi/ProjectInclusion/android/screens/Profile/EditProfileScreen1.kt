@@ -95,8 +95,10 @@ import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import java.io.ByteArrayOutputStream
 
 @Composable
-fun EditProfileScreen1(onNext: () -> Unit,  //EditProfileScreen2
+fun EditProfileScreen1(onNextTeacher: () -> Unit,  //EditProfileScreen2
                        onBack: () -> Unit,
+                       onNextProfessional: () -> Unit,
+                       onNextSpecialEducator: () -> Unit,
                        loginViewModel: LoginViewModel) {
     var isDialogVisible by remember { mutableStateOf(false) }
 //    val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
@@ -125,7 +127,12 @@ fun EditProfileScreen1(onNext: () -> Unit,  //EditProfileScreen2
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            EditProfileScreenUI(context, onBack = onBack, loginViewModel = loginViewModel, onNext = onNext)
+            EditProfileScreenUI(context, onBack = onBack,
+                loginViewModel = loginViewModel,
+                onNextTeacher = onNextTeacher,
+                onNextProfessional = onNextProfessional,
+                onNextSpecialEducator = onNextSpecialEducator,
+            )
         }
     }
 }
@@ -135,9 +142,10 @@ fun EditProfileScreenUI(
     context: Context,
     onBack: () -> Unit,
     loginViewModel: LoginViewModel,
-    onNext: () -> Unit
+    onNextTeacher: () -> Unit,
+    onNextProfessional: () -> Unit,
+    onNextSpecialEducator: () -> Unit,
 ) {
-
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
     val isInternetAvailable by remember { mutableStateOf(true) }
@@ -180,6 +188,7 @@ fun EditProfileScreenUI(
     val email = remember { mutableStateOf("") }
     val mobNo = remember { mutableStateOf("") }
     val whatsappNo = remember { mutableStateOf("") }
+    val noInternet = stringResource(id=R.string.txt_oops_no_internet)
 
     val viewProfile by loginViewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
     LaunchedEffect(viewProfile) {
@@ -306,7 +315,6 @@ fun EditProfileScreenUI(
                                     modifier = Modifier
                                         .size(90.dp), // adjust the size as needed,
                                     painter =
-//                                    if (profileData?.user.)
                                         painterResource(id = R.drawable.profile_user_icon),
                                     contentDescription = IMG_DESCRIPTION
                                 )
@@ -632,6 +640,8 @@ fun EditProfileScreenUI(
                                     enabled = mobNo.value.length >= 10,
                                     title = txtContinue,
                                     onClick = {
+//                                        onNext()
+                                        onNextProfessional()
                                         if (mobNo.value.isEmpty()) {
                                             inValidMobNo = true
                                         } else if (firstName.value.toString().isEmpty()) {
@@ -673,13 +683,19 @@ fun EditProfileScreenUI(
                                                         "EditProfile: " + "1.. " + firstStepProfileRequest + " .. "
                                                                 + strToken + " .. " + mobNo.value.toString() + " .. " + fileName + " .. "
                                                     )
-
-                                                    loginViewModel.createFirstStepProfileRepo(
-                                                        firstStepProfileRequest,
-                                                        strToken,
-                                                        byteArray,
-                                                        fileName
-                                                    )
+                                                    // check Internet
+                                                    if (!isInternetAvailable) {
+                                                        context.toast(noInternet)
+                                                    } else {
+                                                        // call Api
+                                                        isDialogVisible = true
+                                                        loginViewModel.createFirstStepProfileRepo(
+                                                            firstStepProfileRequest,
+                                                            strToken,
+                                                            byteArray,
+                                                            fileName
+                                                        )
+                                                    }
                                                 }
                                             }
                                         }

@@ -175,7 +175,7 @@ class ApiService(private val client: HttpClient) {
             }
             headers {
                 append(HttpHeaders.Accept, "application/json")
-                append(HttpHeaders.Authorization, "Bearer $strToken")
+                append(HttpHeaders.Authorization, strToken)
             }
             contentType(ContentType.Application.Json)
             setBody(passwordRequest)
@@ -193,7 +193,7 @@ class ApiService(private val client: HttpClient) {
             }
             headers {
                 append(HttpHeaders.Accept, "application/json")
-                append(HttpHeaders.Authorization, "Bearer $strToken")
+                append(HttpHeaders.Authorization, strToken)
             }
             contentType(ContentType.Application.Json)
             setBody(changeRequest)
@@ -211,7 +211,6 @@ class ApiService(private val client: HttpClient) {
             }
             headers {
                 append(HttpHeaders.Accept, "application/json")
-//                append(HttpHeaders.Authorization, "Bearer $strToken")
             }
             contentType(ContentType.Application.Json)
             setBody(certificateRequest)
@@ -344,7 +343,7 @@ class ApiService(private val client: HttpClient) {
             }
             headers {
                 append(HttpHeaders.Accept, "application/json")
-                append(HttpHeaders.Authorization, "Bearer $strToken")
+                append(HttpHeaders.Authorization, strToken)
             }
             contentType(ContentType.Application.Json)
             setBody(professionalProfileRequest)
