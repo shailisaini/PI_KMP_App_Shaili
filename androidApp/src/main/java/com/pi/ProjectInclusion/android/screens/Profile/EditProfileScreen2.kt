@@ -786,7 +786,7 @@ fun EditProfileScreen2UI(
                                     if(schoolSelectedId.intValue == -1){
                                         context.toast(schoolError)
                                     }
-
+                                    else{
                                     val professionalProfileRequest = ProfessionalProfileRequest(
                                         udiseCode.value.toString(),
                                         stateSelectedId.intValue,
@@ -797,6 +797,7 @@ fun EditProfileScreen2UI(
                                     loginViewModel.createProfessionalProfileRepo(
                                         professionalProfileRequest, strToken
                                     )
+                                    }
                                 },
                             )
                         }
