@@ -16,11 +16,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -34,8 +35,9 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat.startActivity
-import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.kmptemplate.logger.LoggerProvider
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.AnimatedRouteHost
@@ -68,12 +70,14 @@ import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.FaqActivity
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.LMSCourseHomeScreen
 import com.pi.ProjectInclusion.android.screens.login.EnterUserNameScreen
 import com.pi.ProjectInclusion.android.screens.notification.NotificationScreen
-import com.pi.ProjectInclusion.android.screens.screeningScreen.AdvanceScreening
 import com.pi.ProjectInclusion.android.screens.screeningScreen.AdvanceScreeningScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ProfilerFormPageScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ReportAdvanceScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ViewScreeningProfileDetailsScreen
+import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
+import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -102,6 +106,42 @@ class StudentDashboardActivity : ComponentActivity() {
                 currentRoute = route
             }
 
+            val viewProfile by viewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
+            var encryptedUserName = viewModel.getPrefData(USER_NAME)
+            logger.d("Profile details on dashboard page for header in drawer :- $encryptedUserName")
+            var profileData by remember { mutableStateOf<ViewProfileResponse.ProfileResponse?>(null) }
+
+            var allUdiseDetails = remember { mutableStateListOf<ViewProfileResponse>() }
+
+            LaunchedEffect(Unit) {
+//                viewModel.getUserProfileViewModel(encryptedUserName)
+                viewModel.getUserProfileViewModel("lhWmhODMnBvTyxCkajySXQ==")
+            }
+
+            LaunchedEffect(viewProfile) {
+                when {
+                    viewProfile.isLoading -> {
+                        isDialogVisible = true
+                    }
+
+                    viewProfile.error.isNotEmpty() -> {
+                        logger.d("viewProfileData: ${viewProfile.success}")
+                        isDialogVisible = false
+                    }
+
+                    viewProfile.success != null -> {
+                        logger.d("Profile Data:- ${viewProfile.success}")
+                        if (viewProfile.success!!.status == true) {
+                            profileData = viewProfile.success!!.response
+                            logger.d("Profile Data details : ${viewProfile.success}")
+                        } else {
+                            context.toast(viewProfile.success!!.message.toString())
+                        }
+                        isDialogVisible = false
+                    }
+                }
+            }
+
             fun navigateBack(toRoute: String? = null) {
                 isForward = false
                 currentRoute = toRoute ?: AppRoute.LanguageSelect.route
@@ -109,7 +149,7 @@ class StudentDashboardActivity : ComponentActivity() {
 
             ModalNavigationDrawer(
                 drawerState = drawerState,
-                gesturesEnabled = false, // prevents swipe
+//                gesturesEnabled = false, // prevents swipe
                 drawerContent = {
                     Column(
                         modifier = Modifier
@@ -124,7 +164,8 @@ class StudentDashboardActivity : ComponentActivity() {
                                     drawerState.close()
                                     navigateTo(AppRoute.ProfileScreen.route)
                                 }
-                            })
+                            }, profileData
+                        )
                         DrawerBody(
                             // List of Navigation Drawer
                             items = listOf(
