@@ -137,7 +137,6 @@ fun EditProfileScreenUI(
     loginViewModel: LoginViewModel,
     onNext: () -> Unit
 ) {
-
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
     val isInternetAvailable by remember { mutableStateOf(true) }
@@ -633,6 +632,7 @@ fun EditProfileScreenUI(
                                     enabled = mobNo.value.length >= 10,
                                     title = txtContinue,
                                     onClick = {
+                                        onNext()
                                         if (mobNo.value.isEmpty()) {
                                             inValidMobNo = true
                                         } else if (firstName.value.toString().isEmpty()) {
@@ -674,7 +674,6 @@ fun EditProfileScreenUI(
                                                         "EditProfile: " + "1.. " + firstStepProfileRequest + " .. "
                                                                 + strToken + " .. " + mobNo.value.toString() + " .. " + fileName + " .. "
                                                     )
-
                                                     // check Internet
                                                     if (!isInternetAvailable) {
                                                         context.toast(noInternet)

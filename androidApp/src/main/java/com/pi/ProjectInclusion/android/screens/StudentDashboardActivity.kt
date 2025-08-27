@@ -271,6 +271,7 @@ class StudentDashboardActivity : ComponentActivity() {
                                         onBack = { navigateBack(AppRoute.ProfileScreen.route) })
 
                                     AppRoute.EditProfileScreen2.route -> EditProfileScreen2(
+                                        loginViewModel = viewModel,
                                         onNext = {
                                             context.startActivity(
                                                 Intent(
