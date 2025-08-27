@@ -18,8 +18,12 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithO
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ProfessionListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.QualificationListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ReasonListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByUdiseCodeResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SpecializationListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
 import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
 import com.pi.ProjectInclusion.domain.repository.AuthenticationRepository
@@ -167,10 +171,15 @@ class AuthenticationUsesCases(private val repository: AuthenticationRepository) 
         firstStepProfileRequest: FirstStepProfileRequest,
         strToken: String,
         profilePic: ByteArray? = null,
-        fileName: String? = null
+        fileName: String? = null,
     ): Flow<Result<CreateFirstStepProfileResponse>> = flow {
         try {
-            val response = repository.createFirstStepProfileRepo(firstStepProfileRequest, strToken, profilePic, fileName)
+            val response = repository.createFirstStepProfileRepo(
+                firstStepProfileRequest,
+                strToken,
+                profilePic,
+                fileName
+            )
             emit(Result.success(response))
         } catch (e: Exception) {
             val errorMessage = e.message ?: unableToConnectServer
@@ -250,4 +259,57 @@ class AuthenticationUsesCases(private val repository: AuthenticationRepository) 
         }
     }.flowOn(Dispatchers.IO)
 
+    fun getAllProfessionRepo(): Flow<Result<List<ProfessionListResponse>>> = flow {
+        try {
+            val response =
+                repository.getAllProfessionRepo()
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            LoggerProvider.logger.d("Exception in otpOnWhatsapp() $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getAllQualificationRepo(profession: Int): Flow<Result<List<QualificationListResponse>>> =
+        flow {
+            try {
+                val response =
+                    repository.getAllQualificationRepo(profession)
+                emit(Result.success(response))
+            } catch (e: Exception) {
+                val errorMessage = e.message ?: unableToConnectServer
+                LoggerProvider.logger.d("Exception in otpOnWhatsapp() $errorMessage")
+                emit(Result.failure(Exception(errorMessage)))
+            }
+        }.flowOn(Dispatchers.IO)
+
+    fun getAllSpecializationRepo(
+        profession: Int,
+        qualification: Int,
+    ): Flow<Result<List<SpecializationListResponse>>> =
+        flow {
+            try {
+                val response =
+                    repository.getAllSpecializationRepo(profession, qualification)
+                emit(Result.success(response))
+            } catch (e: Exception) {
+                val errorMessage = e.message ?: unableToConnectServer
+                LoggerProvider.logger.d("Exception in otpOnWhatsapp() $errorMessage")
+                emit(Result.failure(Exception(errorMessage)))
+            }
+        }.flowOn(Dispatchers.IO)
+
+    fun getAllReasonRepo(): Flow<Result<ReasonListResponse>> =
+        flow {
+            try {
+                val response =
+                    repository.getAllReasonRepo()
+                emit(Result.success(response))
+            } catch (e: Exception) {
+                val errorMessage = e.message ?: unableToConnectServer
+                LoggerProvider.logger.d("Exception in otpOnWhatsapp() $errorMessage")
+                emit(Result.failure(Exception(errorMessage)))
+            }
+        }.flowOn(Dispatchers.IO)
 }

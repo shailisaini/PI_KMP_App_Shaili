@@ -5,6 +5,7 @@
     <string name="choose_hindi_english">Choose Language Hindi &amp; English</string>
     <string name="select_userType">Select an user type</string>
     <string name="text_enter_no">Please enter valid mobile number</string>
+    <string name="text_enter_udise">Please enter valid udise number</string>
     <string name="txt_enter_valid_mob_user">Please enter valid username or mobile number</string>
     <string name="text_mobile_no_user">Mobile Number/Username</string>
     <string name="text_continue">Continue</string>
@@ -487,6 +488,15 @@ and make a difference together!</string>
     <string name="txt_re_screening_desc">The student has been promoted to higher grade level, so rescreening is required to ensure appropriate intervention.</string>
     <string name="txt_enter_whatsApp">Enter your whatsApp number</string>
     <string name="txt_enter_mail">Enter your email</string>
+    <string name="key_select_state">Select your state</string>
+    <string name="key_select_district">Select your district</string>
+    <string name="key_select_block">Select your block</string>
+    <string name="key_select_school">Select your school</string>
+    <string name="key_select_reason">Select your reason</string>
+    <string name="key_select_profession">Select your profession</string>
+    <string name="key_select_qualification">Select your qualification</string>
+    <string name="key_select_specialization">Select your specialization</string>
+    <string name="key_CRR_No">Enter your CRR No.</string>
 
 
 </resources>
