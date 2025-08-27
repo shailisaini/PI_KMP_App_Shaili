@@ -487,6 +487,10 @@ and make a difference together!</string>
     <string name="txt_re_screening_desc">The student has been promoted to higher grade level, so rescreening is required to ensure appropriate intervention.</string>
     <string name="txt_enter_whatsApp">Enter your whatsApp number</string>
     <string name="txt_enter_mail">Enter your email</string>
+    <string name="txt_select_state">Please select a state</string>
+    <string name="txt_select_district">Please select a district</string>
+    <string name="txt_select_block">Please select a block</string>
+    <string name="txt_select_school">Please select a school</string>
 
 
 </resources>

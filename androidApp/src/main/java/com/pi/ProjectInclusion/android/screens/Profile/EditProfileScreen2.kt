@@ -76,11 +76,13 @@ import com.pi.ProjectInclusion.android.common_UI.SchoolListBottomSheet
 import com.pi.ProjectInclusion.android.common_UI.SmallBtnUi
 import com.pi.ProjectInclusion.android.common_UI.UdiseTextField
 import com.pi.ProjectInclusion.android.utils.fontMedium
+import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.CustomDialog
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetLanguageListResponse
@@ -140,8 +142,12 @@ fun EditProfileScreen2UI(
 //  languageData[LanguageTranslationsResponse.KEY_INVALID_MOBILE_NO_ERROR].toString()
     val txtContinue = stringResource(id = R.string.text_continue)
     val tvUdise = stringResource(id = R.string.txt_udise_number)
+    val stateError = stringResource(id = R.string.txt_select_state)
+    val districtError = stringResource(id = R.string.txt_select_district)
+    val blockError = stringResource(id = R.string.txt_select_block)
+    val schoolError = stringResource(id = R.string.txt_select_school)
     val schoolList = remember { mutableStateListOf<GetLanguageListResponse.LanguageResponse>() }
-    var mobNo = rememberSaveable { mutableStateOf("") }
+    var udiseCode = rememberSaveable { mutableStateOf("") }
     val enterUdiseCode = stringResource(R.string.txt_udise_number)
     var isUdiseDetails by remember { mutableStateOf(false) }
     var showError by remember { mutableStateOf(false) }
@@ -177,7 +183,6 @@ fun EditProfileScreen2UI(
     var blockSelectedId = remember { mutableIntStateOf(-1) }
     var schoolSelectedId = remember { mutableIntStateOf(-1) }
     val scope = rememberCoroutineScope()
-    var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true,)
 
@@ -301,7 +306,7 @@ fun EditProfileScreen2UI(
     }
 
     if (isUdiseCalled){
-        loginViewModel.getAllDetailsByUdiseId(mobNo.value.toString())
+        loginViewModel.getAllDetailsByUdiseId(udiseCode.value.toString())
         isDialogVisible = true
         val allUdiseState by loginViewModel.allUdiseCodeResponse.collectAsStateWithLifecycle()
         LaunchedEffect(allUdiseState) {
@@ -444,7 +449,7 @@ fun EditProfileScreen2UI(
                                         isIcon = false,
                                         icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
                                         colors = colors,
-                                        number = mobNo,
+                                        number = udiseCode,
                                         enable = true,
                                         hint = enterUdiseCode.toString()
                                     )
@@ -486,7 +491,7 @@ fun EditProfileScreen2UI(
                                                     .fillMaxWidth()
                                                     .fillMaxHeight()
                                                     .clickable {
-                                                        mobNo.value.clearQuotes()
+                                                        udiseCode.value.clearQuotes()
                                                         isUdiseDetails = false
                                                         // remove values
                                                         selectedState = ""
@@ -743,246 +748,6 @@ fun EditProfileScreen2UI(
 
                             Spacer(modifier = Modifier.height(15.dp))
                         }
-                        /*Text(
-                            tvUdise,
-                            modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),
-                            fontFamily = fontMedium,
-                            fontSize = 14.sp,
-                            color = if (isSystemInDarkTheme()) {
-                                DARK_DEFAULT_BUTTON_TEXT
-                            } else {
-                                Gray
-                            }
-                        )
-
-                        MobileTextField(
-                            isIcon = false,
-                            icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
-                            colors = colors,
-                            number = mobNo,
-                            enable = true,
-                            hint = enterMobile.toString()
-                        )
-
-                        // State
-                        Text(
-                            text = buildAnnotatedString {
-                                append(stringResource(R.string.txt_state))
-                                pushStyle(SpanStyle(color = Color.Red))
-                                append(ASTRICK)
-                                pop()
-                            },
-                            modifier = Modifier.padding(
-                                top = 24.dp,
-                                bottom = 10.dp,
-                                start = 8.dp, end = 8.dp
-                            ),
-                            textAlign = TextAlign.Start,
-                            fontFamily = fontMedium,
-                            fontSize = 14.sp,
-                            color = if (isSystemInDarkTheme()) {
-                                DARK_BODY_TEXT
-                            } else {
-                                Bg_Gray
-                            }
-                        )
-
-                        DropdownMenuUi(listOf(), onItemSelected = {
-
-                        }, modifier = Modifier.clickable {
-
-                        }, placeholder = selectedSchool, onClick = {
-//                            schoolListOpen = true
-                            scope.launch {
-                                isBottomSheetVisible = true // true under development code
-                                sheetState.expand()
-                            }
-                        })
-                        SchoolListBottomSheet(
-                            isBottomSheetVisible = isBottomSheetVisible,
-                            sheetState = sheetState,
-                            onDismiss = {
-                                scope.launch { sheetState.hide() }
-                                    .invokeOnCompletion { isBottomSheetVisible = false }
-                            },
-                            onDecline = {
-
-                            },
-                            onTextSelected = { it ->
-                                *//* selectedSchool = it
-                         schoolList.find { it.name == selectedSchool }?.id?.let {
-                             schoolSelectedId.value = it
-                         }*//*
-                                "School"
-                            },
-                            schoolList.map { it.name }.toList() as List<String>
-                        )
-
-                        // District
-                        Text(
-                            text = buildAnnotatedString {
-                                append(stringResource(R.string.txt_district))
-                                pushStyle(SpanStyle(color = Color.Red))
-                                append(ASTRICK)
-                                pop()
-                            },
-                            modifier = Modifier.padding(
-                                top = 24.dp,
-                                bottom = 10.dp,
-                                start = 8.dp, end = 8.dp
-                            ),
-                            textAlign = TextAlign.Start,
-                            fontFamily = fontMedium,
-                            fontSize = 14.sp,
-                            color = if (isSystemInDarkTheme()) {
-                                DARK_BODY_TEXT
-                            } else {
-                                Bg_Gray
-                            }
-                        )
-                        DropdownMenuUi(listOf(), onItemSelected = {
-
-                        }, modifier = Modifier.clickable {
-                        }, placeholder = selectedSchool, onClick = {
-//                            schoolListOpen = true
-                            scope.launch {
-                                isBottomSheetVisible = true // true under development code
-                                sheetState.expand()
-                            }
-                        })
-                        SchoolListBottomSheet(
-                            isBottomSheetVisible = isBottomSheetVisible,
-                            sheetState = sheetState,
-                            onDismiss = {
-                                scope.launch { sheetState.hide() }
-                                    .invokeOnCompletion { isBottomSheetVisible = false }
-                            },
-                            onDecline = {
-
-                            },
-                            onTextSelected = { it ->
-                                *//* selectedSchool = it
-                         schoolList.find { it.name == selectedSchool }?.id?.let {
-                             schoolSelectedId.value = it
-                         }*//*
-                                "School"
-                            },
-                            schoolList.map { it.name }.toList() as List<String>
-                        )
-
-                        // Block
-                        Text(
-                            text = buildAnnotatedString {
-                                append(stringResource(R.string.txt_block_zone))
-                                pushStyle(SpanStyle(color = Color.Red))
-                                append(ASTRICK)
-                                pop()
-                            },
-                            modifier = Modifier.padding(
-                                top = 24.dp,
-                                bottom = 10.dp,
-                                start = 8.dp, end = 8.dp
-                            ),
-                            textAlign = TextAlign.Start,
-                            fontFamily = fontMedium,
-                            fontSize = 14.sp,
-                            color = if (isSystemInDarkTheme()) {
-                                DARK_BODY_TEXT
-                            } else {
-                                Bg_Gray
-                            }
-                        )
-                        DropdownMenuUi(listOf(), onItemSelected = {
-
-                        }, modifier = Modifier.clickable {
-                        }, placeholder = selectedSchool, onClick = {
-//                            schoolListOpen = true
-                            scope.launch {
-                                isBottomSheetVisible = true // true under development code
-                                sheetState.expand()
-                            }
-                        })
-                        SchoolListBottomSheet(
-                            isBottomSheetVisible = isBottomSheetVisible,
-                            sheetState = sheetState,
-                            onDismiss = {
-                                scope.launch { sheetState.hide() }
-                                    .invokeOnCompletion { isBottomSheetVisible = false }
-                            },
-                            onDecline = {
-
-                            },
-                            onTextSelected = { it ->
-                                *//* selectedSchool = it
-                         schoolList.find { it.name == selectedSchool }?.id?.let {
-                             schoolSelectedId.value = it
-                         }*//*
-                                "School"
-                            },
-                            schoolList.map { it.name }.toList() as List<String>
-                        )
-
-                        // School
-                        Text(
-                            text = buildAnnotatedString {
-                                append(stringResource(R.string.txt_school_name))
-                                pushStyle(SpanStyle(color = Color.Red))
-                                append(ASTRICK)
-                                pop()
-                            },
-                            modifier = Modifier.padding(
-                                top = 24.dp,
-                                bottom = 10.dp,
-                                start = 8.dp, end = 8.dp
-                            ),
-                            textAlign = TextAlign.Start,
-                            fontFamily = fontMedium,
-                            fontSize = 14.sp,
-                            color = if (isSystemInDarkTheme()) {
-                                DARK_BODY_TEXT
-                            } else {
-                                Bg_Gray
-                            }
-                        )
-                        DropdownMenuUi(listOf(), onItemSelected = {
-
-                        }, modifier = Modifier.clickable {
-                        }, placeholder = selectedSchool, onClick = {
-//                            schoolListOpen = true
-                            scope.launch {
-                                isBottomSheetVisible = true // true under development code
-                                sheetState.expand()
-                            }
-                        })
-                        SchoolListBottomSheet(
-                            isBottomSheetVisible = isBottomSheetVisible,
-                            sheetState = sheetState,
-                            onDismiss = {
-                                scope.launch { sheetState.hide() }
-                                    .invokeOnCompletion { isBottomSheetVisible = false }
-                            },
-                            onDecline = {
-
-                            },
-                            onTextSelected = { it ->
-                                *//* selectedSchool = it
-                         schoolList.find { it.name == selectedSchool }?.id?.let {
-                             schoolSelectedId.value = it
-                         }*//*
-                                "School"
-                            },
-                            schoolList.map { it.name }.toList() as List<String>
-                        )
-
-                        if (inValidMobNo) {
-                            Text(
-                                invalidMobNo.toString(),
-                                color = LightRed01,
-                                modifier = Modifier.padding(5.dp),
-                                fontSize = 10.sp
-                            )
-                        }*/
-
                         Spacer(modifier = Modifier.height(15.dp))
                     }
                     Box(
@@ -1005,26 +770,33 @@ fun EditProfileScreen2UI(
                             horizontalAlignment = Alignment.End
                         ) {
                             SmallBtnUi(
-                                enabled = mobNo.value.length >= 10,
+                                enabled = schoolSelectedId.intValue != -1, // if school is not empty
                                 title = txtContinue,
                                 onClick = {
-                                    if (mobNo.value.isEmpty()) {
-                                    } else {
-                                        if (showError || mobNo.value.length < 10) {
 
-                                        } else { // if first digit of mobile is less than 6 then error will show
-                                            showError = mobNo.value.isEmpty()
-                                            val firstDigitChar = mobNo.value.toString().first()
-                                            val firstDigit = firstDigitChar.digitToInt()
-                                            if (firstDigit < 6) {
-
-                                            } else {
-                                                isDialogVisible = true
-                                               onNext()
-
-                                            }
-                                        }
+                                    if (schoolSelectedId.intValue == -1){
+                                        context.toast(stateError)
                                     }
+                                    if(districtSelectedId.intValue == -1){
+                                        context.toast(districtError)
+                                    }
+                                    if(blockSelectedId.intValue == -1){
+                                        context.toast(blockError)
+                                    }
+                                    if(schoolSelectedId.intValue == -1){
+                                        context.toast(schoolError)
+                                    }
+
+                                    val professionalProfileRequest = ProfessionalProfileRequest(
+                                        udiseCode.value.toString(),
+                                        stateSelectedId.intValue,
+                                        districtSelectedId.intValue,
+                                        blockSelectedId.intValue,
+                                        schoolSelectedId.intValue
+                                    )
+                                    loginViewModel.createProfessionalProfileRepo(
+                                        professionalProfileRequest, strToken
+                                    )
                                 },
                             )
                         }
