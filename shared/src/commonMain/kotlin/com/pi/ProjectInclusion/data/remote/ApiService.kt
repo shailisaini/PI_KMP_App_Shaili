@@ -19,8 +19,12 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithO
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ProfessionListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.QualificationListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ReasonListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByUdiseCodeResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SpecializationListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
 import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
 import io.ktor.client.HttpClient
@@ -52,6 +56,7 @@ class ApiService(private val client: HttpClient) {
         const val appendUser = "users"
         const val appendCertificate = "Certificate"
         const val appendLive = "api"
+        const val appendReason = "reason"
     }
 
     suspend fun getLanguages(): GetLanguageListResponse = client.get {
@@ -228,7 +233,7 @@ class ApiService(private val client: HttpClient) {
         firstStepProfileRequest: FirstStepProfileRequest,
         strToken: String,
         profilePic: ByteArray? = null,
-        fileName: String? = null
+        fileName: String? = null,
     ): CreateFirstStepProfileResponse =
         client.patch {
 
@@ -243,30 +248,33 @@ class ApiService(private val client: HttpClient) {
             contentType(ContentType.Application.Json)
             setBody(
                 MultiPartFormDataContent(
-                formData {
-                    append("firstname", firstStepProfileRequest.firstname.toString())
-                    append("middlename", firstStepProfileRequest.email.toString())
-                    append("lastname", firstStepProfileRequest.mobile.toString())
-                    append("gender", firstStepProfileRequest.mobile.toString())
-                    append("mobile", firstStepProfileRequest.mobile.toString())
-                    append("whatsapp", firstStepProfileRequest.mobile.toString())
-                    append("dob", firstStepProfileRequest.mobile.toString())
-                    append("email", firstStepProfileRequest.mobile.toString())
-                    profilePic?.let { bytes ->
-                        append(
-                            key = "profilepic", //params Name
-                            value = bytes,
-                            headers = Headers.build {
-                                append(HttpHeaders.ContentType, ContentType.Image.PNG.toString())
-                                append(
-                                    HttpHeaders.ContentDisposition,
-                                    "form-data; name=\"profilepic\"; filename=\"${fileName ?: "profile.jpg"}\""
-                                )
-                            }
-                        )
+                    formData {
+                        append("firstname", firstStepProfileRequest.firstname.toString())
+                        append("middlename", firstStepProfileRequest.email.toString())
+                        append("lastname", firstStepProfileRequest.mobile.toString())
+                        append("gender", firstStepProfileRequest.mobile.toString())
+                        append("mobile", firstStepProfileRequest.mobile.toString())
+                        append("whatsapp", firstStepProfileRequest.mobile.toString())
+                        append("dob", firstStepProfileRequest.mobile.toString())
+                        append("email", firstStepProfileRequest.mobile.toString())
+                        profilePic?.let { bytes ->
+                            append(
+                                key = "profilepic", //params Name
+                                value = bytes,
+                                headers = Headers.build {
+                                    append(
+                                        HttpHeaders.ContentType,
+                                        ContentType.Image.PNG.toString()
+                                    )
+                                    append(
+                                        HttpHeaders.ContentDisposition,
+                                        "form-data; name=\"profilepic\"; filename=\"${fileName ?: "profile.jpg"}\""
+                                    )
+                                }
+                            )
+                        }
                     }
-                }
-            ))
+                ))
         }.body<CreateFirstStepProfileResponse>()
 
     suspend fun getAllStateList(): List<StateListResponse> =
@@ -341,4 +349,54 @@ class ApiService(private val client: HttpClient) {
             contentType(ContentType.Application.Json)
             setBody(professionalProfileRequest)
         }.body<CreateFirstStepProfileResponse>()
+
+    suspend fun getAllProfession(): List<ProfessionListResponse> =
+        client.get {
+            url {
+                takeFrom(BASIC_LIVE_BASE_URL)
+                appendPathSegments(appendLive, "Profession/GetProfession")
+            }
+            headers {
+                append(HttpHeaders.Accept, "application/json")
+            }
+        }.body<List<ProfessionListResponse>>()
+
+    suspend fun getAllQualification(profession: Int): List<QualificationListResponse> =
+        client.get {
+            url {
+                takeFrom(BASIC_LIVE_BASE_URL)
+                appendPathSegments(appendLive, "Profession/GetQualification/${profession}")
+            }
+            headers {
+                append(HttpHeaders.Accept, "application/json")
+            }
+        }.body<List<QualificationListResponse>>()
+
+    suspend fun getAllSpecialization(
+        profession: Int,
+        qualification: Int,
+    ): List<SpecializationListResponse> =
+        client.get {
+            url {
+                takeFrom(BASIC_LIVE_BASE_URL)
+                appendPathSegments(
+                    appendLive,
+                    "Profession/GetSpecialization/${profession}/${qualification}"
+                )
+            }
+            headers {
+                append(HttpHeaders.Accept, "application/json")
+            }
+        }.body<List<SpecializationListResponse>>()
+
+    suspend fun getAllReason(): ReasonListResponse =
+        client.get {
+            url {
+                takeFrom(STUDENT_BASE_URL)
+                appendPathSegments(appendReason, "get-all")
+            }
+            headers {
+                append(HttpHeaders.Accept, "application/json")
+            }
+        }.body<ReasonListResponse>()
 }

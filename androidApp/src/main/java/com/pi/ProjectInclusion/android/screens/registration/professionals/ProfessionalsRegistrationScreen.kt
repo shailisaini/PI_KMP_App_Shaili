@@ -1,4 +1,4 @@
-package com.pi.ProjectInclusion.android.screens.registration
+package com.pi.ProjectInclusion.android.screens.registration.professionals
 
 import android.content.Context
 import androidx.compose.foundation.background
@@ -73,8 +73,10 @@ import com.pi.ProjectInclusion.android.common_UI.DropdownMenuUi
 import com.pi.ProjectInclusion.android.common_UI.RegistrationHeader
 import com.pi.ProjectInclusion.android.common_UI.SchoolListBottomSheet
 import com.pi.ProjectInclusion.android.common_UI.SmallBtnUi
+import com.pi.ProjectInclusion.android.common_UI.TextViewField
 import com.pi.ProjectInclusion.android.common_UI.UdiseTextField
 import com.pi.ProjectInclusion.android.utils.fontMedium
+import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
@@ -82,9 +84,11 @@ import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetLanguageListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ProfessionListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.QualificationListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByUdiseCodeResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SpecializationListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.launch
@@ -92,12 +96,20 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.ext.clearQuotes
 
 @Composable
-fun EnterUserScreen2(
-    viewModel: LoginViewModel,
-    onNext: () -> Unit, // Dashboard
+fun ProfessionalsRegistrationScreen(
+    onNext: () -> Unit,
     onBack: () -> Unit,
+    viewModel: LoginViewModel,
 ) {
+    var isDialogVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
+
+    CustomDialog(
+        isVisible = isDialogVisible,
+        onDismiss = { isDialogVisible = false },
+        message = stringResource(R.string.txt_loading)
+    )
+
     BackHandler {
         onBack()
     }
@@ -113,14 +125,14 @@ fun EnterUserScreen2(
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            ProfileScreen2UI(context, onBack = onBack, onNext = onNext, viewModel = viewModel)
+            ProfessionalScreenUI(context, onBack = onBack, onNext = onNext, viewModel = viewModel)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen2UI(
+fun ProfessionalScreenUI(
     context: Context,
     onNext: () -> Unit,
     onBack: () -> Unit,
@@ -128,39 +140,39 @@ fun ProfileScreen2UI(
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
-    val coroutineScope = rememberCoroutineScope()
-    val isInternetAvailable by remember { mutableStateOf(true) }
     var isApiResponded by remember { mutableStateOf(false) }
     val internetMessage by remember { mutableStateOf("") }
 
     var isDialogVisible by remember { mutableStateOf(false) }
     var isUdiseDetails by remember { mutableStateOf(false) }
-    var selectedIndex by remember { mutableStateOf<Int?>(null) }
-
-    val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
-    val invalidMobNo = stringResource(id = R.string.text_enter_no)
-//  languageData[LanguageTranslationsResponse.KEY_INVALID_MOBILE_NO_ERROR].toString()
+    val invalidMobNo = stringResource(id = R.string.text_enter_udise)
     val txtContinue = stringResource(id = R.string.text_continue)
     val tvUdise = stringResource(id = R.string.txt_udise_number)
+    val enterMobile = stringResource(R.string.txt_enter_udise)
+    val enterHereText = stringResource(R.string.enter_here)
+    var msgState = stringResource(R.string.key_select_state)
+    var msgDistrict = stringResource(R.string.key_select_district)
+    var msgBlock = stringResource(R.string.key_select_block)
+    var msgSchool = stringResource(R.string.key_select_school)
+    var msgProfession = stringResource(R.string.key_select_profession)
+    var msgQualification = stringResource(R.string.key_select_qualification)
+    var msgSpecialization = stringResource(R.string.key_select_specialization)
+    var msgCRRN = stringResource(R.string.key_CRR_No)
+
     var mobNo = rememberSaveable { mutableStateOf("") }
-    var firstName = rememberSaveable { mutableStateOf("") }
-    var lastName = rememberSaveable { mutableStateOf("") }
-    var whatsappNo = rememberSaveable { mutableStateOf("") }
-    var email = rememberSaveable { mutableStateOf("") }
-    var textUpload = stringResource(R.string.txt_profile_pic_upload)
-    val enterUdiseCode = stringResource(R.string.txt_udise_number)
-    val textNameEg = stringResource(R.string.txt_eg_first_name)
-    val textWhatsappEg = stringResource(R.string.txt_eg_whatsapp_name)
-    val textLastNameEg = stringResource(R.string.txt_eg_last_name)
-    val textEmailEg = stringResource(R.string.txt_eg_email_name)
+    val crrText = rememberSaveable { mutableStateOf("") }
+
     var showError by remember { mutableStateOf(false) }
     var inValidMobNo by remember { mutableStateOf(false) }
-    var date by remember { mutableStateOf("") }
+
     val scope = rememberCoroutineScope()
     var isBottomSheetStateVisible by rememberSaveable { mutableStateOf(false) }
     var isBottomSheetDistrictVisible by rememberSaveable { mutableStateOf(false) }
     var isBottomSheetBlockVisible by rememberSaveable { mutableStateOf(false) }
     var isBottomSheetSchoolVisible by rememberSaveable { mutableStateOf(false) }
+    var isBottomSheetProfessionVisible by rememberSaveable { mutableStateOf(false) }
+    var isBottomSheetQualificationVisible by rememberSaveable { mutableStateOf(false) }
+    var isBottomSheetSpecializationVisible by rememberSaveable { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true, confirmValueChange = { it != SheetValue.Hidden })
 
@@ -168,11 +180,17 @@ fun ProfileScreen2UI(
     var selectedDistrict by remember { mutableStateOf("") }
     var selectedBlock by remember { mutableStateOf("") }
     var selectedSchool by remember { mutableStateOf("") }
+    var selectedProfession by remember { mutableStateOf("") }
+    var selectedQualification by remember { mutableStateOf("") }
+    var selectedSpecialization by remember { mutableStateOf("") }
     val allStatesState by viewModel.allStatesResponse.collectAsStateWithLifecycle()
     val allDistrictsState by viewModel.allDistrictsResponse.collectAsStateWithLifecycle()
     val allBlocksState by viewModel.allBlocksResponse.collectAsStateWithLifecycle()
     val allSchoolsState by viewModel.allSchoolsResponse.collectAsStateWithLifecycle()
     val allUdiseState by viewModel.allUdiseCodeResponse.collectAsStateWithLifecycle()
+    val allProfessionState by viewModel.professionListResponse.collectAsStateWithLifecycle()
+    val allQualificationState by viewModel.qualificationListResponse.collectAsStateWithLifecycle()
+    val allSpecializationState by viewModel.specializationListResponse.collectAsStateWithLifecycle()
     val professionalProfileState by viewModel.professionalProfileResponse.collectAsStateWithLifecycle()
     var allState = remember { mutableStateListOf<StateListResponse>() }
     var allDistricts = remember { mutableStateListOf<DistrictListResponse>() }
@@ -180,11 +198,17 @@ fun ProfileScreen2UI(
     var allSchools = remember { mutableStateListOf<SchoolListResponse.SchoolResponse>() }
     var allUdiseDetails =
         remember { mutableStateListOf<SchoolByUdiseCodeResponse.UdiseCodeResponse>() }
+    var allProfession = remember { mutableStateListOf<ProfessionListResponse>() }
+    var allQualification = remember { mutableStateListOf<QualificationListResponse>() }
+    var allSpecialization = remember { mutableStateListOf<SpecializationListResponse>() }
 
     var stateSelectedId = remember { mutableIntStateOf(-1) }
     var districtSelectedId = remember { mutableIntStateOf(-1) }
     var blockSelectedId = remember { mutableIntStateOf(-1) }
     var schoolSelectedId = remember { mutableIntStateOf(-1) }
+    var professionId = remember { mutableIntStateOf(-1) }
+    var qualificationId = remember { mutableIntStateOf(-1) }
+    var specializationId = remember { mutableIntStateOf(-1) }
     val strToken =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjR5QW9PaGdVQnJyOUVkdXVvbHFvSVE9PSIsInN1YiI6IjEiLCJpYXQiOjE3NTU3NzQ4NDcsImV4cCI6MTc1NTg2MTI0N30.bjqUtT6SSrMRpNO4EiLgh6VhnJp54deOPvQBrjzbTGo"
 
@@ -313,6 +337,92 @@ fun ProfileScreen2UI(
                         }
                     }
                     println("All Udise list data :- $allUdiseDetails")
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
+    LaunchedEffect(allProfessionState) {
+        when {
+            allProfessionState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            allProfessionState.error.isNotEmpty() -> {
+                logger.d("All Profession error : ${allProfessionState.success}")
+                isDialogVisible = false
+            }
+
+            allProfessionState.success != null -> {
+                logger.d("All Profession response : ${allProfessionState.success}")
+                if (allProfessionState.success?.size != 0) {
+                    allProfessionState.success!!.let {
+                        it.let { it5 ->
+                            allProfession.addAll(
+                                it5.toList()
+                            )
+                        }
+                    }
+                    println("All Profession list data :- $allProfession")
+                    isUdiseDetails = true
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
+    LaunchedEffect(allQualificationState) {
+        when {
+            allQualificationState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            allQualificationState.error.isNotEmpty() -> {
+                logger.d("All Qualification error : ${allQualificationState.success}")
+                isDialogVisible = false
+            }
+
+            allQualificationState.success != null -> {
+                logger.d("All Qualification response : ${allQualificationState.success}")
+                if (allQualificationState.success?.size != 0) {
+                    allQualificationState.success!!.let {
+                        it.let { it5 ->
+                            allQualification.addAll(
+                                it5.toList()
+                            )
+                        }
+                    }
+                    println("All Qualification list data :- $allQualification")
+                    isUdiseDetails = true
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
+    LaunchedEffect(allSpecializationState) {
+        when {
+            allSpecializationState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            allSpecializationState.error.isNotEmpty() -> {
+                logger.d("All Specialization error : ${allSpecializationState.success}")
+                isDialogVisible = false
+            }
+
+            allSpecializationState.success != null -> {
+                logger.d("All Specialization response : ${allSpecializationState.success}")
+                if (allSpecializationState.success?.size != 0) {
+                    allSpecializationState.success!!.let {
+                        it.let { it5 ->
+                            allSpecialization.addAll(
+                                it5.toList()
+                            )
+                        }
+                    }
+                    println("All Specialization list data :- $allSpecialization")
                     isUdiseDetails = true
                 }
                 isDialogVisible = false
@@ -341,12 +451,6 @@ fun ProfileScreen2UI(
             }
         }
     }
-
-    CustomDialog(
-        isVisible = isDialogVisible,
-        onDismiss = { isDialogVisible = false },
-        message = stringResource(R.string.txt_loading)
-    )
 
     Box(
         modifier = Modifier
@@ -380,10 +484,12 @@ fun ProfileScreen2UI(
             ) {
 
                 Text(
-                    tvUdise,
-                    modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),
+                    text = tvUdise,
+                    modifier = Modifier.padding(
+                        top = 10.dp, bottom = 10.dp, start = 8.dp, end = 8.dp
+                    ),
                     fontFamily = fontMedium,
-                    fontSize = 14.sp,
+                    fontSize = 15.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_DEFAULT_BUTTON_TEXT
                     } else {
@@ -408,7 +514,7 @@ fun ProfileScreen2UI(
                             colors = colors,
                             number = mobNo,
                             enable = true,
-                            hint = enterUdiseCode.toString()
+                            hint = enterMobile.toString()
                         )
                     }
 
@@ -482,7 +588,7 @@ fun ProfileScreen2UI(
                     ),
                     textAlign = TextAlign.Start,
                     fontFamily = fontMedium,
-                    fontSize = 14.sp,
+                    fontSize = 15.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_BODY_TEXT
                     } else {
@@ -492,7 +598,7 @@ fun ProfileScreen2UI(
 
                 DropdownMenuUi(
                     options = listOf(),
-                    onItemSelected = {},
+                    onItemSelected = { },
                     modifier = Modifier.clickable {
                         logger.d("Clicked state Id :- ${allState.size}")
                     },
@@ -503,8 +609,8 @@ fun ProfileScreen2UI(
                     },
                     onClick = {
                         scope.launch {
-                            isBottomSheetStateVisible = true // true under development code
-                            sheetState.expand()
+                            isBottomSheetStateVisible = true
+                            sheetState.show()
                         }
                     })
 
@@ -539,14 +645,13 @@ fun ProfileScreen2UI(
                     ),
                     textAlign = TextAlign.Start,
                     fontFamily = fontMedium,
-                    fontSize = 14.sp,
+                    fontSize = 15.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_BODY_TEXT
                     } else {
                         Bg_Gray
                     }
                 )
-
                 DropdownMenuUi(
                     options = listOf(),
                     onItemSelected = {},
@@ -594,7 +699,7 @@ fun ProfileScreen2UI(
                     ),
                     textAlign = TextAlign.Start,
                     fontFamily = fontMedium,
-                    fontSize = 14.sp,
+                    fontSize = 15.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_BODY_TEXT
                     } else {
@@ -649,7 +754,7 @@ fun ProfileScreen2UI(
                     ),
                     textAlign = TextAlign.Start,
                     fontFamily = fontMedium,
-                    fontSize = 14.sp,
+                    fontSize = 15.sp,
                     color = if (isSystemInDarkTheme()) {
                         DARK_BODY_TEXT
                     } else {
@@ -658,8 +763,7 @@ fun ProfileScreen2UI(
                 )
                 DropdownMenuUi(
                     options = listOf(),
-                    onItemSelected = {
-                    },
+                    onItemSelected = {},
                     modifier = Modifier.clickable {},
                     placeholder = if (selectedSchool.isNotEmpty()) {
                         selectedSchool.toString()
@@ -685,10 +789,186 @@ fun ProfileScreen2UI(
                         selectedSchool = school
                         allSchools.find { it.name == school }?.id?.let {
                             schoolSelectedId.intValue = it
+                            viewModel.getAllProfessionRepo()
                         }
                     },
                     allSchools.map { it.name }.toList() as List<String>
                 )
+
+                // Profession
+                Text(
+                    text = stringResource(R.string.txt_profession),
+                    modifier = Modifier.padding(
+                        top = 24.dp, bottom = 10.dp, start = 8.dp, end = 8.dp
+                    ),
+                    textAlign = TextAlign.Start,
+                    fontFamily = fontMedium,
+                    fontSize = 15.sp,
+                    color = if (isSystemInDarkTheme()) {
+                        DARK_BODY_TEXT
+                    } else {
+                        Bg_Gray
+                    }
+                )
+
+                DropdownMenuUi(
+                    options = listOf(),
+                    onItemSelected = {},
+                    modifier = Modifier.clickable {},
+                    placeholder = if (selectedProfession.isNotEmpty()) {
+                        selectedProfession.toString()
+                    } else {
+                        stringResource(R.string.choose_option)
+                    },
+                    onClick = {
+                        scope.launch {
+                            isBottomSheetProfessionVisible = true // true under development code
+                            sheetState.expand()
+                        }
+                    })
+
+                SchoolListBottomSheet(
+                    isBottomSheetVisible = isBottomSheetProfessionVisible,
+                    sheetState = sheetState,
+                    onDismiss = {
+                        scope.launch { sheetState.hide() }
+                            .invokeOnCompletion { isBottomSheetProfessionVisible = false }
+                    },
+                    onDecline = {},
+                    onTextSelected = { profession ->
+                        selectedProfession = profession
+                        allProfession.find { it.name == profession }?.id?.let {
+                            professionId.intValue = it
+                            viewModel.getAllQualificationRepo(it)
+                        }
+                    },
+                    allProfession.map { it.name }.toList() as List<String>
+                )
+
+                // Qualification
+                Text(
+                    text = stringResource(R.string.txt_qualification),
+                    modifier = Modifier.padding(
+                        top = 24.dp, bottom = 10.dp, start = 8.dp, end = 8.dp
+                    ),
+                    textAlign = TextAlign.Start,
+                    fontFamily = fontMedium,
+                    fontSize = 15.sp,
+                    color = if (isSystemInDarkTheme()) {
+                        DARK_BODY_TEXT
+                    } else {
+                        Bg_Gray
+                    }
+                )
+
+                DropdownMenuUi(
+                    options = listOf(),
+                    onItemSelected = {},
+                    modifier = Modifier.clickable {},
+                    placeholder = if (selectedQualification.isNotEmpty()) {
+                        selectedQualification.toString()
+                    } else {
+                        stringResource(R.string.choose_option)
+                    },
+                    onClick = {
+                        scope.launch {
+                            isBottomSheetQualificationVisible = true // true under development code
+                            sheetState.expand()
+                        }
+                    })
+
+                SchoolListBottomSheet(
+                    isBottomSheetVisible = isBottomSheetQualificationVisible,
+                    sheetState = sheetState,
+                    onDismiss = {
+                        scope.launch { sheetState.hide() }
+                            .invokeOnCompletion { isBottomSheetQualificationVisible = false }
+                    },
+                    onDecline = {},
+                    onTextSelected = { qualification ->
+                        selectedQualification = qualification
+                        allQualification.find { it.name == qualification }?.id?.let {
+                            qualificationId.intValue = it
+                            viewModel.getAllSpecializationRepo(professionId.intValue, it)
+                        }
+                    },
+                    allQualification.map { it.name }.toList() as List<String>
+                )
+
+                // Specialization
+                Text(
+                    text = stringResource(R.string.txt_specialization),
+                    modifier = Modifier.padding(
+                        top = 24.dp, bottom = 10.dp, start = 8.dp, end = 8.dp
+                    ),
+                    textAlign = TextAlign.Start,
+                    fontFamily = fontMedium,
+                    fontSize = 15.sp,
+                    color = if (isSystemInDarkTheme()) {
+                        DARK_BODY_TEXT
+                    } else {
+                        Bg_Gray
+                    }
+                )
+
+                DropdownMenuUi(
+                    options = listOf(),
+                    onItemSelected = {},
+                    modifier = Modifier.clickable {},
+                    placeholder = if (selectedSpecialization.isNotEmpty()) {
+                        selectedSpecialization.toString()
+                    } else {
+                        stringResource(R.string.choose_option)
+                    },
+                    onClick = {
+                        scope.launch {
+                            isBottomSheetSpecializationVisible = true
+                            sheetState.expand()
+                        }
+                    })
+
+                SchoolListBottomSheet(
+                    isBottomSheetVisible = isBottomSheetSpecializationVisible,
+                    sheetState = sheetState,
+                    onDismiss = {
+                        scope.launch { sheetState.hide() }
+                            .invokeOnCompletion { isBottomSheetSpecializationVisible = false }
+                    },
+                    onDecline = {},
+                    onTextSelected = { specialization ->
+                        selectedSpecialization = specialization
+                        allSpecialization.find { it.name == specialization }?.id?.let {
+                            specializationId.intValue = it
+                        }
+                    },
+                    allSpecialization.map { it.name }.toList() as List<String>
+                )
+
+                // Crr No.
+                Text(
+                    text = stringResource(R.string.txt_crrNo),
+                    modifier = Modifier.padding(
+                        top = 24.dp, bottom = 10.dp, start = 8.dp, end = 8.dp
+                    ),
+                    textAlign = TextAlign.Start,
+                    fontFamily = fontMedium,
+                    fontSize = 15.sp,
+                    color = if (isSystemInDarkTheme()) {
+                        DARK_BODY_TEXT
+                    } else {
+                        Bg_Gray
+                    }
+                )
+
+                TextViewField(
+                    isIcon = false,
+                    icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
+                    colors = colors,
+                    text = crrText,
+                    trueFalse = true,
+                    hint = enterHereText.toString()
+                )
+                Spacer(modifier = Modifier.height(15.dp))
 
                 if (inValidMobNo) {
                     Text(
@@ -698,9 +978,8 @@ fun ProfileScreen2UI(
                         fontSize = 10.sp
                     )
                 }
-
-                Spacer(modifier = Modifier.height(15.dp))
             }
+
             Box(
                 modifier = Modifier
                     .padding(20.dp)
@@ -725,10 +1004,26 @@ fun ProfileScreen2UI(
                         onClick = {
                             if (mobNo.value.isEmpty()) {
                                 inValidMobNo = true
+                            } else if (selectedState.isEmpty() || stateSelectedId.intValue == -1) {
+                                context.toast(msgState)
+                            } else if (selectedDistrict.isEmpty() || districtSelectedId.intValue == -1) {
+                                context.toast(msgDistrict)
+                            } else if (selectedBlock.isEmpty() || blockSelectedId.intValue == -1) {
+                                context.toast(msgBlock)
+                            } else if (selectedSchool.isEmpty() || schoolSelectedId.intValue == -1) {
+                                context.toast(msgSchool)
+                            } else if (selectedProfession.isEmpty() || professionId.intValue == -1) {
+                                context.toast(msgProfession)
+                            } else if (selectedQualification.isEmpty() || qualificationId.intValue == -1) {
+                                context.toast(msgQualification)
+                            } else if (selectedSpecialization.isEmpty() || specializationId.intValue == -1) {
+                                context.toast(msgSpecialization)
+                            } else if (crrText.value.isEmpty()) {
+                                context.toast(msgCRRN)
                             } else {
                                 if (showError || mobNo.value.length < 10) {
                                     inValidMobNo = true
-                                } else { // if first digit of mobile is less than 6 then error will show
+                                } else {
                                     showError = mobNo.value.isEmpty()
                                     val firstDigitChar = mobNo.value.toString().first()
                                     val firstDigit = firstDigitChar.digitToInt()
@@ -736,14 +1031,19 @@ fun ProfileScreen2UI(
                                         inValidMobNo = true
                                     } else {
                                         isDialogVisible = true
-
                                         val professionalProfileRequest = ProfessionalProfileRequest(
                                             mobNo.value.toString(),
                                             stateSelectedId.intValue,
                                             districtSelectedId.intValue,
                                             blockSelectedId.intValue,
-                                            schoolSelectedId.intValue
+                                            schoolSelectedId.intValue,
+                                            0,
+                                            professionId.intValue,
+                                            qualificationId.intValue,
+                                            specializationId.intValue,
+                                            crrText.value.toString()
                                         )
+
                                         viewModel.createProfessionalProfileRepo(
                                             professionalProfileRequest, strToken
                                         )
@@ -766,5 +1066,5 @@ fun UserProfile2UI() {
     val onNext: () -> Unit = {}
     val onBack: () -> Unit = {}
     val viewModel: LoginViewModel = koinViewModel()
-    ProfileScreen2UI(context, onNext, onBack, viewModel)
+    ProfessionalScreenUI(context, onNext, onBack, viewModel = viewModel)
 }

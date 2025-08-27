@@ -17,8 +17,12 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithO
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ProfessionListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.QualificationListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ReasonListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByUdiseCodeResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SpecializationListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
 import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
 import com.pi.ProjectInclusion.data.remote.ApiService
@@ -79,9 +83,14 @@ class AuthenticationRepoImpl(private val apiService: ApiService) : Authenticatio
         firstStepProfileRequest: FirstStepProfileRequest,
         strToken: String,
         profilePic: ByteArray?,
-        fileName: String?
+        fileName: String?,
     ): CreateFirstStepProfileResponse {
-        return apiService.createFirstStepProfile(firstStepProfileRequest, strToken, profilePic, fileName)
+        return apiService.createFirstStepProfile(
+            firstStepProfileRequest,
+            strToken,
+            profilePic,
+            fileName
+        )
     }
 
     override suspend fun getAllStateListRepo(): List<StateListResponse> {
@@ -109,6 +118,25 @@ class AuthenticationRepoImpl(private val apiService: ApiService) : Authenticatio
         strToken: String,
     ): CreateFirstStepProfileResponse {
         return apiService.createProfessionalProfile(professionalProfileRequest, strToken)
+    }
+
+    override suspend fun getAllProfessionRepo(): List<ProfessionListResponse> {
+        return apiService.getAllProfession()
+    }
+
+    override suspend fun getAllQualificationRepo(profession: Int): List<QualificationListResponse> {
+        return apiService.getAllQualification(profession)
+    }
+
+    override suspend fun getAllSpecializationRepo(
+        profession: Int,
+        qualification: Int,
+    ): List<SpecializationListResponse> {
+        return apiService.getAllSpecialization(profession, qualification)
+    }
+
+    override suspend fun getAllReasonRepo(): ReasonListResponse {
+        return apiService.getAllReason()
     }
 }
 

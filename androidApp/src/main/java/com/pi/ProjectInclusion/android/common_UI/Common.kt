@@ -652,7 +652,7 @@ fun UdiseTextField(
     isIcon: Boolean = false,
     icon: ImageVector?,
     colors: ColorScheme,
-    trueFalse: Boolean,
+    enable: Boolean,
     modifier: Modifier = Modifier,
     number: MutableState<String> = remember { mutableStateOf("") },
     hint: String = remember { mutableStateOf("") }.toString(),
@@ -672,7 +672,7 @@ fun UdiseTextField(
                 }
             }
         },
-        enabled = trueFalse,
+        enabled = enable,
         placeholder = { Text(hint, color = GrayLight01, fontSize = 14.sp) },
         shape = RoundedCornerShape(8.dp),
         singleLine = true,
