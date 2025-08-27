@@ -55,6 +55,8 @@ and make a difference together!</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="track_request">Track Request</string>
     <string name="notification_screen">Notification</string>
+    <string name="history_list">History</string>
+    <string name="conducted_by">Conducted by</string>
     <string name="nav_home">Home</string>
     <string name="nav_course">Courses</string>
     <string name="nav_screening">Screening</string>
