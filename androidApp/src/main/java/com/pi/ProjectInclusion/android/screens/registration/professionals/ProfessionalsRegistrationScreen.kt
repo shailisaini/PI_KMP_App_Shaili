@@ -145,10 +145,10 @@ fun ProfessionalScreenUI(
 
     var isDialogVisible by remember { mutableStateOf(false) }
     var isUdiseDetails by remember { mutableStateOf(false) }
-    val invalidMobNo = stringResource(id = R.string.text_enter_udise)
+    val invalidUdiseNo = stringResource(id = R.string.text_enter_udise)
     val txtContinue = stringResource(id = R.string.text_continue)
     val tvUdise = stringResource(id = R.string.txt_udise_number)
-    val enterMobile = stringResource(R.string.txt_enter_udise)
+    val enterUdise = stringResource(R.string.txt_enter_udise)
     val enterHereText = stringResource(R.string.enter_here)
     var msgState = stringResource(R.string.key_select_state)
     var msgDistrict = stringResource(R.string.key_select_district)
@@ -159,11 +159,11 @@ fun ProfessionalScreenUI(
     var msgSpecialization = stringResource(R.string.key_select_specialization)
     var msgCRRN = stringResource(R.string.key_CRR_No)
 
-    var mobNo = rememberSaveable { mutableStateOf("") }
+    var udiseNo = rememberSaveable { mutableStateOf("") }
     val crrText = rememberSaveable { mutableStateOf("") }
 
     var showError by remember { mutableStateOf(false) }
-    var inValidMobNo by remember { mutableStateOf(false) }
+    var inValidUdiseNo by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
     var isBottomSheetStateVisible by rememberSaveable { mutableStateOf(false) }
@@ -512,9 +512,9 @@ fun ProfessionalScreenUI(
                             isIcon = false,
                             icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
                             colors = colors,
-                            number = mobNo,
+                            number = udiseNo,
                             enable = true,
-                            hint = enterMobile.toString()
+                            hint = enterUdise.toString()
                         )
                     }
 
@@ -554,7 +554,7 @@ fun ProfessionalScreenUI(
                                         .fillMaxWidth()
                                         .fillMaxHeight()
                                         .clickable {
-                                            mobNo.value.clearQuotes()
+                                            udiseNo.value.clearQuotes()
                                             isUdiseDetails = false
                                         })
                             } else {
@@ -568,7 +568,7 @@ fun ProfessionalScreenUI(
                                         .align(Alignment.CenterHorizontally)
                                         .padding(8.dp)
                                         .clickable {
-                                            viewModel.getAllDetailsByUdiseId(mobNo.value.toString())
+                                            viewModel.getAllDetailsByUdiseId(udiseNo.value.toString())
                                         })
                             }
                         }
@@ -970,9 +970,9 @@ fun ProfessionalScreenUI(
                 )
                 Spacer(modifier = Modifier.height(15.dp))
 
-                if (inValidMobNo) {
+                if (inValidUdiseNo) {
                     Text(
-                        invalidMobNo.toString(),
+                        invalidUdiseNo.toString(),
                         color = LightRed01,
                         modifier = Modifier.padding(5.dp),
                         fontSize = 10.sp
@@ -999,11 +999,11 @@ fun ProfessionalScreenUI(
                         .wrapContentHeight(), horizontalAlignment = Alignment.End
                 ) {
                     SmallBtnUi(
-                        enabled = mobNo.value.length >= 10,
+                        enabled = udiseNo.value.length >= 11,
                         title = txtContinue,
                         onClick = {
-                            if (mobNo.value.isEmpty()) {
-                                inValidMobNo = true
+                            if (udiseNo.value.isEmpty()) {
+                                inValidUdiseNo = true
                             } else if (selectedState.isEmpty() || stateSelectedId.intValue == -1) {
                                 context.toast(msgState)
                             } else if (selectedDistrict.isEmpty() || districtSelectedId.intValue == -1) {
@@ -1021,18 +1021,18 @@ fun ProfessionalScreenUI(
                             } else if (crrText.value.isEmpty()) {
                                 context.toast(msgCRRN)
                             } else {
-                                if (showError || mobNo.value.length < 10) {
-                                    inValidMobNo = true
+                                if (showError || udiseNo.value.length < 11) {
+                                    inValidUdiseNo = true
                                 } else {
-                                    showError = mobNo.value.isEmpty()
-                                    val firstDigitChar = mobNo.value.toString().first()
+                                    showError = udiseNo.value.isEmpty()
+                                    val firstDigitChar = udiseNo.value.toString().first()
                                     val firstDigit = firstDigitChar.digitToInt()
                                     if (firstDigit < 6) {
-                                        inValidMobNo = true
+                                        inValidUdiseNo = true
                                     } else {
                                         isDialogVisible = true
                                         val professionalProfileRequest = ProfessionalProfileRequest(
-                                            mobNo.value.toString(),
+                                            udiseNo.value.toString(),
                                             stateSelectedId.intValue,
                                             districtSelectedId.intValue,
                                             blockSelectedId.intValue,

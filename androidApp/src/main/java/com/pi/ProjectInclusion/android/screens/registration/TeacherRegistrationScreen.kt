@@ -138,11 +138,11 @@ fun TeacherScreenUI(
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
 
     val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
-    val invalidMobNo = stringResource(id = R.string.text_enter_udise)
+    val invalidUdise = stringResource(id = R.string.text_enter_udise)
 //  languageData[LanguageTranslationsResponse.KEY_INVALID_MOBILE_NO_ERROR].toString()
     val txtContinue = stringResource(id = R.string.text_continue)
     val tvUdise = stringResource(id = R.string.txt_udise_number)
-    var mobNo = rememberSaveable { mutableStateOf("") }
+    var udiseNo = rememberSaveable { mutableStateOf("") }
     var firstName = rememberSaveable { mutableStateOf("") }
     var lastName = rememberSaveable { mutableStateOf("") }
     var whatsappNo = rememberSaveable { mutableStateOf("") }
@@ -154,7 +154,7 @@ fun TeacherScreenUI(
     val textLastNameEg = stringResource(R.string.txt_eg_last_name)
     val textEmailEg = stringResource(R.string.txt_eg_email_name)
     var showError by remember { mutableStateOf(false) }
-    var inValidMobNo by remember { mutableStateOf(false) }
+    var inValidUdiseNo by remember { mutableStateOf(false) }
     var date by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
     var isBottomSheetStateVisible by rememberSaveable { mutableStateOf(false) }
@@ -410,7 +410,7 @@ fun TeacherScreenUI(
                             isIcon = false,
                             icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
                             colors = colors,
-                            number = mobNo,
+                            number = udiseNo,
                             enable = true,
                             hint = enterUdiseCode.toString()
                         )
@@ -452,7 +452,7 @@ fun TeacherScreenUI(
                                         .fillMaxWidth()
                                         .fillMaxHeight()
                                         .clickable {
-                                            mobNo.value.clearQuotes()
+                                            udiseNo.value.clearQuotes()
                                             isUdiseDetails = false
                                         })
                             } else {
@@ -466,7 +466,7 @@ fun TeacherScreenUI(
                                         .align(Alignment.CenterHorizontally)
                                         .padding(8.dp)
                                         .clickable {
-                                            viewModel.getAllDetailsByUdiseId(mobNo.value.toString())
+                                            viewModel.getAllDetailsByUdiseId(udiseNo.value.toString())
                                         })
                             }
                         }
@@ -693,9 +693,9 @@ fun TeacherScreenUI(
                     allSchools.map { it.name }.toList() as List<String>
                 )
 
-                if (inValidMobNo) {
+                if (inValidUdiseNo) {
                     Text(
-                        invalidMobNo.toString(),
+                        invalidUdise.toString(),
                         color = LightRed01,
                         modifier = Modifier.padding(5.dp),
                         fontSize = 10.sp
@@ -723,11 +723,11 @@ fun TeacherScreenUI(
                         .wrapContentHeight(), horizontalAlignment = Alignment.End
                 ) {
                     SmallBtnUi(
-                        enabled = mobNo.value.length >= 10,
+                        enabled = udiseNo.value.length >= 11,
                         title = txtContinue,
                         onClick = {
-                            if (mobNo.value.isEmpty()) {
-                                inValidMobNo = true
+                            if (udiseNo.value.isEmpty()) {
+                                inValidUdiseNo = true
                             } else if (selectedState.isEmpty() || stateSelectedId.intValue == -1) {
                                 context.toast(msgState)
                             } else if (selectedDistrict.isEmpty() || districtSelectedId.intValue == -1) {
@@ -737,19 +737,18 @@ fun TeacherScreenUI(
                             } else if (selectedSchool.isEmpty() || schoolSelectedId.intValue == -1) {
                                 context.toast(msgSchool)
                             } else {
-                                if (showError || mobNo.value.length < 10) {
-                                    inValidMobNo = true
+                                if (showError || udiseNo.value.length < 11) {
+                                    inValidUdiseNo = true
                                 } else {
-                                    showError = mobNo.value.isEmpty()
-                                    val firstDigitChar = mobNo.value.toString().first()
+                                    showError = udiseNo.value.isEmpty()
+                                    val firstDigitChar = udiseNo.value.toString().first()
                                     val firstDigit = firstDigitChar.digitToInt()
                                     if (firstDigit < 6) {
-                                        inValidMobNo = true
+                                        inValidUdiseNo = true
                                     } else {
                                         isDialogVisible = true
-
                                         val professionalProfileRequest = ProfessionalProfileRequest(
-                                            mobNo.value.toString(),
+                                            udiseNo.value.toString(),
                                             stateSelectedId.intValue,
                                             districtSelectedId.intValue,
                                             blockSelectedId.intValue,

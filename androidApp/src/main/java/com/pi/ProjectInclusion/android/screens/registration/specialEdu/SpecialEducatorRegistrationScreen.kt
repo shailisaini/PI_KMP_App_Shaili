@@ -153,14 +153,14 @@ fun SpeEducatorScreenUI(
     val invalidMobNo = stringResource(id = R.string.text_enter_udise)
     val txtContinue = stringResource(id = R.string.text_continue)
     val tvUdise = stringResource(id = R.string.txt_udise_number)
-    val enterMobile = stringResource(R.string.txt_enter_udise)
+    val enterUdise = stringResource(R.string.txt_enter_udise)
     val enterHereText = stringResource(R.string.enter_here)
 
-    var mobNo = rememberSaveable { mutableStateOf("") }
+    var udiseNo = rememberSaveable { mutableStateOf("") }
     val crrText = rememberSaveable { mutableStateOf("") }
 
     var showError by remember { mutableStateOf(false) }
-    var inValidMobNo by remember { mutableStateOf(false) }
+    var inValidUdiseNo by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
     var isBottomSheetStateVisible by rememberSaveable { mutableStateOf(false) }
@@ -546,9 +546,9 @@ fun SpeEducatorScreenUI(
                             isIcon = false,
                             icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
                             colors = colors,
-                            number = mobNo,
+                            number = udiseNo,
                             enable = true,
-                            hint = enterMobile.toString()
+                            hint = enterUdise.toString()
                         )
                     }
 
@@ -588,7 +588,7 @@ fun SpeEducatorScreenUI(
                                         .fillMaxWidth()
                                         .fillMaxHeight()
                                         .clickable {
-                                            mobNo.value.clearQuotes()
+                                            udiseNo.value.clearQuotes()
                                             isUdiseDetails = false
                                         })
                             } else {
@@ -602,7 +602,7 @@ fun SpeEducatorScreenUI(
                                         .align(Alignment.CenterHorizontally)
                                         .padding(8.dp)
                                         .clickable {
-                                            viewModel.getAllDetailsByUdiseId(mobNo.value.toString())
+                                            viewModel.getAllDetailsByUdiseId(udiseNo.value.toString())
                                         })
                             }
                         }
@@ -829,7 +829,7 @@ fun SpeEducatorScreenUI(
                     allSchools.map { it.name }.toList() as List<String>
                 )
 
-                if (inValidMobNo) {
+                if (inValidUdiseNo) {
                     Text(
                         invalidMobNo.toString(),
                         color = LightRed01,
@@ -1083,11 +1083,11 @@ fun SpeEducatorScreenUI(
                         .wrapContentHeight(), horizontalAlignment = Alignment.End
                 ) {
                     SmallBtnUi(
-                        enabled = mobNo.value.length >= 10,
+                        enabled = udiseNo.value.length >= 11,
                         title = txtContinue,
                         onClick = {
-                            if (mobNo.value.isEmpty()) {
-                                inValidMobNo = true
+                            if (udiseNo.value.isEmpty()) {
+                                inValidUdiseNo = true
                             } else if (selectedState.isEmpty() || stateSelectedId.intValue == -1) {
                                 context.toast(msgState)
                             } else if (selectedDistrict.isEmpty() || districtSelectedId.intValue == -1) {
@@ -1107,18 +1107,18 @@ fun SpeEducatorScreenUI(
                             } else if (crrText.value.isEmpty()) {
                                 context.toast(msgCRRN)
                             } else {
-                                if (showError || mobNo.value.length < 10) {
-                                    inValidMobNo = true
-                                } else { // if first digit of mobile is less than 6 then error will show
-                                    showError = mobNo.value.isEmpty()
-                                    val firstDigitChar = mobNo.value.toString().first()
+                                if (showError || udiseNo.value.length < 11) {
+                                    inValidUdiseNo = true
+                                } else {
+                                    showError = udiseNo.value.isEmpty()
+                                    val firstDigitChar = udiseNo.value.toString().first()
                                     val firstDigit = firstDigitChar.digitToInt()
                                     if (firstDigit < 6) {
-                                        inValidMobNo = true
+                                        inValidUdiseNo = true
                                     } else {
                                         isDialogVisible = true
                                         val professionalProfileRequest = ProfessionalProfileRequest(
-                                            mobNo.value.toString(),
+                                            udiseNo.value.toString(),
                                             stateSelectedId.intValue,
                                             districtSelectedId.intValue,
                                             blockSelectedId.intValue,
