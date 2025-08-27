@@ -75,6 +75,7 @@ import com.pi.ProjectInclusion.android.common_UI.SchoolListBottomSheet
 import com.pi.ProjectInclusion.android.common_UI.SmallBtnUi
 import com.pi.ProjectInclusion.android.common_UI.UdiseTextField
 import com.pi.ProjectInclusion.android.utils.fontMedium
+import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
@@ -82,7 +83,6 @@ import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetLanguageListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByUdiseCodeResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
@@ -92,7 +92,7 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.ext.clearQuotes
 
 @Composable
-fun EnterUserScreen2(
+fun TeacherRegistrationScreen(
     viewModel: LoginViewModel,
     onNext: () -> Unit, // Dashboard
     onBack: () -> Unit,
@@ -113,14 +113,14 @@ fun EnterUserScreen2(
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            ProfileScreen2UI(context, onBack = onBack, onNext = onNext, viewModel = viewModel)
+            TeacherScreenUI(context, onBack = onBack, onNext = onNext, viewModel = viewModel)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen2UI(
+fun TeacherScreenUI(
     context: Context,
     onNext: () -> Unit,
     onBack: () -> Unit,
@@ -138,11 +138,11 @@ fun ProfileScreen2UI(
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
 
     val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
-    val invalidMobNo = stringResource(id = R.string.text_enter_no)
+    val invalidUdise = stringResource(id = R.string.text_enter_udise)
 //  languageData[LanguageTranslationsResponse.KEY_INVALID_MOBILE_NO_ERROR].toString()
     val txtContinue = stringResource(id = R.string.text_continue)
     val tvUdise = stringResource(id = R.string.txt_udise_number)
-    var mobNo = rememberSaveable { mutableStateOf("") }
+    var udiseNo = rememberSaveable { mutableStateOf("") }
     var firstName = rememberSaveable { mutableStateOf("") }
     var lastName = rememberSaveable { mutableStateOf("") }
     var whatsappNo = rememberSaveable { mutableStateOf("") }
@@ -154,7 +154,7 @@ fun ProfileScreen2UI(
     val textLastNameEg = stringResource(R.string.txt_eg_last_name)
     val textEmailEg = stringResource(R.string.txt_eg_email_name)
     var showError by remember { mutableStateOf(false) }
-    var inValidMobNo by remember { mutableStateOf(false) }
+    var inValidUdiseNo by remember { mutableStateOf(false) }
     var date by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
     var isBottomSheetStateVisible by rememberSaveable { mutableStateOf(false) }
@@ -187,6 +187,10 @@ fun ProfileScreen2UI(
     var schoolSelectedId = remember { mutableIntStateOf(-1) }
     val strToken =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjR5QW9PaGdVQnJyOUVkdXVvbHFvSVE9PSIsInN1YiI6IjEiLCJpYXQiOjE3NTU3NzQ4NDcsImV4cCI6MTc1NTg2MTI0N30.bjqUtT6SSrMRpNO4EiLgh6VhnJp54deOPvQBrjzbTGo"
+    var msgState = stringResource(R.string.key_select_state)
+    var msgDistrict = stringResource(R.string.key_select_district)
+    var msgBlock = stringResource(R.string.key_select_block)
+    var msgSchool = stringResource(R.string.key_select_school)
 
     LaunchedEffect(Unit) {
         viewModel.getAllStateList()
@@ -406,7 +410,7 @@ fun ProfileScreen2UI(
                             isIcon = false,
                             icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
                             colors = colors,
-                            number = mobNo,
+                            number = udiseNo,
                             enable = true,
                             hint = enterUdiseCode.toString()
                         )
@@ -448,7 +452,7 @@ fun ProfileScreen2UI(
                                         .fillMaxWidth()
                                         .fillMaxHeight()
                                         .clickable {
-                                            mobNo.value.clearQuotes()
+                                            udiseNo.value.clearQuotes()
                                             isUdiseDetails = false
                                         })
                             } else {
@@ -462,7 +466,7 @@ fun ProfileScreen2UI(
                                         .align(Alignment.CenterHorizontally)
                                         .padding(8.dp)
                                         .clickable {
-                                            viewModel.getAllDetailsByUdiseId(mobNo.value.toString())
+                                            viewModel.getAllDetailsByUdiseId(udiseNo.value.toString())
                                         })
                             }
                         }
@@ -658,8 +662,7 @@ fun ProfileScreen2UI(
                 )
                 DropdownMenuUi(
                     options = listOf(),
-                    onItemSelected = {
-                    },
+                    onItemSelected = {},
                     modifier = Modifier.clickable {},
                     placeholder = if (selectedSchool.isNotEmpty()) {
                         selectedSchool.toString()
@@ -690,9 +693,9 @@ fun ProfileScreen2UI(
                     allSchools.map { it.name }.toList() as List<String>
                 )
 
-                if (inValidMobNo) {
+                if (inValidUdiseNo) {
                     Text(
-                        invalidMobNo.toString(),
+                        invalidUdise.toString(),
                         color = LightRed01,
                         modifier = Modifier.padding(5.dp),
                         fontSize = 10.sp
@@ -720,25 +723,32 @@ fun ProfileScreen2UI(
                         .wrapContentHeight(), horizontalAlignment = Alignment.End
                 ) {
                     SmallBtnUi(
-                        enabled = mobNo.value.length >= 10,
+                        enabled = udiseNo.value.length >= 11,
                         title = txtContinue,
                         onClick = {
-                            if (mobNo.value.isEmpty()) {
-                                inValidMobNo = true
+                            if (udiseNo.value.isEmpty()) {
+                                inValidUdiseNo = true
+                            } else if (selectedState.isEmpty() || stateSelectedId.intValue == -1) {
+                                context.toast(msgState)
+                            } else if (selectedDistrict.isEmpty() || districtSelectedId.intValue == -1) {
+                                context.toast(msgDistrict)
+                            } else if (selectedBlock.isEmpty() || blockSelectedId.intValue == -1) {
+                                context.toast(msgBlock)
+                            } else if (selectedSchool.isEmpty() || schoolSelectedId.intValue == -1) {
+                                context.toast(msgSchool)
                             } else {
-                                if (showError || mobNo.value.length < 10) {
-                                    inValidMobNo = true
-                                } else { // if first digit of mobile is less than 6 then error will show
-                                    showError = mobNo.value.isEmpty()
-                                    val firstDigitChar = mobNo.value.toString().first()
+                                if (showError || udiseNo.value.length < 11) {
+                                    inValidUdiseNo = true
+                                } else {
+                                    showError = udiseNo.value.isEmpty()
+                                    val firstDigitChar = udiseNo.value.toString().first()
                                     val firstDigit = firstDigitChar.digitToInt()
                                     if (firstDigit < 6) {
-                                        inValidMobNo = true
+                                        inValidUdiseNo = true
                                     } else {
                                         isDialogVisible = true
-
                                         val professionalProfileRequest = ProfessionalProfileRequest(
-                                            mobNo.value.toString(),
+                                            udiseNo.value.toString(),
                                             stateSelectedId.intValue,
                                             districtSelectedId.intValue,
                                             blockSelectedId.intValue,
@@ -766,5 +776,5 @@ fun UserProfile2UI() {
     val onNext: () -> Unit = {}
     val onBack: () -> Unit = {}
     val viewModel: LoginViewModel = koinViewModel()
-    ProfileScreen2UI(context, onNext, onBack, viewModel)
+    TeacherScreenUI(context, onNext, onBack, viewModel)
 }

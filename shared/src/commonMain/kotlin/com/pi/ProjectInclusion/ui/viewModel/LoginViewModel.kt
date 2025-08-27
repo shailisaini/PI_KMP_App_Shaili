@@ -20,8 +20,12 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithO
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ProfessionListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.QualificationListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ReasonListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByUdiseCodeResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SpecializationListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
 import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
 import com.pi.ProjectInclusion.database.LocalDataSource
@@ -115,6 +119,26 @@ class LoginViewModel(
         MutableStateFlow(UiState<CreateFirstStepProfileResponse>())
     val professionalProfileResponse: StateFlow<UiState<CreateFirstStepProfileResponse>> =
         professionalProfile
+
+    private val professionList =
+        MutableStateFlow(UiState<List<ProfessionListResponse>>())
+    val professionListResponse: StateFlow<UiState<List<ProfessionListResponse>>> =
+        professionList
+
+    private val qualificationList =
+        MutableStateFlow(UiState<List<QualificationListResponse>>())
+    val qualificationListResponse: StateFlow<UiState<List<QualificationListResponse>>> =
+        qualificationList
+
+    private val specializationList =
+        MutableStateFlow(UiState<List<SpecializationListResponse>>())
+    val specializationListResponse: StateFlow<UiState<List<SpecializationListResponse>>> =
+        specializationList
+
+    private val reasonList =
+        MutableStateFlow(UiState<ReasonListResponse>())
+    val reasonListResponse: StateFlow<UiState<ReasonListResponse>> =
+        reasonList
 
     private val query = MutableStateFlow("")
 
@@ -457,10 +481,15 @@ class LoginViewModel(
         firstStepProfileRequest: FirstStepProfileRequest,
         strToken: String,
         profilePic: ByteArray? = null,
-        fileName: String? = null
+        fileName: String? = null,
     ) = viewModelScope.launch {
         firstStepProfilePassword.update { UiState(isLoading = true) }
-        getAuthViewModel.createFirstStepProfileRepo(firstStepProfileRequest, strToken, profilePic, fileName)
+        getAuthViewModel.createFirstStepProfileRepo(
+            firstStepProfileRequest,
+            strToken,
+            profilePic,
+            fileName
+        )
             .catch { exception ->
                 firstStepProfilePassword.update {
                     UiState(error = exception.message ?: somethingWentWrong)
@@ -608,6 +637,97 @@ class LoginViewModel(
                     },
                     onFailure = { exception ->
                         professionalProfile.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun getAllProfessionRepo() = viewModelScope.launch {
+        professionList.update { UiState(isLoading = true) }
+        getAuthViewModel.getAllProfessionRepo()
+            .catch { exception ->
+                professionList.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        professionList.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        professionList.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun getAllQualificationRepo(profession: Int) = viewModelScope.launch {
+        qualificationList.update { UiState(isLoading = true) }
+        getAuthViewModel.getAllQualificationRepo(profession)
+            .catch { exception ->
+                qualificationList.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        qualificationList.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        qualificationList.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun getAllSpecializationRepo(
+        profession: Int,
+        qualification: Int,
+    ) = viewModelScope.launch {
+        specializationList.update { UiState(isLoading = true) }
+        getAuthViewModel.getAllSpecializationRepo(profession, qualification)
+            .catch { exception ->
+                specializationList.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        specializationList.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        specializationList.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun getAllReasonRepo() = viewModelScope.launch {
+        reasonList.update { UiState(isLoading = true) }
+        getAuthViewModel.getAllReasonRepo()
+            .catch { exception ->
+                reasonList.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        reasonList.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        reasonList.update {
                             UiState(error = exception.message ?: somethingWentWrong)
                         }
                     }
