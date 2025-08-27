@@ -497,6 +497,10 @@ and make a difference together!</string>
     <string name="key_select_qualification">Select your qualification</string>
     <string name="key_select_specialization">Select your specialization</string>
     <string name="key_CRR_No">Enter your CRR No.</string>
+    <string name="txt_select_state">Please select a state</string>
+    <string name="txt_select_district">Please select a district</string>
+    <string name="txt_select_block">Please select a block</string>
+    <string name="txt_select_school">Please select a school</string>
 
 
 </resources>

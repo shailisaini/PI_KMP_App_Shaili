@@ -2385,13 +2385,8 @@ fun SchoolListBottomSheet(
     onTextSelected: (String) -> Unit = { "" },
     myList: List<String>,
 ) {
-//    var mySchoolList: List<String> = myList
-    val colors = MaterialTheme.colorScheme
-//    val viewModel: LoginViewModel = hiltViewModel()
-//    val languageListName = stringResource(id = R.string.key_lang_list)
     val chooseOption = stringResource(id = R.string.choose_option)
     val searchHere = stringResource(id = R.string.txt_search_here)
-    val otherOption = stringResource(id = R.string.txt_other)
     var languageData = HashMap<String, String>()
 //    languageData = viewModel.getLanguageTranslationData(languageListName)
 
@@ -2430,6 +2425,7 @@ fun SchoolListBottomSheet(
                 Row(
                     modifier = Modifier
                         .wrapContentHeight()
+                        .padding(top = 15.dp)
                         .background(
                             color = if (isSystemInDarkTheme()) {
                                 Dark_03
@@ -2484,35 +2480,53 @@ fun SchoolListBottomSheet(
                     )
                 }
                 val selectedItem = remember { mutableStateOf<String?>(null) }
-                val filteredListWithOther = filteredList + listOf(otherOption)
-
-                LazyColumn() {
-                    items(filteredListWithOther) { item ->
-                        val isSelected = selectedItem.value == item.toString()
+                if (filteredList.isNotEmpty()) {
+                    LazyColumn {
+                        items(filteredList) { item ->
+                            val isSelected = selectedItem.value == item.toString()
+                            Text(
+                                text = item, modifier = Modifier
+                                    .background(
+                                        color = if (isSelected) {
+                                            if (isSystemInDarkTheme()) {
+                                                Dark_03
+                                            } else {
+                                                PrimaryBlueLt
+                                            }
+                                        } else {
+                                            if (isSystemInDarkTheme()) {
+                                                Dark_03
+                                            } else {
+                                                White
+                                            }
+                                        }
+                                    )
+                                    .fillMaxWidth()
+                                    .padding(15.dp)
+                                    .clickable {
+                                        selectedItem.value = item
+                                        onTextSelected.invoke(item)
+                                        onDismiss.invoke()
+                                    }, fontFamily = fontMedium
+                            )
+                        }
+                    }
+                }
+                else {
+                    Column(
+                        Modifier.padding(bottom = 10.dp)
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Text(
-                            text = item, modifier = Modifier
-                                .background(
-                                    color = if (isSelected) {
-                                        if (isSystemInDarkTheme()) {
-                                            Dark_03
-                                        } else {
-                                            PrimaryBlueLt
-                                        }
-                                    } else {
-                                        if (isSystemInDarkTheme()) {
-                                            Dark_03
-                                        } else {
-                                            White
-                                        }
-                                    }
-                                )
-                                .fillMaxWidth()
-                                .padding(16.dp)
+                            text = stringResource(R.string.txt_oops_no_data_found),
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .padding(17.dp)
                                 .clickable {
-                                    selectedItem.value = item
-                                    onTextSelected.invoke(item)
                                     onDismiss.invoke()
-                                }, style = MaterialTheme.typography.bodyLarge
+                                },
+                            fontFamily = fontMedium
                         )
                     }
                 }

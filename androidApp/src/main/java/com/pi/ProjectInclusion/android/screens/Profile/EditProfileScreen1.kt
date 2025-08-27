@@ -137,7 +137,6 @@ fun EditProfileScreenUI(
     loginViewModel: LoginViewModel,
     onNext: () -> Unit
 ) {
-
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
     val isInternetAvailable by remember { mutableStateOf(true) }
@@ -180,6 +179,7 @@ fun EditProfileScreenUI(
     val email = remember { mutableStateOf("") }
     val mobNo = remember { mutableStateOf("") }
     val whatsappNo = remember { mutableStateOf("") }
+    val noInternet = stringResource(id=R.string.txt_oops_no_internet)
 
     val viewProfile by loginViewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
     LaunchedEffect(viewProfile) {
@@ -632,6 +632,7 @@ fun EditProfileScreenUI(
                                     enabled = mobNo.value.length >= 10,
                                     title = txtContinue,
                                     onClick = {
+                                        onNext()
                                         if (mobNo.value.isEmpty()) {
                                             inValidMobNo = true
                                         } else if (firstName.value.toString().isEmpty()) {
@@ -673,13 +674,19 @@ fun EditProfileScreenUI(
                                                         "EditProfile: " + "1.. " + firstStepProfileRequest + " .. "
                                                                 + strToken + " .. " + mobNo.value.toString() + " .. " + fileName + " .. "
                                                     )
-
-                                                    loginViewModel.createFirstStepProfileRepo(
-                                                        firstStepProfileRequest,
-                                                        strToken,
-                                                        byteArray,
-                                                        fileName
-                                                    )
+                                                    // check Internet
+                                                    if (!isInternetAvailable) {
+                                                        context.toast(noInternet)
+                                                    } else {
+                                                        // call Api
+                                                        isDialogVisible = true
+                                                        loginViewModel.createFirstStepProfileRepo(
+                                                            firstStepProfileRequest,
+                                                            strToken,
+                                                            byteArray,
+                                                            fileName
+                                                        )
+                                                    }
                                                 }
                                             }
                                         }
