@@ -316,10 +316,22 @@ fun TeacherScreenUI(
                             )
                         }
                     }
+                    selectedState = allUdiseDetails[0].stateName.toString()
+                    stateSelectedId.intValue = allUdiseDetails[0].stateId!!
+
+                    selectedDistrict = allUdiseDetails[0].districtName.toString()
+                    districtSelectedId.intValue = allUdiseDetails[0].districtId!!
+
+                    selectedBlock = allUdiseDetails[0].blockName.toString()
+                    blockSelectedId.intValue = allUdiseDetails[0].blockId!!
+
+                    selectedSchool = allUdiseDetails[0].schoolName.toString()
+                    schoolSelectedId.intValue = allUdiseDetails[0].schoolId!!
+
                     println("All Udise list data :- $allUdiseDetails")
                     isUdiseDetails = true
+                    isDialogVisible = false
                 }
-                isDialogVisible = false
             }
         }
     }
@@ -454,6 +466,17 @@ fun TeacherScreenUI(
                                         .clickable {
                                             udiseNo.value.clearQuotes()
                                             isUdiseDetails = false
+                                            selectedState = ""
+                                            stateSelectedId.intValue = -1
+
+                                            selectedDistrict = ""
+                                            districtSelectedId.intValue = -1
+
+                                            selectedBlock = ""
+                                            blockSelectedId.intValue = -1
+
+                                            selectedSchool = ""
+                                            schoolSelectedId.intValue = -1
                                         })
                             } else {
                                 Icon(
