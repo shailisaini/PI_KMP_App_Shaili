@@ -108,12 +108,14 @@ import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.N_A
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.LoginApiResponse
 import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
+import com.pi.ProjectInclusion.data.remote.ApiService.Companion.PROFILE_BASE_URL
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlin.Unit
 
@@ -138,6 +140,7 @@ fun ViewProfileScreen(
     var languageId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
 
     var encryptedUserName = viewModel.getPrefData(USER_NAME)
+    val profilePic = remember { mutableStateOf("") }
 
 
     var hasAllPermissions = remember { mutableStateOf(false) }
@@ -145,8 +148,11 @@ fun ViewProfileScreen(
     var profileData by remember { mutableStateOf<ViewProfileResponse?>(null) }
 
     logger.d("Screen: " + "ViewProfileScreen()")
-    logger.d("viewProfileUI: $languageId  .. $encryptedUserName")
-    viewModel.getUserProfileViewModel(encryptedUserName)
+
+    LaunchedEffect(Unit) {
+        logger.d("viewProfileUI: $languageId  .. $encryptedUserName")
+        viewModel.getUserProfileViewModel(encryptedUserName)
+    }
 
     val viewProfile by viewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
     LaunchedEffect(viewProfile) {
@@ -165,6 +171,8 @@ fun ViewProfileScreen(
                 if (viewProfile.success!!.status == true){
                     profileData = viewProfile.success!!
                     logger.d("viewProfileData 1: ${viewProfile.success}")
+                    profilePic.value = PROFILE_BASE_URL + profileData!!.response?.profilepic
+
 //                    context.toast(sendOtpState.success!!.response!!.message.toString())
                 }
                 else{
@@ -254,7 +262,7 @@ fun ProfileViewUI(
                         .padding(15.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    ProfileWithProgress(image = "", progress = 0.8f)
+                    ProfileWithProgress(image = PROFILE_BASE_URL + profileData.response?.profilepic, progress = 0.8f)
 
                     Text(
                         text = decryptUserName,
@@ -343,7 +351,7 @@ fun ProfileViewUI(
                             ) {
                                 TextWithIconOnLeft(
                                     moreSpace = true,
-                                    text = stringResource(R.string.txt_eg_whatsapp_name),
+                                    text = profileData.response?.dob?:N_A,
                                     icon = ImageVector.vectorResource(id = R.drawable.calendar_blue),
                                     textColor = PrimaryBlue,
                                     iconColor = Color.Unspecified,
@@ -353,7 +361,7 @@ fun ProfileViewUI(
                                 Spacer(modifier = Modifier.height(4.dp))
                                 TextWithIconOnLeft(
                                     moreSpace = true,
-                                    text = stringResource(R.string.txt_eg_whatsapp_name),
+                                    text = profileData.response?.mobile?:N_A,
                                     icon = ImageVector.vectorResource(id = R.drawable.ic_call_blue),
                                     textColor = PrimaryBlue,
                                     iconColor = Color.Unspecified,
@@ -363,7 +371,7 @@ fun ProfileViewUI(
                                 Spacer(modifier = Modifier.height(4.dp))
                                 TextWithIconOnLeft(
                                     moreSpace = true,
-                                    text = stringResource(R.string.txt_eg_whatsapp_name),
+                                    text = profileData.response?.whatsapp?:N_A,
                                     icon = ImageVector.vectorResource(id = R.drawable.ic_whatsapp_blue),
                                     textColor = PrimaryBlue,
                                     iconColor = Color.Unspecified,
@@ -438,7 +446,7 @@ fun ProfileViewUI(
                                         .weight(1f)
                                 )
                                 Text(
-                                    stringResource(R.string.text_add),
+                                    profileData.response?.udicecode?:N_A,
                                     textAlign = TextAlign.End,
                                     fontSize = 14.sp,
                                     fontFamily = fontMedium,
@@ -482,7 +490,7 @@ fun ProfileViewUI(
                                         .weight(1f)
                                 )
                                 Text(
-                                    stringResource(R.string.text_add),
+                                    profileData.response?.stateId?:N_A,
                                     textAlign = TextAlign.End,
                                     fontSize = 15.sp,
                                     fontFamily = fontMedium,
@@ -506,7 +514,7 @@ fun ProfileViewUI(
                                         .weight(1f)
                                 )
                                 Text(
-                                    stringResource(R.string.text_add),
+                                    profileData.response?.districtId?:N_A,
                                     textAlign = TextAlign.End,
                                     fontSize = 15.sp,
                                     fontFamily = fontMedium,
@@ -530,7 +538,7 @@ fun ProfileViewUI(
                                         .weight(1f)
                                 )
                                 Text(
-                                    stringResource(R.string.text_add),
+                                    profileData.response?.blockId?:N_A,
                                     textAlign = TextAlign.End,
                                     fontSize = 15.sp,
                                     fontFamily = fontMedium,
@@ -559,7 +567,7 @@ fun ProfileViewUI(
                                         .weight(1f)
                                 )
                                 Text(
-                                    stringResource(R.string.text_add),
+                                    profileData.response?.schoolId?:N_A,
                                     textAlign = TextAlign.End,
                                     fontSize = 15.sp,
                                     fontFamily = fontMedium,

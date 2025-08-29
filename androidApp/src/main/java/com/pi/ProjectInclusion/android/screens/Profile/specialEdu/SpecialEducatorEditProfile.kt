@@ -80,6 +80,7 @@ import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
@@ -125,7 +126,7 @@ fun SpecialEducatorEditProfile(
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            SpeEducatorScreenUI(context, onBack = onBack, onNext = onNext, viewModel = loginViewModel)
+            SpeEducatorScreenUI(context, onBack = onBack, onNext = onNext, loginViewModel = loginViewModel)
         }
     }
 }
@@ -136,7 +137,7 @@ fun SpeEducatorScreenUI(
     context: Context,
     onNext: () -> Unit,
     onBack: () -> Unit,
-    viewModel: LoginViewModel,
+    loginViewModel: LoginViewModel,
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
@@ -177,16 +178,16 @@ fun SpeEducatorScreenUI(
     var selectedProfession by remember { mutableStateOf("") }
     var selectedQualification by remember { mutableStateOf("") }
     var selectedSpecialization by remember { mutableStateOf("") }
-    val allStatesState by viewModel.allStatesResponse.collectAsStateWithLifecycle()
-    val allDistrictsState by viewModel.allDistrictsResponse.collectAsStateWithLifecycle()
-    val allBlocksState by viewModel.allBlocksResponse.collectAsStateWithLifecycle()
-    val allSchoolsState by viewModel.allSchoolsResponse.collectAsStateWithLifecycle()
-    val allReasonState by viewModel.reasonListResponse.collectAsStateWithLifecycle()
-    val allUdiseState by viewModel.allUdiseCodeResponse.collectAsStateWithLifecycle()
-    val allProfessionState by viewModel.professionListResponse.collectAsStateWithLifecycle()
-    val allQualificationState by viewModel.qualificationListResponse.collectAsStateWithLifecycle()
-    val allSpecializationState by viewModel.specializationListResponse.collectAsStateWithLifecycle()
-    val professionalProfileState by viewModel.professionalProfileResponse.collectAsStateWithLifecycle()
+    val allStatesState by loginViewModel.allStatesResponse.collectAsStateWithLifecycle()
+    val allDistrictsState by loginViewModel.allDistrictsResponse.collectAsStateWithLifecycle()
+    val allBlocksState by loginViewModel.allBlocksResponse.collectAsStateWithLifecycle()
+    val allSchoolsState by loginViewModel.allSchoolsResponse.collectAsStateWithLifecycle()
+    val allReasonState by loginViewModel.reasonListResponse.collectAsStateWithLifecycle()
+    val allUdiseState by loginViewModel.allUdiseCodeResponse.collectAsStateWithLifecycle()
+    val allProfessionState by loginViewModel.professionListResponse.collectAsStateWithLifecycle()
+    val allQualificationState by loginViewModel.qualificationListResponse.collectAsStateWithLifecycle()
+    val allSpecializationState by loginViewModel.specializationListResponse.collectAsStateWithLifecycle()
+    val professionalProfileState by loginViewModel.professionalProfileResponse.collectAsStateWithLifecycle()
     var allState = remember { mutableStateListOf<StateListResponse>() }
     var allDistricts = remember { mutableStateListOf<DistrictListResponse>() }
     var allBlocks = remember { mutableStateListOf<BlockListResponse>() }
@@ -206,8 +207,7 @@ fun SpeEducatorScreenUI(
     var professionId = remember { mutableIntStateOf(-1) }
     var qualificationId = remember { mutableIntStateOf(-1) }
     var specializationId = remember { mutableIntStateOf(-1) }
-    val strToken =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjR5QW9PaGdVQnJyOUVkdXVvbHFvSVE9PSIsInN1YiI6IjEiLCJpYXQiOjE3NTU3NzQ4NDcsImV4cCI6MTc1NTg2MTI0N30.bjqUtT6SSrMRpNO4EiLgh6VhnJp54deOPvQBrjzbTGo"
+    var strToken = loginViewModel.getPrefData(TOKEN_PREF_KEY)
     var msgState = stringResource(R.string.key_select_state)
     var msgDistrict = stringResource(R.string.key_select_district)
     var msgBlock = stringResource(R.string.key_select_block)
@@ -219,7 +219,7 @@ fun SpeEducatorScreenUI(
     var msgCRRN = stringResource(R.string.key_CRR_No)
 
     LaunchedEffect(Unit) {
-        viewModel.getAllStateList()
+        loginViewModel.getAllStateList()
     }
 
     LaunchedEffect(allStatesState) {
@@ -597,7 +597,7 @@ fun SpeEducatorScreenUI(
                                         .align(Alignment.CenterHorizontally)
                                         .padding(8.dp)
                                         .clickable {
-                                            viewModel.getAllDetailsByUdiseId(udiseNo.value.toString())
+                                            loginViewModel.getAllDetailsByUdiseId(udiseNo.value.toString())
                                         })
                             }
                         }
@@ -655,7 +655,7 @@ fun SpeEducatorScreenUI(
                         selectedState = state.toString()
                         allState.find { it.name == state }?.id?.let {
                             stateSelectedId.intValue = it
-                            viewModel.getAllDistrictByStateId(it)
+                            loginViewModel.getAllDistrictByStateId(it)
                         }
                     },
                     allState.map { it.name }.toMutableList() as List<String>
@@ -710,7 +710,7 @@ fun SpeEducatorScreenUI(
                         selectedDistrict = districts
                         allDistricts.find { it.name == districts }?.id?.let {
                             districtSelectedId.intValue = it
-                            viewModel.getAllBlockByDistrictId(it)
+                            loginViewModel.getAllBlockByDistrictId(it)
                         }
                     },
                     allDistricts.map { it.name }.toList() as List<String>
@@ -764,7 +764,7 @@ fun SpeEducatorScreenUI(
                         selectedBlock = block
                         allBlocks.find { it.name == block }?.id?.let {
                             blockSelectedId.intValue = it
-                            viewModel.getAllSchoolsByBlockId(it)
+                            loginViewModel.getAllSchoolsByBlockId(it)
                         }
                     },
                     allBlocks.map { it.name }.toList() as List<String>
@@ -817,8 +817,8 @@ fun SpeEducatorScreenUI(
                         selectedSchool = school
                         allSchools.find { it.name == school }?.id?.let {
                             schoolSelectedId.intValue = it
-                            viewModel.getAllProfessionRepo()
-                            viewModel.getAllReasonRepo()
+                            loginViewModel.getAllProfessionRepo()
+                            loginViewModel.getAllReasonRepo()
                         }
                     },
                     allSchools.map { it.name }.toList() as List<String>
@@ -877,7 +877,7 @@ fun SpeEducatorScreenUI(
                         selectedReason = reason
                         allReasons.find { it.name == reason }?.id?.let {
                             reasonSelectedId.intValue = it.toInt()
-                            viewModel.getAllProfessionRepo()
+                            loginViewModel.getAllProfessionRepo()
                         }
                     },
                     allReasons.map { it.name }.toList() as List<String>
@@ -927,7 +927,7 @@ fun SpeEducatorScreenUI(
                         selectedProfession = profession
                         allProfession.find { it.name == profession }?.id?.let {
                             professionId.intValue = it
-                            viewModel.getAllQualificationRepo(it)
+                            loginViewModel.getAllQualificationRepo(it)
                         }
                     },
                     allProfession.map { it.name }.toList() as List<String>
@@ -977,7 +977,7 @@ fun SpeEducatorScreenUI(
                         selectedQualification = qualification
                         allQualification.find { it.name == qualification }?.id?.let {
                             qualificationId.intValue = it
-                            viewModel.getAllSpecializationRepo(professionId.intValue, it)
+                            loginViewModel.getAllSpecializationRepo(professionId.intValue, it)
                         }
                     },
                     allQualification.map { it.name }.toList() as List<String>
@@ -1125,7 +1125,7 @@ fun SpeEducatorScreenUI(
                                             crrText.value.toString()
                                         )
 
-                                        viewModel.createProfessionalProfileRepo(
+                                        loginViewModel.createProfessionalProfileRepo(
                                             professionalProfileRequest, strToken
                                         )
                                     }
@@ -1147,5 +1147,5 @@ fun UserProfile2UI() {
     val onNext: () -> Unit = {}
     val onBack: () -> Unit = {}
     val viewModel: LoginViewModel = koinViewModel()
-    SpeEducatorScreenUI(context, onNext, onBack, viewModel = viewModel)
+    SpeEducatorScreenUI(context, onNext, onBack, loginViewModel = viewModel)
 }

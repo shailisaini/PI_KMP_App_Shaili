@@ -26,7 +26,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -80,6 +79,7 @@ import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
@@ -125,7 +125,7 @@ fun ProfessionalsEditProfile(
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            ProfessionalScreenUI(context, onBack = onBack, onNext = onNext, viewModel = loginViewModel)
+            ProfessionalScreenUI(context, onBack = onBack, onNext = onNext, loginViewModel = loginViewModel)
         }
     }
 }
@@ -136,7 +136,7 @@ fun ProfessionalScreenUI(
     context: Context,
     onNext: () -> Unit,
     onBack: () -> Unit,
-    viewModel: LoginViewModel,
+    loginViewModel: LoginViewModel,
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
@@ -182,15 +182,11 @@ fun ProfessionalScreenUI(
     var selectedProfession by remember { mutableStateOf("") }
     var selectedQualification by remember { mutableStateOf("") }
     var selectedSpecialization by remember { mutableStateOf("") }
-    val allStatesState by viewModel.allStatesResponse.collectAsStateWithLifecycle()
-    val allDistrictsState by viewModel.allDistrictsResponse.collectAsStateWithLifecycle()
-    val allBlocksState by viewModel.allBlocksResponse.collectAsStateWithLifecycle()
-    val allSchoolsState by viewModel.allSchoolsResponse.collectAsStateWithLifecycle()
-    val allUdiseState by viewModel.allUdiseCodeResponse.collectAsStateWithLifecycle()
-    val allProfessionState by viewModel.professionListResponse.collectAsStateWithLifecycle()
-    val allQualificationState by viewModel.qualificationListResponse.collectAsStateWithLifecycle()
-    val allSpecializationState by viewModel.specializationListResponse.collectAsStateWithLifecycle()
-    val professionalProfileState by viewModel.professionalProfileResponse.collectAsStateWithLifecycle()
+
+    val allProfessionState by loginViewModel.professionListResponse.collectAsStateWithLifecycle()
+    val allQualificationState by loginViewModel.qualificationListResponse.collectAsStateWithLifecycle()
+    val allSpecializationState by loginViewModel.specializationListResponse.collectAsStateWithLifecycle()
+    val professionalProfileState by loginViewModel.professionalProfileResponse.collectAsStateWithLifecycle()
     var allState = remember { mutableStateListOf<StateListResponse>() }
     var allDistricts = remember { mutableStateListOf<DistrictListResponse>() }
     var allBlocks = remember { mutableStateListOf<BlockListResponse>() }
@@ -208,13 +204,15 @@ fun ProfessionalScreenUI(
     var professionId = remember { mutableIntStateOf(-1) }
     var qualificationId = remember { mutableIntStateOf(-1) }
     var specializationId = remember { mutableIntStateOf(-1) }
-    val strToken =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjR5QW9PaGdVQnJyOUVkdXVvbHFvSVE9PSIsInN1YiI6IjEiLCJpYXQiOjE3NTU3NzQ4NDcsImV4cCI6MTc1NTg2MTI0N30.bjqUtT6SSrMRpNO4EiLgh6VhnJp54deOPvQBrjzbTGo"
+    var strToken = loginViewModel.getPrefData(TOKEN_PREF_KEY)
 
-    LaunchedEffect(Unit) {
-        viewModel.getAllStateList()
-    }
+    var isDistrictListCalled by rememberSaveable { mutableStateOf(false) }
+    var isBlockListCalled by rememberSaveable { mutableStateOf(false) }
+    var isSchoolListCalled by rememberSaveable { mutableStateOf(false) }
+    var isUdiseCalled by rememberSaveable { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) { loginViewModel.getAllStateList()}
+    val allStatesState by loginViewModel.allStatesResponse.collectAsStateWithLifecycle()
     LaunchedEffect(allStatesState) {
         when {
             allStatesState.isLoading -> {
@@ -240,104 +238,135 @@ fun ProfessionalScreenUI(
         }
     }
 
-    LaunchedEffect(allDistrictsState) {
-        when {
-            allDistrictsState.isLoading -> {
-                isDialogVisible = true
-            }
-
-            allDistrictsState.error.isNotEmpty() -> {
-                logger.d("All district error : ${allDistrictsState.success}")
-                isDialogVisible = false
-            }
-
-            allDistrictsState.success != null -> {
-                logger.d("All district response : ${allDistrictsState.success}")
-                if (allDistrictsState.success?.size != 0) {
-                    allBlocks.clear()
-                    allDistrictsState.success.let {
-                        it.let { it2 -> allDistricts.addAll(it2!!.toList()) }
-                    }
-                    println("All district list data :- $allDistricts")
+    if (isDistrictListCalled && stateSelectedId.intValue != -1){
+        loginViewModel.getAllDistrictByStateId(stateSelectedId.intValue)
+        val allDistrictsState by loginViewModel.allDistrictsResponse.collectAsStateWithLifecycle()
+        LaunchedEffect(allDistrictsState) {
+            when {
+                allDistrictsState.isLoading -> {
+                    isDialogVisible = true
                 }
-                isDialogVisible = false
-            }
-        }
-    }
 
-    LaunchedEffect(allBlocksState) {
-        when {
-            allBlocksState.isLoading -> {
-                isDialogVisible = true
-            }
-
-            allBlocksState.error.isNotEmpty() -> {
-                logger.d("All Blocks error : ${allBlocksState.success}")
-                isDialogVisible = false
-            }
-
-            allBlocksState.success != null -> {
-                logger.d("All Blocks response : ${allBlocksState.success}")
-                if (allBlocksState.success?.size != 0) {
-                    allSchools.clear()
-                    allBlocksState.success.let {
-                        it.let { it3 -> allBlocks.addAll(it3!!.toList()) }
-                    }
-                    println("All Blocks list data :- $allBlocks")
+                allDistrictsState.error.isNotEmpty() -> {
+                    logger.d("All district error : ${allDistrictsState.success}")
+                    isDialogVisible = false
                 }
-                isDialogVisible = false
-            }
-        }
-    }
 
-    LaunchedEffect(allSchoolsState) {
-        when {
-            allSchoolsState.isLoading -> {
-                isDialogVisible = true
-            }
-
-            allSchoolsState.error.isNotEmpty() -> {
-                logger.d("All Schools error : ${allSchoolsState.success}")
-                isDialogVisible = false
-            }
-
-            allSchoolsState.success != null -> {
-                logger.d("All Schools response : ${allSchoolsState.success}")
-                if (allSchoolsState.success?.status == 1) {
-                    allSchoolsState.success!!.response.let {
-                        it.let { it4 -> allSchools.addAll(it4!!.toList()) }
-                    }
-                    println("All Schools list data :- $allSchools")
-                }
-                isDialogVisible = false
-            }
-        }
-    }
-
-    LaunchedEffect(allUdiseState) {
-        when {
-            allUdiseState.isLoading -> {
-                isDialogVisible = true
-            }
-
-            allUdiseState.error.isNotEmpty() -> {
-                logger.d("All Udise error : ${allUdiseState.success}")
-                isDialogVisible = false
-            }
-
-            allUdiseState.success != null -> {
-                logger.d("All Udise response : ${allUdiseState.success}")
-                if (allUdiseState.success?.status == 1) {
-                    allUdiseState.success!!.response.let {
-                        it.let { it5 ->
-                            allUdiseDetails.addAll(
-                                it5!!.toList()
-                            )
+                allDistrictsState.success != null -> {
+                    logger.d("All district response : ${allDistrictsState.success}")
+                    isDistrictListCalled = false
+                    if (allDistrictsState.success?.size != 0) {
+                        allBlocks.clear()
+                        allDistrictsState.success.let {
+                            it.let { it2 -> allDistricts.addAll(it2!!.toList()) }
                         }
+                        println("All district list data :- $allDistricts")
                     }
-                    println("All Udise list data :- $allUdiseDetails")
+                    isDialogVisible = false
                 }
-                isDialogVisible = false
+            }
+        }
+    }
+
+    if (isBlockListCalled) {
+        val allBlocksState by loginViewModel.allBlocksResponse.collectAsStateWithLifecycle()
+        LaunchedEffect(allBlocksState) {
+            when {
+                allBlocksState.isLoading -> {
+                    isDialogVisible = true
+                }
+
+                allBlocksState.error.isNotEmpty() -> {
+                    logger.d("All Blocks error : ${allBlocksState.success}")
+                    isDialogVisible = false
+                }
+
+                allBlocksState.success != null -> {
+                    logger.d("All Blocks response : ${allBlocksState.success}")
+                    if (allBlocksState.success?.size != 0) {
+                        allSchools.clear()
+                        allBlocksState.success.let {
+                            it.let { it3 -> allBlocks.addAll(it3!!.toList()) }
+                        }
+                        println("All Blocks list data :- $allBlocks")
+                    }
+                    isDialogVisible = false
+                }
+            }
+        }
+    }
+    if (isSchoolListCalled) {
+        val allSchoolsState by loginViewModel.allSchoolsResponse.collectAsStateWithLifecycle()
+        LaunchedEffect(allSchoolsState) {
+            when {
+                allSchoolsState.isLoading -> {
+                    isDialogVisible = true
+                }
+
+                allSchoolsState.error.isNotEmpty() -> {
+                    logger.d("All Schools error : ${allSchoolsState.success}")
+                    isDialogVisible = false
+                }
+
+                allSchoolsState.success != null -> {
+                    logger.d("All Schools response : ${allSchoolsState.success}")
+                    if (allSchoolsState.success?.status == 1) {
+                        allSchoolsState.success!!.response.let {
+                            it.let { it4 -> allSchools.addAll(it4!!.toList()) }
+                        }
+                        println("All Schools list data :- $allSchools")
+                    }
+                    isDialogVisible = false
+                }
+            }
+        }
+    }
+
+    if (isUdiseCalled){
+        loginViewModel.getAllDetailsByUdiseId(udiseNo.value.toString())
+        isDialogVisible = true
+        val allUdiseState by loginViewModel.allUdiseCodeResponse.collectAsStateWithLifecycle()
+        LaunchedEffect(allUdiseState) {
+            when {
+                allUdiseState.isLoading -> {
+                    isDialogVisible = true
+                }
+
+                allUdiseState.error.isNotEmpty() -> {
+                    logger.d("All Udise error : ${allUdiseState.success}")
+                    isUdiseCalled = false
+                    isDialogVisible = false
+                }
+
+                allUdiseState.success != null -> {
+                    logger.d("All Udise response : ${allUdiseState.success}")
+                    isUdiseCalled = false
+                    if (allUdiseState.success?.status == 1) {
+                        allUdiseState.success!!.response.let {
+                            it.let { it5 ->
+                                allUdiseDetails.addAll(
+                                    it5!!.toList()
+                                )
+                            }
+                        }
+                        selectedState = allUdiseDetails[0].stateName.toString()
+                        stateSelectedId.intValue = allUdiseDetails[0].stateId!!
+
+                        selectedDistrict = allUdiseDetails[0].districtName.toString()
+                        districtSelectedId.intValue = allUdiseDetails[0].districtId!!
+
+                        selectedBlock = allUdiseDetails[0].blockName.toString()
+                        blockSelectedId.intValue = allUdiseDetails[0].blockId!!
+
+                        selectedSchool = allUdiseDetails[0].schoolName.toString()
+                        schoolSelectedId.intValue = allUdiseDetails[0].schoolId!!
+
+                        println("All Udise list data :- $allUdiseDetails")
+                        isUdiseDetails = true
+                        isDialogVisible = false
+                    }
+
+                }
             }
         }
     }
@@ -567,7 +596,8 @@ fun ProfessionalScreenUI(
                                         .align(Alignment.CenterHorizontally)
                                         .padding(8.dp)
                                         .clickable {
-                                            viewModel.getAllDetailsByUdiseId(udiseNo.value.toString())
+                                            isDialogVisible = true
+                                            isUdiseCalled = true
                                         })
                             }
                         }
@@ -625,7 +655,7 @@ fun ProfessionalScreenUI(
                         selectedState = state.toString()
                         allState.find { it.name == state }?.id?.let {
                             stateSelectedId.intValue = it
-                            viewModel.getAllDistrictByStateId(it)
+                            isDistrictListCalled = true
                         }
                     },
                     allState.map { it.name }.toMutableList() as List<String>
@@ -679,7 +709,8 @@ fun ProfessionalScreenUI(
                         selectedDistrict = districts
                         allDistricts.find { it.name == districts }?.id?.let {
                             districtSelectedId.intValue = it
-                            viewModel.getAllBlockByDistrictId(it)
+                            isBlockListCalled = true
+                            loginViewModel.getAllBlockByDistrictId(it)
                         }
                     },
                     allDistricts.map { it.name }.toList() as List<String>
@@ -734,7 +765,8 @@ fun ProfessionalScreenUI(
                         selectedBlock = block
                         allBlocks.find { it.name == block }?.id?.let {
                             blockSelectedId.intValue = it
-                            viewModel.getAllSchoolsByBlockId(it)
+                            isSchoolListCalled = true
+                            loginViewModel.getAllSchoolsByBlockId(it)
                         }
                     },
                     allBlocks.map { it.name }.toList() as List<String>
@@ -788,7 +820,7 @@ fun ProfessionalScreenUI(
                         selectedSchool = school
                         allSchools.find { it.name == school }?.id?.let {
                             schoolSelectedId.intValue = it
-                            viewModel.getAllProfessionRepo()
+                            loginViewModel.getAllProfessionRepo()
                         }
                     },
                     allSchools.map { it.name }.toList() as List<String>
@@ -838,7 +870,7 @@ fun ProfessionalScreenUI(
                         selectedProfession = profession
                         allProfession.find { it.name == profession }?.id?.let {
                             professionId.intValue = it
-                            viewModel.getAllQualificationRepo(it)
+                            loginViewModel.getAllQualificationRepo(it)
                         }
                     },
                     allProfession.map { it.name }.toList() as List<String>
@@ -888,7 +920,7 @@ fun ProfessionalScreenUI(
                         selectedQualification = qualification
                         allQualification.find { it.name == qualification }?.id?.let {
                             qualificationId.intValue = it
-                            viewModel.getAllSpecializationRepo(professionId.intValue, it)
+                            loginViewModel.getAllSpecializationRepo(professionId.intValue, it)
                         }
                     },
                     allQualification.map { it.name }.toList() as List<String>
@@ -1043,7 +1075,7 @@ fun ProfessionalScreenUI(
                                             crrText.value.toString()
                                         )
 
-                                        viewModel.createProfessionalProfileRepo(
+                                        loginViewModel.createProfessionalProfileRepo(
                                             professionalProfileRequest, strToken
                                         )
                                     }
@@ -1065,5 +1097,5 @@ fun UserProfile2UI() {
     val onNext: () -> Unit = {}
     val onBack: () -> Unit = {}
     val viewModel: LoginViewModel = koinViewModel()
-    ProfessionalScreenUI(context, onNext, onBack, viewModel = viewModel)
+    ProfessionalScreenUI(context, onNext, onBack, loginViewModel = viewModel)
 }
