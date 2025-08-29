@@ -1,8 +1,12 @@
 package com.pi.ProjectInclusion.domain.useCases
 
 import com.example.kmptemplate.logger.LoggerProvider.logger
-import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
 import com.pi.ProjectInclusion.domain.repository.DashboardRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -28,4 +32,57 @@ class DashboardUsesCases(private val repository: DashboardRepository) {
         }
     }.flowOn(Dispatchers.IO)
 
+    fun getAllCategoryRepo(): Flow<Result<List<CategoryListResponse>>> = flow {
+        try {
+            val response = repository.getAllCategoryRepo()
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            logger.d("Exception in getAllCategoryRepo() $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getAllSubCategoryRepo(): Flow<Result<List<SubCategoryListResponse>>> = flow {
+        try {
+            val response = repository.getAllSubCategoryRepo()
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            logger.d("Exception in getAllSubCategoryRepo() $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getAllSubCategoryByCategoryIdRepo(categoryId: Int): Flow<Result<SubCategoryByCategoryIdResponse>> =
+        flow {
+            try {
+                val response = repository.getAllSubCategoryByCategoryIdRepo(categoryId)
+                emit(Result.success(response))
+            } catch (e: Exception) {
+                val errorMessage = e.message ?: unableToConnectServer
+                logger.d("Exception in getAllSubCategoryRepo() $errorMessage")
+                emit(Result.failure(Exception(errorMessage)))
+            }
+        }.flowOn(Dispatchers.IO)
+
+    fun getAllFAQsRepo(
+        strKeyword: String,
+        userTypeId: String,
+        categoryId: String,
+        subCategoryId: String,
+        userId: String,
+        languageId: String,
+    ): Flow<Result<FAQsListResponse>> = flow {
+        try {
+            val response = repository.getAllFAQsRepo(
+                strKeyword, userTypeId, categoryId, subCategoryId, userId, languageId
+            )
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            logger.d("Exception in getAllFAQsRepo() $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
 }

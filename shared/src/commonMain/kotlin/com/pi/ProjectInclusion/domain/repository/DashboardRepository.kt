@@ -2,6 +2,10 @@ package com.pi.ProjectInclusion.domain.repository
 
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
 
 interface DashboardRepository {
 
@@ -9,4 +13,19 @@ interface DashboardRepository {
         certificateRequest: CertificateRequest,
         strToken: String,
     ): CertificateListResponse
+
+    suspend fun getAllCategoryRepo(): List<CategoryListResponse>
+
+    suspend fun getAllSubCategoryRepo(): List<SubCategoryListResponse>
+
+    suspend fun getAllSubCategoryByCategoryIdRepo(categoryId: Int): SubCategoryByCategoryIdResponse
+
+    suspend fun getAllFAQsRepo(
+        strKeyword: String,
+        userTypeId: String,
+        categoryId: String,
+        subCategoryId: String,
+        userId: String,
+        languageId: String,
+    ): FAQsListResponse
 }

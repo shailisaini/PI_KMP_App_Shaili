@@ -18,7 +18,9 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginReque
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ProfessionListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.QualificationListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ReasonListResponse
@@ -26,6 +28,8 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByU
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SpecializationListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
 import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -53,6 +57,7 @@ class ApiService(private val client: HttpClient) {
         const val CERTIFICATE_BASE_URL = "https://lmsapi.projectinclusion.in/api"
         const val BASIC_LIVE_BASE_URL = "https://api-pi.projectinclusion.in"
         const val SCHOOL_LIVE_BASE_URL = "https://api-school.projectinclusion.in"
+        const val FAQ_BASE_URL = "https://api-faq.projectinclusion.in"
         const val appendUser = "users"
         const val appendCertificate = "Certificate"
         const val appendLive = "api"
@@ -166,8 +171,7 @@ class ApiService(private val client: HttpClient) {
     suspend fun forgetPassword(
         passwordRequest: ForgetPasswordRequest,
         strToken: String,
-    ): ForgetPasswordResponse =
-        client.patch {
+    ): ForgetPasswordResponse = client.patch {
 
             url {
                 takeFrom(STUDENT_BASE_URL)
@@ -184,8 +188,7 @@ class ApiService(private val client: HttpClient) {
     suspend fun createRegisterPassword(
         changeRequest: CreatePasswordRequest,
         strToken: String,
-    ): CreateRegisterPasswordResponse =
-        client.post {
+    ): CreateRegisterPasswordResponse = client.post {
 
             url {
                 takeFrom(STUDENT_BASE_URL)
@@ -202,8 +205,7 @@ class ApiService(private val client: HttpClient) {
     suspend fun getLMSUserCertificate(
         certificateRequest: CertificateRequest,
         strToken: String,
-    ): CertificateListResponse =
-        client.post {
+    ): CertificateListResponse = client.post {
 
             url {
                 takeFrom(CERTIFICATE_BASE_URL)
@@ -217,120 +219,110 @@ class ApiService(private val client: HttpClient) {
         }.body<CertificateListResponse>()
 
     // user Profile
-    suspend fun getViewUserProfile(username: String): ViewProfileResponse =
-        client.get {
-            url {
-                takeFrom(STUDENT_BASE_URL)
-                appendPathSegments(appendUser, "get-user-by-username", username)
-            }
-            headers {
-                append(HttpHeaders.Accept, "application/json")
-            }
-        }.body<ViewProfileResponse>()
+    suspend fun getViewUserProfile(username: String): ViewProfileResponse = client.get {
+        url {
+            takeFrom(STUDENT_BASE_URL)
+            appendPathSegments(appendUser, "get-user-by-username", username)
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+    }.body<ViewProfileResponse>()
 
     suspend fun createFirstStepProfile(
         firstStepProfileRequest: FirstStepProfileRequest,
         strToken: String,
         profilePic: ByteArray? = null,
         fileName: String? = null,
-    ): CreateFirstStepProfileResponse =
-        client.patch {
+    ): CreateFirstStepProfileResponse = client.patch {
 
-            url {
-                takeFrom(STUDENT_BASE_URL)
-                appendPathSegments(appendUser, "update-basic-profile")
-            }
-            headers {
-                append(HttpHeaders.Accept, "application/json")
-                append(HttpHeaders.Authorization, strToken)
-            }
-            contentType(ContentType.Application.Json)
-            setBody(
-                MultiPartFormDataContent(
-                    formData {
-                        append("firstname", firstStepProfileRequest.firstname.toString())
-                        append("middlename", firstStepProfileRequest.email.toString())
-                        append("lastname", firstStepProfileRequest.mobile.toString())
-                        append("gender", firstStepProfileRequest.mobile.toString())
-                        append("mobile", firstStepProfileRequest.mobile.toString())
-                        append("whatsapp", firstStepProfileRequest.mobile.toString())
-                        append("dob", firstStepProfileRequest.mobile.toString())
-                        append("email", firstStepProfileRequest.mobile.toString())
-                        profilePic?.let { bytes ->
-                            append(
-                                key = "profilepic", //params Name
-                                value = bytes,
-                                headers = Headers.build {
-                                    append(
-                                        HttpHeaders.ContentType,
-                                        ContentType.Image.PNG.toString()
-                                    )
-                                    append(
-                                        HttpHeaders.ContentDisposition,
-                                        "form-data; name=\"profilepic\"; filename=\"${fileName ?: "profile.jpg"}\""
-                                    )
-                                }
-                            )
-                        }
+        url {
+            takeFrom(STUDENT_BASE_URL)
+            appendPathSegments(appendUser, "update-basic-profile")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+            append(HttpHeaders.Authorization, strToken)
+        }
+        contentType(ContentType.Application.Json)
+        setBody(
+            MultiPartFormDataContent(
+                formData {
+                    append("firstname", firstStepProfileRequest.firstname.toString())
+                    append("middlename", firstStepProfileRequest.email.toString())
+                    append("lastname", firstStepProfileRequest.mobile.toString())
+                    append("gender", firstStepProfileRequest.mobile.toString())
+                    append("mobile", firstStepProfileRequest.mobile.toString())
+                    append("whatsapp", firstStepProfileRequest.mobile.toString())
+                    append("dob", firstStepProfileRequest.mobile.toString())
+                    append("email", firstStepProfileRequest.mobile.toString())
+                    profilePic?.let { bytes ->
+                        append(
+                            key = "profilepic", //params Name
+                            value = bytes, headers = Headers.build {
+                                append(
+                                    HttpHeaders.ContentType, ContentType.Image.PNG.toString()
+                                )
+                                append(
+                                    HttpHeaders.ContentDisposition,
+                                    "form-data; name=\"profilepic\"; filename=\"${fileName ?: "profile.jpg"}\""
+                                )
+                            })
                     }
-                ))
-        }.body<CreateFirstStepProfileResponse>()
+                })
+        )
+    }.body<CreateFirstStepProfileResponse>()
 
-    suspend fun getAllStateList(): List<StateListResponse> =
-        client.get {
-            url {
-                takeFrom(BASIC_LIVE_BASE_URL)
-                appendPathSegments(appendLive, "State")
-            }
-            headers {
-                append(HttpHeaders.Accept, "application/json")
-            }
-        }.body<List<StateListResponse>>()
+    suspend fun getAllStateList(): List<StateListResponse> = client.get {
+        url {
+            takeFrom(BASIC_LIVE_BASE_URL)
+            appendPathSegments(appendLive, "State")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+    }.body<List<StateListResponse>>()
 
-    suspend fun getAllDistrictByStateId(stateId: Int): List<DistrictListResponse> =
-        client.get {
-            url {
-                takeFrom(BASIC_LIVE_BASE_URL)
-                appendPathSegments(appendLive, "District/GetDistrictByState/${stateId}")
-            }
-            headers {
-                append(HttpHeaders.Accept, "application/json")
-            }
-        }.body<List<DistrictListResponse>>()
+    suspend fun getAllDistrictByStateId(stateId: Int): List<DistrictListResponse> = client.get {
+        url {
+            takeFrom(BASIC_LIVE_BASE_URL)
+            appendPathSegments(appendLive, "District/GetDistrictByState/${stateId}")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+    }.body<List<DistrictListResponse>>()
 
-    suspend fun getAllBlockByDistrictId(districtId: Int): List<BlockListResponse> =
-        client.get {
-            url {
-                takeFrom(BASIC_LIVE_BASE_URL)
-                appendPathSegments(appendLive, "Block/GetBlockByDistrict/${districtId}")
-            }
-            headers {
-                append(HttpHeaders.Accept, "application/json")
-            }
-        }.body<List<BlockListResponse>>()
+    suspend fun getAllBlockByDistrictId(districtId: Int): List<BlockListResponse> = client.get {
+        url {
+            takeFrom(BASIC_LIVE_BASE_URL)
+            appendPathSegments(appendLive, "Block/GetBlockByDistrict/${districtId}")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+    }.body<List<BlockListResponse>>()
 
-    suspend fun getAllSchoolsByBlockId(blockId: Int): SchoolListResponse =
-        client.get {
-            url {
-                takeFrom(SCHOOL_LIVE_BASE_URL)
-                appendPathSegments(appendLive, "SchoolMaster/GetSchoolsByBlockId/${blockId}")
-            }
-            headers {
-                append(HttpHeaders.Accept, "application/json")
-            }
-        }.body<SchoolListResponse>()
+    suspend fun getAllSchoolsByBlockId(blockId: Int): SchoolListResponse = client.get {
+        url {
+            takeFrom(SCHOOL_LIVE_BASE_URL)
+            appendPathSegments(appendLive, "SchoolMaster/GetSchoolsByBlockId/${blockId}")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+    }.body<SchoolListResponse>()
 
-    suspend fun getAllDetailsByUdiseId(udiseCode: String): SchoolByUdiseCodeResponse =
-        client.get {
-            url {
-                takeFrom(SCHOOL_LIVE_BASE_URL)
-                appendPathSegments(appendLive, "SchoolMaster/GetSchoolByUdiseCode")
-                parameters.append("udiseCode", udiseCode)
-            }
-            headers {
-                append(HttpHeaders.Accept, "application/json")
-            }
-        }.body<SchoolByUdiseCodeResponse>()
+    suspend fun getAllDetailsByUdiseId(udiseCode: String): SchoolByUdiseCodeResponse = client.get {
+        url {
+            takeFrom(SCHOOL_LIVE_BASE_URL)
+            appendPathSegments(appendLive, "SchoolMaster/GetSchoolByUdiseCode")
+            parameters.append("udiseCode", udiseCode)
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+    }.body<SchoolByUdiseCodeResponse>()
 
     suspend fun createProfessionalProfile(
         professionalProfileRequest: ProfessionalProfileRequest,
@@ -349,53 +341,105 @@ class ApiService(private val client: HttpClient) {
             setBody(professionalProfileRequest)
         }.body<CreateFirstStepProfileResponse>()
 
-    suspend fun getAllProfession(): List<ProfessionListResponse> =
-        client.get {
-            url {
-                takeFrom(BASIC_LIVE_BASE_URL)
-                appendPathSegments(appendLive, "Profession/GetProfession")
-            }
-            headers {
-                append(HttpHeaders.Accept, "application/json")
-            }
-        }.body<List<ProfessionListResponse>>()
+    suspend fun getAllProfession(): List<ProfessionListResponse> = client.get {
+        url {
+            takeFrom(BASIC_LIVE_BASE_URL)
+            appendPathSegments(appendLive, "Profession/GetProfession")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+    }.body<List<ProfessionListResponse>>()
 
-    suspend fun getAllQualification(profession: Int): List<QualificationListResponse> =
-        client.get {
-            url {
-                takeFrom(BASIC_LIVE_BASE_URL)
-                appendPathSegments(appendLive, "Profession/GetQualification/${profession}")
-            }
-            headers {
-                append(HttpHeaders.Accept, "application/json")
-            }
-        }.body<List<QualificationListResponse>>()
+    suspend fun getAllQualification(profession: Int): List<QualificationListResponse> = client.get {
+        url {
+            takeFrom(BASIC_LIVE_BASE_URL)
+            appendPathSegments(appendLive, "Profession/GetQualification/${profession}")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+    }.body<List<QualificationListResponse>>()
 
     suspend fun getAllSpecialization(
         profession: Int,
         qualification: Int,
-    ): List<SpecializationListResponse> =
+    ): List<SpecializationListResponse> = client.get {
+        url {
+            takeFrom(BASIC_LIVE_BASE_URL)
+            appendPathSegments(
+                appendLive, "Profession/GetSpecialization/${profession}/${qualification}"
+            )
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+    }.body<List<SpecializationListResponse>>()
+
+    suspend fun getAllReason(): ReasonListResponse = client.get {
+        url {
+            takeFrom(STUDENT_BASE_URL)
+            appendPathSegments(appendReason, "get-all")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+    }.body<ReasonListResponse>()
+
+    suspend fun getAllCategory(): List<CategoryListResponse> = client.get {
+        url {
+            takeFrom(FAQ_BASE_URL)
+            appendPathSegments(appendLive, "Category")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+    }.body<List<CategoryListResponse>>()
+
+    suspend fun getAllSubCategory(): List<SubCategoryListResponse> = client.get {
+        url {
+            takeFrom(FAQ_BASE_URL)
+            appendPathSegments(appendLive, "SubCategory")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+    }.body<List<SubCategoryListResponse>>()
+
+    suspend fun getAllSubCategoryByCategoryId(categoryId: Int): SubCategoryByCategoryIdResponse =
         client.get {
             url {
-                takeFrom(BASIC_LIVE_BASE_URL)
+                takeFrom(FAQ_BASE_URL)
                 appendPathSegments(
                     appendLive,
-                    "Profession/GetSpecialization/${profession}/${qualification}"
+                    "SubCategory/GetSubCategoryByCategoryId/${categoryId}"
                 )
             }
             headers {
                 append(HttpHeaders.Accept, "application/json")
             }
-        }.body<List<SpecializationListResponse>>()
+        }.body<SubCategoryByCategoryIdResponse>()
 
-    suspend fun getAllReason(): ReasonListResponse =
-        client.get {
-            url {
-                takeFrom(STUDENT_BASE_URL)
-                appendPathSegments(appendReason, "get-all")
-            }
-            headers {
-                append(HttpHeaders.Accept, "application/json")
-            }
-        }.body<ReasonListResponse>()
+    suspend fun getAllFAQs(
+        strKeyword: String,
+        userTypeId: String,
+        categoryId: String,
+        subCategoryId: String,
+        userId: String,
+        languageId: String,
+    ): FAQsListResponse = client.get {
+        url {
+            takeFrom(FAQ_BASE_URL)
+            appendPathSegments(appendLive, "FAQs/GetFAQs")
+            parameters.append("Keyword", strKeyword)
+            parameters.append("UserTypeId", userTypeId)
+            parameters.append("CategoryId", categoryId)
+            parameters.append("SubCategoryId", subCategoryId)
+            parameters.append("UserId", userId)
+            parameters.append("LanguageId", languageId)
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+    }.body<FAQsListResponse>()
 }

@@ -2387,7 +2387,7 @@ fun SchoolListBottomSheet(
 ) {
     val chooseOption = stringResource(id = R.string.choose_option)
     val searchHere = stringResource(id = R.string.txt_search_here)
-    var languageData = HashMap<String, String>()
+    var SerialNamegeData = HashMap<String, String>()
 //    languageData = viewModel.getLanguageTranslationData(languageListName)
 
     if (isBottomSheetVisible) {
