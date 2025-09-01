@@ -6,6 +6,8 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryL
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingTokenResponse
 
 interface DashboardRepository {
 
@@ -28,4 +30,12 @@ interface DashboardRepository {
         userId: String,
         languageId: String,
     ): FAQsListResponse
+
+    suspend fun getRefreshTokenRepo(): ZoomMeetingTokenResponse
+
+    suspend fun getZoomMeetingsActualTokenRepo(
+        strAuthKey: String,
+        strGrantType: String,
+        strRefreshToken: String,
+    ): TokenResponse
 }

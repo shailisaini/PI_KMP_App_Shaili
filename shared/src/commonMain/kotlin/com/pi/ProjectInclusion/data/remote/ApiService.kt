@@ -30,10 +30,15 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.Specializ
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingTokenResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
 import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.get
@@ -44,6 +49,7 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
+import io.ktor.http.Parameters
 import io.ktor.http.appendPathSegments
 import io.ktor.http.contentType
 import io.ktor.http.takeFrom
@@ -51,7 +57,7 @@ import io.ktor.http.takeFrom
 class ApiService(private val client: HttpClient) {
 
     companion object {
-//        private val STUDENT_BASE_URL = "https://staging-api-pi.projectinclusion.in/api/"   // Production BASE URL
+        //        private val STUDENT_BASE_URL = "https://staging-api-pi.projectinclusion.in/api/"   // Production BASE URL
 //        const val STUDENT_BASE_URL = "https://student-api.auroscholar.org/api/"                         // Production
         const val STUDENT_BASE_URL = "https://staging-pi-api.projectinclusion.in/api/v2"
         const val PROFILE_BASE_URL = "https://staging-pi-api.projectinclusion.in/uploads/profile/"
@@ -59,10 +65,18 @@ class ApiService(private val client: HttpClient) {
         const val BASIC_LIVE_BASE_URL = "https://api-pi.projectinclusion.in"
         const val SCHOOL_LIVE_BASE_URL = "https://api-school.projectinclusion.in"
         const val FAQ_BASE_URL = "https://api-faq.projectinclusion.in"
+
+        const val ZOOM_FIRST_TOKEN_URL = "https://admin.projectinclusion.in/Upload"
+        const val ZOOM_ACTUAL_TOKEN_URL = "https://zoom.us"
+        const val ZOOM_BASE_URL = "https://api.zoom.us"
+
         const val appendUser = "users"
         const val appendCertificate = "Certificate"
         const val appendLive = "api"
         const val appendReason = "reason"
+        const val appendZoomAuth = "ZoomAuth"
+        const val appendOAuth = "oauth"
+        const val appendZoomUser = "v2"
     }
 
     suspend fun getLanguages(): GetLanguageListResponse = client.get {
@@ -174,50 +188,50 @@ class ApiService(private val client: HttpClient) {
         strToken: String,
     ): ForgetPasswordResponse = client.patch {
 
-            url {
-                takeFrom(STUDENT_BASE_URL)
-                appendPathSegments(appendUser, "forget-password")
-            }
-            headers {
-                append(HttpHeaders.Accept, "application/json")
-                append(HttpHeaders.Authorization, strToken)
-            }
-            contentType(ContentType.Application.Json)
-            setBody(passwordRequest)
-        }.body<ForgetPasswordResponse>()
+        url {
+            takeFrom(STUDENT_BASE_URL)
+            appendPathSegments(appendUser, "forget-password")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+            append(HttpHeaders.Authorization, strToken)
+        }
+        contentType(ContentType.Application.Json)
+        setBody(passwordRequest)
+    }.body<ForgetPasswordResponse>()
 
     suspend fun createRegisterPassword(
         changeRequest: CreatePasswordRequest,
         strToken: String,
     ): CreateRegisterPasswordResponse = client.post {
 
-            url {
-                takeFrom(STUDENT_BASE_URL)
-                appendPathSegments(appendUser, "register-user")
-            }
-            headers {
-                append(HttpHeaders.Accept, "application/json")
-                append(HttpHeaders.Authorization, strToken)
-            }
-            contentType(ContentType.Application.Json)
-            setBody(changeRequest)
-        }.body<CreateRegisterPasswordResponse>()
+        url {
+            takeFrom(STUDENT_BASE_URL)
+            appendPathSegments(appendUser, "register-user")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+            append(HttpHeaders.Authorization, strToken)
+        }
+        contentType(ContentType.Application.Json)
+        setBody(changeRequest)
+    }.body<CreateRegisterPasswordResponse>()
 
     suspend fun getLMSUserCertificate(
         certificateRequest: CertificateRequest,
         strToken: String,
     ): CertificateListResponse = client.post {
 
-            url {
-                takeFrom(CERTIFICATE_BASE_URL)
-                appendPathSegments(appendCertificate, "GetLMSUserCertificate")
-            }
-            headers {
-                append(HttpHeaders.Accept, "application/json")
-            }
-            contentType(ContentType.Application.Json)
-            setBody(certificateRequest)
-        }.body<CertificateListResponse>()
+        url {
+            takeFrom(CERTIFICATE_BASE_URL)
+            appendPathSegments(appendCertificate, "GetLMSUserCertificate")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+        contentType(ContentType.Application.Json)
+        setBody(certificateRequest)
+    }.body<CertificateListResponse>()
 
     // user Profile
     suspend fun getViewUserProfile(username: String): ViewProfileResponse = client.get {
@@ -328,19 +342,18 @@ class ApiService(private val client: HttpClient) {
     suspend fun createProfessionalProfile(
         professionalProfileRequest: ProfessionalProfileRequest,
         strToken: String,
-    ): CreateFirstStepProfileResponse =
-        client.post {
-            url {
-                takeFrom(STUDENT_BASE_URL)
-                appendPathSegments(appendUser, "update-professional-profile")
-            }
-            headers {
-                append(HttpHeaders.Accept, "application/json")
-                append(HttpHeaders.Authorization, strToken)
-            }
-            contentType(ContentType.Application.Json)
-            setBody(professionalProfileRequest)
-        }.body<CreateFirstStepProfileResponse>()
+    ): CreateFirstStepProfileResponse = client.post {
+        url {
+            takeFrom(STUDENT_BASE_URL)
+            appendPathSegments(appendUser, "update-professional-profile")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+            append(HttpHeaders.Authorization, strToken)
+        }
+        contentType(ContentType.Application.Json)
+        setBody(professionalProfileRequest)
+    }.body<CreateFirstStepProfileResponse>()
 
     suspend fun getAllProfession(): List<ProfessionListResponse> = client.get {
         url {
@@ -412,8 +425,7 @@ class ApiService(private val client: HttpClient) {
             url {
                 takeFrom(FAQ_BASE_URL)
                 appendPathSegments(
-                    appendLive,
-                    "SubCategory/GetSubCategoryByCategoryId/${categoryId}"
+                    appendLive, "SubCategory/GetSubCategoryByCategoryId/${categoryId}"
                 )
             }
             headers {
@@ -443,4 +455,69 @@ class ApiService(private val client: HttpClient) {
             append(HttpHeaders.Accept, "application/json")
         }
     }.body<FAQsListResponse>()
+
+    suspend fun getRefreshToken(): ZoomMeetingTokenResponse = client.get {
+        url {
+            takeFrom(ZOOM_FIRST_TOKEN_URL)
+            appendPathSegments(appendZoomAuth, "ZoomAuthResponse.json")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+    }.body<ZoomMeetingTokenResponse>()
+
+    suspend fun getZoomMeetingsActualToken(
+        strAuthKey: String,
+        strGrantType: String,
+        strRefreshToken: String,
+    ): TokenResponse = client.post {
+        url {
+            takeFrom(ZOOM_ACTUAL_TOKEN_URL)
+            appendPathSegments(appendOAuth, "token")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+            append(
+                HttpHeaders.Authorization, strAuthKey
+            )
+        }
+        contentType(ContentType.Application.FormUrlEncoded)
+        setBody(
+            FormDataContent(
+                Parameters.build {
+                    append("grant_type", strGrantType)
+                    append("refresh_token", strRefreshToken)
+                })
+        )
+    }.body<TokenResponse>()
+
+    suspend fun getAllZoomMeetings(
+        tokenKey: String,
+    ): ZoomMeetingListResponse = client.get {
+        url {
+            takeFrom(ZOOM_BASE_URL)
+            appendPathSegments(appendZoomUser, "users/me/meetings")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+            append(
+                HttpHeaders.Authorization, tokenKey
+            )
+        }
+    }.body<ZoomMeetingListResponse>()
+
+    suspend fun getJoinZoomMeetings(
+        tokenKey: String, meetingId: Long,
+    ): ZoomMeetingsJoinResponse = client.get {
+        url {
+            takeFrom(ZOOM_BASE_URL)
+            appendPathSegments(appendZoomUser, "meetings/${meetingId}")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+            append(
+                HttpHeaders.Authorization, tokenKey
+            )
+        }
+    }.body<ZoomMeetingsJoinResponse>()
 }
