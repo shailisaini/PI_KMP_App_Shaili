@@ -43,6 +43,7 @@ import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
 import com.pi.ProjectInclusion.android.common_UI.AccountRecoverDialog
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
+import com.pi.ProjectInclusion.android.common_UI.CommonAlertDialog
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.MobileTextField
 import com.pi.ProjectInclusion.android.common_UI.TermsAndPrivacyText
@@ -110,13 +111,14 @@ fun LoginUI(
     val txtContinue = stringResource(id = R.string.text_continue)
     val tvMobNo = stringResource(id = R.string.text_mobile_no_user)
 
-    val uiState by viewModel.validateUserResponse.collectAsStateWithLifecycle()
+    val validateUserState by viewModel.validateUserResponse.collectAsStateWithLifecycle()
     var userName = rememberSaveable { mutableStateOf("") }
     val enterMobile = stringResource(R.string.txt_enter_mobile_no_)
     var showError by remember { mutableStateOf(false) }
     var inValidMobNo by remember { mutableStateOf(false) }
     var isApiCalled by remember { mutableStateOf(false) }
     var confirmRecoverState by remember { mutableStateOf(false) }
+    var isNewUserError by remember { mutableStateOf(false) }
     val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
 
     // user Type Id
@@ -132,26 +134,31 @@ fun LoginUI(
             LoggerProvider.logger.d("ValidateUserParams: ${userName.value} .. $userTypeId")
             viewModel.getValidateUser(encryptedPhoneNo, userTypeId)
 
-            LaunchedEffect(uiState) {
+            LaunchedEffect(validateUserState) {
                 when {
-                    uiState.isLoading -> {
+                    validateUserState.isLoading -> {
                         isDialogVisible = true
                     }
 
-                    uiState.error.isNotEmpty() -> {
+                    validateUserState.error.isNotEmpty() -> {
                         isDialogVisible = false
-                        LoggerProvider.logger.d("Error: ${uiState.error}")
-                        context.toast(uiState.error)
+                        LoggerProvider.logger.d("Error: ${validateUserState.error}")
+                        context.toast(validateUserState.error)
                     }
 
-                    uiState.success != null -> {
-                        if (uiState.success!!.status == true) {
-                            var apiResponse = uiState.success!!.response
-                            LoggerProvider.logger.d("User ValidateResponse: ${uiState.success!!.response}")
+                    validateUserState.success != null -> {
+                        if (validateUserState.success!!.status == true) {
+                            var apiResponse = validateUserState.success!!.response
+                            LoggerProvider.logger.d("User ValidateResponse: ${validateUserState.success!!.response}")
                             isApiCalled = false
                             if (apiResponse?.message == NEW_USER) {
-                                // if new User
-                                onRegister()
+                                if (userName.value.length == 10 && userName.value.all { char -> char.isDigit() }){
+                                // if new User & has mobile no only then register
+                                onRegister()}
+                                else{
+//                                    show error message of only digits
+                                    isNewUserError = true
+                                }
                             } else if (apiResponse?.message == USER_EXIST) {
                                 // if login with password
                                 viewModel.savePrefData(USER_MOBILE_NO, apiResponse.user!!.mobile.toString())
@@ -162,7 +169,7 @@ fun LoginUI(
                             }
                         }
                         else{
-                            context.toast(uiState.success!!.message.toString())
+                            context.toast(validateUserState.success!!.message.toString())
                         }
                         isDialogVisible = false
                     }
@@ -170,10 +177,20 @@ fun LoginUI(
             }
         }
 
+    // Error dialog
+    if (isNewUserError) {
+        CommonAlertDialog(
+            alertMessage = stringResource(R.string.key_phn_error),
+            onClick = {
+                isNewUserError = false
+            }
+        )
+    }
+
     // recover dialog
     if (confirmRecoverState) {
         AccountRecoverDialog(
-            msg = uiState.success?.response?.message.toString(),
+            msg = validateUserState.success?.response?.message.toString(),
             onRestore = {
                 confirmRecoverState = false
 //                LoggerProvider.logger.d("Screen: Moving to$onRegister.route")

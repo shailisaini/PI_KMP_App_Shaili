@@ -477,7 +477,7 @@ fun AccountRecoverDialog(msg: String = "", onDismiss: () -> Unit = {}, onRestore
                     )
 
                     Text(
-                        text = stringResource(R.string.txt_90_days_left),
+                        text = msg + stringResource(R.string.txt_90_days_left),
                         modifier = Modifier
                             .wrapContentWidth()
                             .padding(top = 3.dp, start = 9.dp, end = 9.dp),
@@ -1314,6 +1314,86 @@ fun ReScreeningDialog(onReScreening: () -> Unit = {}) {
                         ) {
                             Text(
                                 text = stringResource(R.string.txt_re_screening_btn),
+                                fontSize = 15.sp,
+                                fontFamily = fontMedium,
+                                color = White,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@SuppressLint("UnusedBoxWithConstraintsScope")
+@Preview
+@Composable
+fun CommonAlertDialog(
+    alertMessage: String = "",
+    onClick: () -> Unit = {}
+) {
+    Dialog(onDismissRequest = { onClick() },
+        properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .padding(20.dp)
+                    .clip(RoundedCornerShape(21.dp))
+                    .background(if (isSystemInDarkTheme()) Dark_02 else White)
+                    .fillMaxWidth()
+
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(vertical = 15.dp, horizontal = 9.dp)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.warning_img),
+                        contentDescription = IMG_DESCRIPTION,
+                        modifier = Modifier.size(121.dp),
+                        tint = Color.Unspecified
+                    )
+
+                    Text(
+                        text = alertMessage,
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .padding(top = 3.dp, start = 9.dp, end = 9.dp),
+                        fontFamily = fontRegular,
+                        fontSize = 15.sp,
+                        color = GrayLight04,
+                        textAlign = TextAlign.Center
+                    )
+                    Row(
+                        modifier = Modifier
+                            .padding(vertical = 15.dp, horizontal = 5.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Button(
+                            onClick = {
+                                onClick()
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .padding(end = 9.dp)
+                                .clip(RoundedCornerShape(9.dp)),
+                            shape = RoundedCornerShape(9.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = PrimaryBlue,
+                                contentColor = White
+                            ),
+                            border = BorderStroke(1.dp, BorderBlue)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.txt_Ok_Got_it),
                                 fontSize = 15.sp,
                                 fontFamily = fontMedium,
                                 color = White,

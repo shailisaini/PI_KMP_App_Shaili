@@ -292,17 +292,21 @@ class LoginViewModel(
         getAuthViewModel.getUserLoginPassword(loginRequest)
             .catch { exception ->
                 _uiStateLogin.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                    UiState(error = exception.message?.takeIf { it.isNotBlank() } ?: somethingWentWrong)
                 }
             }
             .collect { result ->
                 result.fold(
                     onSuccess = { data ->
-                        _uiStateLogin.update { UiState(success = data) }
+                        if (data.status == true) { // success field from API
+                            _uiStateLogin.update { UiState(success = data) }
+                        } else {
+                            _uiStateLogin.update { UiState(error = data.message?.takeIf { it.isNotBlank() } ?: somethingWentWrong) }
+                        }
                     },
                     onFailure = { exception ->
                         _uiStateLogin.update {
-                            UiState(error = exception.message ?: somethingWentWrong)
+                            UiState(error = exception.message?.takeIf { it.isNotBlank() } ?: somethingWentWrong)
                         }
                     }
                 )
