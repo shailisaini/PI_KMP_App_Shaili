@@ -51,9 +51,10 @@ import io.ktor.http.takeFrom
 class ApiService(private val client: HttpClient) {
 
     companion object {
-        //    private val STUDENT_BASE_URL = "https://staging-api-pi.projectinclusion.in/api/"   // Production BASE URL
+//        private val STUDENT_BASE_URL = "https://staging-api-pi.projectinclusion.in/api/"   // Production BASE URL
 //        const val STUDENT_BASE_URL = "https://student-api.auroscholar.org/api/"                         // Production
         const val STUDENT_BASE_URL = "https://staging-pi-api.projectinclusion.in/api/v2"
+        const val PROFILE_BASE_URL = "https://staging-pi-api.projectinclusion.in/uploads/profile/"
         const val CERTIFICATE_BASE_URL = "https://lmsapi.projectinclusion.in/api"
         const val BASIC_LIVE_BASE_URL = "https://api-pi.projectinclusion.in"
         const val SCHOOL_LIVE_BASE_URL = "https://api-school.projectinclusion.in"
@@ -173,51 +174,50 @@ class ApiService(private val client: HttpClient) {
         strToken: String,
     ): ForgetPasswordResponse = client.patch {
 
-        url {
-            takeFrom(STUDENT_BASE_URL)
-            appendPathSegments(appendUser, "forget-password")
-        }
-        headers {
-            append(HttpHeaders.Accept, "application/json")
-            append(HttpHeaders.Authorization, "Bearer $strToken")
-        }
-        contentType(ContentType.Application.Json)
-        setBody(passwordRequest)
-    }.body<ForgetPasswordResponse>()
+            url {
+                takeFrom(STUDENT_BASE_URL)
+                appendPathSegments(appendUser, "forget-password")
+            }
+            headers {
+                append(HttpHeaders.Accept, "application/json")
+                append(HttpHeaders.Authorization, strToken)
+            }
+            contentType(ContentType.Application.Json)
+            setBody(passwordRequest)
+        }.body<ForgetPasswordResponse>()
 
     suspend fun createRegisterPassword(
         changeRequest: CreatePasswordRequest,
         strToken: String,
     ): CreateRegisterPasswordResponse = client.post {
 
-        url {
-            takeFrom(STUDENT_BASE_URL)
-            appendPathSegments(appendUser, "register-user")
-        }
-        headers {
-            append(HttpHeaders.Accept, "application/json")
-            append(HttpHeaders.Authorization, "Bearer $strToken")
-        }
-        contentType(ContentType.Application.Json)
-        setBody(changeRequest)
-    }.body<CreateRegisterPasswordResponse>()
+            url {
+                takeFrom(STUDENT_BASE_URL)
+                appendPathSegments(appendUser, "register-user")
+            }
+            headers {
+                append(HttpHeaders.Accept, "application/json")
+                append(HttpHeaders.Authorization, strToken)
+            }
+            contentType(ContentType.Application.Json)
+            setBody(changeRequest)
+        }.body<CreateRegisterPasswordResponse>()
 
     suspend fun getLMSUserCertificate(
         certificateRequest: CertificateRequest,
         strToken: String,
     ): CertificateListResponse = client.post {
 
-        url {
-            takeFrom(CERTIFICATE_BASE_URL)
-            appendPathSegments(appendCertificate, "GetLMSUserCertificate")
-        }
-        headers {
-            append(HttpHeaders.Accept, "application/json")
-//                append(HttpHeaders.Authorization, "Bearer $strToken")
-        }
-        contentType(ContentType.Application.Json)
-        setBody(certificateRequest)
-    }.body<CertificateListResponse>()
+            url {
+                takeFrom(CERTIFICATE_BASE_URL)
+                appendPathSegments(appendCertificate, "GetLMSUserCertificate")
+            }
+            headers {
+                append(HttpHeaders.Accept, "application/json")
+            }
+            contentType(ContentType.Application.Json)
+            setBody(certificateRequest)
+        }.body<CertificateListResponse>()
 
     // user Profile
     suspend fun getViewUserProfile(username: String): ViewProfileResponse = client.get {
@@ -328,18 +328,19 @@ class ApiService(private val client: HttpClient) {
     suspend fun createProfessionalProfile(
         professionalProfileRequest: ProfessionalProfileRequest,
         strToken: String,
-    ): CreateFirstStepProfileResponse = client.post {
-        url {
-            takeFrom(STUDENT_BASE_URL)
-            appendPathSegments(appendUser, "update-professional-profile")
-        }
-        headers {
-            append(HttpHeaders.Accept, "application/json")
-            append(HttpHeaders.Authorization, "Bearer $strToken")
-        }
-        contentType(ContentType.Application.Json)
-        setBody(professionalProfileRequest)
-    }.body<CreateFirstStepProfileResponse>()
+    ): CreateFirstStepProfileResponse =
+        client.post {
+            url {
+                takeFrom(STUDENT_BASE_URL)
+                appendPathSegments(appendUser, "update-professional-profile")
+            }
+            headers {
+                append(HttpHeaders.Accept, "application/json")
+                append(HttpHeaders.Authorization, strToken)
+            }
+            contentType(ContentType.Application.Json)
+            setBody(professionalProfileRequest)
+        }.body<CreateFirstStepProfileResponse>()
 
     suspend fun getAllProfession(): List<ProfessionListResponse> = client.get {
         url {

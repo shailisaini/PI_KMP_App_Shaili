@@ -169,8 +169,6 @@ fun EditProfileScreen2UI(
     var isUdiseCalled by rememberSaveable { mutableStateOf(false) }
 
     val allStatesState by loginViewModel.allStatesResponse.collectAsStateWithLifecycle()
-    val allSchoolsState by loginViewModel.allSchoolsResponse.collectAsStateWithLifecycle()
-    val professionalProfileState by loginViewModel.professionalProfileResponse.collectAsStateWithLifecycle()
     var allState = remember { mutableStateListOf<StateListResponse>() }
     var allDistricts = remember { mutableStateListOf<DistrictListResponse>() }
     var allBlocks = remember { mutableStateListOf<BlockListResponse>() }
@@ -194,7 +192,6 @@ fun EditProfileScreen2UI(
         message = stringResource(R.string.txt_loading)
     )
 
-    if (isStateListCalled){
         loginViewModel.getAllStateList()
         LaunchedEffect(allStatesState) {
             when {
@@ -220,7 +217,6 @@ fun EditProfileScreen2UI(
                 }
             }
         }
-    }
 
     if (isDistrictListCalled && stateSelectedId.intValue != -1){
         loginViewModel.getAllDistrictByStateId(stateSelectedId.intValue)
@@ -249,6 +245,7 @@ fun EditProfileScreen2UI(
                     isDialogVisible = false
                 }
             }
+            isDistrictListCalled = false
         }
     }
 
@@ -277,9 +274,11 @@ fun EditProfileScreen2UI(
                     isDialogVisible = false
                 }
             }
+            isBlockListCalled = false
         }
     }
-    if (isBlockListCalled) {
+    if (isSchoolListCalled) {
+        val allSchoolsState by loginViewModel.allSchoolsResponse.collectAsStateWithLifecycle()
         LaunchedEffect(allSchoolsState) {
             when {
                 allSchoolsState.isLoading -> {
@@ -302,6 +301,7 @@ fun EditProfileScreen2UI(
                     isDialogVisible = false
                 }
             }
+            isSchoolListCalled = false
         }
     }
 
@@ -631,6 +631,7 @@ fun EditProfileScreen2UI(
                                     selectedDistrict = districts
                                     allDistricts.find { it.name == districts }?.id?.let {
                                         districtSelectedId.intValue = it
+                                        isBlockListCalled = true
                                         loginViewModel.getAllBlockByDistrictId(it)
                                     }
                                 },
@@ -686,6 +687,7 @@ fun EditProfileScreen2UI(
                                     selectedBlock = block
                                     allBlocks.find { it.name == block }?.id?.let {
                                         blockSelectedId.intValue = it
+                                        isSchoolListCalled = true
                                         loginViewModel.getAllSchoolsByBlockId(it)
                                     }
                                 },

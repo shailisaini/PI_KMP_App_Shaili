@@ -46,6 +46,10 @@ import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen2
 import com.pi.ProjectInclusion.android.screens.Profile.TrackRequestScreen
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentDetailsScreen
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentMoreDetailsScreen
+import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen2
+import com.pi.ProjectInclusion.android.screens.Profile.TrackRequestScreen
+import com.pi.ProjectInclusion.android.screens.Profile.professionals.ProfessionalsEditProfile
+import com.pi.ProjectInclusion.android.screens.Profile.specialEdu.SpecialEducatorEditProfile
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.CertificateListActivity
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.ChangePasswordActivity
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.FaqActivity
@@ -308,10 +312,38 @@ class StudentDashboardActivity : ComponentActivity() {
 
                                     AppRoute.EditProfileScreen.route -> EditProfileScreen1(
                                         loginViewModel = viewModel,
-                                        onNext = { navigateTo(AppRoute.EditProfileScreen2.route) },
+                                        onNextTeacher = { navigateTo(AppRoute.EditTeacherProfileScreen.route) },
+                                        onNextProfessional = { navigateTo(AppRoute.EditProfessionalEditProfile.route) },
+                                        onNextSpecialEducator = { navigateTo(AppRoute.EditSpeEduEditProfile.route) },
                                         onBack = { navigateBack(AppRoute.ProfileScreen.route) })
 
-                                    AppRoute.EditProfileScreen2.route -> EditProfileScreen2(
+                                    AppRoute.EditTeacherProfileScreen.route -> EditProfileScreen2(
+                                        loginViewModel = viewModel,
+                                        onNext = {
+                                            context.startActivity(
+                                                Intent(
+                                                    context,
+                                                    StudentDashboardActivity::class.java
+                                                )
+                                            )
+                                            (context as? Activity)?.finish()
+                                        },
+                                        onBack = { navigateBack(AppRoute.ProfileScreen.route) })
+
+                                    AppRoute.EditProfessionalEditProfile.route -> ProfessionalsEditProfile(
+                                        loginViewModel = viewModel,
+                                        onNext = {
+                                            context.startActivity(
+                                                Intent(
+                                                    context,
+                                                    StudentDashboardActivity::class.java
+                                                )
+                                            )
+                                            (context as? Activity)?.finish()
+                                        },
+                                        onBack = { navigateBack(AppRoute.ProfileScreen.route) })
+
+                                    AppRoute.EditSpeEduEditProfile.route -> SpecialEducatorEditProfile(
                                         loginViewModel = viewModel,
                                         onNext = {
                                             context.startActivity(
