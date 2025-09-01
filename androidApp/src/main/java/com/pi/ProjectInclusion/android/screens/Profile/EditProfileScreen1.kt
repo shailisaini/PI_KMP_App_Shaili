@@ -1,5 +1,6 @@
 package com.pi.ProjectInclusion.android.screens.Profile
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -52,6 +53,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Bg_Gray
 import com.pi.ProjectInclusion.Bg_Gray1
@@ -91,12 +94,15 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
+import com.pi.ProjectInclusion.data.remote.ApiService.Companion.PROFILE_BASE_URL
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import java.io.ByteArrayOutputStream
 
 @Composable
-fun EditProfileScreen1(onNext: () -> Unit,  //EditProfileScreen2
+fun EditProfileScreen1(onNextTeacher: () -> Unit,  //EditProfileScreen2
                        onBack: () -> Unit,
+                       onNextProfessional: () -> Unit,
+                       onNextSpecialEducator: () -> Unit,
                        loginViewModel: LoginViewModel) {
     var isDialogVisible by remember { mutableStateOf(false) }
 //    val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
@@ -125,17 +131,25 @@ fun EditProfileScreen1(onNext: () -> Unit,  //EditProfileScreen2
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            EditProfileScreenUI(context, onBack = onBack, loginViewModel = loginViewModel, onNext = onNext)
+            EditProfileScreenUI(context, onBack = onBack,
+                loginViewModel = loginViewModel,
+                onNextTeacher = onNextTeacher,
+                onNextProfessional = onNextProfessional,
+                onNextSpecialEducator = onNextSpecialEducator,
+            )
         }
     }
 }
 
+@SuppressLint("UseKtx")
 @Composable
 fun EditProfileScreenUI(
     context: Context,
     onBack: () -> Unit,
     loginViewModel: LoginViewModel,
-    onNext: () -> Unit
+    onNextTeacher: () -> Unit,
+    onNextProfessional: () -> Unit,
+    onNextSpecialEducator: () -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
@@ -163,7 +177,6 @@ fun EditProfileScreenUI(
 
     var encryptedUserName = loginViewModel.getPrefData(USER_NAME)
     var strToken = loginViewModel.getPrefData(TOKEN_PREF_KEY)
-    loginViewModel.getUserProfileViewModel(encryptedUserName)
 
     // Gender
     val selectedGender = remember { mutableStateOf("") }
@@ -179,7 +192,12 @@ fun EditProfileScreenUI(
     val email = remember { mutableStateOf("") }
     val mobNo = remember { mutableStateOf("") }
     val whatsappNo = remember { mutableStateOf("") }
+    val profilePic = remember { mutableStateOf("") }
     val noInternet = stringResource(id=R.string.txt_oops_no_internet)
+
+    LaunchedEffect(Unit) {
+        loginViewModel.getUserProfileViewModel(encryptedUserName)
+    }
 
     val viewProfile by loginViewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
     LaunchedEffect(viewProfile) {
@@ -202,6 +220,8 @@ fun EditProfileScreenUI(
                         email.value = response.email ?: ""
                         mobNo.value = response.mobile ?: ""
                         whatsappNo.value = response.mobile ?: ""
+                        profilePic.value = PROFILE_BASE_URL + response.profilepic
+                        selectedUri.value =  Uri.parse(profilePic.value)
                     }
                 }
                 else{
@@ -220,22 +240,23 @@ fun EditProfileScreenUI(
             }
     }
 
-    if (selectedUri.value != null){
-        try {
+        if (selectedUri.value != null) {
+            LaunchedEffect(Unit) {
+            try {
+                val imagePath = selectedUri.value!!.path
+                bitmap = BitmapFactory.decodeFile(imagePath)
+                val stream = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.PNG, 50, stream)
+                byteArray = stream.toByteArray()
+                //  mBinding.profileImg.setImageBitmap(bitmap)
+                fileName =
+                    imagePath?.substring(imagePath.toString().lastIndexOf("/") + 1)
 
-            val imagePath = selectedUri.value!!.path
-            bitmap = BitmapFactory.decodeFile(imagePath)
-            val stream = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.PNG, 50, stream)
-            byteArray = stream.toByteArray()
-            //  mBinding.profileImg.setImageBitmap(bitmap)
-            fileName =
-                imagePath?.substring(imagePath.toString().lastIndexOf("/") + 1)
-
-        } catch (e: Exception) {
-            logger.d(
-                "FileNotConvertedException " + "1.. " +e.message
-            )
+            } catch (e: Exception) {
+                logger.d(
+                    "FileNotConvertedException " + "1.. " + e.message
+                )
+            }
         }
     }
 
@@ -303,11 +324,36 @@ fun EditProfileScreenUI(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Image(
-                                    modifier = Modifier
-                                        .size(90.dp), // adjust the size as needed,
-                                    painter =
-//                                    if (profileData?.user.)
-                                        painterResource(id = R.drawable.profile_user_icon),
+                                    modifier = Modifier.size(90.dp),
+                                    painter = when {
+                                        selectedUri.value != null -> {
+                                            // Case 1: Camera/gallery selection
+                                            rememberAsyncImagePainter(
+                                                ImageRequest.Builder(context)
+                                                    .data(selectedUri.value)
+                                                    .placeholder(R.drawable.profile_user_icon)
+                                                    .error(R.drawable.profile_user_icon)
+                                                    .crossfade(true)
+                                                    .build()
+                                            )
+                                        }
+//                                        will use this later
+                                        /*!profilePic.value.isNullOrEmpty() -> {
+                                            // Case 2: API URL
+                                            rememberAsyncImagePainter(
+                                                ImageRequest.Builder(context)
+                                                    .data(profilePic.value)
+                                                    .placeholder(R.drawable.profile_user_icon)
+                                                    .error(R.drawable.profile_user_icon)
+                                                    .crossfade(true)
+                                                    .build()
+                                            )
+                                        }*/
+                                        else -> {
+                                            // Case 3: Default fallback
+                                            painterResource(id = R.drawable.profile_user_icon)
+                                        }
+                                    },
                                     contentDescription = IMG_DESCRIPTION
                                 )
                                 Column(
@@ -632,7 +678,8 @@ fun EditProfileScreenUI(
                                     enabled = mobNo.value.length >= 10,
                                     title = txtContinue,
                                     onClick = {
-                                        onNext()
+//                                        onNext()
+                                        onNextProfessional()
                                         if (mobNo.value.isEmpty()) {
                                             inValidMobNo = true
                                         } else if (firstName.value.toString().isEmpty()) {

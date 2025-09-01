@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.android.MyApplicationTheme
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.screens.login.EnterPasswordScreen
@@ -60,8 +61,8 @@ class LoginNavigationScreen : ComponentActivity() {
 
             var encryptedUserName = viewModel.getPrefData(USER_NAME)
             var userToken = viewModel.getPrefData(TOKEN_PREF_KEY)
-
             if (userToken.isNotEmpty()) {
+                logger.d("token:: ${userToken}")
                 startDestination = AppRoute.TeacherDashboard.route
             } else {
                 startDestination

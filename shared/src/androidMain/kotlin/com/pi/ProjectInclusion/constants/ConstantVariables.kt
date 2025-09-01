@@ -29,6 +29,7 @@ object ConstantVariables {
     var PAGE_LENGTH: String = "1"
     var PAGE_LIMIT: String = "20"
     var ASTRICK: String = "*"
+    var N_A: String = "N/A"
     var RURAL: String = "Rural"
     var URBAN: String = "Urban"
     var PI_DOCUMENT: String = "PI_DOCUMENT"
