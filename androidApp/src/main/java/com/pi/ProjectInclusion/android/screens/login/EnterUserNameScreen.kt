@@ -43,18 +43,22 @@ import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
 import com.pi.ProjectInclusion.android.common_UI.AccountRecoverDialog
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
+import com.pi.ProjectInclusion.android.common_UI.ChooseOneBottomSheet
 import com.pi.ProjectInclusion.android.common_UI.CommonAlertDialog
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
-import com.pi.ProjectInclusion.android.common_UI.MobileTextField
 import com.pi.ProjectInclusion.android.common_UI.TermsAndPrivacyText
 import com.pi.ProjectInclusion.android.common_UI.UserNameTextField
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_EXIST
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.IS_COMING_FROM
+import com.pi.ProjectInclusion.constants.ConstantVariables.LOGIN_WITH_OTP
 import com.pi.ProjectInclusion.constants.ConstantVariables.NEW_USER
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
+import com.pi.ProjectInclusion.constants.ConstantVariables.SUCCESS
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_MOBILE_NO
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
@@ -67,14 +71,7 @@ fun EnterUserNameScreen(
     onRegister: () -> Unit,
     onBack: () -> Unit
 ) {
-    var isDialogVisible by remember { mutableStateOf(false) }
-
     val context = LocalContext.current
-    CustomDialog(
-        isVisible = isDialogVisible,
-        onDismiss = { isDialogVisible = false },
-        message = stringResource(R.string.txt_loading)
-    )
     BackHandler {
         onBack()
     }
@@ -89,7 +86,13 @@ fun EnterUserNameScreen(
                 .background(color = Bg_Gray1),
             verticalArrangement = Arrangement.Top
         ) {
-            LoginUI(viewModel = viewModel,context, onNext = onNext, onBack = onBack, onRegister = onRegister)
+            LoginUI(
+                viewModel = viewModel,
+                context,
+                onNext = onNext,
+                onBack = onBack,
+                onRegister = onRegister
+            )
         }
     }
 }
@@ -104,14 +107,13 @@ fun LoginUI(
 ) {
     val colors = MaterialTheme.colorScheme
     var isDialogVisible by remember { mutableStateOf(false) }
+    var isInternetAvailable by remember { mutableStateOf(true) }
     val internetMessage = stringResource(R.string.txt_oops_no_internet)
-    val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
     val invalidMobNo = stringResource(id = R.string.txt_enter_valid_mob_user)
 
     val txtContinue = stringResource(id = R.string.text_continue)
     val tvMobNo = stringResource(id = R.string.text_mobile_no_user)
 
-    val validateUserState by viewModel.validateUserResponse.collectAsStateWithLifecycle()
     var userName = rememberSaveable { mutableStateOf("") }
     val enterMobile = stringResource(R.string.txt_enter_mobile_no_)
     var showError by remember { mutableStateOf(false) }
@@ -119,69 +121,113 @@ fun LoginUI(
     var isApiCalled by remember { mutableStateOf(false) }
     var confirmRecoverState by remember { mutableStateOf(false) }
     var isNewUserError by remember { mutableStateOf(false) }
-    val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
+    var showOtpBottomSheet by remember { mutableStateOf(false) }
 
     // user Type Id
     var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
     var languageId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
+    var recoverMessage = ""
     val encryptedPhoneNo = userName.value.encryptAES().toString().trim()
+    var sendOtpViaCall by remember { mutableStateOf(false) }
+    var sendOtpViaWhatsApp by remember { mutableStateOf(false) }
+
+    CustomDialog(
+        isVisible = isDialogVisible,
+        onDismiss = { isDialogVisible = false },
+        message = stringResource(R.string.txt_loading)
+    )
 
     if (isApiCalled) {
         // saving userName & mobile no as a local variable in view Model
         viewModel.saveUserName(userName.value)
 
         // commenting this as API is not provided. need it later
-            LoggerProvider.logger.d("ValidateUserParams: ${userName.value} .. $userTypeId")
+        LoggerProvider.logger.d("ValidateUserParams: ${userName.value} .. $userTypeId")
+        LaunchedEffect(Unit) {
             viewModel.getValidateUser(encryptedPhoneNo, userTypeId)
+        }
 
-            LaunchedEffect(validateUserState) {
-                when {
-                    validateUserState.isLoading -> {
-                        isDialogVisible = true
-                    }
+        val validateUserState by viewModel.validateUserResponse.collectAsStateWithLifecycle()
+        LaunchedEffect(validateUserState) {
+            when {
+                validateUserState.isLoading -> {
+                    isDialogVisible = true
+                }
 
-                    validateUserState.error.isNotEmpty() -> {
-                        isDialogVisible = false
-                        LoggerProvider.logger.d("Error: ${validateUserState.error}")
-                        context.toast(validateUserState.error)
-                    }
+                validateUserState.error.isNotEmpty() -> {
+                    isDialogVisible = false
+                    LoggerProvider.logger.d("Error: ${validateUserState.error}")
+                    context.toast(validateUserState.error)
+                }
 
-                    validateUserState.success != null -> {
-                        if (validateUserState.success!!.status == true) {
-                            var apiResponse = validateUserState.success!!.response
-                            LoggerProvider.logger.d("User ValidateResponse: ${validateUserState.success!!.response}")
-                            isApiCalled = false
-                            if (apiResponse?.message == NEW_USER) {
-                                if (userName.value.length == 10 && userName.value.all { char -> char.isDigit() }){
+                validateUserState.success != null -> {
+                    if (validateUserState.success!!.status == true) {
+                        var apiResponse = validateUserState.success!!.response
+                        LoggerProvider.logger.d("User ValidateResponse: ${validateUserState.success!!.response}")
+                        if (apiResponse?.message == NEW_USER) {
+                            if (userName.value.length == 10 && userName.value.all { char -> char.isDigit() }) {
                                 // if new User & has mobile no only then register
-                                onRegister()}
-                                else{
-//                                    show error message of only digits
-                                    isNewUserError = true
-                                }
-                            } else if (apiResponse?.message == USER_EXIST) {
-                                // if login with password
-                                viewModel.savePrefData(USER_MOBILE_NO, apiResponse.user!!.mobile.toString())
-                                onNext()
+                                showOtpBottomSheet = true
+
                             } else {
-                                // if account deactivated
-                                confirmRecoverState = true
+//                                    show error message of only digits
+                                isNewUserError = true
                             }
+                        } else if (apiResponse?.message == USER_EXIST) {
+                            // if login with password
+                            viewModel.savePrefData(
+                                USER_MOBILE_NO,
+                                apiResponse.user!!.mobile.toString()
+                            )
+                            onNext()
+                        } else {
+                            // if account deactivated
+                            confirmRecoverState = true
+                            recoverMessage = validateUserState.success?.response?.message.toString()
                         }
-                        else{
-                            context.toast(validateUserState.success!!.message.toString())
-                        }
-                        isDialogVisible = false
+                    } else {
+                        context.toast(validateUserState.success!!.message.toString())
                     }
+                    isDialogVisible = false
+                    isApiCalled = false
                 }
             }
         }
+
+    }
+
+    // api for otp on call
+    if (sendOtpViaCall) {
+        LaunchedEffect(Unit) {
+            viewModel.getOTPViewModel(encryptedPhoneNo)
+            sendOtpViaCall = false
+        }
+    }
+
+    // api for otp on Whatsapp
+    if (sendOtpViaWhatsApp) {
+        LaunchedEffect(Unit) {
+            viewModel.getOTPWhatsappViewModel(encryptedPhoneNo)
+            sendOtpViaWhatsApp = false
+        }
+    }
+
+    // dialog to show otp on whatsapp or call
+    if (showOtpBottomSheet) {
+        ChooseOneBottomSheet(onCallClick = {
+            sendOtpViaCall = true
+        }, onWhatsappClick = {
+            sendOtpViaWhatsApp = true
+        }, onDismiss = {
+            showOtpBottomSheet = false
+        })
+    }
 
     // Error dialog
     if (isNewUserError) {
         CommonAlertDialog(
             alertMessage = stringResource(R.string.key_phn_error),
-            onClick = {
+            onDismiss = {
                 isNewUserError = false
             }
         )
@@ -190,7 +236,7 @@ fun LoginUI(
     // recover dialog
     if (confirmRecoverState) {
         AccountRecoverDialog(
-            msg = validateUserState.success?.response?.message.toString(),
+            msg = recoverMessage,
             onRestore = {
                 confirmRecoverState = false
 //                LoggerProvider.logger.d("Screen: Moving to$onRegister.route")
@@ -203,8 +249,8 @@ fun LoginUI(
     }
 
     // Response for sent OTP on mobile
+    val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
     LaunchedEffect(sendOtpState) {
-//        viewModel.getOTPViewModel(otpValue)
 
         when {
             sendOtpState.isLoading -> {
@@ -217,8 +263,8 @@ fun LoginUI(
             }
 
             sendOtpState.success != null -> {
-//                LoggerProvider.logger.d("Languages fetched: ${list.size}")
                 isDialogVisible = false
+                viewModel.savePrefData(IS_COMING_FROM, LOGIN_WITH_OTP)
                 onRegister() // Go to OTP Verify screen
             }
         }
@@ -292,19 +338,16 @@ fun LoginUI(
                                 if (showError || userName.value.length < 6) {
                                     inValidMobNo = true
                                 } else {
+                                    isInternetAvailable = isNetworkAvailable(context)
                                     // if first digit of mobile is less than 6 then error will show
 
-                                // commenting this as old user needs char, it might need later.
-                                    /*showError = mobNo.value.isEmpty()
-                                    val firstDigitChar = mobNo.value.toString().first()
-                                    val firstDigit = firstDigitChar.digitToInt()
-                                    if (firstDigit < 6) {
-                                        inValidMobNo = true
+                                    if (!isInternetAvailable) {
+                                        context.toast(internetMessage)
                                     } else {
+                                        // call Api
+                                        isDialogVisible = true
                                         isApiCalled = true
-                                    }*/
-
-                                    isApiCalled = true
+                                    }
                                 }
                             }
                         },

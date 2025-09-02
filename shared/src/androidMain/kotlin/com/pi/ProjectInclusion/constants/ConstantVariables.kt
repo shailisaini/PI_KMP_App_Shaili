@@ -39,6 +39,7 @@ object ConstantVariables {
 
     // screens Name
     var LOGIN_WITH_OTP: String = "loginWithOtp"
+    var REGISTER_NEW: String = "registerNew"
 
     // Tabs
     var ALL: String = "All"

@@ -1333,9 +1333,9 @@ fun ReScreeningDialog(onReScreening: () -> Unit = {}) {
 @Composable
 fun CommonAlertDialog(
     alertMessage: String = "",
-    onClick: () -> Unit = {}
+    onDismiss: () -> Unit = {}
 ) {
-    Dialog(onDismissRequest = { onClick() },
+    Dialog(onDismissRequest = { onDismiss() },
         properties = DialogProperties(usePlatformDefaultWidth = false)) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             Box(
@@ -1378,8 +1378,8 @@ fun CommonAlertDialog(
                     ) {
                         Button(
                             onClick = {
-                                onClick()
-                            },
+                                onDismiss()
+                                      },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f)

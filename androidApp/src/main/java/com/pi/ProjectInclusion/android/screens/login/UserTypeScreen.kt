@@ -74,6 +74,7 @@ import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
 import com.pi.ProjectInclusion.constants.CommonFunction.NoDataFound
 import com.pi.ProjectInclusion.constants.CommonFunction.ShowError
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
@@ -154,8 +155,7 @@ fun UserTypeResponseUI(
     val errColor = PrimaryBlue
     val scrollState = rememberLazyGridState()
     val coroutineScope = rememberCoroutineScope()
-    val isInternetAvailable by remember { mutableStateOf(true) }
-    var isApiResponded by remember { mutableStateOf(false) }
+    var isInternetAvailable by remember { mutableStateOf(true) }
 
     var isDialogVisible by remember { mutableStateOf(false) }
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
@@ -236,6 +236,7 @@ fun UserTypeResponseUI(
                             }
                         }
                     } else {
+                        isInternetAvailable = isNetworkAvailable(context)
                         if (!isInternetAvailable) {
                             ShowError(
                                 internetMessage,

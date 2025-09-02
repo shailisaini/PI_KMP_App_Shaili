@@ -502,6 +502,6 @@ and make a difference together!</string>
     <string name="txt_select_block">Please select a block</string>
     <string name="txt_select_school">Please select a school</string>
     <string name="key_search">Please enter search key</string>
-    <string name="key_phn_error">You are not registered with us \nplease Enter your mobile number here.</string>
+    <string name="key_phn_error">You are not registered with us \nplease Enter your 10 digit mobile number here.</string>
 
 </resources>

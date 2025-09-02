@@ -48,6 +48,8 @@ class LoginViewModel(
 ) : ViewModel() {
     var noInternetConnection: String = "No Internet Found!"
     var somethingWentWrong: String = "Something went wrong"
+    var serverError: String = "Failed to connect to"
+    var serverMsg: String = "Server not responding!"
 
     // check if which API has to call if internet comes
     private var shouldRefreshLanguages = false
@@ -212,8 +214,15 @@ class LoginViewModel(
 
         getAuthViewModel.getLanguage()
             .catch { exception ->
-                _uiState.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true){
+                    _uiState.update {
+                        UiState(error = serverMsg)
+                    }
+                }
+                else {
+                    _uiState.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             }
             .collect { result ->
@@ -222,8 +231,15 @@ class LoginViewModel(
                         _uiState.update { UiState(success = data) }
                     },
                     onFailure = { exception ->
-                        _uiState.update {
-                            UiState(error = exception.message ?: somethingWentWrong)
+                        if (exception.message?.contains(serverError) == true){
+                            _uiState.update {
+                                UiState(error = serverMsg)
+                            }
+                        }
+                        else {
+                            _uiState.update {
+                                UiState(error = exception.message ?: somethingWentWrong)
+                            }
                         }
                     }
                 )
@@ -244,8 +260,15 @@ class LoginViewModel(
         _uiStateUserType.update { UiState(isLoading = true) }
         getAuthViewModel.getUserType()
             .catch { exception ->
-                _uiStateUserType.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true){
+                    _uiStateUserType.update {
+                        UiState(error = serverMsg)
+                    }
+                }
+                else {
+                    _uiStateUserType.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             }
             .collect { result ->
@@ -254,8 +277,15 @@ class LoginViewModel(
                         _uiStateUserType.update { UiState(success = data) }
                     },
                     onFailure = { exception ->
-                        _uiStateUserType.update {
-                            UiState(error = exception.message ?: somethingWentWrong)
+                        if (exception.message?.contains(serverError) == true){
+                            _uiStateUserType.update {
+                                UiState(error = serverMsg)
+                            }
+                        }
+                        else {
+                            _uiStateUserType.update {
+                                UiState(error = exception.message ?: somethingWentWrong)
+                            }
                         }
                     }
                 )

@@ -149,7 +149,7 @@ fun PasswordUI(
     isForgetPassword: () -> Unit,
     onNext: () -> Unit,    // OtpSendVerifyUI
 ) {
-    val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
+
     val loginResponse by viewModel.uiStateLoginResponse.collectAsStateWithLifecycle()
 
     val isInternetAvailable by remember { mutableStateOf(true) }
@@ -247,6 +247,7 @@ fun PasswordUI(
             sendOtpViaCall = false
         }
     }
+
     // api for otp on Whatsapp
     if (sendOtpViaWhatsApp) {
     LaunchedEffect(Unit) {
@@ -256,6 +257,7 @@ fun PasswordUI(
     }
 
     // send otp response
+    val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
     LaunchedEffect(sendOtpState) {
         when {
             sendOtpState.isLoading -> {

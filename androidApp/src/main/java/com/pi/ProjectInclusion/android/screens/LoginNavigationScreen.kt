@@ -132,9 +132,6 @@ class LoginNavigationScreen : ComponentActivity() {
                             // for register & activate
                             onRegister = {
                                 navigateTo(AppRoute.OtpSendVerifyUI.route)
-//                                navigateTo(AppRoute.EnterTeacherRegScreen.route)
-//                                navigateTo(AppRoute.SpecialEducatorRegistration.route)
-//                                navigateTo(AppRoute.EnterProfessionalScreen.route)
                             },
 
                             onBack = { navigateBack(AppRoute.UserTypeSelect.route) }
@@ -142,6 +139,7 @@ class LoginNavigationScreen : ComponentActivity() {
 
                         AppRoute.OtpSendVerifyUI.route -> OtpSendVerifyScreen(
                             onNext = { navigateTo(AppRoute.SetNewPasswordUI.route) },
+                            onBackUserName = {navigateTo(AppRoute.UserNameScreen.route)},
                             onBack = {
                                 navigateBack(AppRoute.ForgetPasswordUI.route)
                             },
