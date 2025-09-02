@@ -9,7 +9,9 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListR
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingTokenResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
 import com.pi.ProjectInclusion.database.LocalDataSource
 import com.pi.ProjectInclusion.domain.ConnectivityObserver
 import com.pi.ProjectInclusion.domain.useCases.DashboardUsesCases
@@ -62,6 +64,14 @@ class DashboardViewModel(
     private val getToken = MutableStateFlow(UiState<TokenResponse>())
     val getTokenResponse: StateFlow<UiState<TokenResponse>> =
         getToken
+
+    private val getMeetingList = MutableStateFlow(UiState<ZoomMeetingListResponse>())
+    val getMeetingListResponse: StateFlow<UiState<ZoomMeetingListResponse>> =
+        getMeetingList
+
+    private val getMeetingJoin = MutableStateFlow(UiState<ZoomMeetingsJoinResponse>())
+    val getMeetingJoinResponse: StateFlow<UiState<ZoomMeetingsJoinResponse>> =
+        getMeetingJoin
 
     fun isNetworkAvailable(): Boolean {
         return connectivityObserver.getCurrentStatus() == ConnectivityObserver.Status.Available
@@ -204,6 +214,47 @@ class DashboardViewModel(
                     getToken.update { UiState(success = data) }
                 }, onFailure = { exception ->
                     getToken.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
+                })
+            }
+    }
+
+    fun getAllZoomMeetings(
+        tokenKey: String,
+    ) = viewModelScope.launch {
+        getMeetingList.update { UiState(isLoading = true) }
+        getUsesCases.getAllZoomMeetingsRepo(tokenKey)
+            .catch { exception ->
+                getMeetingList.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }.collect { result ->
+                result.fold(onSuccess = { data ->
+                    getMeetingList.update { UiState(success = data) }
+                }, onFailure = { exception ->
+                    getMeetingList.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
+                })
+            }
+    }
+
+    fun getJoinZoomMeetings(
+        tokenKey: String,
+        meetingId: Long,
+    ) = viewModelScope.launch {
+        getMeetingJoin.update { UiState(isLoading = true) }
+        getUsesCases.getJoinZoomMeetingsRepo(tokenKey, meetingId)
+            .catch { exception ->
+                getMeetingJoin.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }.collect { result ->
+                result.fold(onSuccess = { data ->
+                    getMeetingJoin.update { UiState(success = data) }
+                }, onFailure = { exception ->
+                    getMeetingJoin.update {
                         UiState(error = exception.message ?: somethingWentWrong)
                     }
                 })

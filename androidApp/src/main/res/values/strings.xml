@@ -505,6 +505,14 @@ and make a difference together!</string>
     <string name="key_phn_error">You are not registered with us \nplease Enter your 10 digit mobile number here.</string>
     <string name="key_upcoming">Upcoming</string>
     <string name="key_past">Past</string>
+    <string name="key_Na">N/A</string>
+    <string name="key_duration_in_minuts">Duration: 60 mins</string>
+    <string name="key_duration">Duration:</string>
+    <string name="key_mins">mins</string>
+    <string name="key_Joined">Joined</string>
+    <string name="key_Passed">Passed</string>
+    <string name="key_Live">Live</string>
+    <string name="key_Completed">Completed</string>
 
 
 </resources>

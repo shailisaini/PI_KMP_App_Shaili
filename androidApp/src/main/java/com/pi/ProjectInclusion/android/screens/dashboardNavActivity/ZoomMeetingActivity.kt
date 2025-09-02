@@ -3,12 +3,16 @@ package com.pi.ProjectInclusion.android.screens.dashboardNavActivity
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,6 +27,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -56,6 +62,7 @@ import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_TITLE_TEXT
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Dark_02
+import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.GrayLight09
 import com.pi.ProjectInclusion.LightGreen06
@@ -75,19 +82,21 @@ import com.pi.ProjectInclusion.android.screens.menu.TabItem
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
-import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.CustomDialog
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingListResponse
 import com.pi.ProjectInclusion.ui.viewModel.DashboardViewModel
-import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Calendar
+import java.util.Locale
 
 class ZoomMeetingActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            logger.d("Screen: " + "ZoomMeetingListScreen()")
             val context = LocalContext.current
             val viewModel: DashboardViewModel = koinViewModel()
 
@@ -124,12 +133,16 @@ private fun ShowZoomMeetingData(context: Context, viewModel: DashboardViewModel)
     var isDialogVisible by remember { mutableStateOf(false) }
     val firstTokenState by viewModel.getZoomMeetingTokenResponse.collectAsStateWithLifecycle()
     val actualTokenState by viewModel.getTokenResponse.collectAsStateWithLifecycle()
+    val meetingListState by viewModel.getMeetingListResponse.collectAsStateWithLifecycle()
+    val meetingJoinState by viewModel.getMeetingJoinResponse.collectAsStateWithLifecycle()
+
     var strRefreshToken by remember { mutableStateOf("") }
     var strActualTokenKey by remember { mutableStateOf("") }
     val strBaseKey =
         "Basic RFdUcmNuUDZSUUdiUzhwX3hUbU1Rdzp4M3hlQ2gyZnJMS3FqOGlHYnlUOEo4VkZvdjdSdWNMNQ=="
     val strRefreshKey = "refresh_token"
 
+    var meetingListData by remember { mutableStateOf(mutableListOf<ZoomMeetingListResponse.Meetings>()) }
 
     LaunchedEffect(Unit) {
         isDialogVisible = true
@@ -150,14 +163,11 @@ private fun ShowZoomMeetingData(context: Context, viewModel: DashboardViewModel)
             firstTokenState.success != null -> {
                 logger.d("Refresh token Response :- ${firstTokenState.success}")
                 if (firstTokenState.success?.refreshToken != null) {
-                    isDialogVisible = false
                     if (firstTokenState.success?.refreshToken!!.isNotEmpty()) {
                         strRefreshToken = firstTokenState.success?.refreshToken.toString()
                         println("Refresh token Data :- $strRefreshToken")
                         viewModel.getZoomMeetingsActualToken(
-                            strBaseKey,
-                            strRefreshKey,
-                            strRefreshToken
+                            strBaseKey, strRefreshKey, strRefreshToken
                         )
                     }
                 } else {
@@ -182,14 +192,42 @@ private fun ShowZoomMeetingData(context: Context, viewModel: DashboardViewModel)
             actualTokenState.success != null -> {
                 logger.d("Actual Token Response :- ${actualTokenState.success}")
                 if (actualTokenState.success?.accessToken != null) {
-                    isDialogVisible = false
                     if (actualTokenState.success?.accessToken!!.isNotEmpty()) {
                         strActualTokenKey = actualTokenState.success?.accessToken.toString()
                         println("Actual token Data :- $strActualTokenKey")
+                        viewModel.getAllZoomMeetings("bearer $strActualTokenKey")
                     }
                 } else {
                     isDialogVisible = false
                     logger.d("Actual token data not found...")
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(meetingListState) {
+        when {
+            meetingListState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            meetingListState.error.isNotEmpty() -> {
+                logger.d("Meeting list error: ${meetingListState.error}")
+                isDialogVisible = false
+            }
+
+            meetingListState.success != null -> {
+                logger.d("Meeting list response :- ${meetingListState.success}")
+                if (meetingListState.success?.meetings != null) {
+                    isDialogVisible = false
+                    if (meetingListState.success?.meetings?.size != 0) {
+                        meetingListData =
+                            meetingListState.success?.meetings as MutableList<ZoomMeetingListResponse.Meetings>
+                        println("Meeting list data :- $meetingListData")
+                    }
+                } else {
+                    isDialogVisible = false
+                    logger.d("Meeting list data not found...")
                 }
             }
         }
@@ -269,7 +307,6 @@ private fun ShowZoomMeetingData(context: Context, viewModel: DashboardViewModel)
                     LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
                         if (!pagerState.isScrollInProgress) {
                             selectedTabIndex = pagerState.currentPage
-                            println("selected Tab Index :- $selectedTabIndex")
                         }
                     }
 
@@ -350,11 +387,11 @@ private fun ShowZoomMeetingData(context: Context, viewModel: DashboardViewModel)
                             ) { index ->
                                 when (index) {
                                     0 -> {
-                                        AllUpcomingMeetingScreening()
+                                        AllUpcomingMeetingScreening(meetingListData)
                                     }
 
                                     1 -> {
-                                        AllPastMeetingScreening()
+                                        AllPastMeetingScreening(meetingListData)
                                     }
                                 }
                             }
@@ -366,7 +403,7 @@ private fun ShowZoomMeetingData(context: Context, viewModel: DashboardViewModel)
 }
 
 @Composable
-fun AllUpcomingMeetingScreening() {
+fun AllUpcomingMeetingScreening(meetingListData: MutableList<ZoomMeetingListResponse.Meetings>) {
 
     val selectedBorder = BorderStroke(
         width = 0.5.dp, if (isSystemInDarkTheme()) {
@@ -376,224 +413,328 @@ fun AllUpcomingMeetingScreening() {
         }
     )
 
-    Card(
-        shape = RoundedCornerShape(8.dp),
+    Column(
         modifier = Modifier
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp)
             .fillMaxWidth()
-            .wrapContentHeight(),
-        colors = if (isSystemInDarkTheme()) {
-            CardDefaults.cardColors(Yellow)
-        } else {
-            CardDefaults.cardColors(
-                containerColor = White,
-                contentColor = White,
-                disabledContentColor = White,
-                disabledContainerColor = White
-            )
-        },
-        border = selectedBorder
+            .padding(2.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(
-                start = 12.dp, end = 12.dp, top = 12.dp, bottom = 12.dp
-            ), horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Card(
-                    shape = RoundedCornerShape(25.dp),
-                    colors = if (isSystemInDarkTheme()) {
-                        CardDefaults.cardColors(PrimaryBlue3) //LightGreen07
-                    } else {
-                        CardDefaults.cardColors(
-                            containerColor = LightRed04,
-                            contentColor = LightRed04,
-                            disabledContentColor = LightRed04,
-                            disabledContainerColor = LightRed04
-                        )
-                    }
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .height(35.dp)
-                            .width(100.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = "•",
-                            modifier = Modifier
-                                .padding(start = 8.dp, end = 4.dp)
-                                .wrapContentWidth(),
-                            fontFamily = fontMedium,
-                            fontSize = 18.sp,
-                            color = if (isSystemInDarkTheme()) {
-                                LightRed01 // ZoomLightRed
-                            } else {
-                                LightRed01 //  ZoomLightRed
-                            },
-                            textAlign = TextAlign.Center
-                        )
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            items(meetingListData) { meetingData ->
 
-                        Text(
-                            text = "Live",
-                            modifier = Modifier
-                                .padding(start = 4.dp, end = 8.dp)
-                                .wrapContentWidth(),
-                            fontFamily = fontMedium,
-                            fontSize = 13.sp,
-                            color = if (isSystemInDarkTheme()) {
-                                LightRed01 // ZoomLightRed
-                            } else {
-                                LightRed01//  ZoomLightRed
-                            },
-                            textAlign = TextAlign.Start
-                        )
-                    }
+                val calender = Calendar.getInstance()
+                val day = calender.get(Calendar.DAY_OF_MONTH)
+                val dayAfter = calender.get(Calendar.DAY_OF_MONTH) + 1
+                val month = calender.get(Calendar.MONTH) + 1
+                val year = calender.get(Calendar.YEAR)
+
+                val today = if (month != 10) {
+                    "$day-0$month-$year"
+                } else {
+                    "$day-$month-$year"
                 }
 
-                Spacer(Modifier.weight(1f))
+                val currentMonth = "$month-$year"
 
-                Column(
-                    modifier = Modifier
-                        .padding(
-                            start = 6.dp, top = 6.dp, bottom = 6.dp
-                        )
-                        .wrapContentWidth(),
-                    horizontalAlignment = Alignment.End,
-                    verticalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Duration: 60 mins",
-                        modifier = Modifier
-                            .wrapContentWidth()
-                            .padding(start = 8.dp, end = 8.dp),
-                        fontFamily = fontRegular,
-                        fontSize = 13.sp,
-                        color = if (isSystemInDarkTheme()) {
-                            DARK_TITLE_TEXT
-                        } else {
-                            GrayLight09
-                        },
-                        textAlign = TextAlign.Start
-                    )
-                }
-            }
-
-            Row(
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.zoom_meeting_img),
-                    contentDescription = IMG_DESCRIPTION,
-                    modifier = Modifier
-                        .size(65.dp)
-                        .background(Color.Unspecified),
-                )
-
-                Column(
-                    modifier = Modifier
-                        .padding(
-                            start = 6.dp, top = 6.dp, bottom = 6.dp
-                        )
-                        .wrapContentWidth(),
-                    horizontalAlignment = Alignment.End,
-                    verticalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Advance Level Training Webinar For Project Inclusion",
-                        modifier = Modifier
-                            .padding(start = 6.dp, end = 8.dp)
-                            .fillMaxWidth(),
-                        fontFamily = fontMedium,
-                        fontSize = 15.sp,
-                        color = if (isSystemInDarkTheme()) {
-                            DARK_TITLE_TEXT
-                        } else {
-                            Black
-                        },
-                        textAlign = TextAlign.Start
-                    )
-                }
-            }
-
-            Row(
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(
-                            top = 6.dp, bottom = 6.dp
-                        )
-                        .wrapContentWidth(),
-                    horizontalAlignment = Alignment.Start,
-                    verticalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "22 Jan 2025, 09:00 AM",
-                        modifier = Modifier
-                            .padding(end = 8.dp)
-                            .wrapContentWidth(),
-                        fontFamily = fontBold,
-                        fontSize = 13.sp,
-                        color = if (isSystemInDarkTheme()) {
-                            DARK_TITLE_TEXT
-                        } else {
-                            GrayLight09
-                        },
-                        textAlign = TextAlign.Start
-                    )
+                val afterTwoDays = if (month != 10) {
+                    "$dayAfter-0$month-$year"
+                } else {
+                    "$dayAfter-$month-$year"
                 }
 
-                Spacer(Modifier.weight(1f))
+                println("Day after tomorrow :- $afterTwoDays")
 
-                Column(
-                    modifier = Modifier.wrapContentHeight(), horizontalAlignment = Alignment.End
-                ) {
-                    Card(
-                        modifier = Modifier
-                            .width(115.dp)
-                            .wrapContentHeight(),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = if (isSystemInDarkTheme()) {
-                            CardDefaults.cardColors(PrimaryBlue)
-                        } else {
-                            CardDefaults.cardColors(
-                                containerColor = PrimaryBlue,
-                                contentColor = PrimaryBlue,
-                                disabledContentColor = PrimaryBlue,
-                                disabledContainerColor = PrimaryBlue
-                            )
-                        }
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .wrapContentWidth()
-                                .height(36.dp)
-                                .align(Alignment.CenterHorizontally),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Join now",
-                                modifier = Modifier.wrapContentWidth(),
-                                fontFamily = fontMedium,
-                                fontSize = 15.sp,
-                                color = if (isSystemInDarkTheme()) {
-                                    White
+                if (meetingData.startTime != null) {
+                    val meetingDateMonth = formatDateMonth(meetingData.startTime.toString())
+                    val meetingDate = formatMonthDate(meetingData.startTime.toString())
+
+                    if (meetingDateMonth.contains(currentMonth)) {
+                        if (meetingDate == afterTwoDays || meetingDate == today) {
+                            Card(
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier
+                                    .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+                                    .fillMaxWidth()
+                                    .wrapContentHeight(),
+                                colors = if (isSystemInDarkTheme()) {
+                                    CardDefaults.cardColors(Yellow)
                                 } else {
-                                    White
+                                    CardDefaults.cardColors(
+                                        containerColor = White,
+                                        contentColor = White,
+                                        disabledContentColor = White,
+                                        disabledContainerColor = White
+                                    )
                                 },
-                                textAlign = TextAlign.Center
-                            )
+                                border = selectedBorder
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(
+                                        start = 12.dp, end = 12.dp, top = 12.dp, bottom = 12.dp
+                                    ), horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(
+                                            horizontal = 4.dp,
+                                            vertical = 4.dp
+                                        ),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Card(
+                                            shape = RoundedCornerShape(25.dp),
+                                            colors = if (isSystemInDarkTheme()) {
+                                                CardDefaults.cardColors(PrimaryBlue3) //LightGreen07
+                                            } else {
+                                                CardDefaults.cardColors(
+                                                    containerColor = LightRed04,
+                                                    contentColor = LightRed04,
+                                                    disabledContentColor = LightRed04,
+                                                    disabledContainerColor = LightRed04
+                                                )
+                                            }
+                                        ) {
+                                            Row(
+                                                modifier = Modifier
+                                                    .height(35.dp)
+                                                    .width(100.dp),
+                                                horizontalArrangement = Arrangement.Center,
+                                                verticalAlignment = Alignment.CenterVertically,
+                                            ) {
+                                                Text(
+                                                    text = "•",
+                                                    modifier = Modifier
+                                                        .padding(start = 8.dp, end = 4.dp)
+                                                        .wrapContentWidth(),
+                                                    fontFamily = fontMedium,
+                                                    fontSize = 18.sp,
+                                                    color = if (isSystemInDarkTheme()) {
+                                                        LightRed01 // ZoomLightRed
+                                                    } else {
+                                                        LightRed01 //  ZoomLightRed
+                                                    },
+                                                    textAlign = TextAlign.Center
+                                                )
+
+                                                Text(
+                                                    text = stringResource(R.string.key_Live),
+                                                    modifier = Modifier
+                                                        .padding(start = 4.dp, end = 8.dp)
+                                                        .wrapContentWidth(),
+                                                    fontFamily = fontMedium,
+                                                    fontSize = 13.sp,
+                                                    color = if (isSystemInDarkTheme()) {
+                                                        LightRed01 // ZoomLightRed
+                                                    } else {
+                                                        LightRed01//  ZoomLightRed
+                                                    },
+                                                    textAlign = TextAlign.Start
+                                                )
+                                            }
+                                        }
+
+                                        Spacer(Modifier.weight(1f))
+
+                                        Column(
+                                            modifier = Modifier
+                                                .padding(
+                                                    start = 6.dp, top = 6.dp, bottom = 6.dp
+                                                )
+                                                .wrapContentWidth(),
+                                            horizontalAlignment = Alignment.End,
+                                            verticalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Text(
+                                                text = if (meetingData.duration != null) {
+                                                    stringResource(R.string.key_duration) + " ${meetingData.duration} " + stringResource(
+                                                        R.string.key_mins
+                                                    )
+                                                } else {
+                                                    stringResource(R.string.key_duration_in_minuts)
+                                                },
+                                                modifier = Modifier
+                                                    .wrapContentWidth()
+                                                    .padding(start = 8.dp, end = 8.dp),
+                                                fontFamily = fontRegular,
+                                                fontSize = 13.sp,
+                                                color = if (isSystemInDarkTheme()) {
+                                                    DARK_TITLE_TEXT
+                                                } else {
+                                                    GrayLight09
+                                                },
+                                                textAlign = TextAlign.Start
+                                            )
+                                        }
+                                    }
+
+                                    Row(
+                                        modifier = Modifier.padding(
+                                            horizontal = 4.dp,
+                                            vertical = 4.dp
+                                        ),
+                                        horizontalArrangement = Arrangement.Start,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Image(
+                                            painter = painterResource(R.drawable.zoom_meeting_img),
+                                            contentDescription = IMG_DESCRIPTION,
+                                            modifier = Modifier
+                                                .size(65.dp)
+                                                .background(Color.Unspecified),
+                                        )
+
+                                        Column(
+                                            modifier = Modifier
+                                                .padding(
+                                                    start = 6.dp, top = 6.dp, bottom = 6.dp
+                                                )
+                                                .wrapContentWidth(),
+                                            horizontalAlignment = Alignment.End,
+                                            verticalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Text(
+                                                text = if (meetingData.topic != null) {
+                                                    meetingData.topic.toString()
+                                                } else {
+                                                    stringResource(R.string.key_Na)
+                                                },
+                                                modifier = Modifier
+                                                    .padding(start = 6.dp, end = 8.dp)
+                                                    .fillMaxWidth(),
+                                                fontFamily = fontMedium,
+                                                fontSize = 15.sp,
+                                                color = if (isSystemInDarkTheme()) {
+                                                    DARK_TITLE_TEXT
+                                                } else {
+                                                    Black
+                                                },
+                                                textAlign = TextAlign.Start
+                                            )
+                                        }
+                                    }
+
+                                    Row(
+                                        modifier = Modifier.padding(
+                                            horizontal = 4.dp,
+                                            vertical = 4.dp
+                                        ),
+                                        horizontalArrangement = Arrangement.Start,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Column(
+                                            modifier = Modifier
+                                                .padding(
+                                                    top = 6.dp, bottom = 6.dp
+                                                )
+                                                .wrapContentWidth(),
+                                            horizontalAlignment = Alignment.Start,
+                                            verticalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            if (meetingData.startTime != null) {
+                                                val formatted =
+                                                    formatDate(meetingData.startTime.toString())
+                                                val formattedTime =
+                                                    formatTime(meetingData.startTime.toString())
+
+                                                Text(
+                                                    text = "$formatted, $formattedTime",
+                                                    modifier = Modifier
+                                                        .padding(end = 8.dp)
+                                                        .wrapContentWidth(),
+                                                    fontFamily = fontBold,
+                                                    fontSize = 13.sp,
+                                                    color = if (isSystemInDarkTheme()) {
+                                                        DARK_TITLE_TEXT
+                                                    } else {
+                                                        GrayLight09
+                                                    },
+                                                    textAlign = TextAlign.Start
+                                                )
+                                            } else {
+                                                Text(
+                                                    text = stringResource(R.string.key_Na),
+                                                    modifier = Modifier
+                                                        .padding(end = 8.dp)
+                                                        .wrapContentWidth(),
+                                                    fontFamily = fontBold,
+                                                    fontSize = 13.sp,
+                                                    color = if (isSystemInDarkTheme()) {
+                                                        DARK_TITLE_TEXT
+                                                    } else {
+                                                        GrayLight09
+                                                    },
+                                                    textAlign = TextAlign.Start
+                                                )
+                                            }
+                                        }
+
+                                        Spacer(Modifier.weight(1f))
+
+                                        Column(
+                                            modifier = Modifier.wrapContentHeight(),
+                                            horizontalAlignment = Alignment.End
+                                        ) {
+                                            Card(
+                                                modifier = Modifier
+                                                    .width(115.dp)
+                                                    .wrapContentHeight()
+                                                    .clickable {
+                                                        if (meetingDate.contains(today)) {
+                                                            println("Clickable for joining meeting")
+                                                        } else {
+                                                            println("Not clickable for joining meeting")
+                                                        }
+                                                    },
+                                                shape = RoundedCornerShape(8.dp),
+                                                colors = if (meetingDate.contains(today)) {
+                                                    if (isSystemInDarkTheme()) {
+                                                        CardDefaults.cardColors(PrimaryBlue)
+                                                    } else {
+                                                        CardDefaults.cardColors(PrimaryBlue)
+                                                    }
+                                                } else {
+                                                    if (isSystemInDarkTheme()) {
+                                                        CardDefaults.cardColors(
+                                                            containerColor = Gray,
+                                                            contentColor = Gray,
+                                                            disabledContentColor = Gray,
+                                                            disabledContainerColor = Gray
+                                                        )
+                                                    } else {
+                                                        CardDefaults.cardColors(
+                                                            containerColor = Gray,
+                                                            contentColor = Gray,
+                                                            disabledContentColor = Gray,
+                                                            disabledContainerColor = Gray
+                                                        )
+                                                    }
+                                                }
+                                            ) {
+                                                Row(
+                                                    modifier = Modifier
+                                                        .wrapContentWidth()
+                                                        .height(36.dp)
+                                                        .align(Alignment.CenterHorizontally),
+                                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                                    verticalAlignment = Alignment.CenterVertically
+                                                ) {
+                                                    Text(
+                                                        text = "Join now",
+                                                        modifier = Modifier.wrapContentWidth(),
+                                                        fontFamily = fontMedium,
+                                                        fontSize = 15.sp,
+                                                        color = if (isSystemInDarkTheme()) {
+                                                            White
+                                                        } else {
+                                                            White
+                                                        },
+                                                        textAlign = TextAlign.Center
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -603,7 +744,7 @@ fun AllUpcomingMeetingScreening() {
 }
 
 @Composable
-fun AllPastMeetingScreening() {
+fun AllPastMeetingScreening(meetingListData: MutableList<ZoomMeetingListResponse.Meetings>) {
 
     val selectedBorder = BorderStroke(
         width = 0.5.dp, if (isSystemInDarkTheme()) {
@@ -613,204 +754,329 @@ fun AllPastMeetingScreening() {
         }
     )
 
-    Card(
-        shape = RoundedCornerShape(8.dp),
+    Column(
         modifier = Modifier
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp)
             .fillMaxWidth()
-            .wrapContentHeight(),
-        colors = if (isSystemInDarkTheme()) {
-            CardDefaults.cardColors(Yellow)
-        } else {
-            CardDefaults.cardColors(
-                containerColor = White,
-                contentColor = White,
-                disabledContentColor = White,
-                disabledContainerColor = White
-            )
-        },
-        border = selectedBorder
+            .padding(2.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(
-                start = 12.dp, end = 12.dp, top = 12.dp, bottom = 12.dp
-            ), horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Card(
-                    shape = RoundedCornerShape(25.dp),
-                    colors = if (isSystemInDarkTheme()) {
-                        CardDefaults.cardColors(LightGreen07) //LightGreen07
-                    } else {
-                        CardDefaults.cardColors(
-                            containerColor = LightGreen07,
-                            contentColor = LightGreen07,
-                            disabledContentColor = LightGreen07,
-                            disabledContainerColor = LightGreen07
-                        )
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            items(meetingListData) { meetingData ->
+                val calender = Calendar.getInstance()
+                val day = calender.get(Calendar.DAY_OF_MONTH)
+                val dayAfter = calender.get(Calendar.DAY_OF_MONTH) + 1
+                val month = calender.get(Calendar.MONTH) + 1
+                val year = calender.get(Calendar.YEAR)
+
+                val today = if (month != 10) {
+                    "$day-0$month-$year"
+                } else {
+                    "$day-$month-$year"
+                }
+
+                val currentMonth = "$month-$year"
+
+                val afterTwoDays = if (month != 10) {
+                    "$dayAfter-0$month-$year"
+                } else {
+                    "$dayAfter-$month-$year"
+                }
+
+                if (meetingData.startTime != null) {
+                    val meetingDateMonth = formatDateMonth(meetingData.startTime.toString())
+                    val meetingDate = formatMonthDate(meetingData.startTime.toString())
+                    if (meetingDateMonth.contains(currentMonth)) {
+                        if (meetingDate != afterTwoDays || meetingDate != today) {
+                            Card(
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier
+                                    .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+                                    .fillMaxWidth()
+                                    .wrapContentHeight(),
+                                colors = if (isSystemInDarkTheme()) {
+                                    CardDefaults.cardColors(Yellow)
+                                } else {
+                                    CardDefaults.cardColors(
+                                        containerColor = White,
+                                        contentColor = White,
+                                        disabledContentColor = White,
+                                        disabledContainerColor = White
+                                    )
+                                },
+                                border = selectedBorder
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(
+                                        start = 12.dp, end = 12.dp, top = 12.dp, bottom = 12.dp
+                                    ), horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(
+                                            horizontal = 4.dp,
+                                            vertical = 4.dp
+                                        ),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Card(
+                                            shape = RoundedCornerShape(25.dp),
+                                            colors = if (isSystemInDarkTheme()) {
+                                                CardDefaults.cardColors(LightGreen07) //LightGreen07
+                                            } else {
+                                                CardDefaults.cardColors(
+                                                    containerColor = LightGreen07,
+                                                    contentColor = LightGreen07,
+                                                    disabledContentColor = LightGreen07,
+                                                    disabledContainerColor = LightGreen07
+                                                )
+                                            }
+                                        ) {
+                                            Row(
+                                                modifier = Modifier
+                                                    .height(35.dp)
+                                                    .width(115.dp),
+                                                horizontalArrangement = Arrangement.Center,
+                                                verticalAlignment = Alignment.CenterVertically,
+                                            ) {
+                                                Text(
+                                                    text = "•",
+                                                    modifier = Modifier
+                                                        .padding(start = 8.dp, end = 4.dp)
+                                                        .wrapContentWidth(),
+                                                    fontFamily = fontMedium,
+                                                    fontSize = 18.sp,
+                                                    color = if (isSystemInDarkTheme()) {
+                                                        LightGreen06
+                                                    } else {
+                                                        LightGreen06
+                                                    },
+                                                    textAlign = TextAlign.Center
+                                                )
+
+                                                Text(
+                                                    text = stringResource(R.string.key_Completed),
+                                                    modifier = Modifier
+                                                        .padding(start = 4.dp, end = 8.dp)
+                                                        .wrapContentWidth(),
+                                                    fontFamily = fontMedium,
+                                                    fontSize = 13.sp,
+                                                    color = if (isSystemInDarkTheme()) {
+                                                        LightGreen06
+                                                    } else {
+                                                        LightGreen06
+                                                    },
+                                                    textAlign = TextAlign.Start
+                                                )
+                                            }
+                                        }
+
+                                        Spacer(Modifier.weight(1f))
+
+                                        Column(
+                                            modifier = Modifier
+                                                .padding(
+                                                    start = 6.dp, top = 6.dp, bottom = 6.dp
+                                                )
+                                                .wrapContentWidth(),
+                                            horizontalAlignment = Alignment.End,
+                                            verticalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Text(
+                                                text = if (meetingData.duration != null) {
+                                                    stringResource(R.string.key_duration) + " ${meetingData.duration} " + stringResource(
+                                                        R.string.key_mins
+                                                    )
+                                                } else {
+                                                    stringResource(R.string.key_duration_in_minuts)
+                                                },
+                                                modifier = Modifier
+                                                    .wrapContentWidth()
+                                                    .padding(start = 8.dp, end = 8.dp),
+                                                fontFamily = fontRegular,
+                                                fontSize = 13.sp,
+                                                color = if (isSystemInDarkTheme()) {
+                                                    DARK_TITLE_TEXT
+                                                } else {
+                                                    GrayLight09
+                                                },
+                                                textAlign = TextAlign.Start
+                                            )
+                                        }
+                                    }
+
+                                    Row(
+                                        modifier = Modifier.padding(
+                                            horizontal = 4.dp,
+                                            vertical = 4.dp
+                                        ),
+                                        horizontalArrangement = Arrangement.Start,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Image(
+                                            painter = painterResource(R.drawable.zoom_meeting_img),
+                                            contentDescription = IMG_DESCRIPTION,
+                                            modifier = Modifier
+                                                .size(65.dp)
+                                                .background(Color.Unspecified),
+                                        )
+
+                                        Column(
+                                            modifier = Modifier
+                                                .padding(
+                                                    start = 6.dp, top = 6.dp, bottom = 6.dp
+                                                )
+                                                .wrapContentWidth(),
+                                            horizontalAlignment = Alignment.End,
+                                            verticalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Text(
+                                                text = if (meetingData.topic != null) {
+                                                    meetingData.topic.toString()
+                                                } else {
+                                                    stringResource(R.string.key_Na)
+                                                },
+                                                modifier = Modifier
+                                                    .padding(start = 6.dp, end = 8.dp)
+                                                    .fillMaxWidth(),
+                                                fontFamily = fontMedium,
+                                                fontSize = 15.sp,
+                                                color = if (isSystemInDarkTheme()) {
+                                                    DARK_TITLE_TEXT
+                                                } else {
+                                                    Black
+                                                },
+                                                textAlign = TextAlign.Start
+                                            )
+                                        }
+                                    }
+
+                                    Row(
+                                        modifier = Modifier.padding(
+                                            horizontal = 4.dp,
+                                            vertical = 4.dp
+                                        ),
+                                        horizontalArrangement = Arrangement.Start,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Column(
+                                            modifier = Modifier
+                                                .padding(
+                                                    top = 6.dp, bottom = 6.dp
+                                                )
+                                                .wrapContentWidth(),
+                                            horizontalAlignment = Alignment.Start,
+                                            verticalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            if (meetingData.startTime != null) {
+                                                val formatted =
+                                                    formatDate(meetingData.startTime.toString())
+                                                val formattedTime =
+                                                    formatTime(meetingData.startTime.toString())
+
+                                                Text(
+                                                    text = "$formatted, $formattedTime",
+                                                    modifier = Modifier
+                                                        .padding(end = 8.dp)
+                                                        .wrapContentWidth(),
+                                                    fontFamily = fontBold,
+                                                    fontSize = 13.sp,
+                                                    color = if (isSystemInDarkTheme()) {
+                                                        DARK_TITLE_TEXT
+                                                    } else {
+                                                        GrayLight09
+                                                    },
+                                                    textAlign = TextAlign.Start
+                                                )
+                                            } else {
+                                                Text(
+                                                    text = stringResource(R.string.key_Na),
+                                                    modifier = Modifier
+                                                        .padding(end = 8.dp)
+                                                        .wrapContentWidth(),
+                                                    fontFamily = fontBold,
+                                                    fontSize = 13.sp,
+                                                    color = if (isSystemInDarkTheme()) {
+                                                        DARK_TITLE_TEXT
+                                                    } else {
+                                                        GrayLight09
+                                                    },
+                                                    textAlign = TextAlign.Start
+                                                )
+                                            }
+                                        }
+
+                                        Spacer(Modifier.weight(1f))
+
+                                        Column(
+                                            modifier = Modifier.wrapContentHeight(),
+                                            horizontalAlignment = Alignment.End
+                                        ) {
+                                            if (!meetingDate.contains(today)) {
+                                                Text(
+                                                    text = stringResource(R.string.key_Joined),
+                                                    modifier = Modifier
+                                                        .padding(start = 8.dp, end = 8.dp)
+                                                        .wrapContentWidth(),
+                                                    fontFamily = fontBold,
+                                                    fontSize = 15.sp,
+                                                    color = if (isSystemInDarkTheme()) {
+                                                        LightGreen06
+                                                    } else {
+                                                        LightGreen06
+                                                    },
+                                                    textAlign = TextAlign.End
+                                                )
+                                            } else {
+                                                Text(
+                                                    text = stringResource(R.string.key_Passed),
+                                                    modifier = Modifier
+                                                        .padding(start = 8.dp, end = 8.dp)
+                                                        .wrapContentWidth(),
+                                                    fontFamily = fontBold,
+                                                    fontSize = 15.sp,
+                                                    color = if (isSystemInDarkTheme()) {
+                                                        LightRed01
+                                                    } else {
+                                                        LightRed01
+                                                    },
+                                                    textAlign = TextAlign.End
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .height(35.dp)
-                            .width(115.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = "•",
-                            modifier = Modifier
-                                .padding(start = 8.dp, end = 4.dp)
-                                .wrapContentWidth(),
-                            fontFamily = fontMedium,
-                            fontSize = 18.sp,
-                            color = if (isSystemInDarkTheme()) {
-                                LightGreen06
-                            } else {
-                                LightGreen06
-                            },
-                            textAlign = TextAlign.Center
-                        )
-
-                        Text(
-                            text = "Completed",
-                            modifier = Modifier
-                                .padding(start = 4.dp, end = 8.dp)
-                                .wrapContentWidth(),
-                            fontFamily = fontMedium,
-                            fontSize = 13.sp,
-                            color = if (isSystemInDarkTheme()) {
-                                LightGreen06
-                            } else {
-                                LightGreen06
-                            },
-                            textAlign = TextAlign.Start
-                        )
-                    }
-                }
-
-                Spacer(Modifier.weight(1f))
-
-                Column(
-                    modifier = Modifier
-                        .padding(
-                            start = 6.dp, top = 6.dp, bottom = 6.dp
-                        )
-                        .wrapContentWidth(),
-                    horizontalAlignment = Alignment.End,
-                    verticalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Duration: 60 mins",
-                        modifier = Modifier
-                            .wrapContentWidth()
-                            .padding(start = 8.dp, end = 8.dp),
-                        fontFamily = fontRegular,
-                        fontSize = 13.sp,
-                        color = if (isSystemInDarkTheme()) {
-                            DARK_TITLE_TEXT
-                        } else {
-                            GrayLight09
-                        },
-                        textAlign = TextAlign.Start
-                    )
-                }
-            }
-
-            Row(
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.zoom_meeting_img),
-                    contentDescription = IMG_DESCRIPTION,
-                    modifier = Modifier
-                        .size(65.dp)
-                        .background(Color.Unspecified),
-                )
-
-                Column(
-                    modifier = Modifier
-                        .padding(
-                            start = 6.dp, top = 6.dp, bottom = 6.dp
-                        )
-                        .wrapContentWidth(),
-                    horizontalAlignment = Alignment.End,
-                    verticalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Advance Level Training Webinar For Project Inclusion",
-                        modifier = Modifier
-                            .padding(start = 6.dp, end = 8.dp)
-                            .fillMaxWidth(),
-                        fontFamily = fontMedium,
-                        fontSize = 15.sp,
-                        color = if (isSystemInDarkTheme()) {
-                            DARK_TITLE_TEXT
-                        } else {
-                            Black
-                        },
-                        textAlign = TextAlign.Start
-                    )
-                }
-            }
-
-            Row(
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(
-                            top = 6.dp, bottom = 6.dp
-                        )
-                        .wrapContentWidth(),
-                    horizontalAlignment = Alignment.Start,
-                    verticalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "22 Jan 2025, 09:00 AM",
-                        modifier = Modifier
-                            .padding(end = 8.dp)
-                            .wrapContentWidth(),
-                        fontFamily = fontBold,
-                        fontSize = 13.sp,
-                        color = if (isSystemInDarkTheme()) {
-                            DARK_TITLE_TEXT
-                        } else {
-                            GrayLight09
-                        },
-                        textAlign = TextAlign.Start
-                    )
-                }
-
-                Spacer(Modifier.weight(1f))
-
-                Column(
-                    modifier = Modifier.wrapContentHeight(), horizontalAlignment = Alignment.End
-                ) {
-                    Text(
-                        text = "Joined/Passed",
-                        modifier = Modifier
-                            .padding(start = 8.dp, end = 8.dp)
-                            .wrapContentWidth(),
-                        fontFamily = fontBold,
-                        fontSize = 15.sp,
-                        color = if (isSystemInDarkTheme()) {
-                            LightGreen06
-                        } else {
-                            LightGreen06
-                        },
-                        textAlign = TextAlign.End
-                    )
                 }
             }
         }
     }
+}
+
+fun formatDateMonth(input: String): String {
+    val inputFormatter = DateTimeFormatter.ISO_ZONED_DATE_TIME
+    val outputFormatter = DateTimeFormatter.ofPattern("MM-yyyy")
+    val parsedDate = ZonedDateTime.parse(input, inputFormatter)
+    return parsedDate.format(outputFormatter)
+}
+
+fun formatDate(input: String): String {
+    val inputFormatter = DateTimeFormatter.ISO_ZONED_DATE_TIME
+    val outputFormatter = DateTimeFormatter.ofPattern("dd-MMM-yyyy")
+    val parsedDate = ZonedDateTime.parse(input, inputFormatter)
+    return parsedDate.format(outputFormatter)
+}
+
+fun formatMonthDate(input: String): String {
+    val inputFormatter = DateTimeFormatter.ISO_ZONED_DATE_TIME
+    val outputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+    val parsedDate = ZonedDateTime.parse(input, inputFormatter)
+    return parsedDate.format(outputFormatter)
+}
+
+fun formatTime(time: String): String {
+    val zonedDateTime = ZonedDateTime.parse(time)
+    val formatter = DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH)
+    val formattedTime = zonedDateTime.format(formatter)
+    return formattedTime
 }
