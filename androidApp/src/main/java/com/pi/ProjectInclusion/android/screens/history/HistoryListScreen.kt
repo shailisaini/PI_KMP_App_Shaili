@@ -46,6 +46,7 @@ import com.pi.ProjectInclusion.GrayLight04
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
+import com.pi.ProjectInclusion.android.screens.lockScreen.LockScreenOrientationPortrait
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.data.model.profileModel.dummyTrackList
@@ -176,6 +177,7 @@ fun HistoryListScreen() {
 }
 @Composable
 fun HistoryList() {
+    LockScreenOrientationPortrait()
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
