@@ -85,4 +85,5 @@ dependencies {
 //    firebase crashlytics
     implementation(libs.firebase.messaging) // latest stable version
     implementation(libs.firebase.analytics.ktx)
+
 }

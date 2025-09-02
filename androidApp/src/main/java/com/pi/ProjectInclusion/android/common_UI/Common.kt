@@ -754,9 +754,9 @@ fun UserNameTextField(
         value = number.value,
         onValueChange = {
 
-            if (it.length <= 10) {
+//            if (it.length <= 10) {
                 number.value = it
-            }
+//            }
         },
         enabled = trueFalse,
         placeholder = { Text(hint, color = GrayLight01, fontSize = 14.sp) },

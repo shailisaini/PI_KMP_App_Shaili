@@ -391,7 +391,7 @@ and make a difference together!</string>
     <string name="txt_subcategory">Subcategory</string>
     <string name="txt_account_delete">Account Deletion</string>
     <string name="txt_delete">Delete</string>
-    <string name="txt_90_days_left">Days Left</string>
+    <string name="txt_90_days_left"> Days Left</string>
     <string name="txt_account_found">An Account Found</string>
     <string name="txt_logout_desc">Are you sure you want to logout?</string>
     <string name="txt_restore">Restore</string>
@@ -502,6 +502,7 @@ and make a difference together!</string>
     <string name="txt_select_block">Please select a block</string>
     <string name="txt_select_school">Please select a school</string>
     <string name="key_search">Please enter search key</string>
+    <string name="key_phn_error">You are not registered with us \nplease Enter your 10 digit mobile number here.</string>
     <string name="key_upcoming">Upcoming</string>
     <string name="key_past">Past</string>
 
