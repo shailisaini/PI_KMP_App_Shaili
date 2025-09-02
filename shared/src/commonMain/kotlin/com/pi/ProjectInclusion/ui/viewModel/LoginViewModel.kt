@@ -20,9 +20,14 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithO
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ProfessionListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.QualificationListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ReasonListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByUdiseCodeResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SpecializationListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
+import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
 import com.pi.ProjectInclusion.database.LocalDataSource
 import com.pi.ProjectInclusion.domain.ConnectivityObserver
 import com.pi.ProjectInclusion.domain.useCases.AuthenticationUsesCases
@@ -43,6 +48,8 @@ class LoginViewModel(
 ) : ViewModel() {
     var noInternetConnection: String = "No Internet Found!"
     var somethingWentWrong: String = "Something went wrong"
+    var serverError: String = "Failed to connect to"
+    var serverMsg: String = "Server not responding!"
 
     // check if which API has to call if internet comes
     private var shouldRefreshLanguages = false
@@ -67,8 +74,8 @@ class LoginViewModel(
     private val _uiStateLogin = MutableStateFlow(UiState<LoginApiResponse>())
     val uiStateLoginResponse: StateFlow<UiState<LoginApiResponse>> = _uiStateLogin
 
-    private val viewUserProfile = MutableStateFlow(UiState<LoginApiResponse>())
-    val viewUserProfileResponse: StateFlow<UiState<LoginApiResponse>> = viewUserProfile
+    private val viewUserProfile = MutableStateFlow(UiState<ViewProfileResponse>())
+    val viewUserProfileResponse: StateFlow<UiState<ViewProfileResponse>> = viewUserProfile
 
     private val verifyLogin = MutableStateFlow(UiState<VerifyOtpResponse>())
     val verifyLoginResponse: StateFlow<UiState<VerifyOtpResponse>> = verifyLogin
@@ -115,6 +122,26 @@ class LoginViewModel(
     val professionalProfileResponse: StateFlow<UiState<CreateFirstStepProfileResponse>> =
         professionalProfile
 
+    private val professionList =
+        MutableStateFlow(UiState<List<ProfessionListResponse>>())
+    val professionListResponse: StateFlow<UiState<List<ProfessionListResponse>>> =
+        professionList
+
+    private val qualificationList =
+        MutableStateFlow(UiState<List<QualificationListResponse>>())
+    val qualificationListResponse: StateFlow<UiState<List<QualificationListResponse>>> =
+        qualificationList
+
+    private val specializationList =
+        MutableStateFlow(UiState<List<SpecializationListResponse>>())
+    val specializationListResponse: StateFlow<UiState<List<SpecializationListResponse>>> =
+        specializationList
+
+    private val reasonList =
+        MutableStateFlow(UiState<ReasonListResponse>())
+    val reasonListResponse: StateFlow<UiState<ReasonListResponse>> =
+        reasonList
+
     private val query = MutableStateFlow("")
 
     // getting userName from intent
@@ -131,7 +158,7 @@ class LoginViewModel(
     }
 
     fun getPrefData(key: String): String {
-        return localData.getValue(key, "N/A")
+        return localData.getValue(key, "")
     }
 
     init {
@@ -187,8 +214,15 @@ class LoginViewModel(
 
         getAuthViewModel.getLanguage()
             .catch { exception ->
-                _uiState.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true){
+                    _uiState.update {
+                        UiState(error = serverMsg)
+                    }
+                }
+                else {
+                    _uiState.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             }
             .collect { result ->
@@ -197,8 +231,15 @@ class LoginViewModel(
                         _uiState.update { UiState(success = data) }
                     },
                     onFailure = { exception ->
-                        _uiState.update {
-                            UiState(error = exception.message ?: somethingWentWrong)
+                        if (exception.message?.contains(serverError) == true){
+                            _uiState.update {
+                                UiState(error = serverMsg)
+                            }
+                        }
+                        else {
+                            _uiState.update {
+                                UiState(error = exception.message ?: somethingWentWrong)
+                            }
                         }
                     }
                 )
@@ -219,8 +260,15 @@ class LoginViewModel(
         _uiStateUserType.update { UiState(isLoading = true) }
         getAuthViewModel.getUserType()
             .catch { exception ->
-                _uiStateUserType.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true){
+                    _uiStateUserType.update {
+                        UiState(error = serverMsg)
+                    }
+                }
+                else {
+                    _uiStateUserType.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             }
             .collect { result ->
@@ -229,8 +277,15 @@ class LoginViewModel(
                         _uiStateUserType.update { UiState(success = data) }
                     },
                     onFailure = { exception ->
-                        _uiStateUserType.update {
-                            UiState(error = exception.message ?: somethingWentWrong)
+                        if (exception.message?.contains(serverError) == true){
+                            _uiStateUserType.update {
+                                UiState(error = serverMsg)
+                            }
+                        }
+                        else {
+                            _uiStateUserType.update {
+                                UiState(error = exception.message ?: somethingWentWrong)
+                            }
                         }
                     }
                 )
@@ -267,17 +322,21 @@ class LoginViewModel(
         getAuthViewModel.getUserLoginPassword(loginRequest)
             .catch { exception ->
                 _uiStateLogin.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                    UiState(error = exception.message?.takeIf { it.isNotBlank() } ?: somethingWentWrong)
                 }
             }
             .collect { result ->
                 result.fold(
                     onSuccess = { data ->
-                        _uiStateLogin.update { UiState(success = data) }
+                        if (data.status == true) { // success field from API
+                            _uiStateLogin.update { UiState(success = data) }
+                        } else {
+                            _uiStateLogin.update { UiState(error = data.message?.takeIf { it.isNotBlank() } ?: somethingWentWrong) }
+                        }
                     },
                     onFailure = { exception ->
                         _uiStateLogin.update {
-                            UiState(error = exception.message ?: somethingWentWrong)
+                            UiState(error = exception.message?.takeIf { it.isNotBlank() } ?: somethingWentWrong)
                         }
                     }
                 )
@@ -456,10 +515,15 @@ class LoginViewModel(
         firstStepProfileRequest: FirstStepProfileRequest,
         strToken: String,
         profilePic: ByteArray? = null,
-        fileName: String? = null
+        fileName: String? = null,
     ) = viewModelScope.launch {
         firstStepProfilePassword.update { UiState(isLoading = true) }
-        getAuthViewModel.createFirstStepProfileRepo(firstStepProfileRequest, strToken, profilePic, fileName)
+        getAuthViewModel.createFirstStepProfileRepo(
+            firstStepProfileRequest,
+            strToken,
+            profilePic,
+            fileName
+        )
             .catch { exception ->
                 firstStepProfilePassword.update {
                     UiState(error = exception.message ?: somethingWentWrong)
@@ -607,6 +671,97 @@ class LoginViewModel(
                     },
                     onFailure = { exception ->
                         professionalProfile.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun getAllProfessionRepo() = viewModelScope.launch {
+        professionList.update { UiState(isLoading = true) }
+        getAuthViewModel.getAllProfessionRepo()
+            .catch { exception ->
+                professionList.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        professionList.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        professionList.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun getAllQualificationRepo(profession: Int) = viewModelScope.launch {
+        qualificationList.update { UiState(isLoading = true) }
+        getAuthViewModel.getAllQualificationRepo(profession)
+            .catch { exception ->
+                qualificationList.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        qualificationList.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        qualificationList.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun getAllSpecializationRepo(
+        profession: Int,
+        qualification: Int,
+    ) = viewModelScope.launch {
+        specializationList.update { UiState(isLoading = true) }
+        getAuthViewModel.getAllSpecializationRepo(profession, qualification)
+            .catch { exception ->
+                specializationList.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        specializationList.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        specializationList.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun getAllReasonRepo() = viewModelScope.launch {
+        reasonList.update { UiState(isLoading = true) }
+        getAuthViewModel.getAllReasonRepo()
+            .catch { exception ->
+                reasonList.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        reasonList.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        reasonList.update {
                             UiState(error = exception.message ?: somethingWentWrong)
                         }
                     }

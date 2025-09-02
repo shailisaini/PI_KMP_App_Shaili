@@ -16,11 +16,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -34,44 +35,51 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat.startActivity
-import androidx.navigation.compose.rememberNavController
-import com.example.kmptemplate.logger.LoggerProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.AnimatedRouteHost
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen1
+import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen2
+import com.pi.ProjectInclusion.android.screens.Profile.TrackRequestScreen
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentDetailsScreen
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentMoreDetailsScreen
 import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen2
 import com.pi.ProjectInclusion.android.screens.Profile.TrackRequestScreen
+import com.pi.ProjectInclusion.android.screens.Profile.professionals.ProfessionalsEditProfile
+import com.pi.ProjectInclusion.android.screens.Profile.specialEdu.SpecialEducatorEditProfile
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.CertificateListActivity
+import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.ChangePasswordActivity
+import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.FaqActivity
+import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.ZoomMeetingActivity
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.DashboardScreen
+import com.pi.ProjectInclusion.android.screens.dashboardScreen.LMSCourseHomeScreen
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.ViewProfileScreen
 import com.pi.ProjectInclusion.android.screens.interventionScreens.InterventionAcceptLevelScreen
 import com.pi.ProjectInclusion.android.screens.interventionScreens.InterventionHomeScreen
 import com.pi.ProjectInclusion.android.screens.interventionScreens.InterventionStudentDetailsScreen
 import com.pi.ProjectInclusion.android.screens.interventionScreens.TeachingPlanScreen
 import com.pi.ProjectInclusion.android.screens.interventionScreens.UploadedDocumentsScreen
+import com.pi.ProjectInclusion.android.screens.login.EnterUserNameScreen
 import com.pi.ProjectInclusion.android.screens.menu.AppBar
 import com.pi.ProjectInclusion.android.screens.menu.BottomNavigationBar
 import com.pi.ProjectInclusion.android.screens.menu.DrawerBody
 import com.pi.ProjectInclusion.android.screens.menu.DrawerHeader
 import com.pi.ProjectInclusion.android.screens.menu.MenuItem
-import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningHomeScreen
-import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneReportScreen
-import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneScreen
-import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.ChangePasswordActivity
-import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.FaqActivity
-import com.pi.ProjectInclusion.android.screens.dashboardScreen.LMSCourseHomeScreen
-import com.pi.ProjectInclusion.android.screens.login.EnterUserNameScreen
 import com.pi.ProjectInclusion.android.screens.notification.NotificationScreen
-import com.pi.ProjectInclusion.android.screens.screeningScreen.AdvanceScreening
 import com.pi.ProjectInclusion.android.screens.screeningScreen.AdvanceScreeningScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ProfilerFormPageScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ReportAdvanceScreen
+import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningHomeScreen
+import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneReportScreen
+import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ViewScreeningProfileDetailsScreen
+import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
+import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -100,6 +108,42 @@ class StudentDashboardActivity : ComponentActivity() {
                 currentRoute = route
             }
 
+            val viewProfile by viewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
+            var encryptedUserName = viewModel.getPrefData(USER_NAME)
+            logger.d("Profile details on dashboard page for header in drawer :- $encryptedUserName")
+            var profileData by remember { mutableStateOf<ViewProfileResponse.ProfileResponse?>(null) }
+
+            var allUdiseDetails = remember { mutableStateListOf<ViewProfileResponse>() }
+
+            LaunchedEffect(Unit) {
+//                viewModel.getUserProfileViewModel(encryptedUserName)
+                viewModel.getUserProfileViewModel("lhWmhODMnBvTyxCkajySXQ==")
+            }
+
+            LaunchedEffect(viewProfile) {
+                when {
+                    viewProfile.isLoading -> {
+                        isDialogVisible = true
+                    }
+
+                    viewProfile.error.isNotEmpty() -> {
+                        logger.d("viewProfileData: ${viewProfile.success}")
+                        isDialogVisible = false
+                    }
+
+                    viewProfile.success != null -> {
+                        logger.d("Profile Data:- ${viewProfile.success}")
+                        if (viewProfile.success!!.status == true) {
+                            profileData = viewProfile.success!!.response
+                            logger.d("Profile Data details : ${viewProfile.success}")
+                        } else {
+                            context.toast(viewProfile.success!!.message.toString())
+                        }
+                        isDialogVisible = false
+                    }
+                }
+            }
+
             fun navigateBack(toRoute: String? = null) {
                 isForward = false
                 currentRoute = toRoute ?: AppRoute.LanguageSelect.route
@@ -107,7 +151,7 @@ class StudentDashboardActivity : ComponentActivity() {
 
             ModalNavigationDrawer(
                 drawerState = drawerState,
-                gesturesEnabled = false, // prevents swipe
+//                gesturesEnabled = false, // prevents swipe
                 drawerContent = {
                     Column(
                         modifier = Modifier
@@ -122,7 +166,8 @@ class StudentDashboardActivity : ComponentActivity() {
                                     drawerState.close()
                                     navigateTo(AppRoute.ProfileScreen.route)
                                 }
-                            })
+                            }, profileData
+                        )
                         DrawerBody(
                             // List of Navigation Drawer
                             items = listOf(
@@ -267,10 +312,39 @@ class StudentDashboardActivity : ComponentActivity() {
 
                                     AppRoute.EditProfileScreen.route -> EditProfileScreen1(
                                         loginViewModel = viewModel,
-                                        onNext = { navigateTo(AppRoute.EditProfileScreen2.route) },
+                                        onNextTeacher = { navigateTo(AppRoute.EditTeacherProfileScreen.route) },
+                                        onNextProfessional = { navigateTo(AppRoute.EditProfessionalEditProfile.route) },
+                                        onNextSpecialEducator = { navigateTo(AppRoute.EditSpeEduEditProfile.route) },
                                         onBack = { navigateBack(AppRoute.ProfileScreen.route) })
 
-                                    AppRoute.EditProfileScreen2.route -> EditProfileScreen2(
+                                    AppRoute.EditTeacherProfileScreen.route -> EditProfileScreen2(
+                                        loginViewModel = viewModel,
+                                        onNext = {
+                                            context.startActivity(
+                                                Intent(
+                                                    context,
+                                                    StudentDashboardActivity::class.java
+                                                )
+                                            )
+                                            (context as? Activity)?.finish()
+                                        },
+                                        onBack = { navigateBack(AppRoute.ProfileScreen.route) })
+
+                                    AppRoute.EditProfessionalEditProfile.route -> ProfessionalsEditProfile(
+                                        loginViewModel = viewModel,
+                                        onNext = {
+                                            context.startActivity(
+                                                Intent(
+                                                    context,
+                                                    StudentDashboardActivity::class.java
+                                                )
+                                            )
+                                            (context as? Activity)?.finish()
+                                        },
+                                        onBack = { navigateBack(AppRoute.ProfileScreen.route) })
+
+                                    AppRoute.EditSpeEduEditProfile.route -> SpecialEducatorEditProfile(
+                                        loginViewModel = viewModel,
                                         onNext = {
                                             context.startActivity(
                                                 Intent(
@@ -407,7 +481,9 @@ fun onMenuItemClick(
         }
 
         AppRoute.JoinMeetingScreen.route -> {
-            LoggerProvider.logger.d("Screen: JoinMeetingActivity()")
+            startActivity(
+                context, Intent(context, ZoomMeetingActivity::class.java), null
+            ).apply { (context as? Activity)?.finish() }
         }
 
         AppRoute.ChangePasswordScreen.route -> {
@@ -417,15 +493,15 @@ fun onMenuItemClick(
         }
 
         AppRoute.LanguageScreen.route -> {
-            LoggerProvider.logger.d("Screen: LanguageChangeActivity()")
+            logger.d("Screen: LanguageChangeActivity()")
         }
 
         AppRoute.ReferScreen.route -> {
-            LoggerProvider.logger.d("Screen: Refer dialog open screen")
+            logger.d("Screen: Refer dialog open screen")
         }
 
         AppRoute.ContactUsScreen.route -> {
-            LoggerProvider.logger.d("Screen: Contact us dialog screen")
+            logger.d("Screen: Contact us dialog screen")
         }
 
         AppRoute.FaqScreen.route -> {

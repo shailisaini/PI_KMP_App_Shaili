@@ -46,7 +46,7 @@ object AESEncryption {
 
     // Decrypt the provided encrypted text
     fun decrypt(
-        encryptedText: String? = "Name",
+        encryptedText: String? = "",
         key: String = KEY,
         initVector: String = INITVECTOR,
     ): String {

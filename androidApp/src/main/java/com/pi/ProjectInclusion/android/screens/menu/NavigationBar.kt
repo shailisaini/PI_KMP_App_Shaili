@@ -1,7 +1,6 @@
 package com.pi.ProjectInclusion.android.screens.menu
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -43,7 +42,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -66,12 +64,13 @@ import com.pi.ProjectInclusion.android.common_UI.ThemeSwitch
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
+import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
 
-@Preview
 @Composable
 fun DrawerHeader(
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Open),
     onItemClick: () -> Unit = {},
+    profileData: ViewProfileResponse.ProfileResponse?,
 ) {
     Box(
         modifier = Modifier
@@ -80,34 +79,28 @@ fun DrawerHeader(
             .padding(end = 50.dp),
         contentAlignment = Alignment.Center
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(230.dp)
-                .clickable {
-                    onItemClick.invoke()
-                }
-                .background(
-                    brush = Brush.linearGradient(
-                        colors = listOf(
-                            BorderBlue, // #2C3EA2
-                            PrimaryBlue  // #101942
-                        ),
-                        start = Offset(0f, Float.POSITIVE_INFINITY),
-                        end = Offset(0f, 0f)
-                    )
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .height(230.dp)
+            .clickable {
+                onItemClick.invoke()
+            }
+            .background(
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        BorderBlue, // #2C3EA2
+                        PrimaryBlue  // #101942
+                    ), start = Offset(0f, Float.POSITIVE_INFINITY), end = Offset(0f, 0f)
                 )
-        ) {
+            )) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(15.dp)
-            )
-            {
+            ) {
                 Box(
                     modifier = Modifier.padding(5.dp)
-                )
-                {
+                ) {
                     Column(
                         modifier = Modifier
                             .wrapContentSize()
@@ -133,22 +126,25 @@ fun DrawerHeader(
                         .padding(horizontal = 10.dp)
                         .weight(1f),
                 ) {
-                    var textName: String = ""
-                    var textEmail: String = ""
-                    textName = stringResource(R.string.user_name)
+                    var textName = stringResource(R.string.user_name)
+                    var textEmail = stringResource(R.string.user_profile)
 
-                    //  email
-                    textEmail = stringResource(R.string.user_profile)
                     Text(
-                        text = textName,
-                        color = White,
-                        fontSize = 19.sp,
-                        fontFamily = fontMedium
+                        text = if (profileData?.firstname != null || profileData?.lastname != null) {
+                            "${profileData.firstname} ${profileData.lastname}"
+                        } else {
+                            textName
+                        }, color = White, fontSize = 19.sp, fontFamily = fontMedium
                     )
+
                     Text(
-                        text = textEmail,
-                        color = LightPurple04, fontSize = 13.sp, fontFamily = fontRegular
+                        text = if (profileData?.userTypeName != null) {
+                            textEmail
+                        } else {
+                            textEmail
+                        }, color = LightPurple04, fontSize = 13.sp, fontFamily = fontRegular
                     )
+
                     Column(
                         modifier = Modifier
                             .wrapContentWidth()
@@ -158,14 +154,10 @@ fun DrawerHeader(
                             modifier = Modifier
                                 .wrapContentSize()
                                 .border(
-                                    width = 1.dp,
-                                    color = White,
-                                    shape = RoundedCornerShape(8.dp)
-                                ),
-                            colors = CardDefaults.cardColors(
+                                    width = 1.dp, color = White, shape = RoundedCornerShape(8.dp)
+                                ), colors = CardDefaults.cardColors(
                                 containerColor = White.copy(alpha = 0.2f) // Set semi-transparent background here
-                            ),
-                            shape = RoundedCornerShape(8.dp)
+                            ), shape = RoundedCornerShape(8.dp)
                             // Do not set containerColor, let the Box inside handle the gradient
                         ) {
                             Text(
@@ -196,7 +188,8 @@ fun DrawerBody(
     val colors = MaterialTheme.colorScheme
 
     Column(
-        modifier = Modifier.padding(end = 50.dp)
+        modifier = Modifier
+            .padding(end = 50.dp)
             .zIndex(1f)
             .fillMaxHeight()
             .background(color = White)
@@ -214,13 +207,12 @@ fun DrawerBody(
                 )
         ) {
             items(items) { item ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            onItemClick(item.id)
-                        }
-                        .padding(start = 20.dp, end = 20.dp, top = 20.dp),
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        onItemClick(item.id)
+                    }
+                    .padding(start = 20.dp, end = 20.dp, top = 20.dp),
                     verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = item.icon,
@@ -248,10 +240,8 @@ fun DrawerBody(
 
             item {
                 Column(
-                    modifier = Modifier
-                        .padding(horizontal = 20.dp, vertical = 10.dp)
-                )
-                {
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)
+                ) {
                     var isLight by remember { mutableStateOf(true) }
 
                     TextWithIconOnLeft(
@@ -272,7 +262,7 @@ fun DrawerBody(
                             .height(1.dp)
                             .fillMaxWidth(),
                         color = BannerColor03,
-                      ){
+                    ) {
 
                     }
                     TextWithIconOnLeft(
@@ -293,7 +283,7 @@ fun DrawerBody(
 @Preview
 @Composable
 fun BottomNavigationBar(
-    onNavigateTo: (String) -> Unit ={},
+    onNavigateTo: (String) -> Unit = {},
     currentDestination: String? = "",
 ) {
     val item = listOf(
@@ -338,40 +328,37 @@ fun BottomNavigationBar(
         item.forEach { screen ->
             NavigationBarItem(
                 icon = {
-                    Box(
-                        modifier = Modifier
-                            .background(
-                                color = if (currentDestination == screen.appRoute) MenuSelectedColor else Color.Transparent,
-                                shape = RoundedCornerShape(70.dp) // curved rectangle
-                            )
-                            .padding(horizontal = 12.dp), // control size of background
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            modifier = Modifier.padding(vertical = 4.dp, horizontal = 5.dp),
-                            imageVector = if (currentDestination == screen.appRoute)screen.selectedIcon else screen.unSelectedIcon,
-                            contentDescription = null,
-                            tint = Color.Unspecified,
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = if (currentDestination == screen.appRoute) MenuSelectedColor else Color.Transparent,
+                            shape = RoundedCornerShape(70.dp) // curved rectangle
                         )
-                    }
-                },
-                selected = currentDestination == screen.appRoute, onClick = {
-                    if (currentDestination != screen.appRoute) {
-                        onNavigateTo(screen.appRoute)
-                    }
-                    },
-                label = {
-                    Text(
-                        text = screen.title,
-                        fontStyle = FontStyle.Normal,
-                        fontFamily = fontMedium,
-                        color = if (currentDestination == screen.appRoute) activeColor else inactiveColor,
-                        fontSize = 12.sp
+                        .padding(horizontal = 12.dp), // control size of background
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        modifier = Modifier.padding(vertical = 4.dp, horizontal = 5.dp),
+                        imageVector = if (currentDestination == screen.appRoute) screen.selectedIcon else screen.unSelectedIcon,
+                        contentDescription = null,
+                        tint = Color.Unspecified,
                     )
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = White // disable default background
+                }
+            }, selected = currentDestination == screen.appRoute, onClick = {
+                if (currentDestination != screen.appRoute) {
+                    onNavigateTo(screen.appRoute)
+                }
+            }, label = {
+                Text(
+                    text = screen.title,
+                    fontStyle = FontStyle.Normal,
+                    fontFamily = fontMedium,
+                    color = if (currentDestination == screen.appRoute) activeColor else inactiveColor,
+                    fontSize = 12.sp
                 )
+            }, colors = NavigationBarItemDefaults.colors(
+                indicatorColor = White // disable default background
+            )
             )
         }
     }

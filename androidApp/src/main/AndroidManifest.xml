@@ -26,6 +26,9 @@
         android:windowSoftInputMode="adjustResize"
         tools:targetApi="tiramisu">
         <activity
+            android:name=".screens.dashboardNavActivity.ZoomMeetingActivity"
+            android:exported="false" />
+        <activity
             android:name=".screens.dashboardNavActivity.FaqActivity"
             android:exported="false" />
         <activity
@@ -33,9 +36,10 @@
             android:exported="false" />
         <activity
             android:name=".screens.StudentDashboardActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity android:name=".screens.LoginNavigationScreen" />
         <activity android:name=".screens.dashboardNavActivity.CertificateListActivity" />
+
         <service
             android:name=".auth.MyFirebaseMessagingService"
             android:exported="false">

@@ -339,7 +339,7 @@ fun AddNewStudentMoreDetailsScreen(onNext: () -> Unit, onBack: () -> Unit) {
                         icon = null,
                         colors = colors,
                         number = mobNo,
-                        trueFalse = true,
+                        enable = true,
                         hint = enterMobile.toString()
                     )
 

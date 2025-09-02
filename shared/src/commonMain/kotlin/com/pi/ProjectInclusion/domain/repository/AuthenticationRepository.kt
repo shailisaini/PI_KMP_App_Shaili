@@ -17,9 +17,14 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithO
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ProfessionListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.QualificationListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ReasonListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByUdiseCodeResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SpecializationListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
+import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
 
 interface AuthenticationRepository {
     suspend fun getLanguage(): GetLanguageListResponse
@@ -30,7 +35,7 @@ interface AuthenticationRepository {
     suspend fun getValidate(userName: String, userTypeId: String): ValidateUserResponse
     suspend fun getVerifyOtpRepo(userName: String, userTypeId: String): VerifyOtpResponse
     suspend fun getLoginWithOTPRepo(request: LoginWithOtpRequest): LoginApiResponse
-    suspend fun getUserProfileRepo(userName: String): LoginApiResponse
+    suspend fun getUserProfileRepo(userName: String): ViewProfileResponse
     suspend fun forgetPasswordRepo(
         passwordRequest: ForgetPasswordRequest,
         strToken: String,
@@ -45,7 +50,7 @@ interface AuthenticationRepository {
         firstStepProfileRequest: FirstStepProfileRequest,
         strToken: String,
         profilePic: ByteArray? = null,
-        fileName: String? = null
+        fileName: String? = null,
     ): CreateFirstStepProfileResponse
 
     suspend fun getAllStateListRepo(): List<StateListResponse>
@@ -62,4 +67,15 @@ interface AuthenticationRepository {
         professionalProfileRequest: ProfessionalProfileRequest,
         strToken: String,
     ): CreateFirstStepProfileResponse
+
+    suspend fun getAllProfessionRepo(): List<ProfessionListResponse>
+
+    suspend fun getAllQualificationRepo(profession: Int): List<QualificationListResponse>
+
+    suspend fun getAllSpecializationRepo(
+        profession: Int,
+        qualification: Int,
+    ): List<SpecializationListResponse>
+
+    suspend fun getAllReasonRepo(): ReasonListResponse
 }

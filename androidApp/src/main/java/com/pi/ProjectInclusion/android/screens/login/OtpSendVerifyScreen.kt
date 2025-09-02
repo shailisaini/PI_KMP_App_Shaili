@@ -66,9 +66,11 @@ import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.IS_COMING_FROM
 import com.pi.ProjectInclusion.constants.ConstantVariables.LOGIN_WITH_OTP
+import com.pi.ProjectInclusion.constants.ConstantVariables.REGISTER_NEW
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
 import com.pi.ProjectInclusion.constants.ConstantVariables.SUCCESS
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_MOBILE_NO
@@ -82,6 +84,7 @@ import kotlinx.coroutines.delay
 fun OtpSendVerifyScreen(
     onNext: () -> Unit,
     onBack: () -> Unit,
+    onBackUserName: () -> Unit,
     viewModel: LoginViewModel,
 ) {
     val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
@@ -125,12 +128,20 @@ fun OtpSendVerifyScreen(
         })
     }
 
+    BackHandler {
+        if (viewModel.getPrefData(IS_COMING_FROM) == REGISTER_NEW) {
+            onBackUserName
+        }
+        else{
+            onBack()
+        }
+    }
+
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
         message = stringResource(R.string.txt_loading)
     )
-
     logger.d("OtpSendVerify: $languageId .. $userTypeId .. $encryptedPhoneNo")
 
     // api for otp on call
@@ -245,7 +256,12 @@ fun OtpSendVerifyScreen(
     }
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
-        onBack()
+        if (viewModel.getPrefData(IS_COMING_FROM) == REGISTER_NEW) {
+            onBackUserName
+        }
+        else{
+            onBack()
+        }
     }, content = {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(

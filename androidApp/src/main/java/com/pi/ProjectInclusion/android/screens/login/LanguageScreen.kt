@@ -84,22 +84,53 @@ import kotlinx.coroutines.launch
 @Composable
     fun LanguageScreen(viewModel: LoginViewModel, onNext: () -> Unit) {
 
-    var isDialogVisible by remember { mutableStateOf(false) }
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
     val context = LocalContext.current
+
+    LoggerProvider.logger.d("Screen: " + "LanguageScreen()")
+
+    Surface(
+        modifier = Modifier.fillMaxWidth(), color = White
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = Bg_Gray1),
+            verticalArrangement = Arrangement.Top
+        ) {
+            LanguageResponseUI(context, onNext, viewModel)
+        }
+    }
+}
+
+@SuppressLint("SuspiciousIndentation")
+@Composable
+fun LanguageResponseUI(
+    context: Context,
+    onNext: () -> Unit,
+    viewModel: LoginViewModel,
+) {
+    val errColor = PrimaryBlue
+    val scrollState = rememberLazyGridState()
+    val coroutineScope = rememberCoroutineScope()
+    var noData  = stringResource(R.string.txt_oops_no_data_found)
+    var isInternetAvailable by remember { mutableStateOf(true) }
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
+    var noDataMessage by remember { mutableStateOf(noData) }
+    var selectedIndex by remember { mutableStateOf<Int?>(null) }
+    val selectedLanguage = remember { mutableStateOf<String?>(null) }
+    val title = stringResource(R.string.select_language)
     val languageData = remember { mutableStateListOf<GetLanguageListResponse.LanguageResponse>() }
+    var isDialogVisible by remember { mutableStateOf(false) }
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
         message = stringResource(R.string.txt_loading)
     )
 
-    LoggerProvider.logger.d("Screen: " + "LanguageScreen()")
     LaunchedEffect(Unit) {
         viewModel.getLanguages()
     }
-
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(uiState) {
         when {
             uiState.isLoading -> {
@@ -112,6 +143,7 @@ import kotlinx.coroutines.launch
                 LoggerProvider.logger.d("Error: ${uiState.error}")
                 context.toast(uiState.error)
                 isDialogVisible = false
+                noDataMessage = uiState.error
             }
 
             uiState.success != null -> {
@@ -129,39 +161,6 @@ import kotlinx.coroutines.launch
         }
     }
 
-    Surface(
-        modifier = Modifier.fillMaxWidth(), color = White
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = Bg_Gray1),
-            verticalArrangement = Arrangement.Top
-        ) {
-            LanguageResponseUI(context, languageData, onNext, viewModel)
-        }
-    }
-}
-
-@SuppressLint("SuspiciousIndentation")
-@Composable
-fun LanguageResponseUI(
-    context: Context,
-    languageData: MutableList<GetLanguageListResponse.LanguageResponse>,
-    onNext: () -> Unit,
-    viewModel: LoginViewModel,
-) {
-    val errColor = PrimaryBlue
-    val scrollState = rememberLazyGridState()
-    val coroutineScope = rememberCoroutineScope()
-    var isInternetAvailable by remember { mutableStateOf(true) }
-    val internetMessage = stringResource(R.string.txt_oops_no_internet)
-    val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
-    var selectedIndex by remember { mutableStateOf<Int?>(null) }
-    val selectedLanguage = remember { mutableStateOf<String?>(null) }
-    val title = stringResource(R.string.select_language)
-
-    isInternetAvailable = isNetworkAvailable(context)
     Box(
         modifier = Modifier
             .padding(top = 5.dp)
@@ -219,6 +218,7 @@ fun LanguageResponseUI(
                     }
                 }
             } else {
+                isInternetAvailable = isNetworkAvailable(context)
                 if (!isInternetAvailable) {
                     ShowError(internetMessage, errColor, painterResource(R.drawable.sad_emoji))
                 } else {

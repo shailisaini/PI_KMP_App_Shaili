@@ -69,10 +69,11 @@ kotlin {
             api(libs.touchlab.kermit)
             implementation(libs.koin.core)
             implementation(libs.sqldelight.coroutines)
-
         }
+
         commonTest.dependencies {
-            implementation(libs.kotlin.test)
+                implementation(libs.kotlin.test) // kotlin.test assertions
+                implementation(libs.kotlinx.coroutines.test)
         }
     }
 }

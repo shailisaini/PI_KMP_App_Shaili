@@ -6,18 +6,12 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,57 +22,51 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SheetValue
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.BannerColor03
 import com.pi.ProjectInclusion.Bg_Gray2
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_TITLE_TEXT
-import com.pi.ProjectInclusion.Dark_01
-import com.pi.ProjectInclusion.Dark_02
 import com.pi.ProjectInclusion.Dark_03
 import com.pi.ProjectInclusion.FaqColor1
 import com.pi.ProjectInclusion.FaqColor2
@@ -87,33 +75,39 @@ import com.pi.ProjectInclusion.FaqColor4
 import com.pi.ProjectInclusion.FaqColor5
 import com.pi.ProjectInclusion.FaqColor6
 import com.pi.ProjectInclusion.Gray
-import com.pi.ProjectInclusion.GrayLight02
 import com.pi.ProjectInclusion.HeaderColor01
 import com.pi.ProjectInclusion.LightPurple04
 import com.pi.ProjectInclusion.PrimaryBlue
-import com.pi.ProjectInclusion.PrimaryBlue3
-import com.pi.ProjectInclusion.Yellow
 import com.pi.ProjectInclusion.android.MyApplicationTheme
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.DropdownMenuUi
 import com.pi.ProjectInclusion.android.common_UI.TextViewField
 import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
-import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningData
-import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningFirstDataUI
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
+import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
+import com.pi.ProjectInclusion.constants.CustomDialog
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
+import com.pi.ProjectInclusion.ui.viewModel.DashboardViewModel
+import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 class FaqActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val navController = rememberNavController()
             val context = LocalContext.current
+            val viewModel: DashboardViewModel = koinViewModel()
 
             BackHandler {
                 startActivity(
@@ -129,7 +123,7 @@ class FaqActivity : ComponentActivity() {
                         .background(color = White),
                     verticalArrangement = Arrangement.Top
                 ) {
-                    ShowFAQData(navController, context)
+                    ShowFAQData(context, viewModel)
                 }
             }
         }
@@ -139,52 +133,179 @@ class FaqActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShowFAQData(
-    controller: NavHostController,
     context: Context,
+    viewModel: DashboardViewModel,
 ) {
 
+    val loginViewModel: LoginViewModel = koinViewModel()
     val colors = MaterialTheme.colorScheme
     val textEnterKeyEg = stringResource(R.string.txt_Enter_Keyword)
+    val textSearchKeyEg = stringResource(R.string.key_search)
     var searchKeyName = rememberSaveable { mutableStateOf("") }
     val scope = rememberCoroutineScope()
     var isCategoryVisible by rememberSaveable { mutableStateOf(false) }
     var isSubCategoryVisible by rememberSaveable { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true, confirmValueChange = { it != SheetValue.Hidden })
-    var selectedCategory = stringResource(R.string.txt_category)
-    var selectedSubCategory = stringResource(R.string.txt_subcategory)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    val faqListData = listOf(
-        FAQData(
-            stringResource(R.string.txt_General),
-            FaqColor1,
-            stringResource(R.string.txt_Accessibility),
-            LightPurple04,
-            stringResource(R.string.txt_Is_Project_Inclusion_available),
-            stringResource(R.string.txt_New_User_access_first_course)
-        ), FAQData(
-            stringResource(R.string.txt_LMS),
-            HeaderColor01,
-            stringResource(R.string.txt_Course),
-            FaqColor2,
-            stringResource(R.string.txt_Which_course_new_access),
-            stringResource(R.string.txt_New_User_access_first_course)
-        ), FAQData(
-            stringResource(R.string.txt_Support),
-            FaqColor3,
-            stringResource(R.string.txt_Technical),
-            FaqColor4,
-            stringResource(R.string.txt_Why_sometimes_not_open_show),
-            stringResource(R.string.txt_New_User_access_first_course)
-        ), FAQData(
-            stringResource(R.string.txt_LMS),
-            FaqColor5,
-            stringResource(R.string.txt_Certification),
-            FaqColor6,
-            stringResource(R.string.txt_Is_Project_Inclusion_available),
-            stringResource(R.string.txt_New_User_access_first_course)
-        )
+    val categoryListState by viewModel.getCategoryListResponse.collectAsStateWithLifecycle()
+    val subCategoryListState by viewModel.getSubCategoryListResponse.collectAsStateWithLifecycle()
+    val subCategoryCategoryIdListState by viewModel.getSubCategoryByCategoryIdListResponse.collectAsStateWithLifecycle()
+    val faqsListState by viewModel.getFAQsListResponse.collectAsStateWithLifecycle()
+    var isDialogVisible by remember { mutableStateOf(false) }
+    var categoryListData = remember { mutableStateListOf<CategoryListResponse>() }
+    var subCategoryListData = remember { mutableStateListOf<SubCategoryListResponse>() }
+    var subCategoryCategoryIdListData =
+        remember { mutableStateListOf<SubCategoryByCategoryIdResponse.SubCategoryResponse>() }
+    var faqsListData = remember { mutableStateListOf<FAQsListResponse.FAQsResponse>() }
+
+    var selectedCategory = remember { mutableStateOf("") }
+    var selectedSubCategory by remember { mutableStateOf("") }
+    var selectedSubCategoryById = remember { mutableStateOf("") }
+    var categorySelectedId = remember { mutableIntStateOf(0) }
+    var subCategorySelectedId = remember { mutableIntStateOf(0) }
+    var subCategoryByIdSelectedId = remember { mutableIntStateOf(0) }
+
+    var languageId = loginViewModel.getPrefData(SELECTED_LANGUAGE_ID)
+    var userTypeId = loginViewModel.getPrefData(USER_TYPE_ID)
+
+    CustomDialog(
+        isVisible = isDialogVisible,
+        onDismiss = { isDialogVisible = false },
+        message = stringResource(R.string.txt_loading)
     )
+
+    LaunchedEffect(Unit) {
+        isDialogVisible = true
+        viewModel.getAllCategory()
+
+        if (categorySelectedId.intValue != 0 && subCategoryByIdSelectedId.intValue != 0) {
+            viewModel.getAllFAQs(
+                searchKeyName.value.toString(),
+                userTypeId.toString(),
+                categorySelectedId.intValue.toString(),
+                subCategoryByIdSelectedId.intValue.toString(),
+                "",
+                languageId.toString()
+            )
+        } else {
+            viewModel.getAllFAQs(
+                "",
+                "1",
+                "1",
+                "1",
+                "",
+                languageId.toString()
+            )
+        }
+    }
+
+    LaunchedEffect(categoryListState) {
+        when {
+            categoryListState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            categoryListState.error.isNotEmpty() -> {
+                logger.d("Category List Error: ${categoryListState.error}")
+                isDialogVisible = false
+            }
+
+            categoryListState.success != null -> {
+                logger.d("Category List Response :- ${categoryListState.success}")
+                if (categoryListState.success?.size != 0) {
+                    categoryListState.success.let { it.let { it1 -> categoryListData.addAll(it1!!.toList()) } }
+                    println("Category List Data :- $categoryListData")
+                } else {
+                    context.toast(categoryListState.success!!.toString())
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
+    LaunchedEffect(subCategoryListState) {
+        when {
+            subCategoryListState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            subCategoryListState.error.isNotEmpty() -> {
+                logger.d("SubCategory List Error: ${subCategoryListState.error}")
+                isDialogVisible = false
+            }
+
+            subCategoryListState.success != null -> {
+                logger.d("SubCategory List Response :- ${subCategoryListState.success}")
+                if (subCategoryListState.success?.size != 0) {
+                    subCategoryListState.success.let {
+                        it.let { it2 ->
+                            subCategoryListData.addAll(
+                                it2!!.toList()
+                            )
+                        }
+                    }
+                    println("SubCategory List Data :- $subCategoryListData")
+                } else {
+                    context.toast(subCategoryListState.success!!.toString())
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
+    LaunchedEffect(subCategoryCategoryIdListState) {
+        when {
+            subCategoryCategoryIdListState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            subCategoryCategoryIdListState.error.isNotEmpty() -> {
+                logger.d("SubCategory By Id List Error: ${subCategoryCategoryIdListState.error}")
+                isDialogVisible = false
+            }
+
+            subCategoryCategoryIdListState.success != null -> {
+                logger.d("SubCategory By Id List Response :- ${subCategoryCategoryIdListState.success}")
+                if (subCategoryCategoryIdListState.success?.response?.size != 0) {
+                    subCategoryCategoryIdListState.success?.response.let {
+                        it.let { it3 ->
+                            subCategoryCategoryIdListData.addAll(
+                                it3!!.toList()
+                            )
+                        }
+                    }
+                    println("SubCategory By Id List Data :- $subCategoryCategoryIdListData")
+                } else {
+                    context.toast(subCategoryCategoryIdListState.success!!.message.toString())
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
+    LaunchedEffect(faqsListState) {
+        when {
+            faqsListState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            faqsListState.error.isNotEmpty() -> {
+                logger.d("Faqs List Error: ${faqsListState.error}")
+                isDialogVisible = false
+            }
+
+            faqsListState.success != null -> {
+                logger.d("Faqs List Response :- ${faqsListState.success}")
+                if (faqsListState.success?.response?.size != 0) {
+                    faqsListState.success?.response.let { it.let { it3 -> faqsListData.addAll(it3!!.toList()) } }
+                    println("Faqs List Data :- $faqsListData")
+                } else {
+                    context.toast(faqsListState.success!!.message.toString())
+                }
+                isDialogVisible = false
+            }
+        }
+    }
 
     BackHandler {
         startActivity(
@@ -235,18 +356,36 @@ private fun ShowFAQData(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             DropdownMenuUi(
-                                listOf(),
+                                options = listOf(),
                                 onItemSelected = {},
                                 modifier = Modifier.clickable {
-                                    logger.e("Category")
+                                    logger.e("Category list :- ${categoryListData.size}")
                                 },
-                                placeholder = selectedCategory,
+                                placeholder = if (selectedCategory.value.isNotEmpty()) {
+                                    selectedCategory.value.toString()
+                                } else {
+                                    stringResource(R.string.txt_category)
+                                },
                                 onClick = {
                                     scope.launch {
-                                        isCategoryVisible = true // true under development code
+                                        isCategoryVisible = true
                                         sheetState.expand()
                                     }
                                 })
+
+                            if (isCategoryVisible) {
+                                CategoryBottomSheet(
+                                    viewModel = viewModel,
+                                    categories = categoryListData,
+                                    selectedCategory = selectedCategory.value,
+                                    selectedCategoryId = categorySelectedId,
+                                    onCategorySelected = { name, id ->
+                                        selectedCategory.value = name.toString()
+                                        categorySelectedId.intValue = id.hashCode()
+                                        isCategoryVisible = false
+                                    },
+                                    onDismiss = { isCategoryVisible = false })
+                            }
                         }
 
                         Column(
@@ -256,18 +395,36 @@ private fun ShowFAQData(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             DropdownMenuUi(
-                                listOf(),
+                                options = listOf(),
                                 onItemSelected = {},
                                 modifier = Modifier.clickable {
-                                    logger.e("SubCategory")
+//                                    logger.e("SubCategory list :- ${subCategoryListData.size}")
+                                    logger.e("SubCategory list :- ${subCategoryCategoryIdListData.size}")
                                 },
-                                placeholder = selectedSubCategory,
+                                placeholder = if (selectedSubCategoryById.value.isNotEmpty()) {
+                                    selectedSubCategoryById.value.toString()
+                                } else {
+                                    stringResource(R.string.txt_subcategory)
+                                },
                                 onClick = {
                                     scope.launch {
                                         isSubCategoryVisible = true // true under development code
                                         sheetState.expand()
                                     }
                                 })
+
+                            if (isSubCategoryVisible) {
+                                SubCategoryBottomSheet(
+                                    subCategories = subCategoryCategoryIdListData,   // your API response list
+                                    selectedCategory = selectedSubCategoryById.value,
+                                    selectedSubCategoryId = subCategoryByIdSelectedId,
+                                    onCategorySelected = { name, id ->
+                                        selectedSubCategoryById.value = name.toString()
+                                        subCategoryByIdSelectedId.intValue = id
+                                        isSubCategoryVisible = false
+                                    },
+                                    onDismiss = { isSubCategoryVisible = false })
+                            }
                         }
                     }
 
@@ -321,7 +478,20 @@ private fun ShowFAQData(
                                     .size(50.dp)
                                     .align(Alignment.CenterHorizontally)
                                     .padding(8.dp)
-                            )
+                                    .clickable {
+                                        if (searchKeyName.value.isEmpty()) {
+                                            context.toast(textSearchKeyEg)
+                                        } else {
+                                            viewModel.getAllFAQs(
+                                                searchKeyName.value.toString(),
+                                                userTypeId.toString(),
+                                                categorySelectedId.intValue.toString(),
+                                                subCategoryByIdSelectedId.intValue.toString(),
+                                                "",
+                                                languageId.toString()
+                                            )
+                                        }
+                                    })
                         }
                     }
 
@@ -339,8 +509,8 @@ private fun ShowFAQData(
                         )
 
                         LazyColumn(modifier = Modifier.padding(top = 8.dp)) {
-                            items(faqListData) { faqData ->
-                                FaqDataUI(faqData)
+                            itemsIndexed(faqsListData) { index, faqData ->
+                                FaqDataUI(index, faqData)
                             }
                         }
                     }
@@ -350,8 +520,14 @@ private fun ShowFAQData(
 }
 
 @Composable
-fun FaqDataUI(faqData: FAQData) {
+fun FaqDataUI(index: Int, faqData: FAQsListResponse.FAQsResponse) {
+
     var isExpanded by remember { mutableStateOf(false) }
+    val colors1 = listOf(FaqColor1, HeaderColor01, FaqColor3, FaqColor5)
+    val colors2 = listOf(LightPurple04, FaqColor2, FaqColor4, FaqColor6)
+
+    val bgColor = colors1[index % colors1.size]
+    val randomColor = colors2.random()
 
     Card(
         shape = RoundedCornerShape(8.dp),
@@ -388,22 +564,22 @@ fun FaqDataUI(faqData: FAQData) {
                     shape = RoundedCornerShape(6.dp),
                     colors = if (isSystemInDarkTheme()) {
                         CardDefaults.cardColors(
-                            containerColor = faqData.categoryColor,
-                            contentColor = faqData.categoryColor,
-                            disabledContentColor = faqData.categoryColor,
-                            disabledContainerColor = faqData.categoryColor
+                            containerColor = bgColor,
+                            contentColor = bgColor,
+                            disabledContentColor = bgColor,
+                            disabledContainerColor = bgColor
                         )
                     } else {
                         CardDefaults.cardColors(
-                            containerColor = faqData.categoryColor,
-                            contentColor = faqData.categoryColor,
-                            disabledContentColor = faqData.categoryColor,
-                            disabledContainerColor = faqData.categoryColor
+                            containerColor = bgColor,
+                            contentColor = bgColor,
+                            disabledContentColor = bgColor,
+                            disabledContainerColor = bgColor
                         )
                     }
                 ) {
                     Text(
-                        text = faqData.categoryName,
+                        text = faqData.categoryName.toString(),
                         modifier = Modifier
                             .wrapContentWidth()
                             .padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
@@ -426,22 +602,22 @@ fun FaqDataUI(faqData: FAQData) {
                     shape = RoundedCornerShape(6.dp),
                     colors = if (isSystemInDarkTheme()) {
                         CardDefaults.cardColors(
-                            containerColor = faqData.subCateColor,
-                            contentColor = faqData.subCateColor,
-                            disabledContentColor = faqData.subCateColor,
-                            disabledContainerColor = faqData.subCateColor
+                            containerColor = randomColor,
+                            contentColor = randomColor,
+                            disabledContentColor = randomColor,
+                            disabledContainerColor = randomColor
                         )
                     } else {
                         CardDefaults.cardColors(
-                            containerColor = faqData.subCateColor,
-                            contentColor = faqData.subCateColor,
-                            disabledContentColor = faqData.subCateColor,
-                            disabledContainerColor = faqData.subCateColor
+                            containerColor = randomColor,
+                            contentColor = randomColor,
+                            disabledContentColor = randomColor,
+                            disabledContainerColor = randomColor
                         )
                     }
                 ) {
                     Text(
-                        text = faqData.subCateName,
+                        text = faqData.subCategoryName.toString(),
                         modifier = Modifier
                             .wrapContentWidth()
                             .padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
@@ -466,7 +642,7 @@ fun FaqDataUI(faqData: FAQData) {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = faqData.questionName,
+                    text = faqData.name.toString(),
                     fontFamily = fontMedium,
                     fontSize = 14.sp,
                     color = if (isSystemInDarkTheme()) {
@@ -499,7 +675,7 @@ fun FaqDataUI(faqData: FAQData) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = faqData.answer,
+                        text = faqData.description.toString(),
                         fontFamily = fontRegular,
                         fontSize = 14.sp,
                         color = if (isSystemInDarkTheme()) {
@@ -526,18 +702,160 @@ fun SectionDivider() {
 }
 
 data class FAQData(
-    var categoryName: String,
     var categoryColor: Color,
-    var subCateName: String,
     var subCateColor: Color,
-    var questionName: String,
-    var answer: String,
 )
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CategoryBottomSheet(
+    viewModel: DashboardViewModel,
+    categories: SnapshotStateList<CategoryListResponse>,
+    selectedCategory: String?,
+    selectedCategoryId: MutableIntState,
+    onCategorySelected: (String, Int) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    ModalBottomSheet(
+        onDismissRequest = { onDismiss() },
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 50.dp)
+        ) {
+            Text(
+                text = "Select Categories",
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+                fontFamily = fontMedium,
+                fontSize = 14.sp,
+                color = if (isSystemInDarkTheme()) {
+                    White
+                } else {
+                    Gray
+                },
+                textAlign = TextAlign.Start
+            )
+
+            categories.forEach { category ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            val id = category.id ?: return@clickable
+                            selectedCategoryId.intValue = id
+                            onCategorySelected(category.name.toString(), id)
+                            viewModel.getAllSubCategoryByCategoryId(selectedCategoryId.intValue)
+                        },
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = category.name.toString(),
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .padding(start = 8.dp, end = 8.dp, top = 8.dp),
+                        fontFamily = fontMedium,
+                        fontSize = 14.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            White
+                        } else {
+                            Black
+                        },
+                        textAlign = TextAlign.Start
+                    )
+
+                    RadioButton(
+                        selected = selectedCategory == category.name?.toString(), onClick = {
+                            val id = category.id ?: return@RadioButton
+                            selectedCategoryId.intValue = id
+                            onCategorySelected(category.name.toString(), id)
+                        })
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SubCategoryBottomSheet(
+    subCategories: SnapshotStateList<SubCategoryByCategoryIdResponse.SubCategoryResponse>,
+    selectedCategory: String?,
+    selectedSubCategoryId: MutableIntState,
+    onCategorySelected: (String, Int) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    ModalBottomSheet(
+        onDismissRequest = { onDismiss() },
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 50.dp)
+        ) {
+            Text(
+                text = "Select SubCategories",
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+                fontFamily = fontMedium,
+                fontSize = 14.sp,
+                color = if (isSystemInDarkTheme()) {
+                    White
+                } else {
+                    Gray
+                },
+                textAlign = TextAlign.Start
+            )
+
+            subCategories.forEach { category ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            val id = category.id ?: return@clickable
+                            selectedSubCategoryId.intValue = id
+                            onCategorySelected(category.name.toString(), id)
+                        },
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = category.name.toString(),
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+                        fontFamily = fontMedium,
+                        fontSize = 14.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            White
+                        } else {
+                            Black
+                        },
+                        textAlign = TextAlign.Start
+                    )
+
+                    RadioButton(
+                        selected = selectedCategory == category.name.toString(), onClick = {
+                            val id = category.id ?: return@RadioButton
+                            selectedSubCategoryId.intValue = id
+                            onCategorySelected(category.name.toString(), id)
+                        })
+                }
+            }
+        }
+    }
+}
 
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
 fun ShowFAQDataUIPreview() {
-    val navController = rememberNavController()
     val context = LocalContext.current
-    ShowFAQData(navController, context)
+    val viewModel: DashboardViewModel = koinViewModel()
+    ShowFAQData(context, viewModel)
 }

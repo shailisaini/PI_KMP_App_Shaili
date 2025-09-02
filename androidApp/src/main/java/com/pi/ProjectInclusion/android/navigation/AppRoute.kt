@@ -22,13 +22,15 @@ sealed class AppRoute(val route: String) {
     data object SetNewPasswordUI : AppRoute("set_new_password_UI")
     data object EnterUserProfileScreen : AppRoute("user_profile_screen") // registration 1
     data object EnterTeacherRegScreen : AppRoute("user_professional_screen") // registration 2
-    data object SpecialEducatorRegistration2 : AppRoute("SpecialEducatorRegistration2") // speEducator registration 2
-    data object EnterProfessionalScreen2 : AppRoute("user_professional_screen") // Professional registration 2
+    data object SpecialEducatorRegistration : AppRoute("SpecialEducatorRegistration2") // speEducator registration 2
+    data object EnterProfessionalScreen : AppRoute("user_professional_screen") // Professional registration 2
 
     data object DashboardScreen : AppRoute("dashboard_screen")
     data object ProfileScreen : AppRoute("profile_screen")     // user profile after Dashboard
     data object EditProfileScreen : AppRoute("edit_profile_screen")     // edit profile after Dashboard
-    data object EditProfileScreen2 : AppRoute("edit_profile_screen_2")     // edit profile after Dashboard
+    data object EditTeacherProfileScreen : AppRoute("edit_profile_screen_2")     // edit profile after Dashboard
+    data object EditSpeEduEditProfile : AppRoute("edit_special_edu_edit_profile")     // edit Special Edu profile after Dashboard
+    data object EditProfessionalEditProfile : AppRoute("edit_professional_edit_profile_screen")     // edit professional profile after Dashboard
 
     data object CourseScreen : AppRoute("course_screen")
     data object CertificateScreen : AppRoute("certificate_screen")
@@ -55,7 +57,7 @@ sealed class AppRoute(val route: String) {
     data object UploadedDocuments : AppRoute("intervention_uploaded_documents")
     data object TeachingPlan : AppRoute("intervention_teaching_plan")
 
-    data object StudentDashboardActivity : AppRoute("student_screen")
+    data object TeacherDashboard : AppRoute("teacher_dashboard")
     data object TrackRequestScreen : AppRoute("track_request_screen")
     data object NotificationScreen : AppRoute("notification_screen")
 }

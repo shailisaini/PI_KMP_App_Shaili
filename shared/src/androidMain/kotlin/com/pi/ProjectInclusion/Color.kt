@@ -44,6 +44,7 @@ val GrayLight05 = Color(0xFFD0D5DD)  //#D0D5DD
 val GrayLight06 = Color(0xFFD3D3D3)  //#D3D3D3
 val GrayLight07 = Color(0xFF3B3B3B)  //#3B3B3B
 val GrayLight08 = Color(0xFF848BAA)  //#848BAA
+val GrayLight09 = Color(0xFF6C6D72)  //#6C6D72
 val White = Color(0xFFFFFFFF)
 val WhiteA = Color(0xFFFFF5DE)
 val BlueBackground = Color(0x4DF6F4FE)
@@ -66,6 +67,7 @@ val LightGreen02 = Color(0xFFACE9B4)
 val LightGreen03 = Color(0xFFDEFFE2)
 val LightGreen05 = Color(0xFFECFAED)
 val LightGreen06 = Color(0xFF56A42F) // #56A42F
+val LightGreen07 = Color(0xFFE5FFED) // #E5FFED
 
 val Yellow = Color(0xFFFFDD00) // #FFDD00
 val Yellow1 = Color(0xFFFE9607) //#FE9607
@@ -101,6 +103,7 @@ val DarkRed2 = Color(0xFFD76B66)
 val LightRed01 = Color(0xFFF2566D)
 val LightRed02 = Color(0xFFFEECEB)
 val LightRed03 = Color(0xFFF2F2F2) // #F2F2F2
+val LightRed04 = Color(0xFFFFF4F4) // #FFF4F4
 
 val BannerColor00 = Color(0xFFF6E4D0)
 val BannerColor01 = Color(0xFFFAD6AE)
@@ -145,3 +148,5 @@ val GreenGradient1 = Color(0x32C7F15C)
 val GreenGradient2 = Color(0x80FCE2B8)
 val DarkGrey02 = Color(0xFF333333) // #333333
 val LightYellow2 = Color(0xFFFFF4DB) //#FFF4DB
+
+val ZoomLightRed = Color(0xFFFFF4DB) //#E76565

@@ -86,7 +86,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -134,10 +133,11 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.example.kmptemplate.logger.LoggerProvider.logger
+import com.pi.ProjectInclusion.BannerColor03
 import com.pi.ProjectInclusion.Bg_Gray2
 import com.pi.ProjectInclusion.Bg_Gray3
 import com.pi.ProjectInclusion.Bg_Gray4
@@ -164,11 +164,12 @@ import com.pi.ProjectInclusion.LightRed01
 import com.pi.ProjectInclusion.OrangeSubTitle
 import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
-import com.pi.ProjectInclusion.PrimaryBlue3
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.PrimaryBlueLt1
 import com.pi.ProjectInclusion.android.R
-import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
+import com.pi.ProjectInclusion.android.common_UI.EncryptedCommonFunction.decryptedEmail
+import com.pi.ProjectInclusion.android.common_UI.EncryptedCommonFunction.decryptedPhoneNo
+import com.pi.ProjectInclusion.android.common_UI.EncryptedCommonFunction.encryptedPhoneNo
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
@@ -412,7 +413,7 @@ fun TextViewField(
                 Icon(
                     imageVector = icon!!,
                     contentDescription = null,
-                    tint = if (isSystemInDarkTheme()) White else Black
+                    tint = if (isSystemInDarkTheme()) White else Gray
                 )
             }
         } else null,
@@ -462,7 +463,92 @@ fun TextViewField(
                 White
             },
             unfocusedIndicatorColor = Transparent,
-            disabledContainerColor = GrayLight03
+            disabledContainerColor = BannerColor03
+        ))
+}
+
+@Composable
+fun TextViewFieldEmail(
+    isIcon: Boolean = false,
+    icon: ImageVector?,
+    colors: ColorScheme,
+    trueFalse: Boolean,
+    modifier: Modifier = Modifier,
+    text: MutableState<String> = remember { mutableStateOf("") },
+    hint: String = remember { mutableStateOf("") }.toString(),
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+    val shownEmail = decryptedEmail(text.value.toString().trim()) // for email
+    val keyboardController = LocalSoftwareKeyboardController.current
+    TextField(
+        value = shownEmail,
+        onValueChange = {
+            text.value = it
+        },
+        enabled = trueFalse,
+        placeholder = { Text(hint, color = GrayLight01, fontSize = 14.sp) },
+        shape = RoundedCornerShape(8.dp),
+        singleLine = true,
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
+        visualTransformation = VisualTransformation.None,
+
+        leadingIcon = if (isIcon) {
+            {
+                Icon(
+                    imageVector = icon!!,
+                    contentDescription = null,
+                    tint = if (isSystemInDarkTheme()) White else Gray
+                )
+            }
+        } else null,
+
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .drawBehind {
+                if (isFocused) {
+                    drawRoundRect(
+                        color = LightBlue.copy(alpha = 0.4f),
+                        cornerRadius = CornerRadius(8.dp.toPx(), 8.dp.toPx()),
+                        style = Stroke(width = 4.dp.toPx())
+                    )
+                }
+            }
+            .border(
+                width = 1.dp, color = when {
+                    isFocused -> LightBlue
+                    isSystemInDarkTheme() -> Dark_02
+                    else -> GrayLight02
+                }, shape = RoundedCornerShape(8.dp)
+            ),
+        interactionSource = interactionSource,
+        textStyle = TextStyle(
+            fontStyle = FontStyle.Normal,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 14.sp,
+            color = if (isSystemInDarkTheme()) {
+                DARK_DEFAULT_BUTTON_TEXT
+            } else {
+                Black
+            }
+        ),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = if (isSystemInDarkTheme()) {
+                Dark_02
+            } else {
+                White
+            },
+            focusedTextColor = Gray,
+            unfocusedTextColor = colors.onSurface,
+            focusedIndicatorColor = Transparent,
+            unfocusedContainerColor = if (isSystemInDarkTheme()) {
+                Dark_02
+            } else {
+                White
+            },
+            unfocusedIndicatorColor = Transparent,
+            disabledContainerColor = BannerColor03
         ))
 }
 
@@ -471,7 +557,102 @@ fun MobileTextField(
     isIcon: Boolean = false,
     icon: ImageVector?,
     colors: ColorScheme,
-    trueFalse: Boolean,
+    enable: Boolean,
+    modifier: Modifier = Modifier,
+    number: MutableState<String>,
+    hint: String = "",
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val shownMobile = decryptedPhoneNo(number.value.trim())
+    TextField(
+        value = shownMobile,
+        onValueChange = {
+            if (it.length <= 10 && it.all { char -> char.isDigit() }) {
+                number.value = it
+
+                //  Hide keyboard on 10 digits
+                if (it.length == 10) {
+                    keyboardController?.hide()
+                }
+            }
+        },
+        enabled = enable,
+        placeholder = {
+            Text(
+                hint,
+                color = GrayLight01,
+                fontFamily = fontRegular,
+                fontSize = 14.sp) },
+        shape = RoundedCornerShape(8.dp),
+        singleLine = true,
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+        visualTransformation = VisualTransformation.None,
+
+        leadingIcon = if (isIcon) {
+            {
+                Icon(
+                    imageVector = icon!!,
+                    contentDescription = null,
+                    tint = if (isSystemInDarkTheme()) White else Gray
+                )
+            }
+        } else null,
+
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .drawBehind {
+                if (isFocused) {
+                    drawRoundRect(
+                        color = LightBlue.copy(alpha = 0.4f),
+                        cornerRadius = CornerRadius(8.dp.toPx(), 8.dp.toPx()),
+                        style = Stroke(width = 4.dp.toPx())
+                    )
+                }
+            }
+            .border(
+                width = 1.dp, color = when {
+                    isFocused -> LightBlue
+                    isSystemInDarkTheme() -> Dark_02
+                    else -> GrayLight02
+                }, shape = RoundedCornerShape(8.dp)
+            ),
+        interactionSource = interactionSource,
+        textStyle = TextStyle(
+            fontFamily = fontSemiBold, fontSize = 14.sp, color = if (isSystemInDarkTheme()) {
+                DARK_DEFAULT_BUTTON_TEXT
+            } else {
+                Black
+            }
+        ),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = if (isSystemInDarkTheme()) {
+                Dark_02
+            } else {
+                White
+            },
+            focusedTextColor = Gray,
+            unfocusedTextColor = colors.onSurface,
+            focusedIndicatorColor = Transparent,
+            unfocusedContainerColor = if (isSystemInDarkTheme()) {
+                Dark_02
+            } else {
+                White
+            },
+            unfocusedIndicatorColor = Transparent,
+            disabledContainerColor = BannerColor03
+        ))
+}
+
+@Composable
+fun UdiseTextField(
+    isIcon: Boolean = false,
+    icon: ImageVector?,
+    colors: ColorScheme,
+    enable: Boolean,
     modifier: Modifier = Modifier,
     number: MutableState<String> = remember { mutableStateOf("") },
     hint: String = remember { mutableStateOf("") }.toString(),
@@ -484,16 +665,14 @@ fun MobileTextField(
     TextField(
         value = number.value,
         onValueChange = {
-            if (it.length <= 10 && it.all { char -> char.isDigit() }) {
+            if (it.length <= 12 && it.all { char -> char.isDigit() }) {
                 number.value = it
-
-                //  Hide keyboard on 10 digits
-                if (it.length == 10) {
+                if (it.length == 12) {
                     keyboardController?.hide()
                 }
             }
         },
-        enabled = trueFalse,
+        enabled = enable,
         placeholder = { Text(hint, color = GrayLight01, fontSize = 14.sp) },
         shape = RoundedCornerShape(8.dp),
         singleLine = true,
@@ -575,9 +754,9 @@ fun UserNameTextField(
         value = number.value,
         onValueChange = {
 
-            if (it.length <= 10) {
+//            if (it.length <= 10) {
                 number.value = it
-            }
+//            }
         },
         enabled = trueFalse,
         placeholder = { Text(hint, color = GrayLight01, fontSize = 14.sp) },
@@ -991,6 +1170,116 @@ fun NoBtnUi(
             fontFamily = fontMedium,
         )
     }
+}
+
+@Composable
+fun InputTextField(
+    isIcon: Boolean = false,
+    icon: ImageVector?,
+    modifier: Modifier = Modifier,
+    value: MutableState<String> = remember { mutableStateOf("") },
+    placeholder: String = "",
+    editable: Boolean = true,
+    keyboardType: KeyboardType = KeyboardType.Text, // Add a parameter for the keyboard type,
+    maxLength: Int = Int.MAX_VALUE, // Add a parameter for the maximum length,
+) {
+    val colors = MaterialTheme.colorScheme
+    TextField(
+        value = value.value,
+        onValueChange = when (placeholder) {
+            "Enter Beneficiary Name" -> {
+                { newValue ->
+                    if (newValue.length <= 35 && newValue.all { char -> !char.isDigit() }) {
+                        value.value = newValue
+                    }
+                }
+            }
+
+            "Enter Account Number" -> {
+                { newValue ->
+                    if (newValue.length <= 18 && newValue.all { char -> char.isDigit() }) {
+                        value.value = newValue
+                    }
+                }
+            }
+
+            "Enter Confirm Account Number" -> {
+                { newValue ->
+                    if (newValue.length <= 18 && newValue.all { char -> char.isDigit() }) {
+                        value.value = newValue
+                    }
+                }
+            }
+
+            "Enter IFSC Code" -> {
+                { newValue ->
+                    if (newValue.length <= 11 && newValue.all { char -> char.isLetterOrDigit() }) {
+                        value.value = newValue
+                    }
+                }
+            }
+
+            else -> {
+                { newValue ->
+                    if (newValue.length <= maxLength) { // Check if the new value is within the limit
+                        value.value = newValue
+                    }
+                }
+            }
+        }, // Update the value state here
+        shape = RoundedCornerShape(8.dp),
+        enabled = editable,
+        singleLine = true,
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = keyboardType), // Use the keyboardType parameter
+        visualTransformation = VisualTransformation.None,
+        leadingIcon = if (isIcon) {
+            {
+                Icon(
+                    imageVector = icon!!,
+                    contentDescription = null,
+                    tint = if (isSystemInDarkTheme()) White else Gray
+                )
+            }
+        } else null,
+        placeholder = {
+            Text(
+                text = placeholder,
+                color = if (isSystemInDarkTheme()) {
+                    colors.onSurface // Light background
+                } else {
+                    Color.Gray
+                },
+                fontSize = 14.sp,
+                fontFamily = fontRegular
+            )
+        },
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .border(
+                width = 1.dp, color = if (isSystemInDarkTheme()) {
+                    Dark_03
+                } else {
+                    GrayLight02
+                }, shape = RoundedCornerShape(8.dp)
+            ),
+        textStyle = TextStyle(
+//            color = Black,
+            color = colors.onSurface,
+            fontSize = 14.sp,
+            fontStyle = FontStyle.Normal,
+            fontFamily = fontSemiBold
+        ),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = if (isSystemInDarkTheme()) Dark_03 else White,
+    focusedTextColor = if (isSystemInDarkTheme()) Dark_03 else Gray,
+    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+    focusedIndicatorColor = Transparent,
+    unfocusedContainerColor = if (isSystemInDarkTheme()) Dark_03 else White,
+    unfocusedIndicatorColor = Transparent,
+    disabledContainerColor = GrayLight03
+    )
+    )
 }
 
 @Composable
@@ -2096,14 +2385,9 @@ fun SchoolListBottomSheet(
     onTextSelected: (String) -> Unit = { "" },
     myList: List<String>,
 ) {
-//    var mySchoolList: List<String> = myList
-    val colors = MaterialTheme.colorScheme
-//    val viewModel: LoginViewModel = hiltViewModel()
-//    val languageListName = stringResource(id = R.string.key_lang_list)
     val chooseOption = stringResource(id = R.string.choose_option)
     val searchHere = stringResource(id = R.string.txt_search_here)
-    val otherOption = stringResource(id = R.string.txt_other)
-    var languageData = HashMap<String, String>()
+    var SerialNamegeData = HashMap<String, String>()
 //    languageData = viewModel.getLanguageTranslationData(languageListName)
 
     if (isBottomSheetVisible) {
@@ -2141,6 +2425,7 @@ fun SchoolListBottomSheet(
                 Row(
                     modifier = Modifier
                         .wrapContentHeight()
+                        .padding(top = 15.dp)
                         .background(
                             color = if (isSystemInDarkTheme()) {
                                 Dark_03
@@ -2195,35 +2480,53 @@ fun SchoolListBottomSheet(
                     )
                 }
                 val selectedItem = remember { mutableStateOf<String?>(null) }
-                val filteredListWithOther = filteredList + listOf(otherOption)
-
-                LazyColumn() {
-                    items(filteredListWithOther) { item ->
-                        val isSelected = selectedItem.value == item.toString()
+                if (filteredList.isNotEmpty()) {
+                    LazyColumn {
+                        items(filteredList) { item ->
+                            val isSelected = selectedItem.value == item.toString()
+                            Text(
+                                text = item, modifier = Modifier
+                                    .background(
+                                        color = if (isSelected) {
+                                            if (isSystemInDarkTheme()) {
+                                                Dark_03
+                                            } else {
+                                                PrimaryBlueLt
+                                            }
+                                        } else {
+                                            if (isSystemInDarkTheme()) {
+                                                Dark_03
+                                            } else {
+                                                White
+                                            }
+                                        }
+                                    )
+                                    .fillMaxWidth()
+                                    .padding(15.dp)
+                                    .clickable {
+                                        selectedItem.value = item
+                                        onTextSelected.invoke(item)
+                                        onDismiss.invoke()
+                                    }, fontFamily = fontMedium
+                            )
+                        }
+                    }
+                }
+                else {
+                    Column(
+                        Modifier.padding(bottom = 10.dp)
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Text(
-                            text = item, modifier = Modifier
-                                .background(
-                                    color = if (isSelected) {
-                                        if (isSystemInDarkTheme()) {
-                                            Dark_03
-                                        } else {
-                                            PrimaryBlueLt
-                                        }
-                                    } else {
-                                        if (isSystemInDarkTheme()) {
-                                            Dark_03
-                                        } else {
-                                            White
-                                        }
-                                    }
-                                )
-                                .fillMaxWidth()
-                                .padding(16.dp)
+                            text = stringResource(R.string.txt_oops_no_data_found),
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .padding(17.dp)
                                 .clickable {
-                                    selectedItem.value = item
-                                    onTextSelected.invoke(item)
                                     onDismiss.invoke()
-                                }, style = MaterialTheme.typography.bodyLarge
+                                },
+                            fontFamily = fontMedium
                         )
                     }
                 }

@@ -4,6 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingTokenResponse
 import com.pi.ProjectInclusion.database.LocalDataSource
 import com.pi.ProjectInclusion.domain.ConnectivityObserver
 import com.pi.ProjectInclusion.domain.useCases.DashboardUsesCases
@@ -34,15 +40,36 @@ class DashboardViewModel(
     private val getCertificate = MutableStateFlow(UiState<CertificateListResponse>())
     val getCertificateResponse: StateFlow<UiState<CertificateListResponse>> = getCertificate
 
+    private val getCategoryList = MutableStateFlow(UiState<List<CategoryListResponse>>())
+    val getCategoryListResponse: StateFlow<UiState<List<CategoryListResponse>>> = getCategoryList
+
+    private val getSubCategoryList = MutableStateFlow(UiState<List<SubCategoryListResponse>>())
+    val getSubCategoryListResponse: StateFlow<UiState<List<SubCategoryListResponse>>> =
+        getSubCategoryList
+
+    private val getSubCategoryByCategoryIdList =
+        MutableStateFlow(UiState<SubCategoryByCategoryIdResponse>())
+    val getSubCategoryByCategoryIdListResponse: StateFlow<UiState<SubCategoryByCategoryIdResponse>> =
+        getSubCategoryByCategoryIdList
+
+    private val getFAQsList = MutableStateFlow(UiState<FAQsListResponse>())
+    val getFAQsListResponse: StateFlow<UiState<FAQsListResponse>> = getFAQsList
+
+    private val getZoomMeetingToken = MutableStateFlow(UiState<ZoomMeetingTokenResponse>())
+    val getZoomMeetingTokenResponse: StateFlow<UiState<ZoomMeetingTokenResponse>> =
+        getZoomMeetingToken
+
+    private val getToken = MutableStateFlow(UiState<TokenResponse>())
+    val getTokenResponse: StateFlow<UiState<TokenResponse>> =
+        getToken
+
     fun isNetworkAvailable(): Boolean {
         return connectivityObserver.getCurrentStatus() == ConnectivityObserver.Status.Available
     }
 
     init {
         viewModelScope.launch {
-            query.debounce(1000)
-                .filter { it.isNotEmpty() }
-                .collectLatest { }
+            query.debounce(1000).filter { it.isNotEmpty() }.collectLatest { }
         }
     }
 
@@ -51,23 +78,135 @@ class DashboardViewModel(
         strToken: String,
     ) = viewModelScope.launch {
         getCertificate.update { UiState(isLoading = true) }
-        getUsesCases.getLMSUserCertificate(certificateRequest, strToken)
-            .catch { exception ->
+        getUsesCases.getLMSUserCertificate(certificateRequest, strToken).catch { exception ->
+            getCertificate.update {
+                UiState(error = exception.message ?: somethingWentWrong)
+            }
+        }.collect { result ->
+            result.fold(onSuccess = { data ->
+                getCertificate.update { UiState(success = data) }
+            }, onFailure = { exception ->
                 getCertificate.update {
                     UiState(error = exception.message ?: somethingWentWrong)
                 }
+            })
+        }
+    }
+
+    fun getAllCategory() = viewModelScope.launch {
+        getCategoryList.update { UiState(isLoading = true) }
+        getUsesCases.getAllCategoryRepo().catch { exception ->
+            getCategoryList.update {
+                UiState(error = exception.message ?: somethingWentWrong)
             }
-            .collect { result ->
-                result.fold(
-                    onSuccess = { data ->
-                        getCertificate.update { UiState(success = data) }
-                    },
-                    onFailure = { exception ->
-                        getCertificate.update {
-                            UiState(error = exception.message ?: somethingWentWrong)
-                        }
+        }.collect { result ->
+            result.fold(onSuccess = { data ->
+                getCategoryList.update { UiState(success = data) }
+            }, onFailure = { exception ->
+                getCategoryList.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            })
+        }
+    }
+
+    fun getAllSubCategory() = viewModelScope.launch {
+        getSubCategoryList.update { UiState(isLoading = true) }
+        getUsesCases.getAllSubCategoryRepo().catch { exception ->
+            getSubCategoryList.update {
+                UiState(error = exception.message ?: somethingWentWrong)
+            }
+        }.collect { result ->
+            result.fold(onSuccess = { data ->
+                getSubCategoryList.update { UiState(success = data) }
+            }, onFailure = { exception ->
+                getSubCategoryList.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            })
+        }
+    }
+
+    fun getAllSubCategoryByCategoryId(categoryId: Int) = viewModelScope.launch {
+        getSubCategoryByCategoryIdList.update { UiState(isLoading = true) }
+        getUsesCases.getAllSubCategoryByCategoryIdRepo(categoryId).catch { exception ->
+            getSubCategoryByCategoryIdList.update {
+                UiState(error = exception.message ?: somethingWentWrong)
+            }
+        }.collect { result ->
+            result.fold(onSuccess = { data ->
+                getSubCategoryByCategoryIdList.update { UiState(success = data) }
+            }, onFailure = { exception ->
+                getSubCategoryByCategoryIdList.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            })
+        }
+    }
+
+    fun getAllFAQs(
+        strKeyword: String,
+        userTypeId: String,
+        categoryId: String,
+        subCategoryId: String,
+        userId: String,
+        languageId: String,
+    ) = viewModelScope.launch {
+        getFAQsList.update { UiState(isLoading = true) }
+        getUsesCases.getAllFAQsRepo(
+            strKeyword, userTypeId, categoryId, subCategoryId, userId, languageId
+        ).catch { exception ->
+            getFAQsList.update {
+                UiState(error = exception.message ?: somethingWentWrong)
+            }
+        }.collect { result ->
+            result.fold(onSuccess = { data ->
+                getFAQsList.update { UiState(success = data) }
+            }, onFailure = { exception ->
+                getFAQsList.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            })
+        }
+    }
+
+
+    fun getRefreshToken() = viewModelScope.launch {
+        getZoomMeetingToken.update { UiState(isLoading = true) }
+        getUsesCases.getRefreshTokenRepo().catch { exception ->
+            getZoomMeetingToken.update {
+                UiState(error = exception.message ?: somethingWentWrong)
+            }
+        }.collect { result ->
+            result.fold(onSuccess = { data ->
+                getZoomMeetingToken.update { UiState(success = data) }
+            }, onFailure = { exception ->
+                getZoomMeetingToken.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            })
+        }
+    }
+
+    fun getZoomMeetingsActualToken(
+        strAuthKey: String,
+        strGrantType: String,
+        strRefreshToken: String,
+    ) = viewModelScope.launch {
+        getToken.update { UiState(isLoading = true) }
+        getUsesCases.getZoomMeetingsActualTokenRepo(strAuthKey, strGrantType, strRefreshToken)
+            .catch { exception ->
+                getToken.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }.collect { result ->
+                result.fold(onSuccess = { data ->
+                    getToken.update { UiState(success = data) }
+                }, onFailure = { exception ->
+                    getToken.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
                     }
-                )
+                })
             }
     }
 

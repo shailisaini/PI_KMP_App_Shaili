@@ -105,12 +105,17 @@ import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
+import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.N_A
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.LoginApiResponse
+import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
+import com.pi.ProjectInclusion.data.remote.ApiService.Companion.PROFILE_BASE_URL
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlin.Unit
 
@@ -135,38 +140,51 @@ fun ViewProfileScreen(
     var languageId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
 
     var encryptedUserName = viewModel.getPrefData(USER_NAME)
+    val profilePic = remember { mutableStateOf("") }
 
 
     var hasAllPermissions = remember { mutableStateOf(false) }
     CameraPermission(hasAllPermissions, context)
-    var profileData by remember { mutableStateOf<LoginApiResponse.LoginResponse?>(null) }
+    var profileData by remember { mutableStateOf<ViewProfileResponse?>(null) }
 
     logger.d("Screen: " + "ViewProfileScreen()")
 
-    val sendOtpState by viewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
-    logger.d("OtpSendVerify: $languageId  .. $encryptedUserName")
-    viewModel.getUserProfileViewModel(encryptedUserName)
+    LaunchedEffect(Unit) {
+        logger.d("viewProfileUI: $languageId  .. $encryptedUserName")
+        viewModel.getUserProfileViewModel(encryptedUserName)
+    }
 
-    LaunchedEffect(sendOtpState) {
+    val viewProfile by viewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
+    LaunchedEffect(viewProfile) {
         when {
-            sendOtpState.isLoading -> {
+            viewProfile.isLoading -> {
                 isDialogVisible = true
             }
 
-            sendOtpState.error.isNotEmpty() -> {
-                logger.d("ResendOtp: ${sendOtpState.success}")
+            viewProfile.error.isNotEmpty() -> {
+                logger.d("viewProfileData: ${viewProfile.success}")
                 isDialogVisible = false
             }
 
-            sendOtpState.success != null -> {
-                logger.d("ResendOtp: ${sendOtpState.success}")
-                if (sendOtpState.success!!.status != true){
-                    profileData = sendOtpState.success!!.response
+            viewProfile.success != null -> {
+                logger.d("viewProfileData: ${viewProfile.success}")
+                if (viewProfile.success!!.status == true){
+                    profileData = viewProfile.success!!
+                    logger.d("viewProfileData 1: ${viewProfile.success}")
+                    profilePic.value = PROFILE_BASE_URL + profileData!!.response?.profilepic
+
 //                    context.toast(sendOtpState.success!!.response!!.message.toString())
+                }
+                else{
+                    context.toast(viewProfile.success!!.message.toString())
                 }
                 isDialogVisible = false
             }
         }
+    }
+
+    BackHandler {
+        onBack()
     }
 
     Surface(
@@ -179,8 +197,10 @@ fun ViewProfileScreen(
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            ProfileViewUI(context, onNext = onNext, onBack = onBack, onBackLogin = onBackLogin,
-                onTrackRequest =onTrackRequest, profileData = profileData,viewModel = viewModel)
+            profileData?.let {
+                ProfileViewUI(context, onNext = onNext, onBack = onBack, onBackLogin = onBackLogin,
+                    onTrackRequest = onTrackRequest, profileData = it,viewModel = viewModel)
+            }
         }
     }
 }
@@ -192,16 +212,16 @@ fun ProfileViewUI(
     onBackLogin: () -> Unit,
     onNext: () -> Unit,
     onTrackRequest: () -> Unit,
-    profileData: LoginApiResponse.LoginResponse?,
-    viewModel: LoginViewModel,
+    profileData: ViewProfileResponse,
+    viewModel: LoginViewModel?,
 ) {
 
-    val decryptUserName = decrypt(profileData?.user?.username.toString().trim())
+    val decryptUserName = decrypt(profileData.response?.username.toString().trim())
     val scrollState = rememberScrollState()
     val textNameEg = stringResource(R.string.txt_eg_first_name)
     var showSheetMenu by remember { mutableStateOf(false) }
     var isChangeRequestBottomSheet by remember { mutableStateOf(false) }
-    var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
+    var userTypeId = viewModel?.getPrefData(USER_TYPE_ID)
 
     if (showSheetMenu) {
         ProfileBottomSheetMenu(onBackLogin = onBackLogin) {
@@ -242,7 +262,7 @@ fun ProfileViewUI(
                         .padding(15.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    ProfileWithProgress(image = "", progress = 0.8f)
+                    ProfileWithProgress(image = PROFILE_BASE_URL + profileData.response?.profilepic, progress = 0.8f)
 
                     Text(
                         text = decryptUserName,
@@ -331,7 +351,7 @@ fun ProfileViewUI(
                             ) {
                                 TextWithIconOnLeft(
                                     moreSpace = true,
-                                    text = stringResource(R.string.txt_eg_whatsapp_name),
+                                    text = profileData.response?.dob?:N_A,
                                     icon = ImageVector.vectorResource(id = R.drawable.calendar_blue),
                                     textColor = PrimaryBlue,
                                     iconColor = Color.Unspecified,
@@ -341,7 +361,7 @@ fun ProfileViewUI(
                                 Spacer(modifier = Modifier.height(4.dp))
                                 TextWithIconOnLeft(
                                     moreSpace = true,
-                                    text = stringResource(R.string.txt_eg_whatsapp_name),
+                                    text = profileData.response?.mobile?:N_A,
                                     icon = ImageVector.vectorResource(id = R.drawable.ic_call_blue),
                                     textColor = PrimaryBlue,
                                     iconColor = Color.Unspecified,
@@ -351,7 +371,7 @@ fun ProfileViewUI(
                                 Spacer(modifier = Modifier.height(4.dp))
                                 TextWithIconOnLeft(
                                     moreSpace = true,
-                                    text = stringResource(R.string.txt_eg_whatsapp_name),
+                                    text = profileData.response?.whatsapp?:N_A,
                                     icon = ImageVector.vectorResource(id = R.drawable.ic_whatsapp_blue),
                                     textColor = PrimaryBlue,
                                     iconColor = Color.Unspecified,
@@ -426,7 +446,7 @@ fun ProfileViewUI(
                                         .weight(1f)
                                 )
                                 Text(
-                                    stringResource(R.string.text_add),
+                                    profileData.response?.udicecode?:N_A,
                                     textAlign = TextAlign.End,
                                     fontSize = 14.sp,
                                     fontFamily = fontMedium,
@@ -470,7 +490,7 @@ fun ProfileViewUI(
                                         .weight(1f)
                                 )
                                 Text(
-                                    stringResource(R.string.text_add),
+                                    profileData.response?.stateId?:N_A,
                                     textAlign = TextAlign.End,
                                     fontSize = 15.sp,
                                     fontFamily = fontMedium,
@@ -494,7 +514,7 @@ fun ProfileViewUI(
                                         .weight(1f)
                                 )
                                 Text(
-                                    stringResource(R.string.text_add),
+                                    profileData.response?.districtId?:N_A,
                                     textAlign = TextAlign.End,
                                     fontSize = 15.sp,
                                     fontFamily = fontMedium,
@@ -518,7 +538,7 @@ fun ProfileViewUI(
                                         .weight(1f)
                                 )
                                 Text(
-                                    stringResource(R.string.text_add),
+                                    profileData.response?.blockId?:N_A,
                                     textAlign = TextAlign.End,
                                     fontSize = 15.sp,
                                     fontFamily = fontMedium,
@@ -547,7 +567,7 @@ fun ProfileViewUI(
                                         .weight(1f)
                                 )
                                 Text(
-                                    stringResource(R.string.text_add),
+                                    profileData.response?.schoolId?:N_A,
                                     textAlign = TextAlign.End,
                                     fontSize = 15.sp,
                                     fontFamily = fontMedium,

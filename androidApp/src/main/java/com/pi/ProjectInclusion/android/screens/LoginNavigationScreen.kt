@@ -23,25 +23,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.ViewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.kmptemplate.logger.LoggerProvider
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.android.MyApplicationTheme
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.screens.login.EnterPasswordScreen
-import com.pi.ProjectInclusion.android.screens.login.ForgetPasswordScreen
 import com.pi.ProjectInclusion.android.screens.login.EnterUserNameScreen
+import com.pi.ProjectInclusion.android.screens.login.ForgetPasswordScreen
 import com.pi.ProjectInclusion.android.screens.login.LanguageScreen
 import com.pi.ProjectInclusion.android.screens.login.OtpSendVerifyScreen
-import com.pi.ProjectInclusion.android.screens.registration.SetNewPasswordScreen
 import com.pi.ProjectInclusion.android.screens.login.UserTypeScreen
 import com.pi.ProjectInclusion.android.screens.registration.CreateNewPasswordScreen
 import com.pi.ProjectInclusion.android.screens.registration.EnterUserScreen1
-import com.pi.ProjectInclusion.android.screens.registration.EnterUserScreen2
-import com.pi.ProjectInclusion.android.screens.registration.professionals.ProfessionalsRegistration2
-import com.pi.ProjectInclusion.android.screens.registration.specialEdu.SpecialEducatorScreen2
+import com.pi.ProjectInclusion.android.screens.registration.SetNewPasswordScreen
+import com.pi.ProjectInclusion.android.screens.registration.TeacherRegistrationScreen
+import com.pi.ProjectInclusion.android.screens.registration.professionals.ProfessionalsRegistrationScreen
+import com.pi.ProjectInclusion.android.screens.registration.specialEdu.SpecialEducatorRegistrationScreen
+import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -53,15 +53,20 @@ class LoginNavigationScreen : ComponentActivity() {
         setContent {
             val context = LocalContext.current
             val navController = rememberNavController()
-//            val viewModel = koinViewModel<LoginViewModel>()
             val viewModel: LoginViewModel = koinViewModel()
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination?.route
-//            val loadScreenName = intent.getStringExtra(screenName.screenName)
-//            val startDestination = if (viewModel.getScreenName() == onboarding2) {
-            val startDestination = AppRoute.LanguageSelect.route
-//            } else if (loadScreenName == onboarding1 || viewModel.getScreenName() == onboarding1) {
-//                AppRoute.RegistrationStep1()
+
+            var startDestination = AppRoute.LanguageSelect.route
+
+            var encryptedUserName = viewModel.getPrefData(USER_NAME)
+            var userToken = viewModel.getPrefData(TOKEN_PREF_KEY)
+            if (userToken.isNotEmpty()) {
+                logger.d("token:: ${userToken}")
+                startDestination = AppRoute.TeacherDashboard.route
+            } else {
+                startDestination
+            }
 
             var currentRoute by remember { mutableStateOf(startDestination) }
             var isForward by remember { mutableStateOf(true) }
@@ -110,7 +115,6 @@ class LoginNavigationScreen : ComponentActivity() {
                         AppRoute.LanguageSelect.route -> LanguageScreen(
                             viewModel = viewModel
                         ) {
-//                            navigateTo(AppRoute.SpecialEducatorRegistration2.route)
                             navigateTo(AppRoute.UserTypeSelect.route)
                         }
 
@@ -128,10 +132,6 @@ class LoginNavigationScreen : ComponentActivity() {
                             // for register & activate
                             onRegister = {
                                 navigateTo(AppRoute.OtpSendVerifyUI.route)
-//                                navigateTo(AppRoute.EnterUserProfileScreen.route)
-//                                navigateTo(AppRoute.EnterTeacherRegScreen.route)
-//                                navigateTo(AppRoute.SpecialEducatorRegistration2.route)
-//                                navigateTo(AppRoute.EnterProfessionalScreen2.route)
                             },
 
                             onBack = { navigateBack(AppRoute.UserTypeSelect.route) }
@@ -139,6 +139,7 @@ class LoginNavigationScreen : ComponentActivity() {
 
                         AppRoute.OtpSendVerifyUI.route -> OtpSendVerifyScreen(
                             onNext = { navigateTo(AppRoute.SetNewPasswordUI.route) },
+                            onBackUserName = {navigateTo(AppRoute.UserNameScreen.route)},
                             onBack = {
                                 navigateBack(AppRoute.ForgetPasswordUI.route)
                             },
@@ -166,12 +167,13 @@ class LoginNavigationScreen : ComponentActivity() {
                         AppRoute.EnterUserProfileScreen.route -> EnterUserScreen1(
                             viewModel = viewModel,
                             onNextTeacher = { navigateTo(AppRoute.EnterTeacherRegScreen.route) },
-                            onNextSpecialEdu = { navigateTo(AppRoute.SpecialEducatorRegistration2.route) },
-                            onNextProfessional = { navigateTo(AppRoute.EnterProfessionalScreen2.route) },
+                            onNextSpecialEdu = { navigateTo(AppRoute.SpecialEducatorRegistration.route) },
+                            onNextProfessional = { navigateTo(AppRoute.EnterProfessionalScreen.route) },
                             onBack = { navigateBack(AppRoute.UserNameScreen.route) }
                         )
 
-                        AppRoute.EnterUserProfileScreen.route -> ProfessionalsRegistration2(
+                        // Professional
+                        AppRoute.EnterProfessionalScreen.route -> ProfessionalsRegistrationScreen(
                             viewModel = viewModel,
                             onNext = {
                                 context.startActivity(
@@ -182,7 +184,8 @@ class LoginNavigationScreen : ComponentActivity() {
                             onBack = { navigateBack(AppRoute.UserNameScreen.route) }
                         )
 
-                        AppRoute.EnterTeacherRegScreen.route -> EnterUserScreen2(
+                        // teacher
+                        AppRoute.EnterTeacherRegScreen.route -> TeacherRegistrationScreen(
                             viewModel = viewModel,
                             onNext = {
                                 context.startActivity(
@@ -193,8 +196,8 @@ class LoginNavigationScreen : ComponentActivity() {
                             onBack = { navigateBack(AppRoute.EnterUserProfileScreen.route) }
                         )
 
-//                        Special Educator
-                        AppRoute.SpecialEducatorRegistration2.route -> SpecialEducatorScreen2(
+                        // Special Educator
+                        AppRoute.SpecialEducatorRegistration.route -> SpecialEducatorRegistrationScreen(
                             viewModel = viewModel,
                             onNext = {
                                 context.startActivity(
@@ -220,6 +223,13 @@ class LoginNavigationScreen : ComponentActivity() {
                             },
                             viewModel = viewModel
                         )
+
+                        AppRoute.TeacherDashboard.route -> {
+                            context.startActivity(
+                                Intent(context, StudentDashboardActivity::class.java)
+                            )
+                            (context as? Activity)?.finish()
+                        }
                     }
                 }
             }

@@ -65,7 +65,9 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IS_COMING_FROM
 import com.pi.ProjectInclusion.constants.ConstantVariables.LOGIN_WITH_OTP
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
 import com.pi.ProjectInclusion.constants.ConstantVariables.SUCCESS
+import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_MOBILE_NO
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetUserTypeResponse
@@ -147,7 +149,7 @@ fun PasswordUI(
     isForgetPassword: () -> Unit,
     onNext: () -> Unit,    // OtpSendVerifyUI
 ) {
-    val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
+
     val loginResponse by viewModel.uiStateLoginResponse.collectAsStateWithLifecycle()
 
     val isInternetAvailable by remember { mutableStateOf(true) }
@@ -211,6 +213,15 @@ fun PasswordUI(
                 loginResponse.success != null -> {
                     loginWithPassword = false
                     if (loginResponse.success!!.status == true){
+                        // save token
+                        viewModel.savePrefData(TOKEN_PREF_KEY,
+                            loginResponse.success!!.response?.accessToken.toString()
+                        )
+                        // save UserName
+                        viewModel.savePrefData(USER_NAME,
+                            loginResponse.success!!.response?.user?.username.toString().trim()
+                        )
+                        encryptedUserName
                         context.toast(loginSuccess)
                         context.startActivity(
                             Intent(
@@ -236,6 +247,7 @@ fun PasswordUI(
             sendOtpViaCall = false
         }
     }
+
     // api for otp on Whatsapp
     if (sendOtpViaWhatsApp) {
     LaunchedEffect(Unit) {
@@ -245,6 +257,7 @@ fun PasswordUI(
     }
 
     // send otp response
+    val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
     LaunchedEffect(sendOtpState) {
         when {
             sendOtpState.isLoading -> {

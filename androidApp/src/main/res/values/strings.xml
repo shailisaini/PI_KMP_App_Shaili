@@ -5,6 +5,7 @@
     <string name="choose_hindi_english">Choose Language Hindi &amp; English</string>
     <string name="select_userType">Select an user type</string>
     <string name="text_enter_no">Please enter valid mobile number</string>
+    <string name="text_enter_udise">Please enter valid udise number</string>
     <string name="txt_enter_valid_mob_user">Please enter valid username or mobile number</string>
     <string name="text_mobile_no_user">Mobile Number/Username</string>
     <string name="text_continue">Continue</string>
@@ -391,7 +392,7 @@ and make a difference together!</string>
     <string name="txt_subcategory">Subcategory</string>
     <string name="txt_account_delete">Account Deletion</string>
     <string name="txt_delete">Delete</string>
-    <string name="txt_90_days_left">Days Left</string>
+    <string name="txt_90_days_left"> Days Left</string>
     <string name="txt_account_found">An Account Found</string>
     <string name="txt_logout_desc">Are you sure you want to logout?</string>
     <string name="txt_restore">Restore</string>
@@ -486,6 +487,25 @@ and make a difference together!</string>
     <string name="txt_re_screening_head">Re-screening Needed</string>
     <string name="txt_re_screening_btn">Start Re-screening</string>
     <string name="txt_re_screening_desc">The student has been promoted to higher grade level, so rescreening is required to ensure appropriate intervention.</string>
+    <string name="txt_enter_whatsApp">Enter your whatsApp number</string>
+    <string name="txt_enter_mail">Enter your email</string>
+    <string name="key_select_state">Select your state</string>
+    <string name="key_select_district">Select your district</string>
+    <string name="key_select_block">Select your block</string>
+    <string name="key_select_school">Select your school</string>
+    <string name="key_select_reason">Select your reason</string>
+    <string name="key_select_profession">Select your profession</string>
+    <string name="key_select_qualification">Select your qualification</string>
+    <string name="key_select_specialization">Select your specialization</string>
+    <string name="key_CRR_No">Enter your CRR No.</string>
+    <string name="txt_select_state">Please select a state</string>
+    <string name="txt_select_district">Please select a district</string>
+    <string name="txt_select_block">Please select a block</string>
+    <string name="txt_select_school">Please select a school</string>
+    <string name="key_search">Please enter search key</string>
+    <string name="key_phn_error">You are not registered with us \nplease Enter your 10 digit mobile number here.</string>
+    <string name="key_upcoming">Upcoming</string>
+    <string name="key_past">Past</string>
 
 
 </resources>

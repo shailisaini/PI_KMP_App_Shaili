@@ -65,4 +65,9 @@ data class ProfessionalProfileRequest(
     val district: Int? = null,
     val block: Int? = null,
     val school: Int? = null,
+    val reason: Int? = null,
+    val profession: Int? = null,
+    val qualification: Int? = null,
+    val specialization: Int? = null,
+    val crrNo: String? = null,
 )
