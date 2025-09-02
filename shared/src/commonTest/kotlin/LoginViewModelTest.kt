@@ -59,7 +59,9 @@ class LoginViewModelTest {
         fakeRepo.shouldSucceed = false
 
         viewModel.loginWithPasswordViewModel(LoginRequest("user", "wrongPass"))
+
         advanceUntilIdle() // wait for coroutines inside loginWithPasswordViewModel
+
         val state = viewModel.uiStateLoginResponse.value
         assertEquals("Invalid credentials", state.error.toString()) //  passes now
     }
