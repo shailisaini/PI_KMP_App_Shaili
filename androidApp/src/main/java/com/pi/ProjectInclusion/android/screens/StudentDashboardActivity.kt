@@ -36,13 +36,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.kmptemplate.logger.LoggerProvider
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.AnimatedRouteHost
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen1
+import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen2
+import com.pi.ProjectInclusion.android.screens.Profile.TrackRequestScreen
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentDetailsScreen
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentMoreDetailsScreen
 import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen2
@@ -50,29 +51,30 @@ import com.pi.ProjectInclusion.android.screens.Profile.TrackRequestScreen
 import com.pi.ProjectInclusion.android.screens.Profile.professionals.ProfessionalsEditProfile
 import com.pi.ProjectInclusion.android.screens.Profile.specialEdu.SpecialEducatorEditProfile
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.CertificateListActivity
+import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.ChangePasswordActivity
+import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.FaqActivity
+import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.ZoomMeetingActivity
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.DashboardScreen
+import com.pi.ProjectInclusion.android.screens.dashboardScreen.LMSCourseHomeScreen
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.ViewProfileScreen
 import com.pi.ProjectInclusion.android.screens.interventionScreens.InterventionAcceptLevelScreen
 import com.pi.ProjectInclusion.android.screens.interventionScreens.InterventionHomeScreen
 import com.pi.ProjectInclusion.android.screens.interventionScreens.InterventionStudentDetailsScreen
 import com.pi.ProjectInclusion.android.screens.interventionScreens.TeachingPlanScreen
 import com.pi.ProjectInclusion.android.screens.interventionScreens.UploadedDocumentsScreen
+import com.pi.ProjectInclusion.android.screens.login.EnterUserNameScreen
 import com.pi.ProjectInclusion.android.screens.menu.AppBar
 import com.pi.ProjectInclusion.android.screens.menu.BottomNavigationBar
 import com.pi.ProjectInclusion.android.screens.menu.DrawerBody
 import com.pi.ProjectInclusion.android.screens.menu.DrawerHeader
 import com.pi.ProjectInclusion.android.screens.menu.MenuItem
-import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningHomeScreen
-import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneReportScreen
-import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneScreen
-import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.ChangePasswordActivity
-import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.FaqActivity
-import com.pi.ProjectInclusion.android.screens.dashboardScreen.LMSCourseHomeScreen
-import com.pi.ProjectInclusion.android.screens.login.EnterUserNameScreen
 import com.pi.ProjectInclusion.android.screens.notification.NotificationScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.AdvanceScreeningScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ProfilerFormPageScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ReportAdvanceScreen
+import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningHomeScreen
+import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneReportScreen
+import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ViewScreeningProfileDetailsScreen
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
@@ -479,7 +481,9 @@ fun onMenuItemClick(
         }
 
         AppRoute.JoinMeetingScreen.route -> {
-            LoggerProvider.logger.d("Screen: JoinMeetingActivity()")
+            startActivity(
+                context, Intent(context, ZoomMeetingActivity::class.java), null
+            ).apply { (context as? Activity)?.finish() }
         }
 
         AppRoute.ChangePasswordScreen.route -> {
@@ -489,15 +493,15 @@ fun onMenuItemClick(
         }
 
         AppRoute.LanguageScreen.route -> {
-            LoggerProvider.logger.d("Screen: LanguageChangeActivity()")
+            logger.d("Screen: LanguageChangeActivity()")
         }
 
         AppRoute.ReferScreen.route -> {
-            LoggerProvider.logger.d("Screen: Refer dialog open screen")
+            logger.d("Screen: Refer dialog open screen")
         }
 
         AppRoute.ContactUsScreen.route -> {
-            LoggerProvider.logger.d("Screen: Contact us dialog screen")
+            logger.d("Screen: Contact us dialog screen")
         }
 
         AppRoute.FaqScreen.route -> {

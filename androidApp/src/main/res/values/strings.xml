@@ -502,6 +502,8 @@ and make a difference together!</string>
     <string name="txt_select_block">Please select a block</string>
     <string name="txt_select_school">Please select a school</string>
     <string name="key_search">Please enter search key</string>
+    <string name="key_upcoming">Upcoming</string>
+    <string name="key_past">Past</string>
 
 
 </resources>
