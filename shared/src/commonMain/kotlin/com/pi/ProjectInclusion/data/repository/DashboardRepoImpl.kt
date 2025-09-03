@@ -7,7 +7,9 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListR
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingTokenResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
 import com.pi.ProjectInclusion.data.remote.ApiService
 import com.pi.ProjectInclusion.domain.repository.DashboardRepository
 
@@ -55,5 +57,16 @@ class DashboardRepoImpl(private val apiService: ApiService) : DashboardRepositor
         strRefreshToken: String,
     ): TokenResponse {
         return apiService.getZoomMeetingsActualToken(strAuthKey, strGrantType, strRefreshToken)
+    }
+
+    override suspend fun getAllZoomMeetingsRepo(tokenKey: String): ZoomMeetingListResponse {
+        return apiService.getAllZoomMeetings(tokenKey)
+    }
+
+    override suspend fun getJoinZoomMeetingsRepo(
+        tokenKey: String,
+        meetingId: Long,
+    ): ZoomMeetingsJoinResponse {
+        return apiService.getJoinZoomMeetings(tokenKey, meetingId)
     }
 }
