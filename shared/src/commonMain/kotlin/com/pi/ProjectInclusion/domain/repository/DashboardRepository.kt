@@ -7,7 +7,9 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListR
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingTokenResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
 
 interface DashboardRepository {
 
@@ -38,4 +40,13 @@ interface DashboardRepository {
         strGrantType: String,
         strRefreshToken: String,
     ): TokenResponse
+
+    suspend fun getAllZoomMeetingsRepo(
+        tokenKey: String,
+    ): ZoomMeetingListResponse
+
+    suspend fun getJoinZoomMeetingsRepo(
+        tokenKey: String,
+        meetingId: Long,
+    ): ZoomMeetingsJoinResponse
 }

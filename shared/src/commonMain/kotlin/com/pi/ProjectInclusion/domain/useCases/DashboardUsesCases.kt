@@ -8,7 +8,9 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListR
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingTokenResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
 import com.pi.ProjectInclusion.domain.repository.DashboardRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -111,6 +113,35 @@ class DashboardUsesCases(private val repository: DashboardRepository) {
         } catch (e: Exception) {
             val errorMessage = e.message ?: unableToConnectServer
             logger.d("Exception in getZoomMeetingsActualTokenRepo() $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getAllZoomMeetingsRepo(
+        tokenKey: String,
+    ): Flow<Result<ZoomMeetingListResponse>> = flow {
+        try {
+            val response =
+                repository.getAllZoomMeetingsRepo(tokenKey)
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            logger.d("Exception in getAllZoomMeetingsRepo() $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getJoinZoomMeetingsRepo(
+        tokenKey: String,
+        meetingId: Long,
+    ): Flow<Result<ZoomMeetingsJoinResponse>> = flow {
+        try {
+            val response =
+                repository.getJoinZoomMeetingsRepo(tokenKey, meetingId)
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            logger.d("Exception in getJoinZoomMeetingsRepo() $errorMessage")
             emit(Result.failure(Exception(errorMessage)))
         }
     }.flowOn(Dispatchers.IO)
