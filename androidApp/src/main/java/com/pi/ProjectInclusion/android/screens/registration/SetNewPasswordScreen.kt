@@ -54,6 +54,7 @@ import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.SUCCESS
+import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import okhttp3.Route
@@ -103,9 +104,8 @@ fun SetNewPasswordScreen(
 
     val encryptedPassword = enterConfirmPasswordStr.value.encryptAES().toString().trim()
     val encryptedUserName = viewModel.userNameValue!!.encryptAES().toString().trim()
-    val encryptedMobile = enterConfirmPasswordStr.value.encryptAES().toString().trim()
-    val strToken: String =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjR5QW9PaGdVQnJyOUVkdXVvbHFvSVE9PSIsInN1YiI6IjEiLCJpYXQiOjE3NTU1OTYyNTIsImV4cCI6MTc1NTY4MjY1Mn0.xC1TkBEv391O5VJaM4MoOr-kRp6THY4Q8xcpAxN-DZ0"
+
+    var strToken = viewModel.getPrefData(TOKEN_PREF_KEY)
 
     LaunchedEffect(forgetPasswordState) {
         when {

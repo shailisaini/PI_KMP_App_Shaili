@@ -1,4 +1,4 @@
-package com.pi.ProjectInclusion.data.model.profileModel
+package com.pi.ProjectInclusion.data.model.profileModel.response
 
 
 val dummyTrackList = listOf(

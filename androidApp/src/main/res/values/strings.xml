@@ -514,6 +514,7 @@ and make a difference together!</string>
     <string name="key_Passed">Passed</string>
     <string name="key_Live">Live</string>
     <string name="key_Completed">Completed</string>
+    <string name="document_empty_error">Document should not be empty</string>
 
 
 </resources>

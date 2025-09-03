@@ -10,6 +10,8 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResp
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingTokenResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
+import com.pi.ProjectInclusion.data.model.profileModel.ProfileNameChangeRequest
+import com.pi.ProjectInclusion.data.model.profileModel.response.ChangeRequestResponse
 import com.pi.ProjectInclusion.data.remote.ApiService
 import com.pi.ProjectInclusion.domain.repository.DashboardRepository
 
@@ -20,6 +22,15 @@ class DashboardRepoImpl(private val apiService: ApiService) : DashboardRepositor
         strToken: String,
     ): CertificateListResponse {
         return apiService.getLMSUserCertificate(certificateRequest, strToken)
+    }
+
+    override suspend fun getChangeRequestRepo(
+        changeRequest: ProfileNameChangeRequest,
+        strToken: String,
+        profilePic: ByteArray?,
+        fileName: String?
+    ): ChangeRequestResponse {
+        return apiService.changeRequestApi(changeRequest, strToken,profilePic, fileName)
     }
 
     override suspend fun getAllCategoryRepo(): List<CategoryListResponse> {

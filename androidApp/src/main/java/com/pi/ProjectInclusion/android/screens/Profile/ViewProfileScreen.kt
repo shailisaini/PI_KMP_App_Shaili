@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.pi.ProjectInclusion.android.screens.dashboardScreen
 
 import android.annotation.SuppressLint
@@ -45,7 +43,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -91,7 +88,6 @@ import com.pi.ProjectInclusion.RedBgColor
 import com.pi.ProjectInclusion.RedText
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.AESEncryption.decrypt
-import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
 import com.pi.ProjectInclusion.android.common_UI.AccountDeleteDialog
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.CameraGalleryButtons
@@ -114,9 +110,12 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.LoginApiResponse
-import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
+import com.pi.ProjectInclusion.data.model.profileModel.ProfileNameChangeRequest
+import com.pi.ProjectInclusion.data.model.profileModel.response.ViewProfileResponse
 import com.pi.ProjectInclusion.data.remote.ApiService.Companion.PROFILE_BASE_URL
+import com.pi.ProjectInclusion.ui.viewModel.DashboardViewModel
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
+import org.koin.androidx.compose.koinViewModel
 import kotlin.Unit
 
 @Composable
@@ -136,7 +135,6 @@ fun ViewProfileScreen(
         onDismiss = { isDialogVisible = false },
         message = "Loading your data..."
     )
-    var showDialog by remember { mutableStateOf(false) }
     var languageId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
 
     var encryptedUserName = viewModel.getPrefData(USER_NAME)
@@ -218,19 +216,18 @@ fun ProfileViewUI(
 
     val decryptUserName = decrypt(profileData.response?.username.toString().trim())
     val scrollState = rememberScrollState()
-    val textNameEg = stringResource(R.string.txt_eg_first_name)
     var showSheetMenu by remember { mutableStateOf(false) }
     var isChangeRequestBottomSheet by remember { mutableStateOf(false) }
     var userTypeId = viewModel?.getPrefData(USER_TYPE_ID)
 
     if (showSheetMenu) {
-        ProfileBottomSheetMenu(onBackLogin = onBackLogin) {
+        ProfileBottomSheetMenu(viewModel= viewModel, onBackLogin = onBackLogin) {
             showSheetMenu = false
         }
     }
 
     if (isChangeRequestBottomSheet) {
-        ChangeRequestSheet(onTrackRequest = onTrackRequest) {
+        ChangeRequestSheet(viewModel = viewModel,onTrackRequest = onTrackRequest) {
             isChangeRequestBottomSheet = false
         }
     }
@@ -645,10 +642,10 @@ fun ProfileUI() {
 //    ProfileViewUI(context, onNext, onBack, onBackLogin, onTrackRequest, profileData)
 }
 
-@Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileBottomSheetMenu(
+    viewModel: LoginViewModel?,
     onBackLogin: () -> Unit ={},
     onDismiss: () -> Unit = {},
 ) {
@@ -781,10 +778,10 @@ fun ProfileBottomSheetMenu(
     }
 }
 
-@Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChangeRequestSheet(
+    viewModel: LoginViewModel?,
     onTrackRequest: () -> Unit = {},
     onDismiss: () -> Unit = {}
 ) {
@@ -795,7 +792,8 @@ fun ChangeRequestSheet(
     var uploadShowDialog by remember { mutableStateOf(false) }
     if (uploadShowDialog) {
         if (isSelectedSchool) {
-            UploadIdDialog(stringResource(R.string.txt_upload_clear_id_school),onTrackRequest =onTrackRequest) {
+            UploadIdDialog(
+                stringResource(R.string.txt_upload_clear_id_school),onTrackRequest =onTrackRequest) {
                 uploadShowDialog = false
             }
         } else {
@@ -922,10 +920,21 @@ fun ChangeRequestSheet(
 }
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
-@Preview
 @Composable
-fun UploadIdDialog(subText: String = "",onTrackRequest: () -> Unit={}, onDismiss: () -> Unit = {}) {
+fun UploadIdDialog(
+    subText: String = "", onTrackRequest: () -> Unit={}, onDismiss: () -> Unit = {}) {
     val context = LocalContext.current
+    val dashboardViewModel: DashboardViewModel = koinViewModel()
+    val requestChangeState by dashboardViewModel.getChangeRequestResponse.collectAsStateWithLifecycle()
+
+    var isDialogVisible by remember { mutableStateOf(false) }
+    var emptyDoc = stringResource(R.string.document_empty_error)
+    var docError by remember { mutableStateOf(emptyDoc) }
+    CustomDialog(
+        isVisible = isDialogVisible,
+        onDismiss = { isDialogVisible = false },
+        message = "Loading your data..."
+    )
 
     var isSubmitted by remember { mutableStateOf(false) }
     if (isSubmitted) {
@@ -935,6 +944,31 @@ fun UploadIdDialog(subText: String = "",onTrackRequest: () -> Unit={}, onDismiss
             onTrackRequest = onTrackRequest,
         ) {
             isSubmitted = false
+        }
+    }
+
+
+    LaunchedEffect(requestChangeState) {
+        when {
+            requestChangeState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            requestChangeState.error.isNotEmpty() -> {
+                logger.d("requestChangeState: ${requestChangeState.success}")
+                isDialogVisible = false
+            }
+
+            requestChangeState.success != null -> {
+                logger.d("requestChangeState: ${requestChangeState.success}")
+                if (requestChangeState.success!!.status == true){
+                    context.toast(requestChangeState.success!!.response.toString())
+                }
+                else{
+                    context.toast(requestChangeState.success!!.message.toString())
+                }
+                isDialogVisible = false
+            }
         }
     }
 
@@ -1124,7 +1158,15 @@ fun UploadIdDialog(subText: String = "",onTrackRequest: () -> Unit={}, onDismiss
                         Button(
                             onClick = {
                                 if (selectedUri.value != null) {
+                                    isDialogVisible = true
                                     isSubmitted = true
+                                    dashboardViewModel.getProfileChangeRequest(
+                                        ProfileNameChangeRequest("","",""),
+                                        ""
+                                    )
+                                }
+                                else{
+                                    context.toast(docError)
                                 }
                             },
                             modifier = Modifier
@@ -1176,7 +1218,6 @@ fun Modifier.drawDashedBorder(
         )
 
         val corner = cornerRadius.toPx()
-        val rect = Rect(0f, 0f, size.width, size.height)
 
         drawRoundRect(
             color = color,

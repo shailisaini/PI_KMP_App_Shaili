@@ -22,7 +22,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.Specializ
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ValidateUserResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.VerifyOtpResponse
-import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
+import com.pi.ProjectInclusion.data.model.profileModel.response.ViewProfileResponse
 import com.pi.ProjectInclusion.domain.repository.AuthenticationRepository
 
 class FakeAuthenticationRepository : AuthenticationRepository {

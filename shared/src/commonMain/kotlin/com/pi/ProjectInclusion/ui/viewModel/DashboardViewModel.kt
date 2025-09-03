@@ -12,6 +12,8 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResp
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingTokenResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
+import com.pi.ProjectInclusion.data.model.profileModel.ProfileNameChangeRequest
+import com.pi.ProjectInclusion.data.model.profileModel.response.ChangeRequestResponse
 import com.pi.ProjectInclusion.database.LocalDataSource
 import com.pi.ProjectInclusion.domain.ConnectivityObserver
 import com.pi.ProjectInclusion.domain.useCases.DashboardUsesCases
@@ -72,6 +74,9 @@ class DashboardViewModel(
     private val getMeetingJoin = MutableStateFlow(UiState<ZoomMeetingsJoinResponse>())
     val getMeetingJoinResponse: StateFlow<UiState<ZoomMeetingsJoinResponse>> =
         getMeetingJoin
+
+    private val getChangeRequest = MutableStateFlow(UiState<ChangeRequestResponse>())
+    val getChangeRequestResponse: StateFlow<UiState<ChangeRequestResponse>> = getChangeRequest
 
     fun isNetworkAvailable(): Boolean {
         return connectivityObserver.getCurrentStatus() == ConnectivityObserver.Status.Available
@@ -218,6 +223,26 @@ class DashboardViewModel(
                     }
                 })
             }
+    }
+
+    fun getProfileChangeRequest(
+        requestChange: ProfileNameChangeRequest,
+        strToken: String,
+    ) = viewModelScope.launch {
+        getChangeRequest.update { UiState(isLoading = true) }
+        getUsesCases.getChangeRequestCases(requestChange, strToken).catch { exception ->
+            getChangeRequest.update {
+                UiState(error = exception.message ?: somethingWentWrong)
+            }
+        }.collect { result ->
+            result.fold(onSuccess = { data ->
+                getChangeRequest.update { UiState(success = data) }
+            }, onFailure = { exception ->
+                getChangeRequest.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            })
+        }
     }
 
     fun getAllZoomMeetings(

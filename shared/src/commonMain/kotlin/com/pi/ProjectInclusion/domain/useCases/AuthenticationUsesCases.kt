@@ -17,9 +17,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginReque
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ProfessionListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.QualificationListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ReasonListResponse
@@ -27,8 +25,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByU
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SpecializationListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
-import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
+import com.pi.ProjectInclusion.data.model.profileModel.response.ViewProfileResponse
 import com.pi.ProjectInclusion.domain.repository.AuthenticationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO

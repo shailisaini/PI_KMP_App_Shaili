@@ -64,7 +64,7 @@ import com.pi.ProjectInclusion.android.common_UI.ThemeSwitch
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
-import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
+import com.pi.ProjectInclusion.data.model.profileModel.response.ViewProfileResponse
 
 @Composable
 fun DrawerHeader(

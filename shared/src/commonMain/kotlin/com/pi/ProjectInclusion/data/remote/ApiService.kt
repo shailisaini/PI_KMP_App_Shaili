@@ -34,10 +34,11 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResp
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingTokenResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
-import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
+import com.pi.ProjectInclusion.data.model.profileModel.ProfileNameChangeRequest
+import com.pi.ProjectInclusion.data.model.profileModel.response.ChangeRequestResponse
+import com.pi.ProjectInclusion.data.model.profileModel.response.ViewProfileResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
@@ -58,10 +59,10 @@ class ApiService(private val client: HttpClient) {
 
     companion object {
 
-//        const val STUDENT_BASE_URL = "https://staging-pi-api.projectinclusion.in/api/v2"   // staging base
-        const val STUDENT_BASE_URL = "http://192.168.0.116:3500/api/v2"                // local base
-//        const val PROFILE_BASE_URL = "https://staging-pi-api.projectinclusion.in/uploads/profile/"   // staging profile
-        const val PROFILE_BASE_URL = "http://192.168.0.116:3500/uploads/profile/"                  // local profile
+        const val STUDENT_BASE_URL = "https://staging-pi-api.projectinclusion.in/api/v2"   // staging base
+//        const val STUDENT_BASE_URL = "http://192.168.0.116:3500/api/v2"                // local base
+        const val PROFILE_BASE_URL = "https://staging-pi-api.projectinclusion.in/uploads/profile/"   // staging profile
+//        const val PROFILE_BASE_URL = "http://192.168.0.116:3500/uploads/profile/"                  // local profile
         const val CERTIFICATE_BASE_URL = "https://lmsapi.projectinclusion.in/api"
         const val BASIC_LIVE_BASE_URL = "https://api-pi.projectinclusion.in"
         const val SCHOOL_LIVE_BASE_URL = "https://api-school.projectinclusion.in"
@@ -72,6 +73,7 @@ class ApiService(private val client: HttpClient) {
         const val ZOOM_BASE_URL = "https://api.zoom.us"
 
         const val appendUser = "users"
+        const val appendGrievance = "grievance"
         const val appendCertificate = "Certificate"
         const val appendLive = "api"
         const val appendReason = "reason"
@@ -521,4 +523,45 @@ class ApiService(private val client: HttpClient) {
             )
         }
     }.body<ZoomMeetingsJoinResponse>()
+
+    suspend fun changeRequestApi(
+        firstStepProfileRequest: ProfileNameChangeRequest,
+        strToken: String,
+        profilePic: ByteArray? = null,
+        fileName: String? = null,
+    ): ChangeRequestResponse = client.patch {
+
+        url {
+            takeFrom(STUDENT_BASE_URL)
+            appendPathSegments(appendGrievance, "name-change-request")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+            append(HttpHeaders.Authorization, strToken)
+        }
+        contentType(ContentType.Application.Json)
+        setBody(
+            MultiPartFormDataContent(
+                formData {
+                    append("requestTypeId", firstStepProfileRequest.requestTypeId.toString())
+                    append("appVersion", firstStepProfileRequest.appVersion.toString())
+                    append("description", firstStepProfileRequest.description.toString())
+
+                    profilePic?.let { bytes ->
+                        append(
+                            key = "filepath", //params Name
+                            value = bytes, headers = Headers.build {
+                                append(
+                                    HttpHeaders.ContentType, ContentType.Image.PNG.toString()
+                                )
+                                append(
+                                    HttpHeaders.ContentDisposition,
+                                    "form-data; name=\"profilepic\"; filename=\"${fileName ?: "profile.jpg"}\""
+                                )
+                            })
+                    }
+                })
+        )
+    }.body<ChangeRequestResponse>()
+
 }

@@ -42,15 +42,12 @@ import androidx.compose.ui.unit.sp
 import com.example.kmptemplate.logger.LoggerProvider
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.Dark_01
-import com.pi.ProjectInclusion.LightYellow02
-import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.CustomDialog
-import com.pi.ProjectInclusion.data.model.profileModel.TrackListModel
-import com.pi.ProjectInclusion.data.model.profileModel.dummyTrackList
+import com.pi.ProjectInclusion.data.model.profileModel.response.dummyTrackList
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
