@@ -17,6 +17,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithO
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForceUpdateResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ProfessionListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.QualificationListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ReasonListResponse
@@ -78,4 +79,8 @@ interface AuthenticationRepository {
     ): List<SpecializationListResponse>
 
     suspend fun getAllReasonRepo(): ReasonListResponse
+
+    suspend fun getForceUpdateAppRepo(
+        deviceOsVersion: Double, latestAppVersion: Double,
+    ): ForceUpdateResponse
 }
