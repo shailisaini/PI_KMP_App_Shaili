@@ -85,6 +85,7 @@ import com.pi.ProjectInclusion.android.screens.Profile.TrackRequestScreen
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentDetailsScreen
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentMoreDetailsScreen
 import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen2
+import com.pi.ProjectInclusion.android.screens.Profile.PrivacyPolicy
 import com.pi.ProjectInclusion.android.screens.Profile.TrackRequestScreen
 import com.pi.ProjectInclusion.android.screens.Profile.professionals.ProfessionalsEditProfile
 import com.pi.ProjectInclusion.android.screens.Profile.specialEdu.SpecialEducatorEditProfile
@@ -341,6 +342,7 @@ class StudentDashboardActivity : ComponentActivity() {
                                     AppRoute.DashboardScreen.route -> DashboardScreen()
 
                                     AppRoute.CourseScreen.route -> LMSCourseHomeScreen()
+//                                    AppRoute.CourseScreen.route -> PrivacyPolicy()
 
                                     AppRoute.ProfileScreen.route -> ViewProfileScreen(
                                         viewModel = viewModel,
