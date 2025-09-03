@@ -264,6 +264,7 @@ and make a difference together!</string>
     <string name="txt_upload_id">Upload Id Card</string>
     <string name="txt_cancel">Cancel</string>
     <string name="txt_submit">Submit</string>
+    <string name="txt_submit_and_conti">Save and Continue</string>
     <string name="txt_remove">Remove</string>
     <string name="txt_leave">Leave</string>
     <string name="txt_request_submitted">Request submitted</string>
