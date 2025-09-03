@@ -692,25 +692,18 @@ fun BottomSheetContactUsScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             IconButton(onClick = {
-                                val strCode: String = ""
-                                val appPackageName = context.packageName
-                                val appLink =
-                                    "https://play.google.com/store/apps/details?id=$appPackageName"
-
-                                val intent = Intent(Intent.ACTION_SEND).apply {
-                                    type = "text/plain"
-                                    putExtra(
-                                        Intent.EXTRA_TEXT,
-                                        "Hey, check out this awesome app:- $appLink \n\n" + "Your referal code:- $strCode"
-                                    )
-                                    setPackage("com.whatsapp") // Ensures it opens in WhatsApp
-                                }
+//                                val phoneNumber = stringResource(R.string.whatsapp_number)
+                                val phoneNumber = "+919355902926"
+                                val url = "https://wa.me/${phoneNumber.replace("+", "")}"
 
                                 try {
+                                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                                        data = Uri.parse(url)
+                                        setPackage("com.whatsapp")
+                                    }
                                     context.startActivity(intent)
                                 } catch (e: Exception) {
-                                    val fallbackIntent =
-                                        Intent(Intent.ACTION_VIEW, Uri.parse(appLink))
+                                    val fallbackIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                                     context.startActivity(fallbackIntent)
                                 }
                             }) {
@@ -745,25 +738,20 @@ fun BottomSheetContactUsScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             IconButton(onClick = {
-                                val strCode: String = ""
-                                val appPackageName = context.packageName
-                                val appLink =
-                                    "https://play.google.com/store/apps/details?id=$appPackageName"
-                                val intent = Intent(Intent.ACTION_SEND).apply {
-                                    type = "text/plain"
-                                    putExtra(
-                                        Intent.EXTRA_TEXT,
-                                        "Hey, check out this awesome app:- $appLink \n\n" + "Your referal code:- $strCode"
-                                    )
-                                    `package` = "com.instagram.android"
+//                                val emailid = stringResource(R.string.email_id)
+                                val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                                    data = Uri.parse("mailto:support.pi@aurosociety.org")
+                                    putExtra(Intent.EXTRA_SUBJECT, "Support Request")
+                                    putExtra(Intent.EXTRA_TEXT, "Hi Team,\n\n")
                                 }
-                                val resolveInfo = context.packageManager.resolveActivity(intent, 0)
-                                if (resolveInfo != null) {
-                                    startActivity(context, intent, null)
-                                } else {
+
+                                try {
+                                    context.startActivity(emailIntent)
+                                } catch (e: Exception) {
+                                    // fallback if no email app
                                     val browserIntent =
-                                        Intent(Intent.ACTION_VIEW, Uri.parse(appLink))
-                                    startActivity(context, browserIntent, null)
+                                        Intent(Intent.ACTION_VIEW, Uri.parse("mailto:support.pi@aurosociety.org"))
+                                    context.startActivity(browserIntent)
                                 }
                             }) {
                                 Image(

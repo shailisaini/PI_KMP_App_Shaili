@@ -105,6 +105,8 @@ and make a difference together!</string>
     <string name="txt_Must_include_one_special_characters">Must include one special characters</string>
     <string name="txt_Please_enter_valid_password_">Please enter valid password.</string>
     <string name="txt_Contact_us">Contact us</string>
+    <string name="whatsapp_number">+919355902926</string>
+    <string name="email_id">support.pi@aurosociety.org</string>
     <string name="txt_Password_updated_successfully">Your password has been updated successfully.</string>
     <string name="txt_Ok_Got_it">Ok! Got it.</string>
     <string name="txt_Pending_1">Pending (01)</string>
