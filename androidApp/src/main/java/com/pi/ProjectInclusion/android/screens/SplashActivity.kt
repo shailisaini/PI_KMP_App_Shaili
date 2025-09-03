@@ -145,7 +145,7 @@ class SplashActivity : ComponentActivity() {
                             forceUpdateData = forceUpdateState.success!!.response
                             logger.d("Force update data details : $forceUpdateData")
                             if (forceUpdateState.success?.response?.isForceUpdate == 1) {
-                                /*try {
+                                try {
                                     startActivity(
                                         Intent(
                                             Intent.ACTION_VIEW,
@@ -161,8 +161,7 @@ class SplashActivity : ComponentActivity() {
                                         )
                                     )
                                 }
-                                context.toast(appMsg)*/
-                                isForceUpdate = true
+                                context.toast(appMsg)
                             } else {
                                 isForceUpdate = true
                             }
