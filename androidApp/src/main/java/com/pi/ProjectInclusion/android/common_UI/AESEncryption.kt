@@ -1,9 +1,7 @@
 package com.pi.ProjectInclusion.android.common_UI
 
-import android.R
 import javax.crypto.Cipher
 import android.util.Base64
-import androidx.compose.ui.res.stringResource
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
@@ -15,8 +13,6 @@ object AESEncryption {
     const val INITVECTOR = "0000000000000000" // Use the same IV on both ends
 
     fun String.encryptAES(
-        key: String = KEY,
-        initVector: String = INITVECTOR,
     ): String? {
         var encryptedKey = ""
         if (this.isBlank()) {
@@ -28,8 +24,8 @@ object AESEncryption {
         }
 
         return try {
-            val iv = IvParameterSpec(initVector.toByteArray(charset("UTF-8")))
-            val skeySpec = SecretKeySpec(key.toByteArray(charset("UTF-8")), ALGORITHM)
+            val iv = IvParameterSpec(INITVECTOR.toByteArray(charset("UTF-8")))
+            val skeySpec = SecretKeySpec(KEY.toByteArray(charset("UTF-8")), ALGORITHM)
             val cipher = Cipher.getInstance(TRANSFORMATION)
             cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv)
             val encrypted = cipher.doFinal(this.toByteArray())
@@ -47,12 +43,10 @@ object AESEncryption {
     // Decrypt the provided encrypted text
     fun decrypt(
         encryptedText: String? = "",
-        key: String = KEY,
-        initVector: String = INITVECTOR,
     ): String {
         try {
-            val iv = IvParameterSpec(initVector.toByteArray(charset("UTF-8")))
-            val skeySpec = SecretKeySpec(key.toByteArray(charset("UTF-8")), ALGORITHM)
+            val iv = IvParameterSpec(INITVECTOR.toByteArray(charset("UTF-8")))
+            val skeySpec = SecretKeySpec(KEY.toByteArray(charset("UTF-8")), ALGORITHM)
 
             val cipher = Cipher.getInstance(TRANSFORMATION)
             cipher.init(Cipher.DECRYPT_MODE, skeySpec, iv)

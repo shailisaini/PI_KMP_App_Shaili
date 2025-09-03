@@ -17,6 +17,7 @@ import androidx.compose.animation.with
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -52,12 +53,10 @@ class LoginNavigationScreen : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val context = LocalContext.current
-            val navController = rememberNavController()
             val viewModel: LoginViewModel = koinViewModel()
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentDestination = navBackStackEntry?.destination?.route
 
             var startDestination = AppRoute.LanguageSelect.route
+            val backStack = remember { mutableStateListOf(startDestination) }
 
             var encryptedUserName = viewModel.getPrefData(USER_NAME)
             var userToken = viewModel.getPrefData(TOKEN_PREF_KEY)
@@ -73,12 +72,22 @@ class LoginNavigationScreen : ComponentActivity() {
 
             fun navigateTo(route: String) {
                 isForward = true
+                if (backStack.last() != route) {
+                    backStack.add(route)
+                }
                 currentRoute = route
             }
 
             fun navigateBack(toRoute: String? = null) {
                 isForward = false
-                currentRoute = toRoute ?: AppRoute.LanguageSelect.route
+                if (toRoute != null) {
+                    while (backStack.isNotEmpty() && backStack.last() != toRoute) {
+                        backStack.removeAt(backStack.lastIndex)
+                    }
+                } else if (backStack.size > 1) {
+                    backStack.removeAt(backStack.lastIndex)
+                }
+                currentRoute = backStack.last()
             }
 
             MyApplicationTheme {
@@ -139,7 +148,9 @@ class LoginNavigationScreen : ComponentActivity() {
 
                         AppRoute.OtpSendVerifyUI.route -> OtpSendVerifyScreen(
                             onNext = { navigateTo(AppRoute.SetNewPasswordUI.route) },
-                            onBackUserName = {navigateTo(AppRoute.UserNameScreen.route)},
+                            onBackUserName = {
+                                navigateBack()
+                            },
                             onBack = {
                                 navigateBack(AppRoute.ForgetPasswordUI.route)
                             },

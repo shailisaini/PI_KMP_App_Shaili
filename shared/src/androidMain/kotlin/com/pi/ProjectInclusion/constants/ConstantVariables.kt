@@ -51,4 +51,5 @@ object ConstantVariables {
     var NEW_USER: String = "New User"
     var USER_EXIST: String = "User Already Exists"
     var DEACTIVATE: String = "Deactivate"
+    var UnableToSendMsg: String = "Unable to send Otp"
 }

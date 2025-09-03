@@ -57,10 +57,11 @@ import io.ktor.http.takeFrom
 class ApiService(private val client: HttpClient) {
 
     companion object {
-        //        private val STUDENT_BASE_URL = "https://staging-api-pi.projectinclusion.in/api/"   // Production BASE URL
-//        const val STUDENT_BASE_URL = "https://student-api.auroscholar.org/api/"                         // Production
-        const val STUDENT_BASE_URL = "https://staging-pi-api.projectinclusion.in/api/v2"
-        const val PROFILE_BASE_URL = "https://staging-pi-api.projectinclusion.in/uploads/profile/"
+
+//        const val STUDENT_BASE_URL = "https://staging-pi-api.projectinclusion.in/api/v2"   // staging base
+        const val STUDENT_BASE_URL = "http://192.168.0.116:3500/api/v2"                // local base
+//        const val PROFILE_BASE_URL = "https://staging-pi-api.projectinclusion.in/uploads/profile/"   // staging profile
+        const val PROFILE_BASE_URL = "http://192.168.0.116:3500/uploads/profile/"                  // local profile
         const val CERTIFICATE_BASE_URL = "https://lmsapi.projectinclusion.in/api"
         const val BASIC_LIVE_BASE_URL = "https://api-pi.projectinclusion.in"
         const val SCHOOL_LIVE_BASE_URL = "https://api-school.projectinclusion.in"

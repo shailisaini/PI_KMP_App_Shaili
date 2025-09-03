@@ -55,12 +55,12 @@ import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_EXIST
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.IS_COMING_FROM
-import com.pi.ProjectInclusion.constants.ConstantVariables.LOGIN_WITH_OTP
 import com.pi.ProjectInclusion.constants.ConstantVariables.NEW_USER
+import com.pi.ProjectInclusion.constants.ConstantVariables.REGISTER_NEW
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
-import com.pi.ProjectInclusion.constants.ConstantVariables.SUCCESS
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_MOBILE_NO
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
+import com.pi.ProjectInclusion.constants.ConstantVariables.UnableToSendMsg
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 
@@ -107,8 +107,10 @@ fun LoginUI(
 ) {
     val colors = MaterialTheme.colorScheme
     var isDialogVisible by remember { mutableStateOf(false) }
+    var noData  = stringResource(R.string.txt_oops_no_data_found)
     var isInternetAvailable by remember { mutableStateOf(true) }
     val internetMessage = stringResource(R.string.txt_oops_no_internet)
+    var noDataMessage by remember { mutableStateOf(noData) }
     val invalidMobNo = stringResource(id = R.string.txt_enter_valid_mob_user)
 
     val txtContinue = stringResource(id = R.string.text_continue)
@@ -141,7 +143,6 @@ fun LoginUI(
         // saving userName & mobile no as a local variable in view Model
         viewModel.saveUserName(userName.value)
 
-        // commenting this as API is not provided. need it later
         LoggerProvider.logger.d("ValidateUserParams: ${userName.value} .. $userTypeId")
         LaunchedEffect(Unit) {
             viewModel.getValidateUser(encryptedPhoneNo, userTypeId)
@@ -193,7 +194,6 @@ fun LoginUI(
                 }
             }
         }
-
     }
 
     // api for otp on call
@@ -249,24 +249,34 @@ fun LoginUI(
     }
 
     // Response for sent OTP on mobile
-    val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
-    LaunchedEffect(sendOtpState) {
+    if (sendOtpViaWhatsApp || sendOtpViaCall) {
+        val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
+        LaunchedEffect(sendOtpState) {
 
-        when {
-            sendOtpState.isLoading -> {
-                isDialogVisible = true
-            }
+            when {
+                sendOtpState.isLoading -> {
+                    isDialogVisible = true
+                }
+                sendOtpState.error.isNotEmpty() -> {
+                    LoggerProvider.logger.d("Error: ${sendOtpState.error}")
+                    isDialogVisible = false
+                    sendOtpViaWhatsApp = false
+                    sendOtpViaCall = false
+                }
 
-            sendOtpState.error.isNotEmpty() -> {
-                LoggerProvider.logger.d("Error: ${sendOtpState.error}")
-                isDialogVisible = false
+                sendOtpState.success != null -> {
+                    isDialogVisible = false
+                    viewModel.savePrefData(USER_MOBILE_NO, encryptedPhoneNo)
+                    viewModel.savePrefData(IS_COMING_FROM, REGISTER_NEW)
+                    if (sendOtpState.success!!.response?.message == UnableToSendMsg){
+                        context.toast(sendOtpState.success!!.response?.message.toString())
+                    }
+                    else {
+                        onRegister() // Go to OTP Verify screen
+                    }
+                }
             }
-
-            sendOtpState.success != null -> {
-                isDialogVisible = false
-                viewModel.savePrefData(IS_COMING_FROM, LOGIN_WITH_OTP)
-                onRegister() // Go to OTP Verify screen
-            }
+            sendOtpViaCall = false
         }
     }
 

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -27,11 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
@@ -43,7 +40,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.kmptemplate.logger.LoggerProvider
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
@@ -54,17 +50,15 @@ import com.pi.ProjectInclusion.INVITE_LIGHT_01
 import com.pi.ProjectInclusion.LightRed01
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.AESEncryption.decrypt
 import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.ChooseOneBottomSheet
 import com.pi.ProjectInclusion.android.common_UI.CustomProgressBar
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
-import com.pi.ProjectInclusion.android.common_UI.EncryptedCommonFunction.isEncryptedPhone
 import com.pi.ProjectInclusion.android.common_UI.OtpInputField
-import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
 import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.fontBold
-import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
@@ -72,7 +66,6 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IS_COMING_FROM
 import com.pi.ProjectInclusion.constants.ConstantVariables.LOGIN_WITH_OTP
 import com.pi.ProjectInclusion.constants.ConstantVariables.REGISTER_NEW
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
-import com.pi.ProjectInclusion.constants.ConstantVariables.SUCCESS
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_MOBILE_NO
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
@@ -88,8 +81,7 @@ fun OtpSendVerifyScreen(
     viewModel: LoginViewModel,
 ) {
     val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
-    val verifyOtpState by viewModel.verifyLoginResponse.collectAsStateWithLifecycle()
-    val loginWithOtp by viewModel.uiStateLoginResponse.collectAsStateWithLifecycle()
+
     logger.d("Screen: " + "OtpSendVerifyScreen()")
 
     var otpValue by remember { mutableStateOf("") }
@@ -107,11 +99,12 @@ fun OtpSendVerifyScreen(
     val loginSuccess = stringResource(id = R.string.txt_login_success)
 
     var isInternetAvailable by remember { mutableStateOf(true) }
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
 
     val context = LocalContext.current
-    isInternetAvailable = isNetworkAvailable(context)
 
     var encryptedPhoneNo = viewModel.getPrefData(USER_MOBILE_NO)  // encrypted from shared Pref
+    var decryptedPhoneNo = decrypt(encryptedPhoneNo)  // decrypted no
 
     val encryptedOtp = otpValue.encryptAES().toString().trim()
 
@@ -120,21 +113,18 @@ fun OtpSendVerifyScreen(
         ChooseOneBottomSheet(onCallClick = {
             isDialogVisible = true
             sendOtpViaCall = true
+            isFinished = false
         }, onWhatsappClick = {
             isDialogVisible = true
             sendOtpViaWhatsApp = true
+            isFinished = false
         }, onDismiss = {
             showBottomSheet = false
         })
     }
 
     BackHandler {
-        if (viewModel.getPrefData(IS_COMING_FROM) == REGISTER_NEW) {
-            onBackUserName
-        }
-        else{
-            onBack()
-        }
+        handleBack(viewModel, onBack, onBackUserName)
     }
 
     CustomDialog(
@@ -147,15 +137,29 @@ fun OtpSendVerifyScreen(
     // api for otp on call
     if (sendOtpViaCall) {
         LaunchedEffect(Unit) {
-            viewModel.getOTPViewModel(encryptedPhoneNo)
-            sendOtpViaCall = false
+            isInternetAvailable = isNetworkAvailable(context)
+            // if first digit of mobile is less than 6 then error will show
+
+            if (!isInternetAvailable) {
+                context.toast(internetMessage)
+            } else {
+                viewModel.getOTPViewModel(encryptedPhoneNo)
+                sendOtpViaCall = false
+            }
         }
     }
     // api for otp on Whatsapp
     if (sendOtpViaWhatsApp) {
         LaunchedEffect(Unit) {
-            viewModel.getOTPWhatsappViewModel(encryptedPhoneNo)
-            sendOtpViaWhatsApp = false
+            isInternetAvailable = isNetworkAvailable(context)
+            // if first digit of mobile is less than 6 then error will show
+
+            if (!isInternetAvailable) {
+                context.toast(internetMessage)
+            } else {
+                viewModel.getOTPWhatsappViewModel(encryptedPhoneNo)
+                sendOtpViaWhatsApp = false
+            }
         }
     }
 
@@ -192,62 +196,64 @@ fun OtpSendVerifyScreen(
                     userTypeId.toInt()
                 )
             )
-        } else {
-            viewModel.getVerifyOtpViewModel(encryptedPhoneNo, encryptedOtp)
-        }
 
-        // verify otp response
-        LaunchedEffect(verifyOtpState) {
-            when {
-                verifyOtpState.isLoading -> {
-                    isDialogVisible = true
-                }
-
-                verifyOtpState.error.isNotEmpty() -> {
-                    logger.d("VerifyOtp Error: ${verifyOtpState.error}")
-                    isDialogVisible = false
-                }
-
-                verifyOtpState.success != null -> {
-                    logger.d("VerifyOtp: ${verifyOtpState.success!!.response!!.message}")
-                    if (verifyOtpState.success!!.status == true) {
-                        onNext()
-                    } else {
-                        invalidText = R.string.txt_Enter_valid_OTP
-                        inValidOTP = true
+            // Handle login with otp response state
+            val loginWithOtp by viewModel.uiStateLoginResponse.collectAsStateWithLifecycle()
+            LaunchedEffect(loginWithOtp) {
+                when {
+                    loginWithOtp.isLoading -> {
+                        isDialogVisible = true
                     }
 
-                    isDialogVisible = false
+                    loginWithOtp.error.isNotEmpty() -> {
+                        logger.d("Error: ${loginWithOtp.error}")
+                        isDialogVisible = false
+                    }
+
+                    loginWithOtp.success != null -> {
+                        if (loginWithOtp.success!!.status == true) {
+                            context.toast(loginSuccess)
+                            context.startActivity(
+                                Intent(
+                                    context,
+                                    StudentDashboardActivity::class.java
+                                )
+                            )
+                        } else {
+//                        invalidText = loginWithOtp.success!!.message.toString()
+                            inValidOTP = true
+                        }
+                        isDialogVisible = false
+                    }
                 }
             }
-        }
 
-        // Handle login with otp response state
-        LaunchedEffect(loginWithOtp) {
-            when {
-                loginWithOtp.isLoading -> {
-                    isDialogVisible = true
-                }
-
-                loginWithOtp.error.isNotEmpty() -> {
-                    logger.d("Error: ${loginWithOtp.error}")
-                    isDialogVisible = false
-                }
-
-                loginWithOtp.success != null -> {
-                    if (loginWithOtp.success!!.status == true) {
-                        context.toast(loginSuccess)
-                        context.startActivity(
-                            Intent(
-                                context,
-                                StudentDashboardActivity::class.java
-                            )
-                        )
-                    } else {
-//                        invalidText = loginWithOtp.success!!.message.toString()
-                        inValidOTP = true
+        } else {
+            viewModel.getVerifyOtpViewModel(encryptedPhoneNo, encryptedOtp)
+            // verify otp response
+            val verifyOtpState by viewModel.verifyLoginResponse.collectAsStateWithLifecycle()
+            LaunchedEffect(verifyOtpState) {
+                when {
+                    verifyOtpState.isLoading -> {
+                        isDialogVisible = true
                     }
-                    isDialogVisible = false
+
+                    verifyOtpState.error.isNotEmpty() -> {
+                        logger.d("VerifyOtp Error: ${verifyOtpState.error}")
+                        isDialogVisible = false
+                    }
+
+                    verifyOtpState.success != null -> {
+                        logger.d("VerifyOtp: ${verifyOtpState.success!!.response!!.message}")
+                        if (verifyOtpState.success!!.status == true) {
+                            onNext()
+                        } else {
+                            invalidText = R.string.txt_Enter_valid_OTP
+                            inValidOTP = true
+                        }
+
+                        isDialogVisible = false
+                    }
                 }
             }
         }
@@ -256,12 +262,7 @@ fun OtpSendVerifyScreen(
     }
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
-        if (viewModel.getPrefData(IS_COMING_FROM) == REGISTER_NEW) {
-            onBackUserName
-        }
-        else{
-            onBack()
-        }
+        handleBack(viewModel, onBack, onBackUserName)
     }, content = {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -286,7 +287,7 @@ fun OtpSendVerifyScreen(
                 )
 
                 Text(
-                    text = stringResource(R.string.txt_OTP_received_phone),
+                    text = stringResource(R.string.txt_OTP_received_phone)+decryptedPhoneNo.takeLast(4),
                     modifier = Modifier.padding(top = 8.dp, start = 10.dp, end = 10.dp),
                     textAlign = TextAlign.Center,
                     fontStyle = FontStyle.Normal,
@@ -323,7 +324,6 @@ fun OtpSendVerifyScreen(
                                 .padding(start = 12.dp, end = 12.dp, top = 16.dp)
                                 .fillMaxWidth()
                                 .clickable {
-                                    isFinished = false
                                     showBottomSheet = true
                                 },
                             fontFamily = fontBold,
@@ -389,6 +389,18 @@ fun OtpSendVerifyScreen(
         }
     }
     )
+}
+
+fun handleBack(viewModel: LoginViewModel, onBack: () -> Unit,
+               onBackUserName: () -> Unit,) {
+    val comingFrom = viewModel.getPrefData(IS_COMING_FROM)
+    if (comingFrom == REGISTER_NEW || comingFrom == LOGIN_WITH_OTP) {
+        logger.d("OtpSendVerify:Back to UserName -> $comingFrom")
+        onBackUserName()
+    } else {
+        logger.d("OtpSendVerify:Back to ForgetPassword -> $comingFrom")
+        onBack()
+    }
 }
 
 @Composable
