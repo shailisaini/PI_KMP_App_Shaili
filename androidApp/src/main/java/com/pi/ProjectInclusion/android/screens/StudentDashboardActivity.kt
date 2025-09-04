@@ -114,9 +114,9 @@ import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneScree
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ViewScreeningProfileDetailsScreen
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.contactUsTxt
-import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
 import com.pi.ProjectInclusion.data.model.profileModel.response.ViewProfileResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -140,6 +140,7 @@ class StudentDashboardActivity : ComponentActivity() {
             var isNotification by remember { mutableStateOf(true) }
             val context = LocalContext.current
             val viewModel: LoginViewModel = koinViewModel()
+            var strToken = viewModel.getPrefData(TOKEN_PREF_KEY)
 
             fun navigateTo(route: String) {
                 isForward = true
@@ -155,7 +156,7 @@ class StudentDashboardActivity : ComponentActivity() {
 
             LaunchedEffect(Unit) {
 //                viewModel.getUserProfileViewModel(encryptedUserName)
-                viewModel.getUserProfileViewModel("lhWmhODMnBvTyxCkajySXQ==")
+                viewModel.getUserProfileViewModel(strToken, "lhWmhODMnBvTyxCkajySXQ==")
             }
 
             LaunchedEffect(viewProfile) {

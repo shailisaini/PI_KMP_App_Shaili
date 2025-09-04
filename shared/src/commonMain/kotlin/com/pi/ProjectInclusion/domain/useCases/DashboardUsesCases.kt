@@ -13,6 +13,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeeti
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
 import com.pi.ProjectInclusion.data.model.profileModel.ProfileNameChangeRequest
 import com.pi.ProjectInclusion.data.model.profileModel.response.ChangeRequestResponse
+import com.pi.ProjectInclusion.data.model.profileModel.response.TrackRequestResponse
 import com.pi.ProjectInclusion.domain.repository.DashboardRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -122,11 +123,25 @@ class DashboardUsesCases(private val repository: DashboardRepository) {
     fun getChangeRequestCases(
         changeRequest: ProfileNameChangeRequest,
         strToken: String,
-        profilePic: ByteArray? = null,
+        docPic: ByteArray? = null,
         fileName: String? = null
     ): Flow<Result<ChangeRequestResponse>> = flow {
         try {
-            val response = repository.getChangeRequestRepo(changeRequest, strToken, profilePic, fileName)
+            val response = repository.getChangeRequestRepo(changeRequest, strToken, docPic, fileName)
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            logger.d("Exception in certificate $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getTrackRequestCases(
+        strToken: String,
+       requestTypeId: String
+    ): Flow<Result<TrackRequestResponse>> = flow {
+        try {
+            val response = repository.TrackRequestResponseRepo(strToken, requestTypeId)
             emit(Result.success(response))
         } catch (e: Exception) {
             val errorMessage = e.message ?: unableToConnectServer

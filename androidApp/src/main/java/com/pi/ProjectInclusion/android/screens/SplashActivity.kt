@@ -69,6 +69,7 @@ import com.pi.ProjectInclusion.android.screens.interventionScreens.InterventionI
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : ComponentActivity() {
@@ -205,13 +206,13 @@ class SplashActivity : ComponentActivity() {
                         SPLASH_KEY -> SplashScreen {
                             if (isForceUpdate) {
                                 // shaili
-                                navigateTo(AppRoute.LanguageSelect.route)
-
-//                             for abhishek & aashish
-                                /* context.startActivity(
-                                     Intent(context, StudentDashboardActivity::class.java)
-                                 )
-                                 (context as? Activity)?.finish()*/
+                                var userToken = viewModel.getPrefData(TOKEN_PREF_KEY)
+                                if (userToken.isNotEmpty()) {
+                                    navigateTo(AppRoute.TeacherDashboard.route)
+                                }
+                                else {
+                                    navigateTo(AppRoute.LanguageSelect.route)
+                                }
                             }
                         }
 

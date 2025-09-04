@@ -270,6 +270,7 @@ and make a difference together!</string>
     <string name="txt_remove">Remove</string>
     <string name="txt_leave">Leave</string>
     <string name="txt_request_submitted">Request submitted</string>
+    <string name="txt_request_submitted_already">Request submitted Already</string>
     <string name="txt_close">Close</string>
     <string name="txt_name_change_desc">You can request a name change if your current name is incorrect or needs to be updated. Our team will review and verify your request before making any changes.</string>
     <string name="txt_check_status">Check Status</string>

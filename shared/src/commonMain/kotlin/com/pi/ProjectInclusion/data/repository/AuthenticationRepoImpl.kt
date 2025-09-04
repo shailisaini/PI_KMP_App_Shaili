@@ -76,8 +76,8 @@ class AuthenticationRepoImpl(private val apiService: ApiService) : Authenticatio
         return apiService.getLoginWithOTP(request)
     }
 
-    override suspend fun getUserProfileRepo(userName: String): ViewProfileResponse {
-        return apiService.getViewUserProfile(userName)
+    override suspend fun getUserProfileRepo(token: String, userName: String): ViewProfileResponse {
+        return apiService.getViewUserProfile(token,userName)
     }
 
     override suspend fun createFirstStepProfileRepo(
