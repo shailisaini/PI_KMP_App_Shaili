@@ -85,6 +85,7 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_FEMALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_MALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_OTHER
+import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
@@ -186,8 +187,7 @@ fun ProfileScreenUI(
     var hasAllPermissions = remember { mutableStateOf(false) }
     val selectedGender = remember { mutableStateOf("") }
     val genderOptions = listOf(KEY_MALE, KEY_FEMALE, KEY_OTHER)
-    val strToken =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjR5QW9PaGdVQnJyOUVkdXVvbHFvSVE9PSIsInN1YiI6IjEiLCJpYXQiOjE3NTU3NzQ4NDcsImV4cCI6MTc1NTg2MTI0N30.bjqUtT6SSrMRpNO4EiLgh6VhnJp54deOPvQBrjzbTGo"
+    var strToken = viewModel.getPrefData(TOKEN_PREF_KEY)
 
     val firstStepProfileState by viewModel.firstStepProfilePasswordResponse.collectAsStateWithLifecycle()
 

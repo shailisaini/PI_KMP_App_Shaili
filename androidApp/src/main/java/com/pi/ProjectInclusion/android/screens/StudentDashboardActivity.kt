@@ -84,8 +84,6 @@ import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen2
 import com.pi.ProjectInclusion.android.screens.Profile.TrackRequestScreen
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentDetailsScreen
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentMoreDetailsScreen
-import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen2
-import com.pi.ProjectInclusion.android.screens.Profile.TrackRequestScreen
 import com.pi.ProjectInclusion.android.screens.Profile.professionals.ProfessionalsEditProfile
 import com.pi.ProjectInclusion.android.screens.Profile.specialEdu.SpecialEducatorEditProfile
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.CertificateListActivity
@@ -119,6 +117,7 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.contactUsTxt
 import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
+import com.pi.ProjectInclusion.data.model.profileModel.response.ViewProfileResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

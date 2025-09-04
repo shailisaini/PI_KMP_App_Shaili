@@ -132,6 +132,7 @@ fun LoginUI(
     val encryptedPhoneNo = userName.value.encryptAES().toString().trim()
     var sendOtpViaCall by remember { mutableStateOf(false) }
     var sendOtpViaWhatsApp by remember { mutableStateOf(false) }
+    val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
 
     CustomDialog(
         isVisible = isDialogVisible,
@@ -250,7 +251,7 @@ fun LoginUI(
 
     // Response for sent OTP on mobile
     if (sendOtpViaWhatsApp || sendOtpViaCall) {
-        val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
+
         LaunchedEffect(sendOtpState) {
 
             when {

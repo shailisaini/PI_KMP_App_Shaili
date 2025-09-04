@@ -10,6 +10,8 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResp
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingTokenResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
+import com.pi.ProjectInclusion.data.model.profileModel.ProfileNameChangeRequest
+import com.pi.ProjectInclusion.data.model.profileModel.response.ChangeRequestResponse
 
 interface DashboardRepository {
 
@@ -17,6 +19,13 @@ interface DashboardRepository {
         certificateRequest: CertificateRequest,
         strToken: String,
     ): CertificateListResponse
+
+    suspend fun getChangeRequestRepo(
+        certificateRequest: ProfileNameChangeRequest,
+        strToken: String,
+        profilePic: ByteArray? = null,
+        fileName: String? = null,
+    ): ChangeRequestResponse
 
     suspend fun getAllCategoryRepo(): List<CategoryListResponse>
 

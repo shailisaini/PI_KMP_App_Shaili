@@ -3,6 +3,7 @@ package com.pi.ProjectInclusion.ui.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kmptemplate.logger.LoggerProvider
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CreateFirstStepProfileResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CreateRegisterPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
@@ -28,7 +29,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByU
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SpecializationListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
-import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
+import com.pi.ProjectInclusion.data.model.profileModel.response.ViewProfileResponse
 import com.pi.ProjectInclusion.database.LocalDataSource
 import com.pi.ProjectInclusion.domain.ConnectivityObserver
 import com.pi.ProjectInclusion.domain.useCases.AuthenticationUsesCases
@@ -454,6 +455,7 @@ class LoginViewModel(
         getAuthViewModel.getVerifyOtp(mobNo, otpValue)
             .catch { exception ->
                 verifyLogin.update {
+                    logger.d("VerifyOtp Error1: ${exception.message}")
                     UiState(error = exception.message ?: somethingWentWrong)
                 }
             }
@@ -461,10 +463,13 @@ class LoginViewModel(
                 result.fold(
                     onSuccess = { data ->
                         verifyLogin.update { UiState(success = data) }
+                        logger.d("VerifyOtp Error2: ${data}")
                     },
                     onFailure = { exception ->
                         verifyLogin.update {
+                            logger.d("VerifyOtp Error3: ${exception.message}")
                             UiState(error = exception.message ?: somethingWentWrong)
+
                         }
                     }
                 )
