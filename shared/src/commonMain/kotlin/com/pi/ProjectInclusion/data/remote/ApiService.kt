@@ -21,6 +21,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockList
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForceUpdateResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ProfessionListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.QualificationListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ReasonListResponse
@@ -58,10 +59,14 @@ class ApiService(private val client: HttpClient) {
 
     companion object {
 
-//        const val STUDENT_BASE_URL = "https://staging-pi-api.projectinclusion.in/api/v2"   // staging base
+        const val PRODUCTION_BASE_URL = "https://api-pi.projectinclusion.in/api/"
+
+        //        const val STUDENT_BASE_URL = "https://staging-pi-api.projectinclusion.in/api/v2"   // staging base
         const val STUDENT_BASE_URL = "http://192.168.0.116:3500/api/v2"                // local base
-//        const val PROFILE_BASE_URL = "https://staging-pi-api.projectinclusion.in/uploads/profile/"   // staging profile
-        const val PROFILE_BASE_URL = "http://192.168.0.116:3500/uploads/profile/"                  // local profile
+
+        //        const val PROFILE_BASE_URL = "https://staging-pi-api.projectinclusion.in/uploads/profile/"   // staging profile
+        const val PROFILE_BASE_URL =
+            "http://192.168.0.116:3500/uploads/profile/"                  // local profile
         const val CERTIFICATE_BASE_URL = "https://lmsapi.projectinclusion.in/api"
         const val BASIC_LIVE_BASE_URL = "https://api-pi.projectinclusion.in"
         const val SCHOOL_LIVE_BASE_URL = "https://api-school.projectinclusion.in"
@@ -78,6 +83,7 @@ class ApiService(private val client: HttpClient) {
         const val appendZoomAuth = "ZoomAuth"
         const val appendOAuth = "oauth"
         const val appendZoomUser = "v2"
+        const val appendForceUpdate = "ForceUpdate"
     }
 
     suspend fun getLanguages(): GetLanguageListResponse = client.get {
@@ -521,4 +527,18 @@ class ApiService(private val client: HttpClient) {
             )
         }
     }.body<ZoomMeetingsJoinResponse>()
+
+    suspend fun getForceUpdateApp(
+        deviceOsVersion: Double, latestAppVersion: Double,
+    ): ForceUpdateResponse = client.get {
+        url {
+            takeFrom(PRODUCTION_BASE_URL)
+            appendPathSegments(
+                appendForceUpdate, "GetForceUpdate/${deviceOsVersion}/${latestAppVersion}"
+            )
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+    }.body<ForceUpdateResponse>()
 }

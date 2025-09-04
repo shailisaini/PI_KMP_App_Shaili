@@ -514,6 +514,9 @@ and make a difference together!</string>
     <string name="key_Passed">Passed</string>
     <string name="key_Live">Live</string>
     <string name="key_Completed">Completed</string>
+    <string name="app_update">Please Update the App</string>
+    <string name="app_upgradation">Upgradation in Progress</string>
+    <string name="key_Retry">Retry</string>
 
 
 </resources>
