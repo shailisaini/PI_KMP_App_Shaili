@@ -57,4 +57,6 @@ object ConstantVariables {
     var USER_EXIST: String = "User Already Exists"
     var DEACTIVATE: String = "Deactivate"
     var UnableToSendMsg: String = "Unable to send Otp"
+    var PLAY_STORE_LINK: String = "https://play.google.com/store/apps/details?id="
+    var MARKET_ID: String = "market://details?id="
 }
