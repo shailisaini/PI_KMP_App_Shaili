@@ -520,6 +520,7 @@ and make a difference together!</string>
     <string name="app_update">Please Update the App</string>
     <string name="app_upgradation">Upgradation in Progress</string>
     <string name="key_Retry">Retry</string>
+    <string name="key_Confirm">Confirm</string>
 
 
 </resources>

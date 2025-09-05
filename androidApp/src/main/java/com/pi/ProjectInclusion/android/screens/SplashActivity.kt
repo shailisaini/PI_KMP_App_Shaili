@@ -3,25 +3,22 @@ package com.pi.ProjectInclusion.android.screens
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.fadeOut
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import com.pi.ProjectInclusion.android.MyApplicationTheme
-import com.pi.ProjectInclusion.android.navigation.AppRoute
-import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
-import kotlinx.coroutines.delay
-import org.koin.androidx.compose.koinViewModel
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -35,6 +32,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,24 +50,30 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.kmptemplate.logger.LoggerProvider.logger
-import com.pi.ProjectInclusion.android.R
-import com.pi.ProjectInclusion.android.utils.toast
-import com.pi.ProjectInclusion.constants.ConstantVariables.ROUTE
-import com.pi.ProjectInclusion.constants.ConstantVariables.SPLASH_KEY
-import com.pi.ProjectInclusion.constants.CustomDialog
-import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForceUpdateResponse
-import androidx.core.net.toUri
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_TITLE_TEXT
 import com.pi.ProjectInclusion.Dark_02
 import com.pi.ProjectInclusion.Gray
+import com.pi.ProjectInclusion.android.MyApplicationTheme
+import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
-import com.pi.ProjectInclusion.android.screens.interventionScreens.InterventionIntroDialog
+import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontRegular
+import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.MARKET_ID
+import com.pi.ProjectInclusion.constants.ConstantVariables.PLAY_STORE_LINK
+import com.pi.ProjectInclusion.constants.ConstantVariables.ROUTE
+import com.pi.ProjectInclusion.constants.ConstantVariables.SPLASH_KEY
+import com.pi.ProjectInclusion.constants.CustomDialog
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForceUpdateResponse
+import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
+import kotlinx.coroutines.delay
+import org.koin.androidx.compose.koinViewModel
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : ComponentActivity() {
@@ -149,7 +154,7 @@ class SplashActivity : ComponentActivity() {
                                     startActivity(
                                         Intent(
                                             Intent.ACTION_VIEW,
-                                            "market://details?id=$appPackageName".toUri()
+                                            "$MARKET_ID$appPackageName".toUri()
                                         )
                                     )
                                 } catch (exception: ActivityNotFoundException) {
@@ -157,7 +162,7 @@ class SplashActivity : ComponentActivity() {
                                     startActivity(
                                         Intent(
                                             Intent.ACTION_VIEW,
-                                            "https://play.google.com/store/apps/details?id=$appPackageName".toUri()
+                                            "$PLAY_STORE_LINK$appPackageName".toUri()
                                         )
                                     )
                                 }
@@ -205,13 +210,13 @@ class SplashActivity : ComponentActivity() {
                         SPLASH_KEY -> SplashScreen {
                             if (isForceUpdate) {
                                 // shaili
-                                navigateTo(AppRoute.LanguageSelect.route)
+//                                navigateTo(AppRoute.LanguageSelect.route)
 
 //                             for abhishek & aashish
-                                /* context.startActivity(
-                                     Intent(context, StudentDashboardActivity::class.java)
-                                 )
-                                 (context as? Activity)?.finish()*/
+                                context.startActivity(
+                                    Intent(context, StudentDashboardActivity::class.java)
+                                )
+                                (context as? Activity)?.finish()
                             }
                         }
 

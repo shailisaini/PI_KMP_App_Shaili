@@ -60,6 +60,7 @@ class ApiService(private val client: HttpClient) {
 
     companion object {
 
+        const val PRODUCTION_BASE_URL = "https://api-pi.projectinclusion.in/api"   // staging base
         const val STUDENT_BASE_URL = "https://staging-pi-api.projectinclusion.in/api/v2"   // staging base
 //        const val STUDENT_BASE_URL = "http://192.168.0.116:3500/api/v2"                // local base
         const val PROFILE_BASE_URL = "https://staging-pi-api.projectinclusion.in/uploads/profile/"   // staging profile
