@@ -350,7 +350,7 @@ class ApiService(private val client: HttpClient) {
     suspend fun createProfessionalProfile(
         professionalProfileRequest: ProfessionalProfileRequest,
         strToken: String,
-    ): CreateFirstStepProfileResponse = client.post {
+    ): CreateFirstStepProfileResponse = client.patch {
         url {
             takeFrom(STUDENT_BASE_URL)
             appendPathSegments(appendUser, "update-professional-profile")

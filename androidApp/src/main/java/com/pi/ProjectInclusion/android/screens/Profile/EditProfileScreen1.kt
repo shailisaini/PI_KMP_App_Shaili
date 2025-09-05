@@ -105,6 +105,9 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateList
 import com.pi.ProjectInclusion.data.remote.ApiService.Companion.PROFILE_BASE_URL
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import java.io.ByteArrayOutputStream
+import java.time.LocalDate
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun EditProfileScreen1(onNextTeacher: () -> Unit,  //EditProfileScreen2
@@ -195,22 +198,13 @@ fun EditProfileScreenUI(
 
     val decryptUserName = decrypt(encryptedUserName.toString().trim())
     val firstNameFromApi = remember { mutableStateOf(decryptUserName) }
-    val firstName = remember { mutableStateOf(decryptUserName) }
-    val lastName = remember { mutableStateOf(decryptUserName) }
+    val firstName = remember { mutableStateOf("") }
+    val lastName = remember { mutableStateOf("") }
     val email = remember { mutableStateOf("") }
     val mobNo = remember { mutableStateOf("") }
     val whatsappNo = remember { mutableStateOf("") }
     val profilePic = remember { mutableStateOf("") }
     val noInternet = stringResource(id=R.string.txt_oops_no_internet)
-
-    var stateSelectedId = remember { mutableIntStateOf(-1) }
-    var districtSelectedId = remember { mutableIntStateOf(-1) }
-    var blockSelectedId = remember { mutableIntStateOf(-1) }
-
-    val allStatesState by loginViewModel.allStatesResponse.collectAsStateWithLifecycle()
-    val allDistrictsState by loginViewModel.allDistrictsResponse.collectAsStateWithLifecycle()
-    val allBlocksState by loginViewModel.allBlocksResponse.collectAsStateWithLifecycle()
-    val allSchoolsState by loginViewModel.allSchoolsResponse.collectAsStateWithLifecycle()
 
     val firstStepProfileState by loginViewModel.firstStepProfilePasswordResponse.collectAsStateWithLifecycle()
     LaunchedEffect(firstStepProfileState) {
@@ -225,8 +219,8 @@ fun EditProfileScreenUI(
             }
 
             firstStepProfileState.success != null -> {
-                logger.d("First step profile state response : ${firstStepProfileState.success}")
-                if (firstStepProfileState.success!!.status != true) {
+                logger.d("First step profile state response : ${loginViewModel.getPrefData(USER_TYPE_ID)}")
+                if (firstStepProfileState.success!!.status == true) {
                     context.toast(firstStepProfileState.success!!.message.toString())
                     if (loginViewModel.getPrefData(USER_TYPE_ID) == "7") {
                         onNextSpecialEducator()
@@ -243,16 +237,6 @@ fun EditProfileScreenUI(
 
     LaunchedEffect(Unit) {
         loginViewModel.getUserProfileViewModel(strToken,encryptedUserName)
-    }
-
-    if (stateSelectedId.intValue != -1){
-        loginViewModel.getAllDistrictByStateId(stateSelectedId.intValue)
-    }
-    if (districtSelectedId.intValue != -1){
-        loginViewModel.getAllBlockByDistrictId(districtSelectedId.intValue)
-    }
-    if (blockSelectedId.intValue != -1){
-        loginViewModel.getAllSchoolsByBlockId(blockSelectedId.intValue)
     }
 
     val viewProfile by loginViewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
@@ -275,111 +259,34 @@ fun EditProfileScreenUI(
 //                        lastName.value = response.username ?: ""
                         email.value = response.email ?: ""
                         mobNo.value = response.mobile ?: ""
-                        whatsappNo.value = response.mobile ?: ""
+                        whatsappNo.value = response.whatsapp ?: ""
+                        firstName.value = response.firstname ?: ""
+                        lastName.value = response.lastname ?: ""
+
+                        // date format
+                        date = response.dob ?: ""
+
+                        val parsedDate = OffsetDateTime.parse(date)
+                        val formattedDate = parsedDate.toLocalDate().format(DateTimeFormatter.ISO_LOCAL_DATE) // "2021-09-04"
+
+                        // Assign this to your state
+                        date = formattedDate
+
                         profilePic.value = PROFILE_BASE_URL + response.profilepic
                         selectedUri.value =  Uri.parse(profilePic.value)
+
+                        if (response.gender.equals("M")){
+                            selectedGender.value = KEY_MALE
+                        } else if (response.gender.equals("F")){
+                            selectedGender.value = KEY_FEMALE
+                        }
+                        else{
+
+                        }
                     }
                 }
                 else{
                     context.toast(viewProfile.success!!.message.toString())
-                }
-                isDialogVisible = false
-            }
-        }
-    }
-
-    LaunchedEffect(allStatesState) {
-        when {
-            allStatesState.isLoading -> {
-                isDialogVisible = true
-            }
-
-            allStatesState.error.isNotEmpty() -> {
-                logger.d("All state error : ${allStatesState.success}")
-                isDialogVisible = false
-            }
-
-            allStatesState.success != null -> {
-                logger.d("All state response : ${allStatesState.success}")
-                if (allStatesState.success?.size != 0) {
-                   /* allStatesState.success.let {
-                        it.let { it1 -> allState.addAll(it1!!.toList()) }
-                    }
-                    println("All states list data :- $allState")*/
-                }
-                isDialogVisible = false
-            }
-        }
-    }
-
-    LaunchedEffect(allDistrictsState) {
-        when {
-            allDistrictsState.isLoading -> {
-                isDialogVisible = true
-            }
-
-            allDistrictsState.error.isNotEmpty() -> {
-                logger.d("All district error : ${allDistrictsState.success}")
-                isDialogVisible = false
-            }
-
-            allDistrictsState.success != null -> {
-                logger.d("All district response : ${allDistrictsState.success}")
-                if (allDistrictsState.success?.size != 0) {
-                  /*  allBlocks.clear()
-                    allDistrictsState.success.let {
-                        it.let { it2 -> allDistricts.addAll(it2!!.toList()) }
-                    }
-                    println("All district list data :- $allDistricts")*/
-                }
-                isDialogVisible = false
-            }
-        }
-    }
-
-    LaunchedEffect(allBlocksState) {
-        when {
-            allBlocksState.isLoading -> {
-                isDialogVisible = true
-            }
-
-            allBlocksState.error.isNotEmpty() -> {
-                logger.d("All Blocks error : ${allBlocksState.success}")
-                isDialogVisible = false
-            }
-
-            allBlocksState.success != null -> {
-                logger.d("All Blocks response : ${allBlocksState.success}")
-                if (allBlocksState.success?.size != 0) {
-                  /*  allSchools.clear()
-                    allBlocksState.success.let {
-                        it.let { it3 -> allBlocks.addAll(it3!!.toList()) }
-                    }
-                    println("All Blocks list data :- $allBlocks")*/
-                }
-                isDialogVisible = false
-            }
-        }
-    }
-
-    LaunchedEffect(allSchoolsState) {
-        when {
-            allSchoolsState.isLoading -> {
-                isDialogVisible = true
-            }
-
-            allSchoolsState.error.isNotEmpty() -> {
-                logger.d("All Schools error : ${allSchoolsState.success}")
-                isDialogVisible = false
-            }
-
-            allSchoolsState.success != null -> {
-                logger.d("All Schools response : ${allSchoolsState.success}")
-                if (allSchoolsState.success?.status == 1) {
-                   /* allSchoolsState.success!!.response.let {
-                        it.let { it4 -> allSchools.addAll(it4!!.toList()) }
-                    }
-                    println("All Schools list data :- $allSchools")*/
                 }
                 isDialogVisible = false
             }
@@ -615,7 +522,7 @@ fun EditProfileScreenUI(
                                 icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
                                 colors = colors,
                                 text = firstName,
-                                trueFalse = firstNameFromApi.value.isEmpty(),
+                                trueFalse = firstName.value.isEmpty(),
                                 hint = textNameEg.toString()
                             )
 
@@ -673,16 +580,16 @@ fun EditProfileScreenUI(
                                 }
                             )
                             TextFieldWithLeftIcon(
-                                text = if (date.isEmpty()) {
+                                text = if (date.isNotEmpty()) {
                                     date
                                 } else {
                                     ""
                                 },
                                 modifier = Modifier.clickable {
                                     showDatePickerDialog(context) { year, month, dayOfMonth ->
-                                        date = "$year-${
-                                            month.toString().padStart(2, '0')
-                                        }-${dayOfMonth.toString().padStart(2, '0')}"
+                                        val localDate = LocalDate.of(year, month, dayOfMonth)
+                                        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                                        date = localDate.format(formatter)
                                     }
                                 },
                                 value = remember { mutableStateOf(date) },
@@ -859,10 +766,10 @@ fun EditProfileScreenUI(
                                                             "",
                                                             lastName.value.toString(),
                                                             selectedGender.value.toString(),
-                                                            apiMobile,
+                                                            mobNo.value,
                                                             whatsappNo.value.toString(),
                                                             date.toString(),
-                                                            apiEmail
+                                                            email.value
                                                         )
 
                                                     logger.d(

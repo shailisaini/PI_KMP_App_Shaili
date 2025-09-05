@@ -243,7 +243,6 @@ fun ProfileViewUI(
     val allBlocksState by viewModel.allBlocksResponse.collectAsStateWithLifecycle()
     val allSchoolsState by viewModel.allSchoolsResponse.collectAsStateWithLifecycle()
 
-
     val decryptUserName = decrypt(profileData.response?.username.toString().trim())
     val scrollState = rememberScrollState()
     var showSheetMenu by remember { mutableStateOf(false) }
