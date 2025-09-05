@@ -3,7 +3,11 @@ package com.pi.ProjectInclusion.android.screens.dashboardScreen
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageInfo
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
+import android.provider.OpenableColumns
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -40,7 +44,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -50,7 +56,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.PathEffect
@@ -106,8 +111,13 @@ import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.N_A
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
+import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
+import com.pi.ProjectInclusion.constants.ConstantVariables.nameChangeDescription
+import com.pi.ProjectInclusion.constants.ConstantVariables.nameChangeRequestId
+import com.pi.ProjectInclusion.constants.ConstantVariables.schoolChangeDescription
+import com.pi.ProjectInclusion.constants.ConstantVariables.schoolChangeRequestId
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.LoginApiResponse
 import com.pi.ProjectInclusion.data.model.profileModel.ProfileNameChangeRequest
@@ -116,6 +126,7 @@ import com.pi.ProjectInclusion.data.remote.ApiService.Companion.PROFILE_BASE_URL
 import com.pi.ProjectInclusion.ui.viewModel.DashboardViewModel
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
+import java.io.ByteArrayOutputStream
 import kotlin.Unit
 
 @Composable
@@ -126,30 +137,31 @@ fun ViewProfileScreen(
     onBack: () -> Unit,
     onTrackRequest: () -> Unit
 ) {
-
     var isDialogVisible by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
-        message = "Loading your data..."
+        message = stringResource(R.string.txt_loading)
     )
     var languageId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
 
     var encryptedUserName = viewModel.getPrefData(USER_NAME)
     val profilePic = remember { mutableStateOf("") }
 
+    var strToken = viewModel.getPrefData(TOKEN_PREF_KEY).toString()
+
 
     var hasAllPermissions = remember { mutableStateOf(false) }
     CameraPermission(hasAllPermissions, context)
     var profileData by remember { mutableStateOf<ViewProfileResponse?>(null) }
 
-    logger.d("Screen: " + "ViewProfileScreen()")
+    logger.d("Screen: " + "ViewProfileScreen()"+ strToken)
 
     LaunchedEffect(Unit) {
         logger.d("viewProfileUI: $languageId  .. $encryptedUserName")
-        viewModel.getUserProfileViewModel(encryptedUserName)
+        viewModel.getUserProfileViewModel(strToken, encryptedUserName)
     }
 
     val viewProfile by viewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
@@ -166,20 +178,20 @@ fun ViewProfileScreen(
 
             viewProfile.success != null -> {
                 logger.d("viewProfileData: ${viewProfile.success}")
-                if (viewProfile.success!!.status == true){
+                if (viewProfile.success!!.status == true) {
                     profileData = viewProfile.success!!
                     logger.d("viewProfileData 1: ${viewProfile.success}")
                     profilePic.value = PROFILE_BASE_URL + profileData!!.response?.profilepic
 
 //                    context.toast(sendOtpState.success!!.response!!.message.toString())
-                }
-                else{
+                } else {
                     context.toast(viewProfile.success!!.message.toString())
                 }
                 isDialogVisible = false
             }
         }
     }
+
 
     BackHandler {
         onBack()
@@ -196,8 +208,10 @@ fun ViewProfileScreen(
             verticalArrangement = Arrangement.Top
         ) {
             profileData?.let {
-                ProfileViewUI(context, onNext = onNext, onBack = onBack, onBackLogin = onBackLogin,
-                    onTrackRequest = onTrackRequest, profileData = it,viewModel = viewModel)
+                ProfileViewUI(
+                    context, onNext = onNext, onBack = onBack, onBackLogin = onBackLogin,
+                    onTrackRequest = onTrackRequest, profileData = it, viewModel = viewModel
+                )
             }
         }
     }
@@ -211,23 +225,147 @@ fun ProfileViewUI(
     onNext: () -> Unit,
     onTrackRequest: () -> Unit,
     profileData: ViewProfileResponse,
-    viewModel: LoginViewModel?,
+    viewModel: LoginViewModel?
 ) {
+    var isDialogVisible by remember { mutableStateOf(false) }
+
+    CustomDialog(
+        isVisible = isDialogVisible,
+        onDismiss = { isDialogVisible = false },
+        message = stringResource(R.string.txt_loading)
+    )
+    var stateSelectedId = remember { mutableIntStateOf(-1) }
+    var districtSelectedId = remember { mutableIntStateOf(-1) }
+    var blockSelectedId = remember { mutableIntStateOf(-1) }
+
+    val allStatesState by viewModel!!.allStatesResponse.collectAsStateWithLifecycle()
+    val allDistrictsState by viewModel.allDistrictsResponse.collectAsStateWithLifecycle()
+    val allBlocksState by viewModel.allBlocksResponse.collectAsStateWithLifecycle()
+    val allSchoolsState by viewModel.allSchoolsResponse.collectAsStateWithLifecycle()
+
 
     val decryptUserName = decrypt(profileData.response?.username.toString().trim())
     val scrollState = rememberScrollState()
     var showSheetMenu by remember { mutableStateOf(false) }
     var isChangeRequestBottomSheet by remember { mutableStateOf(false) }
-    var userTypeId = viewModel?.getPrefData(USER_TYPE_ID)
+    var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
+
+    if (stateSelectedId.intValue != -1){
+        viewModel.getAllDistrictByStateId(stateSelectedId.intValue)
+    }
+    if (districtSelectedId.intValue != -1){
+        viewModel.getAllBlockByDistrictId(districtSelectedId.intValue)
+    }
+    if (blockSelectedId.intValue != -1){
+        viewModel.getAllSchoolsByBlockId(blockSelectedId.intValue)
+    }
+
+    LaunchedEffect(allStatesState) {
+        when {
+            allStatesState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            allStatesState.error.isNotEmpty() -> {
+                logger.d("All state error : ${allStatesState.success}")
+                isDialogVisible = false
+            }
+
+            allStatesState.success != null -> {
+                logger.d("All state response : ${allStatesState.success}")
+                if (allStatesState.success?.size != 0) {
+                    /* allStatesState.success.let {
+                         it.let { it1 -> allState.addAll(it1!!.toList()) }
+                     }
+                     println("All states list data :- $allState")*/
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
+    LaunchedEffect(allDistrictsState) {
+        when {
+            allDistrictsState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            allDistrictsState.error.isNotEmpty() -> {
+                logger.d("All district error : ${allDistrictsState.success}")
+                isDialogVisible = false
+            }
+
+            allDistrictsState.success != null -> {
+                logger.d("All district response : ${allDistrictsState.success}")
+                if (allDistrictsState.success?.size != 0) {
+                    /*  allBlocks.clear()
+                      allDistrictsState.success.let {
+                          it.let { it2 -> allDistricts.addAll(it2!!.toList()) }
+                      }
+                      println("All district list data :- $allDistricts")*/
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
+    LaunchedEffect(allBlocksState) {
+        when {
+            allBlocksState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            allBlocksState.error.isNotEmpty() -> {
+                logger.d("All Blocks error : ${allBlocksState.success}")
+                isDialogVisible = false
+            }
+
+            allBlocksState.success != null -> {
+                logger.d("All Blocks response : ${allBlocksState.success}")
+                if (allBlocksState.success?.size != 0) {
+                    /*  allSchools.clear()
+                      allBlocksState.success.let {
+                          it.let { it3 -> allBlocks.addAll(it3!!.toList()) }
+                      }
+                      println("All Blocks list data :- $allBlocks")*/
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
+    LaunchedEffect(allSchoolsState) {
+        when {
+            allSchoolsState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            allSchoolsState.error.isNotEmpty() -> {
+                logger.d("All Schools error : ${allSchoolsState.success}")
+                isDialogVisible = false
+            }
+
+            allSchoolsState.success != null -> {
+                logger.d("All Schools response : ${allSchoolsState.success}")
+                if (allSchoolsState.success?.status == 1) {
+                    /* allSchoolsState.success!!.response.let {
+                         it.let { it4 -> allSchools.addAll(it4!!.toList()) }
+                     }
+                     println("All Schools list data :- $allSchools")*/
+                }
+                isDialogVisible = false
+            }
+        }
+    }
 
     if (showSheetMenu) {
-        ProfileBottomSheetMenu(viewModel= viewModel, onBackLogin = onBackLogin) {
+        ProfileBottomSheetMenu(viewModel = viewModel, onBackLogin = onBackLogin) {
             showSheetMenu = false
         }
     }
 
     if (isChangeRequestBottomSheet) {
-        ChangeRequestSheet(viewModel = viewModel,onTrackRequest = onTrackRequest) {
+        ChangeRequestSheet(viewModel = viewModel, onTrackRequest = onTrackRequest) {
             isChangeRequestBottomSheet = false
         }
     }
@@ -259,10 +397,13 @@ fun ProfileViewUI(
                         .padding(15.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    ProfileWithProgress(image = PROFILE_BASE_URL + profileData.response?.profilepic, progress = 0.8f)
+                    ProfileWithProgress(
+                        image = PROFILE_BASE_URL + profileData.response?.profilepic,
+                        progress = 0.8f
+                    )
 
                     Text(
-                        text = decryptUserName,
+                        text = profileData.response?.firstname +" "+ profileData.response?.lastname,
                         fontSize = 19.sp,
                         fontFamily = fontBold,
                         color = Black,
@@ -275,10 +416,10 @@ fun ProfileViewUI(
                             stringResource(R.string.txt_special_educator)
                         } else if (userTypeId == "8") {
                             stringResource(R.string.txt_Professional)
-                        } else{
+                        } else {
                             // teacher
                             stringResource(R.string.txt_teacher)
-                        } ,
+                        },
                         textAlign = TextAlign.Center,
                         fontSize = 13.sp,
                         fontFamily = fontMedium,
@@ -348,7 +489,7 @@ fun ProfileViewUI(
                             ) {
                                 TextWithIconOnLeft(
                                     moreSpace = true,
-                                    text = profileData.response?.dob?:N_A,
+                                    text = profileData.response?.dob ?: N_A,
                                     icon = ImageVector.vectorResource(id = R.drawable.calendar_blue),
                                     textColor = PrimaryBlue,
                                     iconColor = Color.Unspecified,
@@ -358,7 +499,7 @@ fun ProfileViewUI(
                                 Spacer(modifier = Modifier.height(4.dp))
                                 TextWithIconOnLeft(
                                     moreSpace = true,
-                                    text = profileData.response?.mobile?:N_A,
+                                    text = profileData.response?.mobile ?: N_A,
                                     icon = ImageVector.vectorResource(id = R.drawable.ic_call_blue),
                                     textColor = PrimaryBlue,
                                     iconColor = Color.Unspecified,
@@ -368,7 +509,7 @@ fun ProfileViewUI(
                                 Spacer(modifier = Modifier.height(4.dp))
                                 TextWithIconOnLeft(
                                     moreSpace = true,
-                                    text = profileData.response?.whatsapp?:N_A,
+                                    text = profileData.response?.whatsapp ?: N_A,
                                     icon = ImageVector.vectorResource(id = R.drawable.ic_whatsapp_blue),
                                     textColor = PrimaryBlue,
                                     iconColor = Color.Unspecified,
@@ -443,7 +584,7 @@ fun ProfileViewUI(
                                         .weight(1f)
                                 )
                                 Text(
-                                    profileData.response?.udicecode?:N_A,
+                                    profileData.response?.udicecode ?: N_A,
                                     textAlign = TextAlign.End,
                                     fontSize = 14.sp,
                                     fontFamily = fontMedium,
@@ -487,7 +628,7 @@ fun ProfileViewUI(
                                         .weight(1f)
                                 )
                                 Text(
-                                    profileData.response?.stateId?:N_A,
+                                    profileData.response?.stateId ?: N_A,
                                     textAlign = TextAlign.End,
                                     fontSize = 15.sp,
                                     fontFamily = fontMedium,
@@ -511,7 +652,7 @@ fun ProfileViewUI(
                                         .weight(1f)
                                 )
                                 Text(
-                                    profileData.response?.districtId?:N_A,
+                                    profileData.response?.districtId ?: N_A,
                                     textAlign = TextAlign.End,
                                     fontSize = 15.sp,
                                     fontFamily = fontMedium,
@@ -535,7 +676,7 @@ fun ProfileViewUI(
                                         .weight(1f)
                                 )
                                 Text(
-                                    profileData.response?.blockId?:N_A,
+                                    profileData.response?.blockId ?: N_A,
                                     textAlign = TextAlign.End,
                                     fontSize = 15.sp,
                                     fontFamily = fontMedium,
@@ -564,7 +705,7 @@ fun ProfileViewUI(
                                         .weight(1f)
                                 )
                                 Text(
-                                    profileData.response?.schoolId?:N_A,
+                                    profileData.response?.schoolId ?: N_A,
                                     textAlign = TextAlign.End,
                                     fontSize = 15.sp,
                                     fontFamily = fontMedium,
@@ -630,23 +771,11 @@ fun ProfileViewUI(
         })
 }
 
-@Composable
-@Preview(showBackground = true, showSystemUi = true)
-fun ProfileUI() {
-    val context = LocalContext.current
-    val onNext: () -> Unit = {}
-    val onBackLogin: () -> Unit = {}
-    val onBack: () -> Unit = {}
-    val onTrackRequest: () -> Unit = {}
-    var profileData by remember { mutableStateOf<LoginApiResponse.LoginResponse?>(null) }
-//    ProfileViewUI(context, onNext, onBack, onBackLogin, onTrackRequest, profileData)
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileBottomSheetMenu(
     viewModel: LoginViewModel?,
-    onBackLogin: () -> Unit ={},
+    onBackLogin: () -> Unit = {},
     onDismiss: () -> Unit = {},
 ) {
     val sheetState = rememberModalBottomSheetState()
@@ -658,6 +787,7 @@ fun ProfileBottomSheetMenu(
             onDismiss = { logOutSheet = false },
             onClick = {
                 logOutSheet = false
+                viewModel?.clearPref()
                 onBackLogin() // move to Login Screen
             }
         )
@@ -790,14 +920,78 @@ fun ChangeRequestSheet(
     var isSelectedName by remember { mutableStateOf(false) }
     var txtContinue = stringResource(id = R.string.text_continue)
     var uploadShowDialog by remember { mutableStateOf(false) }
+
+    var isDialogVisible = remember { mutableStateOf(false) }
+    var isRequestedAlready by remember { mutableStateOf(false) }
+    var requestTypeId by remember { mutableStateOf("1") }
+    var strToken = viewModel?.getPrefData(TOKEN_PREF_KEY).toString()
+    val dashboardViewModel: DashboardViewModel = koinViewModel()
+
+    CustomDialog(
+        isVisible = isDialogVisible.value,
+        onDismiss = { isDialogVisible.value = false },
+        message = stringResource(R.string.txt_loading)
+    )
+
+    val requestTrackState by dashboardViewModel.getTrackRequestResponse.collectAsStateWithLifecycle()
+    LaunchedEffect(requestTrackState) {
+        when {
+            requestTrackState.isLoading -> {
+                isDialogVisible.value = true
+            }
+
+            requestTrackState.error.isNotEmpty() -> {
+                logger.d("requestTrackState: ${requestTrackState.success}")
+                isDialogVisible.value = false
+                isRequestedAlready = false
+                uploadShowDialog = false
+            }
+
+            requestTrackState.success != null -> {
+                logger.d("requestTrackState: ${requestTrackState.success}")
+                if (requestTrackState.success!!.status == true) {
+                    if (requestTrackState.success!!.response?.already_requested == true) {
+                        isRequestedAlready = true
+                    } else {
+                        uploadShowDialog = true
+                    }
+                }
+                isDialogVisible.value = false
+            }
+        }
+    }
+
+    if (isRequestedAlready) {
+        RequestSubmittedDialog(
+            stringResource(R.string.txt_request_submitted_already),
+            requestTrackState.success!!.response?.message?: stringResource(R.string.txt_submit_review),
+            onTrackRequest = onTrackRequest,
+        ) {
+            isRequestedAlready = false
+        }
+    }
+
     if (uploadShowDialog) {
         if (isSelectedSchool) {
             UploadIdDialog(
-                stringResource(R.string.txt_upload_clear_id_school),onTrackRequest =onTrackRequest) {
+                strToken,
+                isDialogVisible,
+                dashboardViewModel = dashboardViewModel,
+                viewModel, schoolChangeRequestId, schoolChangeDescription,
+                stringResource(R.string.txt_upload_clear_id_school), onTrackRequest = onTrackRequest
+            ) {
                 uploadShowDialog = false
             }
         } else {
-            NameRequestDialog(stringResource(R.string.txt_name_change), onTrackRequest = onTrackRequest) {
+            // name change Track
+            NameRequestDialog(
+                strToken = strToken,
+                isDialogVisible = isDialogVisible,
+                dashboardViewModel = dashboardViewModel,
+                viewModel = viewModel,
+                title = stringResource(R.string.txt_name_change),
+                onTrackRequest = onTrackRequest
+            ) {
                 uploadShowDialog = false
             }
         }
@@ -842,30 +1036,33 @@ fun ChangeRequestSheet(
                     .padding(start = 10.dp, bottom = 5.dp, top = 10.dp)
                     .clickable {
                         isSelectedSchool = true
+                        requestTypeId = schoolChangeRequestId
                         isSelectedName = false
-                        // If it's a single choice question
-//                        answersState.value = listOf(answerId)
                     },
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
-                TextWithIconOnLeft(
-                    text = stringResource(R.string.txt_school_change),
-                    icon = ImageVector.vectorResource(id = R.drawable.ic_school_request),
-                    textColor = Black,
-                    iconColor = Color.Unspecified,
-                    textSize = 17.sp,
-                    onClick = {
-                        isSelectedSchool = true
-                        isSelectedName = false
-                    },
-                    modifier = Modifier.weight(1f)
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    TextWithIconOnLeft(
+                        text = stringResource(R.string.txt_school_change),
+                        icon = ImageVector.vectorResource(id = R.drawable.ic_school_request),
+                        textColor = Black,
+                        iconColor = Color.Unspecified,
+                        textSize = 17.sp,
+                    )
+                }
 
                 RadioButton(
                     selected = isSelectedSchool,
                     onClick = {
                         isSelectedSchool = true
+                        requestTypeId = schoolChangeRequestId
                         isSelectedName = false
                     },
                 )
@@ -877,29 +1074,32 @@ fun ChangeRequestSheet(
                     .padding(start = 10.dp, bottom = 10.dp)
                     .clickable {
                         isSelectedSchool = false
+                        requestTypeId = nameChangeRequestId
                         isSelectedName = true
-                        // If it's a single choice question
-//                        answersState.value = listOf(answerId)
                     },
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextWithIconOnLeft(
-                    text = stringResource(R.string.txt_name_change),
-                    icon = ImageVector.vectorResource(id = R.drawable.ic_name_request),
-                    textColor = Black,
-                    iconColor = Color.Unspecified,
-                    textSize = 17.sp,
-                    onClick = {
-                        isSelectedSchool = false
-                        isSelectedName = true
-                    },
-                    modifier = Modifier.weight(1f)
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    TextWithIconOnLeft(
+                        text = stringResource(R.string.txt_name_change),
+                        icon = ImageVector.vectorResource(id = R.drawable.ic_name_request),
+                        textColor = Black,
+                        iconColor = Color.Unspecified,
+                        textSize = 17.sp
+                    )
+                }
 
                 RadioButton(
                     selected = isSelectedName,
                     onClick = {
                         isSelectedSchool = false
+                        requestTypeId = nameChangeRequestId
                         isSelectedName = true
                     }
                 )
@@ -910,7 +1110,7 @@ fun ChangeRequestSheet(
                 title = txtContinue,
                 onClick = {
                     if (isSelectedSchool || isSelectedName) {
-                        uploadShowDialog = true
+                        dashboardViewModel.getTrackChangeRequest(strToken, requestTypeId)
                     }
                 },
             )
@@ -922,21 +1122,39 @@ fun ChangeRequestSheet(
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun UploadIdDialog(
-    subText: String = "", onTrackRequest: () -> Unit={}, onDismiss: () -> Unit = {}) {
+    strToken: String = "",
+    isDialogVisible: MutableState<Boolean>,
+    dashboardViewModel: DashboardViewModel,
+    viewModel: LoginViewModel?,
+    requestId: String = "",
+    requestDescription: String = "",
+    subText: String = "",
+    onTrackRequest: () -> Unit = {},
+    onDismiss: () -> Unit = {}
+) {
     val context = LocalContext.current
     val dashboardViewModel: DashboardViewModel = koinViewModel()
     val requestChangeState by dashboardViewModel.getChangeRequestResponse.collectAsStateWithLifecycle()
 
-    var isDialogVisible by remember { mutableStateOf(false) }
     var emptyDoc = stringResource(R.string.document_empty_error)
     var docError by remember { mutableStateOf(emptyDoc) }
-    CustomDialog(
-        isVisible = isDialogVisible,
-        onDismiss = { isDialogVisible = false },
-        message = "Loading your data..."
-    )
+
+    var byteArray: ByteArray? = null
+    var fileName: String? = null
+    lateinit var bitmap: Bitmap
+
+
+    // App version
+    var appPackageName: String = ""
+    var appVersion: String = ""
+
+    appPackageName = context.packageName
+    val pInfo: PackageInfo =
+        context.packageManager.getPackageInfo(appPackageName, 0)
+    appVersion = pInfo.versionName.toString()
 
     var isSubmitted by remember { mutableStateOf(false) }
+
     if (isSubmitted) {
         RequestSubmittedDialog(
             stringResource(R.string.txt_request_submitted),
@@ -947,27 +1165,26 @@ fun UploadIdDialog(
         }
     }
 
-
     LaunchedEffect(requestChangeState) {
         when {
             requestChangeState.isLoading -> {
-                isDialogVisible = true
+                isDialogVisible.value = true
             }
 
             requestChangeState.error.isNotEmpty() -> {
                 logger.d("requestChangeState: ${requestChangeState.success}")
-                isDialogVisible = false
+                isDialogVisible.value = false
             }
 
             requestChangeState.success != null -> {
                 logger.d("requestChangeState: ${requestChangeState.success}")
-                if (requestChangeState.success!!.status == true){
+                if (requestChangeState.success!!.status == true) {
+                    isSubmitted = true
                     context.toast(requestChangeState.success!!.response.toString())
-                }
-                else{
+                } else {
                     context.toast(requestChangeState.success!!.message.toString())
                 }
-                isDialogVisible = false
+                isDialogVisible.value = false
             }
         }
     }
@@ -975,6 +1192,35 @@ fun UploadIdDialog(
     Dialog(onDismissRequest = { onDismiss() }) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             var selectedUri = remember { mutableStateOf<Uri?>(null) }
+
+            if (selectedUri.value != null) {
+                LaunchedEffect(Unit) {
+                    try {
+                        val uri = selectedUri.value!!
+                        val inputStream = context.contentResolver.openInputStream(uri)
+
+                        bitmap = BitmapFactory.decodeStream(inputStream)
+                        inputStream?.close()
+
+                        // Convert to byteArray
+                        val stream = ByteArrayOutputStream()
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 50, stream)
+                        byteArray = stream.toByteArray()
+
+                        // File name (if available from Uri)
+                        context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                            if (cursor.moveToFirst()) {
+                                fileName = cursor.getString(nameIndex)
+                            }
+                        }
+                        logger.d("Picked image fileName = $fileName, byteArray size = ${byteArray.size}")
+
+                    } catch (e: Exception) {
+                        logger.d("FileNotConvertedException: ${e.message}")
+                    }
+                }
+            }
 
             Box(
                 modifier = Modifier
@@ -1158,14 +1404,13 @@ fun UploadIdDialog(
                         Button(
                             onClick = {
                                 if (selectedUri.value != null) {
-                                    isDialogVisible = true
-                                    isSubmitted = true
+                                    isDialogVisible.value = true
                                     dashboardViewModel.getProfileChangeRequest(
-                                        ProfileNameChangeRequest("","",""),
-                                        ""
+                                        ProfileNameChangeRequest(requestId, appVersion, requestDescription),
+                                        strToken.toString(), byteArray,
+                                        fileName
                                     )
-                                }
-                                else{
+                                } else {
                                     context.toast(docError)
                                 }
                             },
@@ -1232,13 +1477,17 @@ fun Modifier.drawDashedBorder(
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Preview
 @Composable
-fun RequestSubmittedDialog(title: String = "", subText: String = "",onTrackRequest: ()  -> Unit = {}, onDismiss: () -> Unit = {}) {
+fun RequestSubmittedDialog(
+    title: String = "",
+    subText: String = "",
+    onTrackRequest: () -> Unit = {},
+    onDismiss: () -> Unit = {}
+) {
     val context = LocalContext.current
+    var strTitle = stringResource(R.string.txt_request_submitted_already)
 
-    Dialog(onDismissRequest = { onDismiss() }) {
+    Dialog(onDismissRequest = { }) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-            var selectedUri = remember { mutableStateOf<Uri?>(null) }
-
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(20.dp))
@@ -1290,12 +1539,14 @@ fun RequestSubmittedDialog(title: String = "", subText: String = "",onTrackReque
                         Button(
                             onClick = {
                                 onDismiss()
-                                context.startActivity(
-                                    Intent(
-                                        context,
-                                        StudentDashboardActivity::class.java
+                                if (title != strTitle){
+                                    context.startActivity(
+                                        Intent(
+                                            context,
+                                            StudentDashboardActivity::class.java
+                                        )
                                     )
-                                )
+                                }
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -1320,6 +1571,7 @@ fun RequestSubmittedDialog(title: String = "", subText: String = "",onTrackReque
                         Button(
                             onClick = {
                                 onTrackRequest()
+                                onDismiss()
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -1349,16 +1601,28 @@ fun RequestSubmittedDialog(title: String = "", subText: String = "",onTrackReque
     }
 }
 
-@Preview
 @Composable
-fun NameRequestDialog(title: String = "",
-                      onTrackRequest: () -> Unit = {},
-                      onDismiss: () -> Unit = {}
+fun NameRequestDialog(
+    isDialogVisible: MutableState<Boolean>,
+    dashboardViewModel: DashboardViewModel,
+    viewModel: LoginViewModel?,
+    title: String = "",
+    strToken: String = "",
+    onTrackRequest: () -> Unit = {},
+    onDismiss: () -> Unit = {},
 ) {
-    val context = LocalContext.current
     var uploadShowDialog by remember { mutableStateOf(false) }
     if (uploadShowDialog) {
-        UploadIdDialog(stringResource(R.string.txt_upload_clear_id_school), onTrackRequest = onTrackRequest) {
+        UploadIdDialog(
+            strToken = strToken,
+            isDialogVisible,
+            dashboardViewModel = dashboardViewModel,
+            viewModel,
+            nameChangeRequestId,
+            nameChangeDescription,
+            stringResource(R.string.txt_upload_clear_id_school),
+            onTrackRequest = onTrackRequest
+        ) {
             uploadShowDialog = false
         }
     }

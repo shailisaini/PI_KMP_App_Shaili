@@ -1,6 +1,8 @@
 package com.pi.ProjectInclusion.android.screens.registration
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -67,6 +69,7 @@ import com.pi.ProjectInclusion.OrangeSubTitle
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
 import com.pi.ProjectInclusion.android.common_UI.CameraGalleryDialog
 import com.pi.ProjectInclusion.android.common_UI.CameraPermission
 import com.pi.ProjectInclusion.android.common_UI.GenderOption
@@ -80,17 +83,22 @@ import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_FEMALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_MALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_OTHER
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_MOBILE_NO
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
+import java.io.ByteArrayOutputStream
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun EnterUserScreen1(
@@ -100,17 +108,12 @@ fun EnterUserScreen1(
     onNextProfessional: () -> Unit,
     viewModel: LoginViewModel,
 ) {
-    var isDialogVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
     var hasAllPermissions = remember { mutableStateOf(false) }
 
     CameraPermission(hasAllPermissions, context)
 
-    CustomDialog(
-        isVisible = isDialogVisible,
-        onDismiss = { isDialogVisible = false },
-        message = stringResource(R.string.txt_loading)
-    )
+
     BackHandler {
         onBack()
     }
@@ -149,7 +152,7 @@ fun ProfileScreenUI(
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
-    val isInternetAvailable by remember { mutableStateOf(true) }
+    var isInternetAvailable by remember { mutableStateOf(true) }
     var isApiResponded by remember { mutableStateOf(false) }
     val internetMessage by remember { mutableStateOf("") }
 
@@ -162,7 +165,12 @@ fun ProfileScreenUI(
     val txtContinue = stringResource(id = R.string.text_continue)
     val tvMobNo = stringResource(id = R.string.text_mobile_no_user)
 
-    var mobNo = rememberSaveable { mutableStateOf("") }
+ /*   var encryptedPhoneNo = viewModel.getPrefData(USER_MOBILE_NO)  // encrypted from shared Pref
+    var decryptedPhoneNo = decrypt(encryptedPhoneNo)  // decrypted no
+    logger.d(
+        "FileNotConvertedException " + "2.. " + decryptedPhoneNo+ encryptedPhoneNo
+    )*/
+    val mobNo = rememberSaveable { mutableStateOf("") }
     var firstName = rememberSaveable { mutableStateOf("") }
     var lastName = rememberSaveable { mutableStateOf("") }
     var whatsappNo = rememberSaveable { mutableStateOf("") }
@@ -191,6 +199,16 @@ fun ProfileScreenUI(
 
     val firstStepProfileState by viewModel.firstStepProfilePasswordResponse.collectAsStateWithLifecycle()
 
+    var byteArray: ByteArray? = null
+    var fileName: String? = null
+    lateinit var bitmap: Bitmap
+
+    CustomDialog(
+        isVisible = isDialogVisible,
+        onDismiss = { isDialogVisible = false },
+        message = stringResource(R.string.txt_loading)
+    )
+
     LaunchedEffect(firstStepProfileState) {
         when {
             firstStepProfileState.isLoading -> {
@@ -210,10 +228,8 @@ fun ProfileScreenUI(
                         onNextSpecialEdu()
                     } else if (viewModel.getPrefData(USER_TYPE_ID) == "8") {
                         onNextProfessional()
-                    } else if (viewModel.getPrefData(USER_TYPE_ID) == "3") {
+                    } else  {
                         onNextTeacher()
-                    } else {
-                        // reviewer
                     }
                 }
                 isDialogVisible = false
@@ -230,15 +246,34 @@ fun ProfileScreenUI(
     CameraPermission(hasAllPermissions, context)
 
     if (isAddImageClicked) {
-        if (hasAllPermissions.value) {
-            CameraGalleryDialog(selectedUri) {
-                isAddImageClicked = false
-            }
-        } else {
-            context.toast(context.getString(R.string.txt_permission_grant))
+        CameraGalleryDialog(selectedUri) {
             isAddImageClicked = false
         }
+        /* } else {
+             context.toast(context.getString(R.string.txt_permission_grant))
+             isAddImageClicked = false
+         }*/
     }
+    if (selectedUri.value != null) {
+        LaunchedEffect(Unit) {
+            try {
+                val imagePath = selectedUri.value!!.path
+                bitmap = BitmapFactory.decodeFile(imagePath)
+                val stream = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.PNG, 50, stream)
+                byteArray = stream.toByteArray()
+                //  mBinding.profileImg.setImageBitmap(bitmap)
+                fileName =
+                    imagePath?.substring(imagePath.toString().lastIndexOf("/") + 1)
+
+            } catch (e: Exception) {
+                logger.d(
+                    "FileNotConvertedException " + "1.. " + e.message
+                )
+            }
+        }
+    }
+
 
     Box(
         modifier = Modifier
@@ -454,13 +489,14 @@ fun ProfileScreenUI(
                     }
                 )
 
+
                 TextFieldWithLeftIcon(
                     text = "",
                     modifier = Modifier.clickable {
                         showDatePickerDialog(context) { year, month, dayOfMonth ->
-                            date = "$year-${
-                                month.toString().padStart(2, '0')
-                            }-${dayOfMonth.toString().padStart(2, '0')}"
+                            val localDate = LocalDate.of(year, month, dayOfMonth)
+                            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                            date = localDate.format(formatter)
                         }
                     },
                     value = remember { mutableStateOf(date) },
@@ -603,25 +639,44 @@ fun ProfileScreenUI(
                             } else if (email.value.toString().isEmpty()) {
                                 context.toast(mailEg)
                             } else {
-                                if (mobNo.value.length == 10) {
-                                    inValidMobNo = false
-                                } else {
-                                    isDialogVisible = true
+                                if (selectedGender.value == "Female"){
+                                    selectedGender.value = "F"
+                                }else if (selectedGender.value == "Male"){
+                                    selectedGender.value = "M"
+                                }else{
+                                    "O"
+                                }
+                                    isInternetAvailable = isNetworkAvailable(context)
                                     val firstStepProfileRequest = FirstStepProfileRequest(
                                         firstName.value.toString(),
                                         "",
                                         lastName.value.toString(),
                                         selectedGender.value.toString(),
-                                        mobNo.value.toString(),
-                                        whatsappNo.value.toString(),
+                                        mobNo.value,
+                                        whatsappNo.value,
                                         date.toString(),
-                                        email.value.toString()
+                                        email.value
                                     )
-                                    viewModel.createFirstStepProfileRepo(
-                                        firstStepProfileRequest,
-                                        strToken,
-                                    )
-                                }
+
+                                    if (!isInternetAvailable) {
+                                        context.toast(internetMessage)
+                                    } else {
+                                        // if image is not empty
+                                        isDialogVisible = true
+                                        if (selectedUri.value != null) {
+                                            viewModel.createFirstStepProfileRepo(
+                                                firstStepProfileRequest,
+                                                strToken,
+                                                byteArray,
+                                                fileName
+                                            )
+                                        } else {
+                                            viewModel.createFirstStepProfileRepo(
+                                                firstStepProfileRequest,
+                                                strToken
+                                            )
+                                        }
+                                    }
                             }
                         },
                     )
@@ -630,7 +685,6 @@ fun ProfileScreenUI(
         }
     }
 }
-
 
 @Composable
 @Preview(showBackground = true, showSystemUi = true)

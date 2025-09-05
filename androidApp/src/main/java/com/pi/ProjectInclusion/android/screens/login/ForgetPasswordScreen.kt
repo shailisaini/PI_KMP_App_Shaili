@@ -89,7 +89,7 @@ fun ForgetPasswordScreen(
 
     val colors = MaterialTheme.colorScheme
     val context = LocalContext.current
-    var mobNo = rememberSaveable { mutableStateOf("") }
+    val mobNo = rememberSaveable { mutableStateOf("") }
     val enterMobile = stringResource(R.string.txt_enter_mobile_no_)
     val txtContinue = stringResource(R.string.txt_Send_OTP)
     val invalidMobNo = stringResource(R.string.txt_Enter_valid_mobile_number)
@@ -161,7 +161,10 @@ fun ForgetPasswordScreen(
                 MobileTextField(
                     isIcon = false,
                     icon = null,
-                    colors = colors, number = mobNo, enable = true, hint = enterMobile.toString()
+                    colors = colors,
+                    number = mobNo,
+                    enable = true,
+                    hint = enterMobile.toString()
                 )
 
                 if (inValidMobNo) {

@@ -1,3 +1,7 @@
+package authentication
+
+import FakeConnectivityObserver
+import FakeLocalDataSource
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.domain.useCases.AuthenticationUsesCases
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
@@ -65,4 +69,5 @@ class LoginViewModelTest {
         val state = viewModel.uiStateLoginResponse.value
         assertEquals("Invalid credentials", state.error.toString()) //  passes now
     }
+
 }

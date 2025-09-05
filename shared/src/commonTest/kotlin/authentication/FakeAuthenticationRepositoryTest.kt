@@ -1,3 +1,5 @@
+package authentication
+
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CreatePasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
@@ -8,6 +10,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockList
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CreateFirstStepProfileResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CreateRegisterPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForceUpdateResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetLanguageListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetUserTypeResponse
@@ -74,7 +77,10 @@ class FakeAuthenticationRepository : AuthenticationRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getUserProfileRepo(userName: String): ViewProfileResponse {
+    override suspend fun getUserProfileRepo(
+        token: String,
+        userName: String
+    ): ViewProfileResponse {
         TODO("Not yet implemented")
     }
 
@@ -144,6 +150,13 @@ class FakeAuthenticationRepository : AuthenticationRepository {
     }
 
     override suspend fun getAllReasonRepo(): ReasonListResponse {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getForceUpdateAppRepo(
+        deviceOsVersion: Double,
+        latestAppVersion: Double
+    ): ForceUpdateResponse {
         TODO("Not yet implemented")
     }
 }

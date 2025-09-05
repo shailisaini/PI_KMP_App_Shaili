@@ -641,9 +641,9 @@ fun CameraPermission(hasAllPermissions: MutableState<Boolean>, context: Context)
         hasAllPermissions.value = permissionsToCheck.all {
             permissions[it] == true
         }
-        if (!hasAllPermissions.value) {
+       /* if (!hasAllPermissions.value) {
             context.toast(context.getString(R.string.txt_permission_grant))
-        }
+        }*/
     }
 
     LaunchedEffect(hasAllPermissions.value) {

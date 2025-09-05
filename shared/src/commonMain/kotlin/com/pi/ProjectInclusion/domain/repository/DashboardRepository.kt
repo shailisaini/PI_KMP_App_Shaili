@@ -12,6 +12,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeeti
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
 import com.pi.ProjectInclusion.data.model.profileModel.ProfileNameChangeRequest
 import com.pi.ProjectInclusion.data.model.profileModel.response.ChangeRequestResponse
+import com.pi.ProjectInclusion.data.model.profileModel.response.TrackRequestResponse
 
 interface DashboardRepository {
 
@@ -26,6 +27,11 @@ interface DashboardRepository {
         profilePic: ByteArray? = null,
         fileName: String? = null,
     ): ChangeRequestResponse
+
+    suspend fun TrackRequestResponseRepo(
+        strToken: String,
+       requestTypeId: String,
+    ): TrackRequestResponse
 
     suspend fun getAllCategoryRepo(): List<CategoryListResponse>
 

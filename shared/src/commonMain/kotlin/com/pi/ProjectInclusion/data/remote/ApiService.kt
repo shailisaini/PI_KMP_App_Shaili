@@ -37,6 +37,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeeti
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
 import com.pi.ProjectInclusion.data.model.profileModel.ProfileNameChangeRequest
 import com.pi.ProjectInclusion.data.model.profileModel.response.ChangeRequestResponse
+import com.pi.ProjectInclusion.data.model.profileModel.response.TrackRequestResponse
 import com.pi.ProjectInclusion.data.model.profileModel.response.ViewProfileResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -240,13 +241,14 @@ class ApiService(private val client: HttpClient) {
     }.body<CertificateListResponse>()
 
     // user Profile
-    suspend fun getViewUserProfile(username: String): ViewProfileResponse = client.get {
+    suspend fun getViewUserProfile(token: String,username: String): ViewProfileResponse = client.get {
         url {
             takeFrom(STUDENT_BASE_URL)
             appendPathSegments(appendUser, "get-user-by-username", username)
         }
         headers {
             append(HttpHeaders.Accept, "application/json")
+            append(HttpHeaders.Authorization, token)
         }
     }.body<ViewProfileResponse>()
 
@@ -270,13 +272,13 @@ class ApiService(private val client: HttpClient) {
             MultiPartFormDataContent(
                 formData {
                     append("firstname", firstStepProfileRequest.firstname.toString())
-                    append("middlename", firstStepProfileRequest.email.toString())
-                    append("lastname", firstStepProfileRequest.mobile.toString())
-                    append("gender", firstStepProfileRequest.mobile.toString())
+                    append("middlename", firstStepProfileRequest.middlename.toString())
+                    append("lastname", firstStepProfileRequest.lastname.toString())
+                    append("gender", firstStepProfileRequest.gender.toString())
                     append("mobile", firstStepProfileRequest.mobile.toString())
-                    append("whatsapp", firstStepProfileRequest.mobile.toString())
-                    append("dob", firstStepProfileRequest.mobile.toString())
-                    append("email", firstStepProfileRequest.mobile.toString())
+                    append("whatsapp", firstStepProfileRequest.whatsapp.toString())
+                    append("dob", firstStepProfileRequest.dob.toString())
+                    append("email", firstStepProfileRequest.email.toString())
                     profilePic?.let { bytes ->
                         append(
                             key = "profilepic", //params Name
@@ -546,7 +548,7 @@ class ApiService(private val client: HttpClient) {
         strToken: String,
         profilePic: ByteArray? = null,
         fileName: String? = null,
-    ): ChangeRequestResponse = client.patch {
+    ): ChangeRequestResponse = client.post {
 
         url {
             takeFrom(STUDENT_BASE_URL)
@@ -580,5 +582,21 @@ class ApiService(private val client: HttpClient) {
                 })
         )
     }.body<ChangeRequestResponse>()
+
+    suspend fun trackChangeRequestApi(
+        strToken: String,
+        requestTypeId : String
+    ): TrackRequestResponse = client.get {
+
+        url {
+            takeFrom(STUDENT_BASE_URL)
+            appendPathSegments(appendGrievance, "check-already-requested/${requestTypeId}")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+            append(HttpHeaders.Authorization, strToken)
+        }
+
+    }.body<TrackRequestResponse>()
 
 }

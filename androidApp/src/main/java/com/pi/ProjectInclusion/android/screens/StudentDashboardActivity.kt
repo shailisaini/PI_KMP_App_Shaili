@@ -118,6 +118,11 @@ import com.pi.ProjectInclusion.android.screens.Profile.professionals.Professiona
 import com.pi.ProjectInclusion.android.screens.Profile.specialEdu.SpecialEducatorEditProfile
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentDetailsScreen
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentMoreDetailsScreen
+import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen2
+import com.pi.ProjectInclusion.android.screens.Profile.PrivacyPolicy
+import com.pi.ProjectInclusion.android.screens.Profile.TrackRequestScreen
+import com.pi.ProjectInclusion.android.screens.Profile.professionals.ProfessionalsEditProfile
+import com.pi.ProjectInclusion.android.screens.Profile.specialEdu.SpecialEducatorEditProfile
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.CertificateListActivity
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.ChangePasswordActivity
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.FaqActivity
@@ -153,6 +158,7 @@ import com.pi.ProjectInclusion.constants.CommonFunction.ShowError
 import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
+import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.contactUsTxt
@@ -181,6 +187,7 @@ class StudentDashboardActivity : ComponentActivity() {
             var isNotification by remember { mutableStateOf(true) }
             val context = LocalContext.current
             val viewModel: LoginViewModel = koinViewModel()
+            var strToken = viewModel.getPrefData(TOKEN_PREF_KEY)
 
             fun navigateTo(route: String) {
                 isForward = true
@@ -195,8 +202,7 @@ class StudentDashboardActivity : ComponentActivity() {
             var allUdiseDetails = remember { mutableStateListOf<ViewProfileResponse>() }
 
             LaunchedEffect(Unit) {
-//                viewModel.getUserProfileViewModel(encryptedUserName)
-                viewModel.getUserProfileViewModel("lhWmhODMnBvTyxCkajySXQ==")
+                viewModel.getUserProfileViewModel(strToken, encryptedUserName)
             }
 
             LaunchedEffect(viewProfile) {
@@ -392,7 +398,8 @@ class StudentDashboardActivity : ComponentActivity() {
                             when (route) {
                                 AppRoute.DashboardScreen.route -> DashboardScreen()
 
-                                AppRoute.CourseScreen.route -> LMSCourseHomeScreen()
+                                    AppRoute.CourseScreen.route -> LMSCourseHomeScreen()
+//                                    AppRoute.CourseScreen.route -> PrivacyPolicy()
 
                                 AppRoute.ProfileScreen.route -> ViewProfileScreen(
                                     viewModel = viewModel,
