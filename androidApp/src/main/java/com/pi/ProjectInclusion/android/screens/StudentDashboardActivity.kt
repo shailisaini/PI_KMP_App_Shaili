@@ -196,8 +196,7 @@ class StudentDashboardActivity : ComponentActivity() {
             var allUdiseDetails = remember { mutableStateListOf<ViewProfileResponse>() }
 
             LaunchedEffect(Unit) {
-//                viewModel.getUserProfileViewModel(encryptedUserName)
-                viewModel.getUserProfileViewModel(strToken, "lhWmhODMnBvTyxCkajySXQ==")
+                viewModel.getUserProfileViewModel(strToken, encryptedUserName)
             }
 
             LaunchedEffect(viewProfile) {

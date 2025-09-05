@@ -77,8 +77,10 @@ import com.pi.ProjectInclusion.android.common_UI.UdiseTextField
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
@@ -128,34 +130,22 @@ fun TeacherScreenUI(
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
-    val coroutineScope = rememberCoroutineScope()
-    val isInternetAvailable by remember { mutableStateOf(true) }
-    var isApiResponded by remember { mutableStateOf(false) }
-    val internetMessage by remember { mutableStateOf("") }
+    var isInternetAvailable by remember { mutableStateOf(true) }
 
     var isDialogVisible by remember { mutableStateOf(false) }
     var isUdiseDetails by remember { mutableStateOf(false) }
-    var selectedIndex by remember { mutableStateOf<Int?>(null) }
 
-    val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
+    val noDataMessage = stringResource(R.string.txt_oops_no_internet)
     val invalidUdise = stringResource(id = R.string.text_enter_udise)
 //  languageData[LanguageTranslationsResponse.KEY_INVALID_MOBILE_NO_ERROR].toString()
     val txtContinue = stringResource(id = R.string.text_continue)
     val tvUdise = stringResource(id = R.string.txt_udise_number)
     var udiseNo = rememberSaveable { mutableStateOf("") }
-    var firstName = rememberSaveable { mutableStateOf("") }
-    var lastName = rememberSaveable { mutableStateOf("") }
-    var whatsappNo = rememberSaveable { mutableStateOf("") }
-    var email = rememberSaveable { mutableStateOf("") }
-    var textUpload = stringResource(R.string.txt_profile_pic_upload)
+
     val enterUdiseCode = stringResource(R.string.txt_udise_number)
-    val textNameEg = stringResource(R.string.txt_eg_first_name)
-    val textWhatsappEg = stringResource(R.string.txt_eg_whatsapp_name)
-    val textLastNameEg = stringResource(R.string.txt_eg_last_name)
-    val textEmailEg = stringResource(R.string.txt_eg_email_name)
+
     var showError by remember { mutableStateOf(false) }
     var inValidUdiseNo by remember { mutableStateOf(false) }
-    var date by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
     var isBottomSheetStateVisible by rememberSaveable { mutableStateOf(false) }
     var isBottomSheetDistrictVisible by rememberSaveable { mutableStateOf(false) }
@@ -185,8 +175,7 @@ fun TeacherScreenUI(
     var districtSelectedId = remember { mutableIntStateOf(-1) }
     var blockSelectedId = remember { mutableIntStateOf(-1) }
     var schoolSelectedId = remember { mutableIntStateOf(-1) }
-    val strToken =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjR5QW9PaGdVQnJyOUVkdXVvbHFvSVE9PSIsInN1YiI6IjEiLCJpYXQiOjE3NTU3NzQ4NDcsImV4cCI6MTc1NTg2MTI0N30.bjqUtT6SSrMRpNO4EiLgh6VhnJp54deOPvQBrjzbTGo"
+    var strToken = viewModel.getPrefData(TOKEN_PREF_KEY)
     var msgState = stringResource(R.string.key_select_state)
     var msgDistrict = stringResource(R.string.key_select_district)
     var msgBlock = stringResource(R.string.key_select_block)
@@ -769,17 +758,23 @@ fun TeacherScreenUI(
                                     if (firstDigit < 6) {
                                         inValidUdiseNo = true
                                     } else {
-                                        isDialogVisible = true
-                                        val professionalProfileRequest = ProfessionalProfileRequest(
-                                            udiseNo.value.toString(),
-                                            stateSelectedId.intValue,
-                                            districtSelectedId.intValue,
-                                            blockSelectedId.intValue,
-                                            schoolSelectedId.intValue
-                                        )
-                                        viewModel.createProfessionalProfileRepo(
-                                            professionalProfileRequest, strToken
-                                        )
+                                        isInternetAvailable = isNetworkAvailable(context)
+                                        if (!isInternetAvailable) {
+                                            context.toast(noDataMessage)
+                                        } else {
+                                            isDialogVisible = true
+                                            val professionalProfileRequest =
+                                                ProfessionalProfileRequest(
+                                                    udiseNo.value.toString(),
+                                                    stateSelectedId.intValue,
+                                                    districtSelectedId.intValue,
+                                                    blockSelectedId.intValue,
+                                                    schoolSelectedId.intValue
+                                                )
+                                            viewModel.createProfessionalProfileRepo(
+                                                professionalProfileRequest, strToken
+                                            )
+                                        }
                                     }
                                 }
                             }

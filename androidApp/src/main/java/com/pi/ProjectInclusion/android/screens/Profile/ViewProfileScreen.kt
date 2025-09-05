@@ -46,6 +46,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -136,7 +137,6 @@ fun ViewProfileScreen(
     onBack: () -> Unit,
     onTrackRequest: () -> Unit
 ) {
-
     var isDialogVisible by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
@@ -192,6 +192,7 @@ fun ViewProfileScreen(
         }
     }
 
+
     BackHandler {
         onBack()
     }
@@ -226,12 +227,136 @@ fun ProfileViewUI(
     profileData: ViewProfileResponse,
     viewModel: LoginViewModel?
 ) {
+    var isDialogVisible by remember { mutableStateOf(false) }
+
+    CustomDialog(
+        isVisible = isDialogVisible,
+        onDismiss = { isDialogVisible = false },
+        message = stringResource(R.string.txt_loading)
+    )
+    var stateSelectedId = remember { mutableIntStateOf(-1) }
+    var districtSelectedId = remember { mutableIntStateOf(-1) }
+    var blockSelectedId = remember { mutableIntStateOf(-1) }
+
+    val allStatesState by viewModel!!.allStatesResponse.collectAsStateWithLifecycle()
+    val allDistrictsState by viewModel.allDistrictsResponse.collectAsStateWithLifecycle()
+    val allBlocksState by viewModel.allBlocksResponse.collectAsStateWithLifecycle()
+    val allSchoolsState by viewModel.allSchoolsResponse.collectAsStateWithLifecycle()
+
 
     val decryptUserName = decrypt(profileData.response?.username.toString().trim())
     val scrollState = rememberScrollState()
     var showSheetMenu by remember { mutableStateOf(false) }
     var isChangeRequestBottomSheet by remember { mutableStateOf(false) }
-    var userTypeId = viewModel?.getPrefData(USER_TYPE_ID)
+    var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
+
+    if (stateSelectedId.intValue != -1){
+        viewModel.getAllDistrictByStateId(stateSelectedId.intValue)
+    }
+    if (districtSelectedId.intValue != -1){
+        viewModel.getAllBlockByDistrictId(districtSelectedId.intValue)
+    }
+    if (blockSelectedId.intValue != -1){
+        viewModel.getAllSchoolsByBlockId(blockSelectedId.intValue)
+    }
+
+    LaunchedEffect(allStatesState) {
+        when {
+            allStatesState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            allStatesState.error.isNotEmpty() -> {
+                logger.d("All state error : ${allStatesState.success}")
+                isDialogVisible = false
+            }
+
+            allStatesState.success != null -> {
+                logger.d("All state response : ${allStatesState.success}")
+                if (allStatesState.success?.size != 0) {
+                    /* allStatesState.success.let {
+                         it.let { it1 -> allState.addAll(it1!!.toList()) }
+                     }
+                     println("All states list data :- $allState")*/
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
+    LaunchedEffect(allDistrictsState) {
+        when {
+            allDistrictsState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            allDistrictsState.error.isNotEmpty() -> {
+                logger.d("All district error : ${allDistrictsState.success}")
+                isDialogVisible = false
+            }
+
+            allDistrictsState.success != null -> {
+                logger.d("All district response : ${allDistrictsState.success}")
+                if (allDistrictsState.success?.size != 0) {
+                    /*  allBlocks.clear()
+                      allDistrictsState.success.let {
+                          it.let { it2 -> allDistricts.addAll(it2!!.toList()) }
+                      }
+                      println("All district list data :- $allDistricts")*/
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
+    LaunchedEffect(allBlocksState) {
+        when {
+            allBlocksState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            allBlocksState.error.isNotEmpty() -> {
+                logger.d("All Blocks error : ${allBlocksState.success}")
+                isDialogVisible = false
+            }
+
+            allBlocksState.success != null -> {
+                logger.d("All Blocks response : ${allBlocksState.success}")
+                if (allBlocksState.success?.size != 0) {
+                    /*  allSchools.clear()
+                      allBlocksState.success.let {
+                          it.let { it3 -> allBlocks.addAll(it3!!.toList()) }
+                      }
+                      println("All Blocks list data :- $allBlocks")*/
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
+    LaunchedEffect(allSchoolsState) {
+        when {
+            allSchoolsState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            allSchoolsState.error.isNotEmpty() -> {
+                logger.d("All Schools error : ${allSchoolsState.success}")
+                isDialogVisible = false
+            }
+
+            allSchoolsState.success != null -> {
+                logger.d("All Schools response : ${allSchoolsState.success}")
+                if (allSchoolsState.success?.status == 1) {
+                    /* allSchoolsState.success!!.response.let {
+                         it.let { it4 -> allSchools.addAll(it4!!.toList()) }
+                     }
+                     println("All Schools list data :- $allSchools")*/
+                }
+                isDialogVisible = false
+            }
+        }
+    }
 
     if (showSheetMenu) {
         ProfileBottomSheetMenu(viewModel = viewModel, onBackLogin = onBackLogin) {
@@ -278,7 +403,7 @@ fun ProfileViewUI(
                     )
 
                     Text(
-                        text = decryptUserName,
+                        text = profileData.response?.firstname +" "+ profileData.response?.lastname,
                         fontSize = 19.sp,
                         fontFamily = fontBold,
                         color = Black,
@@ -662,6 +787,7 @@ fun ProfileBottomSheetMenu(
             onDismiss = { logOutSheet = false },
             onClick = {
                 logOutSheet = false
+                viewModel?.clearPref()
                 onBackLogin() // move to Login Screen
             }
         )

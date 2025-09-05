@@ -80,6 +80,7 @@ fun EnterPasswordScreen(
     viewModel: LoginViewModel,
     onNext: () -> Unit, //OtpSendVerifyUI
     onBack: () -> Unit,
+    onNextProfile: () -> Unit, // complete Profile
     isForgetPassword: () -> Unit
 ) {
     var isDialogVisible by remember { mutableStateOf(false) }
@@ -136,6 +137,7 @@ fun EnterPasswordScreen(
                 onBack = onBack,
                 isForgetPassword = isForgetPassword,
                 viewModel = viewModel,
+                onNextProfile = onNextProfile
             )
         }
     }
@@ -145,6 +147,7 @@ fun EnterPasswordScreen(
 fun PasswordUI(
     context: Context,
     onBack: () -> Unit,
+    onNextProfile: () -> Unit,
     viewModel: LoginViewModel,
     isForgetPassword: () -> Unit,
     onNext: () -> Unit,    // OtpSendVerifyUI
@@ -221,13 +224,15 @@ fun PasswordUI(
                         viewModel.savePrefData(USER_NAME,
                             loginResponse.success!!.response?.user?.username.toString().trim()
                         )
+                        viewModel.savePrefData(USER_MOBILE_NO, loginResponse.success!!.response?.user?.mobile.toString())
                         context.toast(loginSuccess)
-                        context.startActivity(
+                        onNextProfile()
+                        /*context.startActivity(
                             Intent(
                                 context,
                                 StudentDashboardActivity::class.java
                             )
-                        )
+                        )*/
                     }
                     else{
                         isValidMobNo = true
@@ -428,10 +433,11 @@ fun LoginPassScreen() {
     val onNext: () -> Unit = {}
     val onBack: () -> Unit = {}
     val isForgetPassword: () -> Unit = {}
+    val onNextProfile: () -> Unit = {}
     val viewModel: LoginViewModel = koinViewModel()
     PasswordUI(
         context,
         onNext = { onNext() },
-        onBack = onBack, isForgetPassword = isForgetPassword, viewModel = viewModel
+        onBack = onBack, isForgetPassword = isForgetPassword, viewModel = viewModel, onNextProfile = onNextProfile
     )
 }

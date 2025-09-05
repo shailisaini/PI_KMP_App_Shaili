@@ -5,7 +5,6 @@ object ConstantVariables {
 //    const val STUDENT_BASE_URL = "https://student-api.auroscholar.org/api/"
 //    const val isRegistration = "isRegistration"
 
-
     // constant keys
 //    Pref keys
     var SPLASH_KEY: String = "splash"
@@ -13,6 +12,7 @@ object ConstantVariables {
     var SHARED_PREF_KEY: String = "PI_PREF"
     var TOKEN_PREF_KEY: String = "user_token"
     var USER_TYPE_ID: String = "userTypeId"
+    var USER_TYPE_NAME: String = "userTypeName"
     var SELECTED_LANGUAGE_ID: String = "selectedLanguageId"
     var IS_COMING_FROM: String = "isComingFrom"
     var USER_MOBILE_NO: String = "userMobileNo"

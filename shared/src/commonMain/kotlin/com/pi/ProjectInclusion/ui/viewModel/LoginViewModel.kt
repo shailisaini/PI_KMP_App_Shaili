@@ -48,6 +48,7 @@ class LoginViewModel(
     private val localData: LocalDataSource,
     private val connectivityObserver: ConnectivityObserver, //  to check network
 ) : ViewModel() {
+
     var noInternetConnection: String = "No Internet Found!"
     var somethingWentWrong: String = "Something went wrong"
     var serverError: String = "Failed to connect to"
@@ -166,6 +167,15 @@ class LoginViewModel(
 
     fun getPrefData(key: String): String {
         return localData.getValue(key, "")
+    }
+
+    // remove particular key
+    fun clearPrefValue(key: String) {
+        localData.clearValue(key)
+    }
+    // clear all data
+    fun clearPref() {
+        localData.clearAll()
     }
 
     init {

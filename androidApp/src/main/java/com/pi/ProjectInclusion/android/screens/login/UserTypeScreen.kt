@@ -77,6 +77,7 @@ import com.pi.ProjectInclusion.constants.CommonFunction.ShowError
 import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_NAME
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetUserTypeResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
@@ -303,6 +304,7 @@ fun UserTypeCard(
             .clickable {
                 // saving User type ID
                 viewModel.savePrefData(USER_TYPE_ID, userTypeIndex.id.toString())
+                viewModel.savePrefData(USER_TYPE_NAME, userTypeIndex.name.toString())
                 onItemClicked.invoke()
                 onNext()
             }
