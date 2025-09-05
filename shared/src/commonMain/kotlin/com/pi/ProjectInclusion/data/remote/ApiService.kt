@@ -272,13 +272,13 @@ class ApiService(private val client: HttpClient) {
             MultiPartFormDataContent(
                 formData {
                     append("firstname", firstStepProfileRequest.firstname.toString())
-                    append("middlename", firstStepProfileRequest.email.toString())
-                    append("lastname", firstStepProfileRequest.mobile.toString())
-                    append("gender", firstStepProfileRequest.mobile.toString())
+                    append("middlename", firstStepProfileRequest.middlename.toString())
+                    append("lastname", firstStepProfileRequest.lastname.toString())
+                    append("gender", firstStepProfileRequest.gender.toString())
                     append("mobile", firstStepProfileRequest.mobile.toString())
-                    append("whatsapp", firstStepProfileRequest.mobile.toString())
-                    append("dob", firstStepProfileRequest.mobile.toString())
-                    append("email", firstStepProfileRequest.mobile.toString())
+                    append("whatsapp", firstStepProfileRequest.whatsapp.toString())
+                    append("dob", firstStepProfileRequest.dob.toString())
+                    append("email", firstStepProfileRequest.email.toString())
                     profilePic?.let { bytes ->
                         append(
                             key = "profilepic", //params Name

@@ -1,13 +1,19 @@
 package com.pi.ProjectInclusion.android.screens.registration
 
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +24,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -30,8 +39,10 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -40,6 +51,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SpanStyle
@@ -55,6 +67,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import coil.size.Size
+import com.example.kmptemplate.logger.LoggerProvider
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Bg_Gray
 import com.pi.ProjectInclusion.Bg_Gray1
@@ -62,7 +75,10 @@ import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Dark_02
+import com.pi.ProjectInclusion.Dark_Selected_BG
 import com.pi.ProjectInclusion.Gray
+import com.pi.ProjectInclusion.GrayLight02
+import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlueLt1
 import com.pi.ProjectInclusion.Transparent
@@ -78,12 +94,21 @@ import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
+import com.pi.ProjectInclusion.constants.CommonFunction.NoDataFound
+import com.pi.ProjectInclusion.constants.CommonFunction.ShowError
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_MOBILE_NO
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_NAME
+import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CreatePasswordRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetUserTypeResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 
 @Composable
@@ -151,7 +176,7 @@ fun CreateNewPasswordUI(
 
     val minLength = enterConfirmPasswordStr.value.length >= 8 || enterPasswordStr.value.length >= 8
     val hasLetter =
-        enterConfirmPasswordStr.value.any { it.isLetter() } || enterPasswordStr.value.any { it.isLetter() }
+        enterConfirmPasswordStr.value.any { it.isUpperCase() } || enterPasswordStr.value.any { it.isUpperCase() }
     val hasDigit =
         enterConfirmPasswordStr.value.any { it.isDigit() } || enterPasswordStr.value.any { it.isDigit() }
     val hasSymbol = Pattern.compile("[^a-zA-Z0-9]").matcher(enterConfirmPasswordStr.value)
@@ -165,6 +190,8 @@ fun CreateNewPasswordUI(
     var languageId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
     var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
     var strToken = viewModel.getPrefData(TOKEN_PREF_KEY)
+
+    var userTypeName = viewModel.getPrefData(USER_TYPE_NAME)
 
     LaunchedEffect(createRegisterPasswordState) {
         when {
@@ -181,6 +208,7 @@ fun CreateNewPasswordUI(
                 logger.d("Create/Register Password Response :- ${createRegisterPasswordState.success!!.response}")
                 if (createRegisterPasswordState.success!!.status == true) {
                     context.toast(createRegisterPasswordState.success!!.message!!)
+                    viewModel.savePrefData(USER_MOBILE_NO, createRegisterPasswordState.success!!.response?.mobile.toString())
                     onNext()
                 } else {
                     context.toast(createRegisterPasswordState.success!!.message!!)
@@ -191,9 +219,8 @@ fun CreateNewPasswordUI(
     }
 
     if (showBottomSheet) {
-        SelectUserBottomSheet(onClick = {
-            otpSendVerify()
-        }, onDismiss = {
+        SelectUserBottomSheet(
+            viewModel = viewModel, onDismiss = {
             showBottomSheet = false
         })
     }
@@ -254,7 +281,7 @@ fun CreateNewPasswordUI(
                         )
 
                         Text(
-                            text = stringResource(R.string.user_profile),
+                            text = userTypeName,
                             modifier = Modifier.padding(
                                 top = 5.dp,
                                 bottom = 5.dp
@@ -596,10 +623,51 @@ fun CreateNewPasswordUI(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectUserBottomSheet(
-    onClick: () -> Unit = {},
+    viewModel: LoginViewModel,
     onDismiss: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState()
+    val context = LocalContext.current
+    val userType = remember { mutableStateListOf<GetUserTypeResponse.UserTypeResponse>() }
+    var isDialogVisible by remember { mutableStateOf(true) }
+    var isInternetAvailable by remember { mutableStateOf(true) }
+    val coroutineScope = rememberCoroutineScope()
+
+    var selectedIndex by remember { mutableStateOf<Int?>(null) }
+    val selectedLanguage = remember { mutableStateOf<String?>(null) }
+
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
+    val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
+
+    CustomDialog(
+        isVisible = isDialogVisible,
+        onDismiss = { isDialogVisible = false },
+        message = stringResource(R.string.txt_loading)
+    )
+    LaunchedEffect(Unit) {
+        viewModel.getUserType()
+    }
+    val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
+    LaunchedEffect(uiState) {
+        when {
+            uiState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            uiState.error.isNotEmpty() -> {
+                context.toast(uiState.error)
+                isDialogVisible = false
+            }
+
+            uiState.success != null -> {
+                uiState.success!!.let {
+                    userType.addAll(it.response!!)
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
     ModalBottomSheet(
         onDismissRequest = {
             onDismiss()
@@ -612,7 +680,8 @@ fun SelectUserBottomSheet(
                 .fillMaxWidth()
                 .padding(start = 15.dp, end = 15.dp, bottom = 20.dp)
         ) {
-
+            val errColor = PrimaryBlue
+            val scrollState = rememberLazyGridState()
             Text(
                 stringResource(R.string.choose_an_option),
                 modifier = Modifier
@@ -628,71 +697,56 @@ fun SelectUserBottomSheet(
                     .fillMaxWidth()
                     .padding(top = 5.dp, bottom = 20.dp)
             ) {
-                Card(
-                    modifier = Modifier
-                        .clickable {
-                            onClick()
-
-                        }
-                        .padding(8.dp)
-                        .fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(1.dp),
-                    colors = CardDefaults.cardColors(
-                        if (isSystemInDarkTheme()) {
-                            Dark_02
-                        } else {
-                            Color.Companion.White
-                        }
-                    ),
-                    border = BorderStroke(
-                        width = 1.dp, PrimaryBlue
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
+                if (userType.isNotEmpty()) {
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(color = PrimaryBlueLt1),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .padding(vertical = 25.dp)
-                                .weight(1f),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Image(
-                                modifier = Modifier
-                                    .background(Color.Unspecified)
-                                    .size(65.dp),
-                                contentScale = ContentScale.Fit,
-//                    painter = if (userTypeIndex.isNotEmpty()) {
-                                painter =
-                                    rememberAsyncImagePainter(
-                                        model = ImageRequest.Builder(LocalContext.current)
-                                            .data(R.drawable.img_teacher)
-                                            .decoderFactory(SvgDecoder.Factory())
-                                            .size(Size.ORIGINAL)
-                                            .placeholder(R.drawable.img_teacher)
-                                            .error(R.drawable.img_teacher)
-                                            .build()
-                                    ),
-                                contentDescription = IMG_DESCRIPTION
-                            )
+                            .wrapContentHeight()
 
-                            Text(
-                                "Teacher",
-                                textAlign = TextAlign.Start,
-                                maxLines = 1,
-                                fontSize = 14.sp,
-                                color = Gray,
-                                modifier = Modifier
-                                    .wrapContentWidth()
-                                    .padding(top = 5.dp)
-//                            .heightIn(min = 40.dp)
-                            )
+                    ) {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            state = scrollState,
+                            contentPadding = PaddingValues(vertical = 15.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 10.dp, horizontal = 8.dp)
+                                .draggable(
+                                    orientation = Orientation.Vertical,
+                                    state = rememberDraggableState { delta ->
+                                        coroutineScope.launch {
+                                            scrollState.scrollBy(-delta)
+                                        }
+                                    })
+                        ) {
+                            items(userType.size) { index ->
+                                UserTypeCard(
+                                    viewModel,
+                                    onNext = onDismiss,
+                                    context,
+                                    isSelected = selectedIndex == index,
+                                    index,
+                                    userType = userType,
+                                    onItemClicked = {
+                                        selectedIndex =
+                                            if (selectedIndex == index) null else index // Toggle selection
+                                        selectedLanguage.value =
+                                            userType[index].id.toString()
+                                    }
+                                )
+                            }
                         }
+                    }
+                } else {
+                    isInternetAvailable = isNetworkAvailable(context)
+                    if (!isInternetAvailable) {
+                        ShowError(
+                            internetMessage,
+                            errColor,
+                            painterResource(R.drawable.sad_emoji)
+                        )
+                    } else {
+                        NoDataFound(noDataMessage, painterResource(R.drawable.sad_emoji))
                     }
                 }
             }
@@ -707,4 +761,115 @@ fun NewPasswordScreen() {
     val onBack: () -> Unit = {}
     val isForgetPassword: () -> Unit = {}
 //    CreateNewPasswordUI(onNext, onBack, isForgetPassword)
+}
+
+@Composable
+fun UserTypeCard(
+    viewModel: LoginViewModel,
+    onNext: () -> Unit,
+    context: Context,
+    isSelected: Boolean = true,
+    index: Int,
+    userType: MutableList<GetUserTypeResponse.UserTypeResponse>,
+    onItemClicked: () -> Unit = {},
+) {
+    val userTypeIndex = userType[index]
+    val errorToast = stringResource(R.string.select_userType)
+
+    val selectedBorder = if (isSelected) BorderStroke(
+        width = 1.dp,
+        if (isSystemInDarkTheme()) {
+            PRIMARY_AURO_BLUE
+        } else {
+            PrimaryBlue
+        }
+    ) else BorderStroke(
+        width = 0.5.dp, if (isSystemInDarkTheme()) {
+            Dark_02
+        } else {
+            GrayLight02
+        }
+    )
+    val backGroundColor = if (isSelected) {
+        if (isSystemInDarkTheme()) {
+            Dark_Selected_BG
+        } else {
+            PrimaryBlueLt1
+        }
+    } else {
+        if (isSystemInDarkTheme()) {
+            Dark_02
+        } else {
+            Color.Companion.White
+        }
+    }
+
+    Card(
+        modifier = Modifier
+            .clickable {
+                // saving User type ID
+                viewModel.savePrefData(USER_TYPE_ID, userTypeIndex.id.toString())
+                viewModel.savePrefData(USER_TYPE_NAME, userTypeIndex.name.toString())
+                onItemClicked.invoke()
+                onNext()
+            }
+            .padding(8.dp)
+            .fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(1.dp),
+        colors = CardDefaults.cardColors(
+            if (isSystemInDarkTheme()) {
+                Dark_02
+            } else {
+                Color.Companion.White
+            }
+        ),
+        border = selectedBorder,
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = backGroundColor),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(vertical = 25.dp)
+                    .weight(1f),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    modifier = Modifier
+                        .background(Color.Unspecified)
+                        .size(65.dp),
+                    contentScale = ContentScale.Fit,
+//                    painter = if (userTypeIndex.isNotEmpty()) {
+                    painter =
+                        rememberAsyncImagePainter(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(userTypeIndex.icon)
+                                .decoderFactory(SvgDecoder.Factory())
+                                .size(Size.ORIGINAL)
+                                .placeholder(R.drawable.img_teacher)
+                                .error(R.drawable.img_teacher)
+                                .build()
+                        ),
+                    contentDescription = IMG_DESCRIPTION
+                )
+
+                Text(
+                    "${userTypeIndex.name} ",
+                    textAlign = TextAlign.Start,
+                    maxLines = 1,
+                    fontSize = 14.sp,
+                    color = if (isSelected) Black else Gray,
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .padding(top = 5.dp)
+//                            .heightIn(min = 40.dp)
+                )
+            }
+        }
+    }
 }

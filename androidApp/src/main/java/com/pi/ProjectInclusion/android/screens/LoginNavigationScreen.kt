@@ -160,6 +160,7 @@ class LoginNavigationScreen : ComponentActivity() {
                                 navigateTo(AppRoute.OtpSendVerifyUI.route)
                             },
                             isForgetPassword = { navigateTo(AppRoute.ForgetPasswordUI.route) },
+                            onNextProfile = { navigateTo(AppRoute.EnterUserProfileScreen.route) },
                             onBack = { navigateBack(AppRoute.UserNameScreen.route) }
                         )
 

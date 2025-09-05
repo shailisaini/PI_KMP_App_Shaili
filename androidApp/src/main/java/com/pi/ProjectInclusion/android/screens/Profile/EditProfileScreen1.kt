@@ -33,6 +33,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -85,6 +87,7 @@ import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_FEMALE
@@ -92,8 +95,13 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_MALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_OTHER
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
 import com.pi.ProjectInclusion.data.remote.ApiService.Companion.PROFILE_BASE_URL
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import java.io.ByteArrayOutputStream
@@ -153,7 +161,7 @@ fun EditProfileScreenUI(
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
-    val isInternetAvailable by remember { mutableStateOf(true) }
+    var isInternetAvailable by remember { mutableStateOf(true) }
 
     var isDialogVisible by remember { mutableStateOf(false) }
     val invalidMobNo = stringResource(id = R.string.text_enter_no)
@@ -195,8 +203,56 @@ fun EditProfileScreenUI(
     val profilePic = remember { mutableStateOf("") }
     val noInternet = stringResource(id=R.string.txt_oops_no_internet)
 
+    var stateSelectedId = remember { mutableIntStateOf(-1) }
+    var districtSelectedId = remember { mutableIntStateOf(-1) }
+    var blockSelectedId = remember { mutableIntStateOf(-1) }
+
+    val allStatesState by loginViewModel.allStatesResponse.collectAsStateWithLifecycle()
+    val allDistrictsState by loginViewModel.allDistrictsResponse.collectAsStateWithLifecycle()
+    val allBlocksState by loginViewModel.allBlocksResponse.collectAsStateWithLifecycle()
+    val allSchoolsState by loginViewModel.allSchoolsResponse.collectAsStateWithLifecycle()
+
+    val firstStepProfileState by loginViewModel.firstStepProfilePasswordResponse.collectAsStateWithLifecycle()
+    LaunchedEffect(firstStepProfileState) {
+        when {
+            firstStepProfileState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            firstStepProfileState.error.isNotEmpty() -> {
+                logger.d("First step profile state error : ${firstStepProfileState.success}")
+                isDialogVisible = false
+            }
+
+            firstStepProfileState.success != null -> {
+                logger.d("First step profile state response : ${firstStepProfileState.success}")
+                if (firstStepProfileState.success!!.status != true) {
+                    context.toast(firstStepProfileState.success!!.message.toString())
+                    if (loginViewModel.getPrefData(USER_TYPE_ID) == "7") {
+                        onNextSpecialEducator()
+                    } else if (loginViewModel.getPrefData(USER_TYPE_ID) == "8") {
+                        onNextProfessional()
+                    } else{
+                        onNextTeacher()
+                    }
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
     LaunchedEffect(Unit) {
         loginViewModel.getUserProfileViewModel(strToken,encryptedUserName)
+    }
+
+    if (stateSelectedId.intValue != -1){
+        loginViewModel.getAllDistrictByStateId(stateSelectedId.intValue)
+    }
+    if (districtSelectedId.intValue != -1){
+        loginViewModel.getAllBlockByDistrictId(districtSelectedId.intValue)
+    }
+    if (blockSelectedId.intValue != -1){
+        loginViewModel.getAllSchoolsByBlockId(blockSelectedId.intValue)
     }
 
     val viewProfile by loginViewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
@@ -226,6 +282,104 @@ fun EditProfileScreenUI(
                 }
                 else{
                     context.toast(viewProfile.success!!.message.toString())
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
+    LaunchedEffect(allStatesState) {
+        when {
+            allStatesState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            allStatesState.error.isNotEmpty() -> {
+                logger.d("All state error : ${allStatesState.success}")
+                isDialogVisible = false
+            }
+
+            allStatesState.success != null -> {
+                logger.d("All state response : ${allStatesState.success}")
+                if (allStatesState.success?.size != 0) {
+                   /* allStatesState.success.let {
+                        it.let { it1 -> allState.addAll(it1!!.toList()) }
+                    }
+                    println("All states list data :- $allState")*/
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
+    LaunchedEffect(allDistrictsState) {
+        when {
+            allDistrictsState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            allDistrictsState.error.isNotEmpty() -> {
+                logger.d("All district error : ${allDistrictsState.success}")
+                isDialogVisible = false
+            }
+
+            allDistrictsState.success != null -> {
+                logger.d("All district response : ${allDistrictsState.success}")
+                if (allDistrictsState.success?.size != 0) {
+                  /*  allBlocks.clear()
+                    allDistrictsState.success.let {
+                        it.let { it2 -> allDistricts.addAll(it2!!.toList()) }
+                    }
+                    println("All district list data :- $allDistricts")*/
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
+    LaunchedEffect(allBlocksState) {
+        when {
+            allBlocksState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            allBlocksState.error.isNotEmpty() -> {
+                logger.d("All Blocks error : ${allBlocksState.success}")
+                isDialogVisible = false
+            }
+
+            allBlocksState.success != null -> {
+                logger.d("All Blocks response : ${allBlocksState.success}")
+                if (allBlocksState.success?.size != 0) {
+                  /*  allSchools.clear()
+                    allBlocksState.success.let {
+                        it.let { it3 -> allBlocks.addAll(it3!!.toList()) }
+                    }
+                    println("All Blocks list data :- $allBlocks")*/
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
+    LaunchedEffect(allSchoolsState) {
+        when {
+            allSchoolsState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            allSchoolsState.error.isNotEmpty() -> {
+                logger.d("All Schools error : ${allSchoolsState.success}")
+                isDialogVisible = false
+            }
+
+            allSchoolsState.success != null -> {
+                logger.d("All Schools response : ${allSchoolsState.success}")
+                if (allSchoolsState.success?.status == 1) {
+                   /* allSchoolsState.success!!.response.let {
+                        it.let { it4 -> allSchools.addAll(it4!!.toList()) }
+                    }
+                    println("All Schools list data :- $allSchools")*/
                 }
                 isDialogVisible = false
             }
@@ -337,18 +491,7 @@ fun EditProfileScreenUI(
                                                     .build()
                                             )
                                         }
-//                                        will use this later
-                                        /*!profilePic.value.isNullOrEmpty() -> {
-                                            // Case 2: API URL
-                                            rememberAsyncImagePainter(
-                                                ImageRequest.Builder(context)
-                                                    .data(profilePic.value)
-                                                    .placeholder(R.drawable.profile_user_icon)
-                                                    .error(R.drawable.profile_user_icon)
-                                                    .crossfade(true)
-                                                    .build()
-                                            )
-                                        }*/
+
                                         else -> {
                                             // Case 3: Default fallback
                                             painterResource(id = R.drawable.profile_user_icon)
@@ -678,8 +821,6 @@ fun EditProfileScreenUI(
                                     enabled = mobNo.value.length >= 10,
                                     title = txtContinue,
                                     onClick = {
-//                                        onNext()
-                                        onNextProfessional()
                                         if (mobNo.value.isEmpty()) {
                                             inValidMobNo = true
                                         } else if (firstName.value.toString().isEmpty()) {
@@ -704,6 +845,13 @@ fun EditProfileScreenUI(
                                                 if (firstDigit < 6) {
                                                     inValidMobNo = true
                                                 } else {
+                                                    if (selectedGender.value == "Female"){
+                                                        selectedGender.value = "F"
+                                                    }else if (selectedGender.value == "Male"){
+                                                        selectedGender.value = "M"
+                                                    }else{
+                                                        "O"
+                                                    }
                                                     isDialogVisible = true
                                                     val firstStepProfileRequest =
                                                         FirstStepProfileRequest(
@@ -722,17 +870,28 @@ fun EditProfileScreenUI(
                                                                 + strToken + " .. " + mobNo.value.toString() + " .. " + fileName + " .. "
                                                     )
                                                     // check Internet
+                                                    isInternetAvailable = isNetworkAvailable(context)
                                                     if (!isInternetAvailable) {
                                                         context.toast(noInternet)
                                                     } else {
                                                         // call Api
                                                         isDialogVisible = true
-                                                        loginViewModel.createFirstStepProfileRepo(
-                                                            firstStepProfileRequest,
-                                                            strToken,
-                                                            byteArray,
-                                                            fileName
-                                                        )
+                                                        // if image is not empty
+                                                        if (selectedUri.value != null) {
+
+                                                            loginViewModel.createFirstStepProfileRepo(
+                                                                firstStepProfileRequest,
+                                                                strToken,
+                                                                byteArray,
+                                                                fileName
+                                                            )
+                                                        }
+                                                        else{
+                                                            loginViewModel.createFirstStepProfileRepo(
+                                                                firstStepProfileRequest,
+                                                                strToken
+                                                            )
+                                                        }
                                                     }
                                                 }
                                             }
