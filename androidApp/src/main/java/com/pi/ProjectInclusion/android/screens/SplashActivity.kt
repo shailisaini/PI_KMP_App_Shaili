@@ -74,6 +74,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForceUpda
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
+import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : ComponentActivity() {
@@ -210,13 +211,13 @@ class SplashActivity : ComponentActivity() {
                         SPLASH_KEY -> SplashScreen {
                             if (isForceUpdate) {
                                 // shaili
-//                                navigateTo(AppRoute.LanguageSelect.route)
-
-//                             for abhishek & aashish
-                                context.startActivity(
-                                    Intent(context, StudentDashboardActivity::class.java)
-                                )
-                                (context as? Activity)?.finish()
+                                var userToken = viewModel.getPrefData(TOKEN_PREF_KEY)
+                                if (userToken.isNotEmpty()) {
+                                    navigateTo(AppRoute.TeacherDashboard.route)
+                                }
+                                else {
+                                    navigateTo(AppRoute.LanguageSelect.route)
+                                }
                             }
                         }
 

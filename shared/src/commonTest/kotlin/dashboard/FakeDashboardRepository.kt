@@ -1,8 +1,8 @@
-package com.pi.ProjectInclusion.data.repository
+package dashboard
 
-import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
@@ -13,44 +13,54 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeeti
 import com.pi.ProjectInclusion.data.model.profileModel.ProfileNameChangeRequest
 import com.pi.ProjectInclusion.data.model.profileModel.response.ChangeRequestResponse
 import com.pi.ProjectInclusion.data.model.profileModel.response.TrackRequestResponse
-import com.pi.ProjectInclusion.data.remote.ApiService
+import com.pi.ProjectInclusion.data.model.profileModel.response.TrackRequestResponse.RequestResponse
 import com.pi.ProjectInclusion.domain.repository.DashboardRepository
 
-class DashboardRepoImpl(private val apiService: ApiService) : DashboardRepository {
-
+class FakeDashboardRepository : DashboardRepository {
+    var shouldSucceed = true
     override suspend fun getLMSUserCertificateRepo(
         certificateRequest: CertificateRequest,
-        strToken: String,
+        strToken: String
     ): CertificateListResponse {
-        return apiService.getLMSUserCertificate(certificateRequest, strToken)
+        TODO("Not yet implemented")
     }
 
     override suspend fun getChangeRequestRepo(
-        changeRequest: ProfileNameChangeRequest,
+        certificateRequest: ProfileNameChangeRequest,
         strToken: String,
         profilePic: ByteArray?,
         fileName: String?
     ): ChangeRequestResponse {
-        return apiService.changeRequestApi(changeRequest, strToken,profilePic, fileName)
+
+        return if (shouldSucceed) {
+            ChangeRequestResponse(status = true, message = "Change request successful", response = "", error ="")
+        } else {
+            throw Exception("Request Not sent!")
+        }
     }
 
     override suspend fun TrackRequestResponseRepo(
         strToken: String,
-        requstTypeId: String
+        requestTypeId: String
     ): TrackRequestResponse {
-        return apiService.trackChangeRequestApi(strToken,requstTypeId)
+        return if (shouldSucceed) {
+            TrackRequestResponse(status = true, message = "Track request successful",
+                response = RequestResponse(true,"Already Requested"), error ="")
+        } else {
+            throw Exception("Request Not found!")
+        }
     }
 
     override suspend fun getAllCategoryRepo(): List<CategoryListResponse> {
-        return apiService.getAllCategory()
+        TODO("Not yet implemented")
     }
 
     override suspend fun getAllSubCategoryRepo(): List<SubCategoryListResponse> {
-        return apiService.getAllSubCategory()
+        TODO("Not yet implemented")
     }
 
     override suspend fun getAllSubCategoryByCategoryIdRepo(categoryId: Int): SubCategoryByCategoryIdResponse {
-        return apiService.getAllSubCategoryByCategoryId(categoryId)
+        TODO("Not yet implemented")
     }
 
     override suspend fun getAllFAQsRepo(
@@ -59,33 +69,32 @@ class DashboardRepoImpl(private val apiService: ApiService) : DashboardRepositor
         categoryId: String,
         subCategoryId: String,
         userId: String,
-        languageId: String,
+        languageId: String
     ): FAQsListResponse {
-        return apiService.getAllFAQs(
-            strKeyword, userTypeId, categoryId, subCategoryId, userId, languageId
-        )
+        TODO("Not yet implemented")
     }
 
     override suspend fun getRefreshTokenRepo(): ZoomMeetingTokenResponse {
-        return apiService.getRefreshToken()
+        TODO("Not yet implemented")
     }
 
     override suspend fun getZoomMeetingsActualTokenRepo(
         strAuthKey: String,
         strGrantType: String,
-        strRefreshToken: String,
+        strRefreshToken: String
     ): TokenResponse {
-        return apiService.getZoomMeetingsActualToken(strAuthKey, strGrantType, strRefreshToken)
+        TODO("Not yet implemented")
     }
 
     override suspend fun getAllZoomMeetingsRepo(tokenKey: String): ZoomMeetingListResponse {
-        return apiService.getAllZoomMeetings(tokenKey)
+        TODO("Not yet implemented")
     }
 
     override suspend fun getJoinZoomMeetingsRepo(
         tokenKey: String,
-        meetingId: Long,
+        meetingId: Long
     ): ZoomMeetingsJoinResponse {
-        return apiService.getJoinZoomMeetings(tokenKey, meetingId)
+        TODO("Not yet implemented")
     }
+
 }

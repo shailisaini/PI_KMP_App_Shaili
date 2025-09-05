@@ -196,7 +196,7 @@ fun EditProfileScreenUI(
     val noInternet = stringResource(id=R.string.txt_oops_no_internet)
 
     LaunchedEffect(Unit) {
-        loginViewModel.getUserProfileViewModel(encryptedUserName)
+        loginViewModel.getUserProfileViewModel(strToken,encryptedUserName)
     }
 
     val viewProfile by loginViewModel.viewUserProfileResponse.collectAsStateWithLifecycle()

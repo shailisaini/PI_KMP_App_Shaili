@@ -215,13 +215,12 @@ fun PasswordUI(
                     if (loginResponse.success!!.status == true){
                         // save token
                         viewModel.savePrefData(TOKEN_PREF_KEY,
-                            loginResponse.success!!.response?.accessToken.toString()
+                            "Bearer "+loginResponse.success!!.response?.accessToken.toString()
                         )
                         // save UserName
                         viewModel.savePrefData(USER_NAME,
                             loginResponse.success!!.response?.user?.username.toString().trim()
                         )
-                        encryptedUserName
                         context.toast(loginSuccess)
                         context.startActivity(
                             Intent(

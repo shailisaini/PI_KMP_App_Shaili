@@ -500,10 +500,10 @@ class LoginViewModel(
             }
     }
 
-    fun getUserProfileViewModel(data: String) = viewModelScope.launch {
+    fun getUserProfileViewModel(token: String, data: String) = viewModelScope.launch {
         // no need to sync data
         viewUserProfile.update { UiState(isLoading = true) }
-        getAuthViewModel.getViewUserProfile(data)
+        getAuthViewModel.getViewUserProfile(token, data)
             .catch { exception ->
                 viewUserProfile.update {
                     UiState(error = exception.message ?: somethingWentWrong)

@@ -36,7 +36,7 @@ interface AuthenticationRepository {
     suspend fun getValidate(userName: String, userTypeId: String): ValidateUserResponse
     suspend fun getVerifyOtpRepo(userName: String, userTypeId: String): VerifyOtpResponse
     suspend fun getLoginWithOTPRepo(request: LoginWithOtpRequest): LoginApiResponse
-    suspend fun getUserProfileRepo(userName: String): ViewProfileResponse
+    suspend fun getUserProfileRepo(token: String,userName: String): ViewProfileResponse
     suspend fun forgetPasswordRepo(
         passwordRequest: ForgetPasswordRequest,
         strToken: String,

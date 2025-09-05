@@ -153,6 +153,7 @@ import com.pi.ProjectInclusion.constants.CommonFunction.ShowError
 import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
+import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.contactUsTxt
@@ -180,6 +181,7 @@ class StudentDashboardActivity : ComponentActivity() {
             var isNotification by remember { mutableStateOf(true) }
             val context = LocalContext.current
             val viewModel: LoginViewModel = koinViewModel()
+            var strToken = viewModel.getPrefData(TOKEN_PREF_KEY)
 
             fun navigateTo(route: String) {
                 isForward = true
@@ -195,7 +197,7 @@ class StudentDashboardActivity : ComponentActivity() {
 
             LaunchedEffect(Unit) {
 //                viewModel.getUserProfileViewModel(encryptedUserName)
-                viewModel.getUserProfileViewModel("lhWmhODMnBvTyxCkajySXQ==")
+                viewModel.getUserProfileViewModel(strToken, "lhWmhODMnBvTyxCkajySXQ==")
             }
 
             LaunchedEffect(viewProfile) {

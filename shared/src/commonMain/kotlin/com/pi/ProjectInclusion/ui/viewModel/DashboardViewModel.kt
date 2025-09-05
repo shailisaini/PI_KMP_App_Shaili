@@ -14,6 +14,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeeti
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
 import com.pi.ProjectInclusion.data.model.profileModel.ProfileNameChangeRequest
 import com.pi.ProjectInclusion.data.model.profileModel.response.ChangeRequestResponse
+import com.pi.ProjectInclusion.data.model.profileModel.response.TrackRequestResponse
 import com.pi.ProjectInclusion.database.LocalDataSource
 import com.pi.ProjectInclusion.domain.ConnectivityObserver
 import com.pi.ProjectInclusion.domain.useCases.DashboardUsesCases
@@ -75,8 +76,11 @@ class DashboardViewModel(
     val getMeetingJoinResponse: StateFlow<UiState<ZoomMeetingsJoinResponse>> =
         getMeetingJoin
 
-    private val getChangeRequest = MutableStateFlow(UiState<ChangeRequestResponse>())
+    val getChangeRequest = MutableStateFlow(UiState<ChangeRequestResponse>())
     val getChangeRequestResponse: StateFlow<UiState<ChangeRequestResponse>> = getChangeRequest
+
+    val getTrackRequest = MutableStateFlow(UiState<TrackRequestResponse>())
+    val getTrackRequestResponse: StateFlow<UiState<TrackRequestResponse>> = getTrackRequest
 
     fun isNetworkAvailable(): Boolean {
         return connectivityObserver.getCurrentStatus() == ConnectivityObserver.Status.Available
@@ -228,9 +232,11 @@ class DashboardViewModel(
     fun getProfileChangeRequest(
         requestChange: ProfileNameChangeRequest,
         strToken: String,
+        docPic: ByteArray? = null,
+        fileName: String? = null
     ) = viewModelScope.launch {
         getChangeRequest.update { UiState(isLoading = true) }
-        getUsesCases.getChangeRequestCases(requestChange, strToken).catch { exception ->
+        getUsesCases.getChangeRequestCases(requestChange, strToken, docPic,fileName ).catch { exception ->
             getChangeRequest.update {
                 UiState(error = exception.message ?: somethingWentWrong)
             }
@@ -239,6 +245,26 @@ class DashboardViewModel(
                 getChangeRequest.update { UiState(success = data) }
             }, onFailure = { exception ->
                 getChangeRequest.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            })
+        }
+    }
+
+    fun getTrackChangeRequest(
+        strToken: String,
+        requestTypeId: String
+    ) = viewModelScope.launch {
+        getTrackRequest.update { UiState(isLoading = true) }
+        getUsesCases.getTrackRequestCases(strToken,requestTypeId).catch { exception ->
+            getTrackRequest.update {
+                UiState(error = exception.message ?: somethingWentWrong)
+            }
+        }.collect { result ->
+            result.fold(onSuccess = { data ->
+                getTrackRequest.update { UiState(success = data) }
+            }, onFailure = { exception ->
+                getTrackRequest.update {
                     UiState(error = exception.message ?: somethingWentWrong)
                 }
             })

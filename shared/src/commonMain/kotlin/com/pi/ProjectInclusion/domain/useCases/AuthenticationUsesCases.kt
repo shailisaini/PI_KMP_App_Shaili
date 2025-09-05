@@ -159,9 +159,9 @@ class AuthenticationUsesCases(private val repository: AuthenticationRepository) 
         }
     }.flowOn(Dispatchers.IO)
 
-    fun getViewUserProfile(userName: String): Flow<Result<ViewProfileResponse>> = flow {
+    fun getViewUserProfile(token: String, userName: String): Flow<Result<ViewProfileResponse>> = flow {
         try {
-            val response = repository.getUserProfileRepo(userName)
+            val response = repository.getUserProfileRepo(token,userName)
             emit(Result.success(response))
         } catch (e: Exception) {
             val errorMessage = e.message ?: unableToConnectServer
