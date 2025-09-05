@@ -114,6 +114,11 @@ import com.pi.ProjectInclusion.android.screens.Profile.professionals.Professiona
 import com.pi.ProjectInclusion.android.screens.Profile.specialEdu.SpecialEducatorEditProfile
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentDetailsScreen
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentMoreDetailsScreen
+import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen2
+import com.pi.ProjectInclusion.android.screens.Profile.PrivacyPolicy
+import com.pi.ProjectInclusion.android.screens.Profile.TrackRequestScreen
+import com.pi.ProjectInclusion.android.screens.Profile.professionals.ProfessionalsEditProfile
+import com.pi.ProjectInclusion.android.screens.Profile.specialEdu.SpecialEducatorEditProfile
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.CertificateListActivity
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.ChangePasswordActivity
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.FaqActivity
@@ -375,7 +380,8 @@ class StudentDashboardActivity : ComponentActivity() {
                             when (route) {
                                 AppRoute.DashboardScreen.route -> DashboardScreen()
 
-                                AppRoute.CourseScreen.route -> LMSCourseHomeScreen()
+                                    AppRoute.CourseScreen.route -> LMSCourseHomeScreen()
+//                                    AppRoute.CourseScreen.route -> PrivacyPolicy()
 
                                 AppRoute.ProfileScreen.route -> ViewProfileScreen(
                                     viewModel = viewModel,
