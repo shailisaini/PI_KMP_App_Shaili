@@ -8,10 +8,15 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,10 +30,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -55,7 +67,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -64,26 +78,45 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.SvgDecoder
+import coil.request.ImageRequest
+import coil.size.Size
+import com.example.kmptemplate.logger.LoggerProvider
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Black
+import com.pi.ProjectInclusion.BorderBlue
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_TITLE_TEXT
 import com.pi.ProjectInclusion.Dark_01
+import com.pi.ProjectInclusion.Dark_02
+import com.pi.ProjectInclusion.Dark_Selected_BG
 import com.pi.ProjectInclusion.Gray
+import com.pi.ProjectInclusion.GrayLight02
+import com.pi.ProjectInclusion.PRIMARY_AURO_BLUE
+import com.pi.ProjectInclusion.PrimaryBlue
+import com.pi.ProjectInclusion.PrimaryBlueLt1
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.AnimatedRouteHost
+import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen1
 import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen2
 import com.pi.ProjectInclusion.android.screens.Profile.TrackRequestScreen
+import com.pi.ProjectInclusion.android.screens.Profile.professionals.ProfessionalsEditProfile
+import com.pi.ProjectInclusion.android.screens.Profile.specialEdu.SpecialEducatorEditProfile
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentDetailsScreen
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentMoreDetailsScreen
+import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen2
+import com.pi.ProjectInclusion.android.screens.Profile.PrivacyPolicy
+import com.pi.ProjectInclusion.android.screens.Profile.TrackRequestScreen
 import com.pi.ProjectInclusion.android.screens.Profile.professionals.ProfessionalsEditProfile
 import com.pi.ProjectInclusion.android.screens.Profile.specialEdu.SpecialEducatorEditProfile
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.CertificateListActivity
@@ -99,6 +132,7 @@ import com.pi.ProjectInclusion.android.screens.interventionScreens.InterventionS
 import com.pi.ProjectInclusion.android.screens.interventionScreens.TeachingPlanScreen
 import com.pi.ProjectInclusion.android.screens.interventionScreens.UploadedDocumentsScreen
 import com.pi.ProjectInclusion.android.screens.login.EnterUserNameScreen
+import com.pi.ProjectInclusion.android.screens.login.ItemLanguageCard
 import com.pi.ProjectInclusion.android.screens.menu.AppBar
 import com.pi.ProjectInclusion.android.screens.menu.BottomNavigationBar
 import com.pi.ProjectInclusion.android.screens.menu.DrawerBody
@@ -112,11 +146,18 @@ import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningHomeScre
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneReportScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ViewScreeningProfileDetailsScreen
+import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.CommonFunction.NoDataFound
+import com.pi.ProjectInclusion.constants.CommonFunction.ShowError
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
+import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.contactUsTxt
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetLanguageListResponse
 import com.pi.ProjectInclusion.data.model.profileModel.response.ViewProfileResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -201,6 +242,7 @@ class StudentDashboardActivity : ComponentActivity() {
 
                         val scope = rememberCoroutineScope()
                         var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
+                        var isLanguageBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
                         val sheetState = rememberModalBottomSheetState(
                             skipPartiallyExpanded = true, /*confirmValueChange = { it != SheetValue.Hidden }*/
                         )
@@ -214,9 +256,19 @@ class StudentDashboardActivity : ComponentActivity() {
                                 }
                             })
 
+                        BottomSheetLanguageScreen(
+                            isBottomSheetVisible = isLanguageBottomSheetVisible,
+                            sheetState = sheetState,
+                            onDismiss = {
+                                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                    isLanguageBottomSheetVisible = false
+                                }
+                            },
+                            viewModel
+                        )
+
                         DrawerHeader(
-                            drawerState,
-                            onItemClick = {
+                            drawerState, onItemClick = {
                                 scope.launch {
                                     drawerState.close()
                                     navigateTo(AppRoute.ProfileScreen.route)
@@ -274,248 +326,219 @@ class StudentDashboardActivity : ComponentActivity() {
                                     this@StudentDashboardActivity,
                                     coroutineScope,
                                     openContactUs = { isBottomSheetVisible = true },
+                                    openLanguage = { isLanguageBottomSheetVisible = true },
                                     drawerState
                                 )
                             })
                     }
                 },
             ) {
-                Scaffold(
-                    contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                    bottomBar = {
-                        if (currentRoute in listOf(
-                                AppRoute.DashboardScreen.route,
-                                AppRoute.CourseScreen.route,
-                                AppRoute.ScreeningScreen.route,
-                                AppRoute.InterventionScreen.route
-                            )
+                Scaffold(contentWindowInsets = WindowInsets(0, 0, 0, 0), bottomBar = {
+                    if (currentRoute in listOf(
+                            AppRoute.DashboardScreen.route,
+                            AppRoute.CourseScreen.route,
+                            AppRoute.ScreeningScreen.route,
+                            AppRoute.InterventionScreen.route
+                        )
+                    ) {
+                        Box(
+                            Modifier
+                                .fillMaxWidth()
+                                .zIndex(1f)
+                                .shadow(elevation = 8.dp)
                         ) {
-                            Box(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .zIndex(1f)
-                                    .shadow(elevation = 8.dp)
-                            ) {
-                                BottomNavigationBar(
-                                    currentDestination = currentRoute,
-                                    onNavigateTo = { route -> navigateTo(route) }
-                                )
-                            }
+                            BottomNavigationBar(
+                                currentDestination = currentRoute,
+                                onNavigateTo = { route -> navigateTo(route) })
                         }
-                    }, topBar = {
-                        if (currentRoute == AppRoute.DashboardScreen.route) {
-                            AppBar(
-                                isNotification,
-                                onNavigationIconClick = {
-                                    scope.launch { drawerState.open() }
-                                },
-                                currentRoute = currentRoute
-                            )
-                        } else if (currentRoute == AppRoute.ScreeningScreen.route) {
-                            AppBar(
-                                isNotification,
-                                onNavigationIconClick = {
-                                    scope.launch { drawerState.open() }
-                                },
-                                currentRoute = currentRoute
-                            )
-                        } else if (currentRoute == AppRoute.InterventionScreen.route) {
-                            AppBar(
-                                isNotification,
-                                onNavigationIconClick = {
-                                    scope.launch { drawerState.open() }
-                                },
-                                currentRoute = currentRoute
-                            )
-                        }
-                    }, content = { innerPadding ->
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                        ) {
-                            AnimatedRouteHost(
-                                currentRoute = currentRoute,
-                                isForward = isForward
-                            ) { route ->
-                                when (route) {
-                                    AppRoute.DashboardScreen.route -> DashboardScreen()
+                    }
+                }, topBar = {
+                    if (currentRoute == AppRoute.DashboardScreen.route) {
+                        AppBar(
+                            isNotification, onNavigationIconClick = {
+                                scope.launch { drawerState.open() }
+                            }, currentRoute = currentRoute
+                        )
+                    } else if (currentRoute == AppRoute.ScreeningScreen.route) {
+                        AppBar(
+                            isNotification, onNavigationIconClick = {
+                                scope.launch { drawerState.open() }
+                            }, currentRoute = currentRoute
+                        )
+                    } else if (currentRoute == AppRoute.InterventionScreen.route) {
+                        AppBar(
+                            isNotification, onNavigationIconClick = {
+                                scope.launch { drawerState.open() }
+                            }, currentRoute = currentRoute
+                        )
+                    }
+                }, content = { innerPadding ->
+                    Column(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        AnimatedRouteHost(
+                            currentRoute = currentRoute, isForward = isForward
+                        ) { route ->
+                            when (route) {
+                                AppRoute.DashboardScreen.route -> DashboardScreen()
 
                                     AppRoute.CourseScreen.route -> LMSCourseHomeScreen()
+//                                    AppRoute.CourseScreen.route -> PrivacyPolicy()
 
-                                    AppRoute.ProfileScreen.route -> ViewProfileScreen(
-                                        viewModel = viewModel,
-                                        onNext = { navigateTo(AppRoute.EditProfileScreen.route) },
-                                        onTrackRequest = { navigateTo(AppRoute.TrackRequestScreen.route) },
-                                        onBackLogin = { navigateTo(AppRoute.UserNameScreen.route) },
-                                        onBack = {
-                                            context.startActivity(
-                                                Intent(
-                                                    context,
-                                                    StudentDashboardActivity::class.java
-                                                )
+                                AppRoute.ProfileScreen.route -> ViewProfileScreen(
+                                    viewModel = viewModel,
+                                    onNext = { navigateTo(AppRoute.EditProfileScreen.route) },
+                                    onTrackRequest = { navigateTo(AppRoute.TrackRequestScreen.route) },
+                                    onBackLogin = { navigateTo(AppRoute.UserNameScreen.route) },
+                                    onBack = {
+                                        context.startActivity(
+                                            Intent(
+                                                context, StudentDashboardActivity::class.java
                                             )
-                                            (context as? Activity)?.finish()
-                                        }
-                                    )
-                                    // for logout & delete account we need to route to login screen
-                                    AppRoute.UserNameScreen.route -> EnterUserNameScreen(
-                                        viewModel = viewModel,
-                                        onNext = { navigateTo(AppRoute.UserPasswordScreen.route) },
-                                        onRegister = {
-                                            navigateTo(AppRoute.OtpSendVerifyUI.route)
-                                        },
-                                        onBack = { navigateBack(AppRoute.UserTypeSelect.route) }
-                                    )
-
-                                    AppRoute.EditProfileScreen.route -> EditProfileScreen1(
-                                        loginViewModel = viewModel,
-                                        onNextTeacher = { navigateTo(AppRoute.EditTeacherProfileScreen.route) },
-                                        onNextProfessional = { navigateTo(AppRoute.EditProfessionalEditProfile.route) },
-                                        onNextSpecialEducator = { navigateTo(AppRoute.EditSpeEduEditProfile.route) },
-                                        onBack = { navigateBack(AppRoute.ProfileScreen.route) })
-
-                                    AppRoute.EditTeacherProfileScreen.route -> EditProfileScreen2(
-                                        loginViewModel = viewModel,
-                                        onNext = {
-                                            context.startActivity(
-                                                Intent(
-                                                    context,
-                                                    StudentDashboardActivity::class.java
-                                                )
-                                            )
-                                            (context as? Activity)?.finish()
-                                        },
-                                        onBack = { navigateBack(AppRoute.ProfileScreen.route) })
-
-                                    AppRoute.EditProfessionalEditProfile.route -> ProfessionalsEditProfile(
-                                        loginViewModel = viewModel,
-                                        onNext = {
-                                            context.startActivity(
-                                                Intent(
-                                                    context,
-                                                    StudentDashboardActivity::class.java
-                                                )
-                                            )
-                                            (context as? Activity)?.finish()
-                                        },
-                                        onBack = { navigateBack(AppRoute.ProfileScreen.route) })
-
-                                    AppRoute.EditSpeEduEditProfile.route -> SpecialEducatorEditProfile(
-                                        loginViewModel = viewModel,
-                                        onNext = {
-                                            context.startActivity(
-                                                Intent(
-                                                    context,
-                                                    StudentDashboardActivity::class.java
-                                                )
-                                            )
-                                            (context as? Activity)?.finish()
-                                        },
-                                        onBack = { navigateBack(AppRoute.ProfileScreen.route) })
-
-                                    // Screening
-                                    AppRoute.ScreeningScreen.route -> ScreeningHomeScreen(
-                                        addStudent = { navigateTo(AppRoute.AddStudentRegister.route) },
-                                        screeningOne = { navigateTo(AppRoute.ScreeningOne.route) },
-                                        profilerForm = { navigateTo(AppRoute.ProfilerFormPage.route) },
-                                        advanceScreening = { navigateTo(AppRoute.AdvanceScreening.route) },
-                                        onBack = { navigateBack(AppRoute.DashboardScreen.route) }
-                                    )
-
-                                    AppRoute.ScreeningOne.route -> ScreeningOneScreen(
-                                        onNext = { navigateTo(AppRoute.ScreeningOneReport.route) },
-                                        onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
-                                    )
-
-                                    AppRoute.TrackRequestScreen.route -> {
-                                        TrackRequestScreen(
-                                            onNext = {},
-                                            onBack = { navigateBack(AppRoute.ProfileScreen.route) }
                                         )
-                                    }
-
-                                    AppRoute.NotificationScreen.route -> {
-                                        NotificationScreen(
-                                            onNext = {},
-                                            onBack = { navigateBack(AppRoute.DashboardScreen.route) }
-                                        )
-                                    }
-
-                                    AppRoute.ScreeningOneReport.route -> {
-                                        ScreeningOneReportScreen(
-                                            showReportScreen = true,
-                                            onNext = { navigateTo(AppRoute.ProfilerFormPage.route) },
-                                            onNextCongratulate = { navigateTo(AppRoute.AdvanceScreeningReport.route) },
-                                            onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
-                                        )
-                                    }
-
-                                    AppRoute.ProfilerFormPage.route -> {
-                                        ProfilerFormPageScreen(
-                                            onNext = { navigateTo(AppRoute.ProfilerFormPage.route) },
-                                            onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
-                                        )
-                                    }
-
-                                    AppRoute.AdvanceScreening.route -> AdvanceScreeningScreen(
-                                        onNext = { navigateTo(AppRoute.AdvanceScreeningReport.route) },
-                                        onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
-                                    )
-
-                                    AppRoute.AdvanceScreeningReport.route -> {
-                                        ReportAdvanceScreen(
-                                            onNext = { navigateTo(AppRoute.InterventionScreen.route) },
-                                            onViewProfileDetails = { navigateTo(AppRoute.ViewScreeningProfileDetails.route) },
-                                            onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
-                                        )
-                                    }
-
-                                    AppRoute.ViewScreeningProfileDetails.route -> {
-                                        ViewScreeningProfileDetailsScreen(
-                                            onNext = { navigateTo(AppRoute.ScreeningScreen.route) },
-                                            onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
-                                        )
-                                    }
-
-                                    AppRoute.AddStudentRegister.route -> AddNewStudentDetailsScreen(
-                                        onNext = { navigateTo(AppRoute.AddNewStudentMoreDetails.route) },
-                                        onBack = { navigateBack(AppRoute.ScreeningScreen.route) }
-                                    )
-
-                                    AppRoute.AddNewStudentMoreDetails.route -> AddNewStudentMoreDetailsScreen(
-                                        onNext = { navigateTo(AppRoute.ScreeningScreen.route) },
-                                        onBack = { navigateBack(AppRoute.AddStudentRegister.route) }
-                                    )
-
-                                    // This is for intervention
-                                    AppRoute.InterventionScreen.route -> InterventionHomeScreen(
-                                        onNext = { navigateTo(AppRoute.InterventionStudentDetails.route) },
-                                        onBack = { navigateBack(AppRoute.DashboardScreen.route) }
-                                    )
-
-                                    AppRoute.InterventionStudentDetails.route -> InterventionStudentDetailsScreen(
-                                        uploadedDocumentScreen = { navigateTo(AppRoute.UploadedDocuments.route) },
-                                        acceptLevelScreen = { navigateTo(AppRoute.InterventionAcceptLevel.route) },
-                                        onBack = { navigateBack(AppRoute.InterventionScreen.route) }
-                                    )
-
-                                    AppRoute.UploadedDocuments.route -> UploadedDocumentsScreen(
-                                        onBack = { navigateBack(AppRoute.InterventionStudentDetails.route) }
-                                    )
-
-                                    AppRoute.InterventionAcceptLevel.route -> InterventionAcceptLevelScreen(
-                                        onNext = { navigateTo(AppRoute.TeachingPlan.route) },
-                                        onBack = { navigateBack(AppRoute.InterventionStudentDetails.route) })
-
-                                    AppRoute.TeachingPlan.route -> TeachingPlanScreen(onBack = {
-                                        navigateBack(
-                                            AppRoute.InterventionAcceptLevel.route
-                                        )
+                                        (context as? Activity)?.finish()
                                     })
+                                // for logout & delete account we need to route to login screen
+                                AppRoute.UserNameScreen.route -> EnterUserNameScreen(
+                                    viewModel = viewModel,
+                                    onNext = { navigateTo(AppRoute.UserPasswordScreen.route) },
+                                    onRegister = {
+                                        navigateTo(AppRoute.OtpSendVerifyUI.route)
+                                    },
+                                    onBack = { navigateBack(AppRoute.UserTypeSelect.route) })
+
+                                AppRoute.EditProfileScreen.route -> EditProfileScreen1(
+                                    loginViewModel = viewModel,
+                                    onNextTeacher = { navigateTo(AppRoute.EditTeacherProfileScreen.route) },
+                                    onNextProfessional = { navigateTo(AppRoute.EditProfessionalEditProfile.route) },
+                                    onNextSpecialEducator = { navigateTo(AppRoute.EditSpeEduEditProfile.route) },
+                                    onBack = { navigateBack(AppRoute.ProfileScreen.route) })
+
+                                AppRoute.EditTeacherProfileScreen.route -> EditProfileScreen2(
+                                    loginViewModel = viewModel,
+                                    onNext = {
+                                        context.startActivity(
+                                            Intent(
+                                                context, StudentDashboardActivity::class.java
+                                            )
+                                        )
+                                        (context as? Activity)?.finish()
+                                    },
+                                    onBack = { navigateBack(AppRoute.ProfileScreen.route) })
+
+                                AppRoute.EditProfessionalEditProfile.route -> ProfessionalsEditProfile(
+                                    loginViewModel = viewModel,
+                                    onNext = {
+                                        context.startActivity(
+                                            Intent(
+                                                context, StudentDashboardActivity::class.java
+                                            )
+                                        )
+                                        (context as? Activity)?.finish()
+                                    },
+                                    onBack = { navigateBack(AppRoute.ProfileScreen.route) })
+
+                                AppRoute.EditSpeEduEditProfile.route -> SpecialEducatorEditProfile(
+                                    loginViewModel = viewModel,
+                                    onNext = {
+                                        context.startActivity(
+                                            Intent(
+                                                context, StudentDashboardActivity::class.java
+                                            )
+                                        )
+                                        (context as? Activity)?.finish()
+                                    },
+                                    onBack = { navigateBack(AppRoute.ProfileScreen.route) })
+
+                                // Screening
+                                AppRoute.ScreeningScreen.route -> ScreeningHomeScreen(
+                                    addStudent = { navigateTo(AppRoute.AddStudentRegister.route) },
+                                    screeningOne = { navigateTo(AppRoute.ScreeningOne.route) },
+                                    profilerForm = { navigateTo(AppRoute.ProfilerFormPage.route) },
+                                    advanceScreening = { navigateTo(AppRoute.AdvanceScreening.route) },
+                                    onBack = { navigateBack(AppRoute.DashboardScreen.route) })
+
+                                AppRoute.ScreeningOne.route -> ScreeningOneScreen(
+                                    onNext = { navigateTo(AppRoute.ScreeningOneReport.route) },
+                                    onBack = { navigateBack(AppRoute.ScreeningScreen.route) })
+
+                                AppRoute.TrackRequestScreen.route -> {
+                                    TrackRequestScreen(
+                                        onNext = {},
+                                        onBack = { navigateBack(AppRoute.ProfileScreen.route) })
                                 }
+
+                                AppRoute.NotificationScreen.route -> {
+                                    NotificationScreen(
+                                        onNext = {},
+                                        onBack = { navigateBack(AppRoute.DashboardScreen.route) })
+                                }
+
+                                AppRoute.ScreeningOneReport.route -> {
+                                    ScreeningOneReportScreen(
+                                        showReportScreen = true,
+                                        onNext = { navigateTo(AppRoute.ProfilerFormPage.route) },
+                                        onNextCongratulate = { navigateTo(AppRoute.AdvanceScreeningReport.route) },
+                                        onBack = { navigateBack(AppRoute.ScreeningScreen.route) })
+                                }
+
+                                AppRoute.ProfilerFormPage.route -> {
+                                    ProfilerFormPageScreen(
+                                        onNext = { navigateTo(AppRoute.ProfilerFormPage.route) },
+                                        onBack = { navigateBack(AppRoute.ScreeningScreen.route) })
+                                }
+
+                                AppRoute.AdvanceScreening.route -> AdvanceScreeningScreen(
+                                    onNext = { navigateTo(AppRoute.AdvanceScreeningReport.route) },
+                                    onBack = { navigateBack(AppRoute.ScreeningScreen.route) })
+
+                                AppRoute.AdvanceScreeningReport.route -> {
+                                    ReportAdvanceScreen(
+                                        onNext = { navigateTo(AppRoute.InterventionScreen.route) },
+                                        onViewProfileDetails = { navigateTo(AppRoute.ViewScreeningProfileDetails.route) },
+                                        onBack = { navigateBack(AppRoute.ScreeningScreen.route) })
+                                }
+
+                                AppRoute.ViewScreeningProfileDetails.route -> {
+                                    ViewScreeningProfileDetailsScreen(
+                                        onNext = { navigateTo(AppRoute.ScreeningScreen.route) },
+                                        onBack = { navigateBack(AppRoute.ScreeningScreen.route) })
+                                }
+
+                                AppRoute.AddStudentRegister.route -> AddNewStudentDetailsScreen(
+                                    onNext = { navigateTo(AppRoute.AddNewStudentMoreDetails.route) },
+                                    onBack = { navigateBack(AppRoute.ScreeningScreen.route) })
+
+                                AppRoute.AddNewStudentMoreDetails.route -> AddNewStudentMoreDetailsScreen(
+                                    onNext = { navigateTo(AppRoute.ScreeningScreen.route) },
+                                    onBack = { navigateBack(AppRoute.AddStudentRegister.route) })
+
+                                // This is for intervention
+                                AppRoute.InterventionScreen.route -> InterventionHomeScreen(
+                                    onNext = { navigateTo(AppRoute.InterventionStudentDetails.route) },
+                                    onBack = { navigateBack(AppRoute.DashboardScreen.route) })
+
+                                AppRoute.InterventionStudentDetails.route -> InterventionStudentDetailsScreen(
+                                    uploadedDocumentScreen = { navigateTo(AppRoute.UploadedDocuments.route) },
+                                    acceptLevelScreen = { navigateTo(AppRoute.InterventionAcceptLevel.route) },
+                                    onBack = { navigateBack(AppRoute.InterventionScreen.route) })
+
+                                AppRoute.UploadedDocuments.route -> UploadedDocumentsScreen(
+                                    onBack = { navigateBack(AppRoute.InterventionStudentDetails.route) })
+
+                                AppRoute.InterventionAcceptLevel.route -> InterventionAcceptLevelScreen(
+                                    onNext = { navigateTo(AppRoute.TeachingPlan.route) },
+                                    onBack = { navigateBack(AppRoute.InterventionStudentDetails.route) })
+
+                                AppRoute.TeachingPlan.route -> TeachingPlanScreen(onBack = {
+                                    navigateBack(
+                                        AppRoute.InterventionAcceptLevel.route
+                                    )
+                                })
                             }
                         }
-                    })
+                    }
+                })
             }
         }
     }
@@ -528,7 +551,8 @@ fun onMenuItemClick(
     studentDashboardActivity: StudentDashboardActivity,
     coroutineScope: CoroutineScope,
     openContactUs: () -> Unit,
-    drawerState: DrawerState
+    openLanguage: () -> Unit,
+    drawerState: DrawerState,
 ) {
     // Handle the click event here
     val context = studentDashboardActivity as Context
@@ -552,7 +576,9 @@ fun onMenuItemClick(
         }
 
         AppRoute.LanguageScreen.route -> {
-            logger.d("Screen: LanguageChangeActivity()")
+            logger.d("Screen: Change language dialog open screen")
+            coroutineScope.launch { drawerState.close() }
+            openLanguage()
         }
 
         AppRoute.ReferScreen.route -> {
@@ -749,8 +775,10 @@ fun BottomSheetContactUsScreen(
                                     context.startActivity(emailIntent)
                                 } catch (e: Exception) {
                                     // fallback if no email app
-                                    val browserIntent =
-                                        Intent(Intent.ACTION_VIEW, Uri.parse("mailto:support.pi@aurosociety.org"))
+                                    val browserIntent = Intent(
+                                        Intent.ACTION_VIEW,
+                                        Uri.parse("mailto:support.pi@aurosociety.org")
+                                    )
                                     context.startActivity(browserIntent)
                                 }
                             }) {
@@ -777,6 +805,369 @@ fun BottomSheetContactUsScreen(
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BottomSheetLanguageScreen(
+    isBottomSheetVisible: Boolean,
+    sheetState: SheetState,
+    onDismiss: () -> Unit,
+    viewModel: LoginViewModel,
+) {
+
+    val context: Context = LocalContext.current
+    val errColor = PrimaryBlue
+    val scrollState = rememberLazyGridState()
+    val coroutineScope = rememberCoroutineScope()
+    var noData = stringResource(R.string.txt_oops_no_data_found)
+    var isInternetAvailable by remember { mutableStateOf(true) }
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
+    var noDataMessage by remember { mutableStateOf(noData) }
+    var selectedIndex by remember { mutableStateOf<Int?>(null) }
+    val selectedLanguageId = remember { mutableStateOf<String?>(null) }
+    val selectedLanguageName = remember { mutableStateOf<String?>(null) }
+    val languageData = remember { mutableStateListOf<GetLanguageListResponse.LanguageResponse>() }
+    var isDialogVisible by remember { mutableStateOf(false) }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    CustomDialog(
+        isVisible = isDialogVisible,
+        onDismiss = { isDialogVisible = false },
+        message = stringResource(R.string.txt_loading)
+    )
+
+    LaunchedEffect(Unit) {
+        viewModel.getLanguages()
+    }
+
+    LaunchedEffect(uiState) {
+        when {
+            uiState.isLoading -> {
+                languageData.clear()
+                isDialogVisible = true
+            }
+
+            uiState.error.isNotEmpty() -> {
+                languageData.clear()
+                logger.d("Error: ${uiState.error}")
+                context.toast(uiState.error)
+                isDialogVisible = false
+                noDataMessage = uiState.error
+            }
+
+            uiState.success != null -> {
+                val list = uiState.success?.response ?: emptyList()
+                logger.d("Languages fetched: ${list.size}")
+                if (list.isNotEmpty()) {
+                    languageData.clear()
+                    languageData.addAll(list)
+                } else {
+                    logger.d("Languages fetched: 0 (null or empty response)")
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
+    if (isBottomSheetVisible) {
+        ModalBottomSheet(
+            onDismissRequest = onDismiss,
+            sheetState = sheetState,
+            containerColor = if (isSystemInDarkTheme()) {
+                Dark_01
+            } else {
+                White
+            },
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+            dragHandle = null,
+            scrimColor = if (isSystemInDarkTheme()) {
+                DARK_TITLE_TEXT.copy(alpha = 0.5f)
+            } else {
+                Color.Black.copy(alpha = 0.5f)
+            },
+            windowInsets = WindowInsets.ime
+        ) {
+            Column(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(vertical = 15.dp, horizontal = 15.dp)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.CenterHorizontally),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "", style = MaterialTheme.typography.headlineLarge.copy(
+                                color = if (isSystemInDarkTheme()) {
+                                    DARK_TITLE_TEXT
+                                } else {
+                                    Black
+                                },
+                                fontSize = 18.sp,
+                                fontFamily = fontBold,
+                                textAlign = TextAlign.Start
+                            )
+                        )
+
+                        Image(
+                            painter = painterResource(R.drawable.line),
+                            contentDescription = IMG_DESCRIPTION,
+                            modifier = Modifier
+                                .wrapContentWidth()
+                                .align(Alignment.CenterVertically)
+                                .padding(top = 8.dp, start = 16.dp, end = 16.dp)
+                                .clickable {
+                                    onDismiss.invoke()
+                                }
+                                .clip(RoundedCornerShape(100.dp))
+                                .border(
+                                    width = 2.dp, color = if (isSystemInDarkTheme()) {
+                                        DARK_TITLE_TEXT
+                                    } else {
+                                        Gray
+                                    }, shape = CircleShape
+                                ))
+
+                        Text(
+                            text = "", style = MaterialTheme.typography.headlineLarge.copy(
+                                color = if (isSystemInDarkTheme()) {
+                                    DARK_TITLE_TEXT
+                                } else {
+                                    Black
+                                },
+                                fontSize = 18.sp,
+                                fontFamily = fontBold,
+                                textAlign = TextAlign.Start
+                            )
+                        )
+                    }
+
+                    Text(
+                        text = stringResource(id = R.string.select_language),
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_BODY_TEXT
+                        } else {
+                            Black
+                        },
+                        fontSize = 19.sp,
+                        fontFamily = fontBold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
+                            .fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Column(
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .padding(start = 8.dp, end = 8.dp, top = 8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        if (languageData.isNotEmpty()) {
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(2),
+                                state = scrollState,
+                                modifier = Modifier
+                                    .height(350.dp)
+                                    .padding(horizontal = 8.dp)
+                                    .draggable(
+                                        orientation = Orientation.Vertical,
+                                        state = rememberDraggableState { delta ->
+                                            coroutineScope.launch {
+                                                scrollState.scrollBy(-delta)
+                                            }
+                                        })
+                            ) {
+                                items(languageData.size) { index ->
+                                    ItemLanguageChangeCard(
+                                        context,
+                                        isSelected = selectedIndex == index,
+                                        index,
+                                        language = languageData,
+                                        onItemClicked = {
+                                            selectedIndex =
+                                                if (selectedIndex == index) null else index // Toggle selection
+                                            selectedLanguageId.value =
+                                                languageData[index].id.toString()
+                                            selectedLanguageName.value =
+                                                languageData[index].name.toString()
+                                            viewModel.savePrefData(
+                                                SELECTED_LANGUAGE_ID,
+                                                languageData[index].id.toString()
+                                            )
+                                        }
+                                    )
+                                }
+                            }
+                        } else {
+                            isInternetAvailable = isNetworkAvailable(context)
+                            if (!isInternetAvailable) {
+                                ShowError(
+                                    internetMessage,
+                                    errColor,
+                                    painterResource(R.drawable.sad_emoji)
+                                )
+                            } else {
+                                NoDataFound(noDataMessage, painterResource(R.drawable.sad_emoji))
+                            }
+                        }
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .padding(bottom = 32.dp, start = 16.dp, end = 16.dp, top = 16.dp)
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.Bottom,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        BtnUi(
+                            onClick = {
+                                onDismiss()
+                                logger.d("Selected language Name and Id :- ${selectedLanguageName.value}, ${selectedLanguageId.value}")
+                            },
+                            title = stringResource(R.string.key_Confirm),
+                            enabled = true
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ItemLanguageChangeCard(
+    context: Context,
+    isSelected: Boolean = true,
+    index: Int,
+    language: MutableList<GetLanguageListResponse.LanguageResponse>,
+    onItemClicked: () -> Unit = {},
+) {
+    val languageIndex = language[index]
+    val errorToast = stringResource(R.string.choose_hindi_english)
+
+    val selectedBorder = if (isSelected) BorderStroke(
+        width = 1.dp,
+        if (isSystemInDarkTheme()) {
+            PRIMARY_AURO_BLUE
+        } else {
+            BorderBlue
+        }
+    ) else BorderStroke(
+        width = 0.5.dp, if (isSystemInDarkTheme()) {
+            Dark_02
+        } else {
+            GrayLight02
+        }
+    )
+    val backGroundColor = if (isSelected) {
+        if (isSystemInDarkTheme()) {
+            Dark_Selected_BG
+        } else {
+            PrimaryBlueLt1
+        }
+    } else {
+        if (isSystemInDarkTheme()) {
+            Dark_02
+        } else {
+            White
+        }
+    }
+
+    Card(
+        modifier = Modifier
+            .clickable {
+                if (languageIndex.status == 1) {
+                    onItemClicked.invoke()
+                } else {
+                    logger.d("Languages fetched: ${languageIndex.status}")
+                    context.toast(errorToast)
+                }
+            }
+            .padding(8.dp)
+            .fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(1.dp),
+        colors = CardDefaults.cardColors(
+            if (isSystemInDarkTheme()) {
+                Dark_02
+            } else {
+                GrayLight02
+            }
+        ),
+        border = selectedBorder,
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = backGroundColor),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(vertical = 15.dp)
+                    .weight(1f),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    modifier = Modifier
+                        .background(Color.Unspecified)
+                        .size(45.dp),
+                    contentScale = ContentScale.Fit,
+                    painter = if (!languageIndex.langIcon.isNullOrEmpty()) {
+                        rememberAsyncImagePainter(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(languageIndex.langIcon)
+                                .decoderFactory(SvgDecoder.Factory())
+                                .size(Size.ORIGINAL)
+                                .placeholder(R.drawable.ic_hindi)
+                                .error(R.drawable.ic_hindi)
+                                .build()
+                        )
+                    } else {
+                        painterResource(id = R.drawable.ic_hindi)
+                    },
+                    contentDescription = IMG_DESCRIPTION
+                )
+
+                Text(
+                    (languageIndex.translated_name ?: languageIndex.name)!!,
+                    textAlign = TextAlign.Start,
+                    maxLines = 1,
+                    fontSize = 16.sp,
+                    overflow = TextOverflow.Ellipsis,
+                    color = Black,
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                )
+
+                Text(
+                    "${languageIndex.name} ",
+                    textAlign = TextAlign.Start,
+                    maxLines = 1,
+                    fontSize = 14.sp,
+                    overflow = TextOverflow.Ellipsis,
+                    color = Gray,
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .padding(top = 5.dp)
+                )
             }
         }
     }
