@@ -3,6 +3,7 @@ package com.pi.ProjectInclusion.ui.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kmptemplate.logger.LoggerProvider
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CreateFirstStepProfileResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CreateRegisterPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
@@ -20,6 +21,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithO
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForceUpdateResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ProfessionListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.QualificationListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ReasonListResponse
@@ -27,7 +29,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByU
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SpecializationListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
-import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
+import com.pi.ProjectInclusion.data.model.profileModel.response.ViewProfileResponse
 import com.pi.ProjectInclusion.database.LocalDataSource
 import com.pi.ProjectInclusion.domain.ConnectivityObserver
 import com.pi.ProjectInclusion.domain.useCases.AuthenticationUsesCases
@@ -142,6 +144,11 @@ class LoginViewModel(
     val reasonListResponse: StateFlow<UiState<ReasonListResponse>> =
         reasonList
 
+    private val forceUpdate =
+        MutableStateFlow(UiState<ForceUpdateResponse>())
+    val forceUpdateResponse: StateFlow<UiState<ForceUpdateResponse>> =
+        forceUpdate
+
     private val query = MutableStateFlow("")
 
     // getting userName from intent
@@ -214,12 +221,11 @@ class LoginViewModel(
 
         getAuthViewModel.getLanguage()
             .catch { exception ->
-                if (exception.message?.contains(serverError) == true){
+                if (exception.message?.contains(serverError) == true) {
                     _uiState.update {
                         UiState(error = serverMsg)
                     }
-                }
-                else {
+                } else {
                     _uiState.update {
                         UiState(error = exception.message ?: somethingWentWrong)
                     }
@@ -231,12 +237,11 @@ class LoginViewModel(
                         _uiState.update { UiState(success = data) }
                     },
                     onFailure = { exception ->
-                        if (exception.message?.contains(serverError) == true){
+                        if (exception.message?.contains(serverError) == true) {
                             _uiState.update {
                                 UiState(error = serverMsg)
                             }
-                        }
-                        else {
+                        } else {
                             _uiState.update {
                                 UiState(error = exception.message ?: somethingWentWrong)
                             }
@@ -260,12 +265,11 @@ class LoginViewModel(
         _uiStateUserType.update { UiState(isLoading = true) }
         getAuthViewModel.getUserType()
             .catch { exception ->
-                if (exception.message?.contains(serverError) == true){
+                if (exception.message?.contains(serverError) == true) {
                     _uiStateUserType.update {
                         UiState(error = serverMsg)
                     }
-                }
-                else {
+                } else {
                     _uiStateUserType.update {
                         UiState(error = exception.message ?: somethingWentWrong)
                     }
@@ -277,12 +281,11 @@ class LoginViewModel(
                         _uiStateUserType.update { UiState(success = data) }
                     },
                     onFailure = { exception ->
-                        if (exception.message?.contains(serverError) == true){
+                        if (exception.message?.contains(serverError) == true) {
                             _uiStateUserType.update {
                                 UiState(error = serverMsg)
                             }
-                        }
-                        else {
+                        } else {
                             _uiStateUserType.update {
                                 UiState(error = exception.message ?: somethingWentWrong)
                             }
@@ -322,7 +325,8 @@ class LoginViewModel(
         getAuthViewModel.getUserLoginPassword(loginRequest)
             .catch { exception ->
                 _uiStateLogin.update {
-                    UiState(error = exception.message?.takeIf { it.isNotBlank() } ?: somethingWentWrong)
+                    UiState(error = exception.message?.takeIf { it.isNotBlank() }
+                        ?: somethingWentWrong)
                 }
             }
             .collect { result ->
@@ -331,12 +335,16 @@ class LoginViewModel(
                         if (data.status == true) { // success field from API
                             _uiStateLogin.update { UiState(success = data) }
                         } else {
-                            _uiStateLogin.update { UiState(error = data.message?.takeIf { it.isNotBlank() } ?: somethingWentWrong) }
+                            _uiStateLogin.update {
+                                UiState(error = data.message?.takeIf { it.isNotBlank() }
+                                    ?: somethingWentWrong)
+                            }
                         }
                     },
                     onFailure = { exception ->
                         _uiStateLogin.update {
-                            UiState(error = exception.message?.takeIf { it.isNotBlank() } ?: somethingWentWrong)
+                            UiState(error = exception.message?.takeIf { it.isNotBlank() }
+                                ?: somethingWentWrong)
                         }
                     }
                 )
@@ -447,6 +455,7 @@ class LoginViewModel(
         getAuthViewModel.getVerifyOtp(mobNo, otpValue)
             .catch { exception ->
                 verifyLogin.update {
+                    logger.d("VerifyOtp Error1: ${exception.message}")
                     UiState(error = exception.message ?: somethingWentWrong)
                 }
             }
@@ -454,10 +463,13 @@ class LoginViewModel(
                 result.fold(
                     onSuccess = { data ->
                         verifyLogin.update { UiState(success = data) }
+                        logger.d("VerifyOtp Error2: ${data}")
                     },
                     onFailure = { exception ->
                         verifyLogin.update {
+                            logger.d("VerifyOtp Error3: ${exception.message}")
                             UiState(error = exception.message ?: somethingWentWrong)
+
                         }
                     }
                 )
@@ -768,6 +780,29 @@ class LoginViewModel(
                 )
             }
     }
+
+    fun getForceUpdateApp(deviceOsVersion: Double, latestAppVersion: Double) =
+        viewModelScope.launch {
+            forceUpdate.update { UiState(isLoading = true) }
+            getAuthViewModel.getForceUpdateAppRepo(deviceOsVersion, latestAppVersion)
+                .catch { exception ->
+                    forceUpdate.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
+                }
+                .collect { result ->
+                    result.fold(
+                        onSuccess = { data ->
+                            forceUpdate.update { UiState(success = data) }
+                        },
+                        onFailure = { exception ->
+                            forceUpdate.update {
+                                UiState(error = exception.message ?: somethingWentWrong)
+                            }
+                        }
+                    )
+                }
+        }
 }
 
 data class UiState<T>(

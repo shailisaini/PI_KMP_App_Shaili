@@ -47,9 +47,16 @@ object ConstantVariables {
     var COURSE: String = "Course"
 
     // API Response Messages
+    var schoolChangeRequestId: String = "1"
+    var schoolChangeDescription: String = "school name change request"
+    var nameChangeRequestId: String = "2"
+    var nameChangeDescription: String = "name change request"
+
     var SUCCESS: String = "Success"
     var NEW_USER: String = "New User"
     var USER_EXIST: String = "User Already Exists"
     var DEACTIVATE: String = "Deactivate"
     var UnableToSendMsg: String = "Unable to send Otp"
+    var PLAY_STORE_LINK: String = "https://play.google.com/store/apps/details?id="
+    var MARKET_ID: String = "market://details?id="
 }

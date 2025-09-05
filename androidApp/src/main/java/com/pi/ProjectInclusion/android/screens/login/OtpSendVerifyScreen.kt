@@ -78,10 +78,12 @@ fun OtpSendVerifyScreen(
     onNext: () -> Unit,
     onBack: () -> Unit,
     onBackUserName: () -> Unit,
+    onNextCreatePass: () -> Unit,
     viewModel: LoginViewModel,
 ) {
     val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
-
+    val verifyOtpState by viewModel.verifyLoginResponse.collectAsStateWithLifecycle()
+    val loginWithOtp by viewModel.uiStateLoginResponse.collectAsStateWithLifecycle()
     logger.d("Screen: " + "OtpSendVerifyScreen()")
 
     var otpValue by remember { mutableStateOf("") }
@@ -185,8 +187,70 @@ fun OtpSendVerifyScreen(
         }
     }
 
+    // verify otp response
+    LaunchedEffect(verifyOtpState) {
+        when {
+            verifyOtpState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            verifyOtpState.error.isNotEmpty() -> {
+                logger.d("VerifyOtp Error: ${verifyOtpState.error}")
+                isDialogVisible = false
+            }
+
+            verifyOtpState.success != null -> {
+                logger.d("VerifyOtp: ${verifyOtpState.success!!.response!!.message}")
+                if (verifyOtpState.success!!.status == true) {
+                    if (viewModel.getPrefData(IS_COMING_FROM) == REGISTER_NEW){
+                        onNextCreatePass()
+                    }
+                    else {
+                        onNext()
+                    }
+                } else {
+                    invalidText = R.string.txt_Enter_valid_OTP
+                    inValidOTP = true
+                }
+
+                isDialogVisible = false
+            }
+        }
+    }
+
+    // Handle login with otp response state
+    LaunchedEffect(loginWithOtp) {
+        when {
+            loginWithOtp.isLoading -> {
+                isDialogVisible = true
+            }
+
+            loginWithOtp.error.isNotEmpty() -> {
+                logger.d("Error: ${loginWithOtp.error}")
+                isDialogVisible = false
+            }
+
+            loginWithOtp.success != null -> {
+                if (loginWithOtp.success!!.status == true) {
+                    context.toast(loginSuccess)
+                    context.startActivity(
+                        Intent(
+                            context,
+                            StudentDashboardActivity::class.java
+                        )
+                    )
+                } else {
+//                        invalidText = loginWithOtp.success!!.message.toString()
+                    inValidOTP = true
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
     // verify Api request & response
     if (isVerifyOtpApi) {
+
         isDialogVisible = true
         if (viewModel.getPrefData(IS_COMING_FROM) == LOGIN_WITH_OTP) {
             viewModel.getLoginWithOtpViewModel(
@@ -197,65 +261,8 @@ fun OtpSendVerifyScreen(
                 )
             )
 
-            // Handle login with otp response state
-            val loginWithOtp by viewModel.uiStateLoginResponse.collectAsStateWithLifecycle()
-            LaunchedEffect(loginWithOtp) {
-                when {
-                    loginWithOtp.isLoading -> {
-                        isDialogVisible = true
-                    }
-
-                    loginWithOtp.error.isNotEmpty() -> {
-                        logger.d("Error: ${loginWithOtp.error}")
-                        isDialogVisible = false
-                    }
-
-                    loginWithOtp.success != null -> {
-                        if (loginWithOtp.success!!.status == true) {
-                            context.toast(loginSuccess)
-                            context.startActivity(
-                                Intent(
-                                    context,
-                                    StudentDashboardActivity::class.java
-                                )
-                            )
-                        } else {
-//                        invalidText = loginWithOtp.success!!.message.toString()
-                            inValidOTP = true
-                        }
-                        isDialogVisible = false
-                    }
-                }
-            }
-
         } else {
             viewModel.getVerifyOtpViewModel(encryptedPhoneNo, encryptedOtp)
-            // verify otp response
-            val verifyOtpState by viewModel.verifyLoginResponse.collectAsStateWithLifecycle()
-            LaunchedEffect(verifyOtpState) {
-                when {
-                    verifyOtpState.isLoading -> {
-                        isDialogVisible = true
-                    }
-
-                    verifyOtpState.error.isNotEmpty() -> {
-                        logger.d("VerifyOtp Error: ${verifyOtpState.error}")
-                        isDialogVisible = false
-                    }
-
-                    verifyOtpState.success != null -> {
-                        logger.d("VerifyOtp: ${verifyOtpState.success!!.response!!.message}")
-                        if (verifyOtpState.success!!.status == true) {
-                            onNext()
-                        } else {
-                            invalidText = R.string.txt_Enter_valid_OTP
-                            inValidOTP = true
-                        }
-
-                        isDialogVisible = false
-                    }
-                }
-            }
         }
 
         isVerifyOtpApi = false

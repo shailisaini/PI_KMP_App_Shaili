@@ -49,7 +49,7 @@ import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.android.screens.lockScreen.LockScreenOrientationPortrait
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
-import com.pi.ProjectInclusion.data.model.profileModel.dummyTrackList
+import com.pi.ProjectInclusion.data.model.profileModel.response.dummyTrackList
 
 
 @OptIn(ExperimentalMaterial3Api::class)

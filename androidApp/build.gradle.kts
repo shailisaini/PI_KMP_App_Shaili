@@ -11,8 +11,8 @@ android {
         applicationId = "com.pi.ProjectInclusion.android"
         minSdk = 29
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 91
+        versionName = "91"
     }
     buildFeatures {
         compose = true

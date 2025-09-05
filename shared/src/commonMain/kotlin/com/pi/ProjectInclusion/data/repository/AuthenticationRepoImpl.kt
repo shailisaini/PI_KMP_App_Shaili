@@ -17,6 +17,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithO
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForceUpdateResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ProfessionListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.QualificationListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ReasonListResponse
@@ -24,7 +25,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByU
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SpecializationListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
-import com.pi.ProjectInclusion.data.model.profileModel.ViewProfileResponse
+import com.pi.ProjectInclusion.data.model.profileModel.response.ViewProfileResponse
 import com.pi.ProjectInclusion.data.remote.ApiService
 import com.pi.ProjectInclusion.domain.repository.AuthenticationRepository
 
@@ -137,6 +138,13 @@ class AuthenticationRepoImpl(private val apiService: ApiService) : Authenticatio
 
     override suspend fun getAllReasonRepo(): ReasonListResponse {
         return apiService.getAllReason()
+    }
+
+    override suspend fun getForceUpdateAppRepo(
+        deviceOsVersion: Double,
+        latestAppVersion: Double,
+    ): ForceUpdateResponse {
+        return apiService.getForceUpdateApp(deviceOsVersion, latestAppVersion)
     }
 }
 

@@ -11,6 +11,8 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResp
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingTokenResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
+import com.pi.ProjectInclusion.data.model.profileModel.ProfileNameChangeRequest
+import com.pi.ProjectInclusion.data.model.profileModel.response.ChangeRequestResponse
 import com.pi.ProjectInclusion.domain.repository.DashboardRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -113,6 +115,22 @@ class DashboardUsesCases(private val repository: DashboardRepository) {
         } catch (e: Exception) {
             val errorMessage = e.message ?: unableToConnectServer
             logger.d("Exception in getZoomMeetingsActualTokenRepo() $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getChangeRequestCases(
+        changeRequest: ProfileNameChangeRequest,
+        strToken: String,
+        profilePic: ByteArray? = null,
+        fileName: String? = null
+    ): Flow<Result<ChangeRequestResponse>> = flow {
+        try {
+            val response = repository.getChangeRequestRepo(changeRequest, strToken, profilePic, fileName)
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            logger.d("Exception in certificate $errorMessage")
             emit(Result.failure(Exception(errorMessage)))
         }
     }.flowOn(Dispatchers.IO)

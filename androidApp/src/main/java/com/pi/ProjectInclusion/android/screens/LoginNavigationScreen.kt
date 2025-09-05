@@ -148,12 +148,9 @@ class LoginNavigationScreen : ComponentActivity() {
 
                         AppRoute.OtpSendVerifyUI.route -> OtpSendVerifyScreen(
                             onNext = { navigateTo(AppRoute.SetNewPasswordUI.route) },
-                            onBackUserName = {
-                                navigateBack()
-                            },
-                            onBack = {
-                                navigateBack(AppRoute.ForgetPasswordUI.route)
-                            },
+                            onNextCreatePass = { navigateTo(AppRoute.CreatePasswordScreen.route) },
+                            onBackUserName = { navigateBack() },
+                            onBack = { navigateBack(AppRoute.ForgetPasswordUI.route) },
                             viewModel = viewModel
                         )
 

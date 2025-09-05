@@ -80,6 +80,7 @@ import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.CommonFunction.LoginScreenTitle
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
+import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CreatePasswordRequest
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
@@ -163,8 +164,7 @@ fun CreateNewPasswordUI(
     val encryptedMobile = isEncryptedPhone(mobileNo.encryptAES().toString().trim())
     var languageId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
     var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
-    val strToken: String =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjR5QW9PaGdVQnJyOUVkdXVvbHFvSVE9PSIsInN1YiI6IjEiLCJpYXQiOjE3NTU1OTYyNTIsImV4cCI6MTc1NTY4MjY1Mn0.xC1TkBEv391O5VJaM4MoOr-kRp6THY4Q8xcpAxN-DZ0"
+    var strToken = viewModel.getPrefData(TOKEN_PREF_KEY)
 
     LaunchedEffect(createRegisterPasswordState) {
         when {
