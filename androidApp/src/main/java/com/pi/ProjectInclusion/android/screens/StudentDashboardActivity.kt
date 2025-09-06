@@ -169,6 +169,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import androidx.core.net.toUri
+import com.pi.ProjectInclusion.android.common_UI.LogoutDialog
 
 class StudentDashboardActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -250,6 +251,7 @@ class StudentDashboardActivity : ComponentActivity() {
                         val sheetState = rememberModalBottomSheetState(
                             skipPartiallyExpanded = true, /*confirmValueChange = { it != SheetValue.Hidden }*/
                         )
+                        var logOutSheet by remember { mutableStateOf(false) }
 
                         BottomSheetContactUsScreen(
                             isBottomSheetVisible = isBottomSheetVisible,
@@ -280,6 +282,15 @@ class StudentDashboardActivity : ComponentActivity() {
                                 }
                             })
 
+                        if (logOutSheet) {
+                            LogoutDialog(onDismiss = { logOutSheet = false }, onClick = {
+                                logOutSheet = false
+                                viewModel.clearPref()
+//                                onBackLogin() // move to Login Screen
+                                AppRoute.UserNameScreen.route
+                            })
+                        }
+
                         DrawerHeader(
                             drawerState, onItemClick = {
                                 scope.launch {
@@ -294,6 +305,7 @@ class StudentDashboardActivity : ComponentActivity() {
                                 }
                             }, profileData
                         )
+
                         DrawerBody(
                             // List of Navigation Drawer
                             items = listOf(
@@ -349,7 +361,8 @@ class StudentDashboardActivity : ComponentActivity() {
                                     openReferUI = { isBottomSheetReferVisible = true },
                                     drawerState
                                 )
-                            })
+                            },
+                            onLogout = { logOutSheet = true })
                     }
                 },
             ) {
@@ -837,7 +850,6 @@ fun BottomSheetContactUsScreen(
         }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

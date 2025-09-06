@@ -59,12 +59,15 @@ import com.pi.ProjectInclusion.RedLogout
 import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.MyApplicationTheme
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.LogoutDialog
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
 import com.pi.ProjectInclusion.android.common_UI.ThemeSwitch
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.data.model.profileModel.response.ViewProfileResponse
+import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun DrawerHeader(
@@ -199,6 +202,7 @@ fun DrawerBody(
     modifier: Modifier = Modifier,
     itemTextStyle: TextStyle = TextStyle(fontSize = 18.sp),
     onItemClick: (String) -> Unit = {},
+    onLogout: () -> Unit = {},
 ) {
     val colors = MaterialTheme.colorScheme
 
@@ -281,6 +285,7 @@ fun DrawerBody(
                     ) {
 
                     }
+
                     TextWithIconOnLeft(
                         text = stringResource(R.string.txt_logout),
                         icon = ImageVector.vectorResource(id = R.drawable.ic_logout),
@@ -288,7 +293,7 @@ fun DrawerBody(
                         iconColor = RedLogout,
                         modifier = Modifier.padding(vertical = 5.dp),
                         onClick = {
-
+                            onLogout()
                         })
                 }
             }
