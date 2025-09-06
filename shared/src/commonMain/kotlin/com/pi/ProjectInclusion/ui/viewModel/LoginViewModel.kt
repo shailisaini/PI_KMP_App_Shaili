@@ -48,6 +48,7 @@ class LoginViewModel(
     private val localData: LocalDataSource,
     private val connectivityObserver: ConnectivityObserver, //  to check network
 ) : ViewModel() {
+
     var noInternetConnection: String = "No Internet Found!"
     var somethingWentWrong: String = "Something went wrong"
     var serverError: String = "Failed to connect to"
@@ -156,8 +157,22 @@ class LoginViewModel(
     private val userName = MutableStateFlow<String?>(null)
     val userNameValue: String? get() = userName.value
 
+    private val firstName = MutableStateFlow<String?>(null)
+    val firstNameValue: String? get() = firstName.value
+
+    private val lastName = MutableStateFlow<String?>(null)
+    val lastNameValue: String? get() = lastName.value
+
     fun saveUserName(number: String) {
         userName.value = number
+    }
+
+    fun saveFirstName(number: String) {
+        firstName.value = number
+    }
+
+    fun saveLastName(number: String) {
+        lastName.value = number
     }
 
     fun savePrefData(key: String, value: String) {
@@ -166,6 +181,15 @@ class LoginViewModel(
 
     fun getPrefData(key: String): String {
         return localData.getValue(key, "")
+    }
+
+    // remove particular key
+    fun clearPrefValue(key: String) {
+        localData.clearValue(key)
+    }
+    // clear all data
+    fun clearPref() {
+        localData.clearAll()
     }
 
     init {

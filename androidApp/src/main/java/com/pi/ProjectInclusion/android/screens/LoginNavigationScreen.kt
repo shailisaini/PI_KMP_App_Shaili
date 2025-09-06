@@ -165,6 +165,7 @@ class LoginNavigationScreen : ComponentActivity() {
                                 navigateTo(AppRoute.OtpSendVerifyUI.route)
                             },
                             isForgetPassword = { navigateTo(AppRoute.ForgetPasswordUI.route) },
+                            onNextProfile = { navigateTo(AppRoute.EnterUserProfileScreen.route) },
                             onBack = { navigateBack(AppRoute.UserNameScreen.route) }
                         )
 
@@ -182,18 +183,6 @@ class LoginNavigationScreen : ComponentActivity() {
                             onNextTeacher = { navigateTo(AppRoute.EnterTeacherRegScreen.route) },
                             onNextSpecialEdu = { navigateTo(AppRoute.SpecialEducatorRegistration.route) },
                             onNextProfessional = { navigateTo(AppRoute.EnterProfessionalScreen.route) },
-                            onBack = { navigateBack(AppRoute.UserNameScreen.route) }
-                        )
-
-                        // Professional
-                        AppRoute.EnterProfessionalScreen.route -> ProfessionalsRegistrationScreen(
-                            viewModel = viewModel,
-                            onNext = {
-                                context.startActivity(
-                                    Intent(context, StudentDashboardActivity::class.java)
-                                )
-                                (context as? Activity)?.finish()
-                            },
                             onBack = { navigateBack(AppRoute.UserNameScreen.route) }
                         )
 
@@ -219,6 +208,18 @@ class LoginNavigationScreen : ComponentActivity() {
                                 (context as? Activity)?.finish()
                             },
                             onBack = { navigateBack(AppRoute.EnterUserProfileScreen.route) }
+                        )
+
+                        // Professional
+                        AppRoute.EnterProfessionalScreen.route -> ProfessionalsRegistrationScreen(
+                            viewModel = viewModel,
+                            onNext = {
+                                context.startActivity(
+                                    Intent(context, StudentDashboardActivity::class.java)
+                                )
+                                (context as? Activity)?.finish()
+                            },
+                            onBack = { navigateBack(AppRoute.UserNameScreen.route) }
                         )
 
                         AppRoute.ForgetPasswordUI.route -> ForgetPasswordScreen(

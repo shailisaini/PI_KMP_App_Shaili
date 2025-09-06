@@ -80,6 +80,7 @@ import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
@@ -114,7 +115,7 @@ fun ProfessionalsRegistrationScreen(
         onBack()
     }
 
-    logger.d("Screen: " + "EnterUserScreen2()")
+    logger.d("Screen: " + "ProfessionalsRegistrationScreen()")
 
     Surface(
         modifier = Modifier.fillMaxWidth(), color = White
@@ -209,8 +210,7 @@ fun ProfessionalScreenUI(
     var professionId = remember { mutableIntStateOf(-1) }
     var qualificationId = remember { mutableIntStateOf(-1) }
     var specializationId = remember { mutableIntStateOf(-1) }
-    val strToken =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjR5QW9PaGdVQnJyOUVkdXVvbHFvSVE9PSIsInN1YiI6IjEiLCJpYXQiOjE3NTU3NzQ4NDcsImV4cCI6MTc1NTg2MTI0N30.bjqUtT6SSrMRpNO4EiLgh6VhnJp54deOPvQBrjzbTGo"
+    var strToken = viewModel.getPrefData(TOKEN_PREF_KEY)
 
     LaunchedEffect(Unit) {
         viewModel.getAllStateList()
@@ -225,10 +225,12 @@ fun ProfessionalScreenUI(
             allStatesState.error.isNotEmpty() -> {
                 logger.d("All state error : ${allStatesState.success}")
                 isDialogVisible = false
+                allState.clear()
             }
 
             allStatesState.success != null -> {
                 logger.d("All state response : ${allStatesState.success}")
+                allState.clear()
                 if (allStatesState.success?.size != 0) {
                     allDistricts.clear()
                     allStatesState.success.let {
@@ -250,10 +252,12 @@ fun ProfessionalScreenUI(
             allDistrictsState.error.isNotEmpty() -> {
                 logger.d("All district error : ${allDistrictsState.success}")
                 isDialogVisible = false
+                allDistricts.clear()
             }
 
             allDistrictsState.success != null -> {
                 logger.d("All district response : ${allDistrictsState.success}")
+                allDistricts.clear()
                 if (allDistrictsState.success?.size != 0) {
                     allBlocks.clear()
                     allDistrictsState.success.let {
@@ -275,10 +279,12 @@ fun ProfessionalScreenUI(
             allBlocksState.error.isNotEmpty() -> {
                 logger.d("All Blocks error : ${allBlocksState.success}")
                 isDialogVisible = false
+                allBlocks.clear()
             }
 
             allBlocksState.success != null -> {
                 logger.d("All Blocks response : ${allBlocksState.success}")
+                allBlocks.clear()
                 if (allBlocksState.success?.size != 0) {
                     allSchools.clear()
                     allBlocksState.success.let {
@@ -300,10 +306,12 @@ fun ProfessionalScreenUI(
             allSchoolsState.error.isNotEmpty() -> {
                 logger.d("All Schools error : ${allSchoolsState.success}")
                 isDialogVisible = false
+                allSchools.clear()
             }
 
             allSchoolsState.success != null -> {
                 logger.d("All Schools response : ${allSchoolsState.success}")
+                allSchools.clear()
                 if (allSchoolsState.success?.status == 1) {
                     allSchoolsState.success!!.response.let {
                         it.let { it4 -> allSchools.addAll(it4!!.toList()) }
@@ -324,10 +332,12 @@ fun ProfessionalScreenUI(
             allUdiseState.error.isNotEmpty() -> {
                 logger.d("All Udise error : ${allUdiseState.success}")
                 isDialogVisible = false
+                allUdiseDetails.clear()
             }
 
             allUdiseState.success != null -> {
                 logger.d("All Udise response : ${allUdiseState.success}")
+                allUdiseDetails.clear()
                 if (allUdiseState.success?.status == 1) {
                     allUdiseState.success!!.response.let {
                         it.let { it5 ->
@@ -351,6 +361,11 @@ fun ProfessionalScreenUI(
                     println("All Udise list data :- $allUdiseDetails")
                     isUdiseDetails = true
                     isDialogVisible = false
+
+                    viewModel.getAllProfessionRepo()
+                    viewModel.getAllReasonRepo()
+                } else {
+                    isDialogVisible = false
                 }
             }
         }
@@ -365,10 +380,12 @@ fun ProfessionalScreenUI(
             allProfessionState.error.isNotEmpty() -> {
                 logger.d("All Profession error : ${allProfessionState.success}")
                 isDialogVisible = false
+                allProfession.clear()
             }
 
             allProfessionState.success != null -> {
                 logger.d("All Profession response : ${allProfessionState.success}")
+                allProfession.clear()
                 if (allProfessionState.success?.size != 0) {
                     allProfessionState.success!!.let {
                         it.let { it5 ->
@@ -394,10 +411,12 @@ fun ProfessionalScreenUI(
             allQualificationState.error.isNotEmpty() -> {
                 logger.d("All Qualification error : ${allQualificationState.success}")
                 isDialogVisible = false
+                allQualification.clear()
             }
 
             allQualificationState.success != null -> {
                 logger.d("All Qualification response : ${allQualificationState.success}")
+                allQualification.clear()
                 if (allQualificationState.success?.size != 0) {
                     allQualificationState.success!!.let {
                         it.let { it5 ->
@@ -423,10 +442,12 @@ fun ProfessionalScreenUI(
             allSpecializationState.error.isNotEmpty() -> {
                 logger.d("All Specialization error : ${allSpecializationState.success}")
                 isDialogVisible = false
+                allSpecialization.clear()
             }
 
             allSpecializationState.success != null -> {
                 logger.d("All Specialization response : ${allSpecializationState.success}")
+                allSpecialization.clear()
                 if (allSpecializationState.success?.size != 0) {
                     allSpecializationState.success!!.let {
                         it.let { it5 ->
@@ -580,6 +601,8 @@ fun ProfessionalScreenUI(
 
                                             selectedSchool = ""
                                             schoolSelectedId.intValue = -1
+
+                                            viewModel.getAllStateList()
                                         })
                             } else {
                                 Icon(
@@ -821,7 +844,12 @@ fun ProfessionalScreenUI(
 
                 // Profession
                 Text(
-                    text = stringResource(R.string.txt_profession),
+                    text = buildAnnotatedString {
+                        append(stringResource(R.string.txt_profession))
+                        pushStyle(SpanStyle(color = Color.Red))
+                        append(ASTRICK)
+                        pop()
+                    },
                     modifier = Modifier.padding(
                         top = 24.dp, bottom = 10.dp, start = 8.dp, end = 8.dp
                     ),
@@ -871,7 +899,12 @@ fun ProfessionalScreenUI(
 
                 // Qualification
                 Text(
-                    text = stringResource(R.string.txt_qualification),
+                    text = buildAnnotatedString {
+                        append(stringResource(R.string.txt_qualification))
+                        pushStyle(SpanStyle(color = Color.Red))
+                        append(ASTRICK)
+                        pop()
+                    },
                     modifier = Modifier.padding(
                         top = 24.dp, bottom = 10.dp, start = 8.dp, end = 8.dp
                     ),
@@ -921,7 +954,12 @@ fun ProfessionalScreenUI(
 
                 // Specialization
                 Text(
-                    text = stringResource(R.string.txt_specialization),
+                    text = buildAnnotatedString {
+                        append(stringResource(R.string.txt_specialization))
+                        pushStyle(SpanStyle(color = Color.Red))
+                        append(ASTRICK)
+                        pop()
+                    },
                     modifier = Modifier.padding(
                         top = 24.dp, bottom = 10.dp, start = 8.dp, end = 8.dp
                     ),
@@ -1026,7 +1064,7 @@ fun ProfessionalScreenUI(
                         enabled = udiseNo.value.length >= 11,
                         title = txtContinue,
                         onClick = {
-                            if (udiseNo.value.isEmpty()) {
+                            if (udiseNo.value.isEmpty() || udiseNo.value.length != 11) {
                                 inValidUdiseNo = true
                             } else if (selectedState.isEmpty() || stateSelectedId.intValue == -1) {
                                 context.toast(msgState)
@@ -1042,10 +1080,30 @@ fun ProfessionalScreenUI(
                                 context.toast(msgQualification)
                             } else if (selectedSpecialization.isEmpty() || specializationId.intValue == -1) {
                                 context.toast(msgSpecialization)
-                            } else if (crrText.value.isEmpty()) {
+                            } /*else if (crrText.value.isEmpty()) {
                                 context.toast(msgCRRN)
-                            } else {
-                                if (showError || udiseNo.value.length < 11) {
+                            }*/ else {
+                                isDialogVisible = true
+                                val professionalProfileRequest = ProfessionalProfileRequest(
+                                    udiseNo.value.toString(),
+                                    stateSelectedId.intValue,
+                                    districtSelectedId.intValue,
+                                    blockSelectedId.intValue,
+                                    schoolSelectedId.intValue,
+                                    0,
+                                    professionId.intValue,
+                                    qualificationId.intValue,
+                                    specializationId.intValue,
+                                    crrText.value.toString()
+                                )
+
+                                viewModel.createProfessionalProfileRepo(
+                                    professionalProfileRequest, strToken
+                                )
+
+
+
+                                /*if (showError || udiseNo.value.length < 11) {
                                     inValidUdiseNo = true
                                 } else {
                                     showError = udiseNo.value.isEmpty()
@@ -1072,7 +1130,7 @@ fun ProfessionalScreenUI(
                                             professionalProfileRequest, strToken
                                         )
                                     }
-                                }
+                                }*/
                             }
                         },
                     )
@@ -1084,8 +1142,7 @@ fun ProfessionalScreenUI(
 
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
-fun UserProfile2UI() {
-    val navController = rememberNavController()
+fun ProfessionalScreenUIPreview() {
     val context = LocalContext.current
     val onNext: () -> Unit = {}
     val onBack: () -> Unit = {}

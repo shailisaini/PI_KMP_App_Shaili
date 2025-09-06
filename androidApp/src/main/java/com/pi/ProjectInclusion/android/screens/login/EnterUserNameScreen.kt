@@ -58,6 +58,7 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IS_COMING_FROM
 import com.pi.ProjectInclusion.constants.ConstantVariables.NEW_USER
 import com.pi.ProjectInclusion.constants.ConstantVariables.REGISTER_NEW
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
+import com.pi.ProjectInclusion.constants.ConstantVariables.SUCCESS
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_MOBILE_NO
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.ConstantVariables.UnableToSendMsg
@@ -213,7 +214,7 @@ fun LoginUI(
     if (sendOtpViaWhatsApp) {
         LaunchedEffect(Unit) {
             viewModel.getOTPWhatsappViewModel(encryptedPhoneNo)
-            sendOtpViaWhatsApp = false
+
         }
     }
 
@@ -253,11 +254,7 @@ fun LoginUI(
         )
     }
 
-    // Response for sent OTP on mobile
-    if (sendOtpViaWhatsApp || sendOtpViaCall) {
-
         LaunchedEffect(sendOtpState) {
-
             when {
                 sendOtpState.isLoading -> {
                     isDialogVisible = true
@@ -266,24 +263,26 @@ fun LoginUI(
                 sendOtpState.error.isNotEmpty() -> {
                     LoggerProvider.logger.d("Error: ${sendOtpState.error}")
                     isDialogVisible = false
-                    sendOtpViaWhatsApp = false
-                    sendOtpViaCall = false
                 }
 
                 sendOtpState.success != null -> {
                     isDialogVisible = false
                     viewModel.savePrefData(USER_MOBILE_NO, encryptedPhoneNo)
                     viewModel.savePrefData(IS_COMING_FROM, REGISTER_NEW)
-                    if (sendOtpState.success!!.response?.message == UnableToSendMsg) {
-                        context.toast(sendOtpState.success!!.response?.message.toString())
-                    } else {
+                    if (sendOtpState.success!!.response?.message == SUCCESS){
                         onRegister() // Go to OTP Verify screen
+                        sendOtpViaWhatsApp = false
+                        sendOtpViaCall = false
+                    }
+                    else {
+
+                        sendOtpViaWhatsApp = false
+                        sendOtpViaCall = false
+                        context.toast(sendOtpState.success!!.response?.message.toString())
                     }
                 }
             }
-            sendOtpViaCall = false
         }
-    }
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
         onBack()

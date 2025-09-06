@@ -41,7 +41,6 @@ object EncryptedCommonFunction {
         var shownPhoneNo = ""
 
         val isEncrypted = isEncryptedPhone(phoneNo.trim())
-        logger.d("Screen1: " + "EditProfileScreen1() "+phoneNo.trim()+" .. "+isEncrypted)
         shownPhoneNo = if (isEncrypted) {
             decrypt(phoneNo)
         } else {

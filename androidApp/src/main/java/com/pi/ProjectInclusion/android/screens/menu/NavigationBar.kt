@@ -70,6 +70,7 @@ import com.pi.ProjectInclusion.data.model.profileModel.response.ViewProfileRespo
 fun DrawerHeader(
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Open),
     onItemClick: () -> Unit = {},
+    onEditClick: () -> Unit = {},
     profileData: ViewProfileResponse.ProfileResponse?,
 ) {
     Box(
@@ -79,20 +80,21 @@ fun DrawerHeader(
             .padding(end = 50.dp),
         contentAlignment = Alignment.Center
     ) {
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .height(230.dp)
-            .clickable {
-                onItemClick.invoke()
-            }
-            .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        BorderBlue, // #2C3EA2
-                        PrimaryBlue  // #101942
-                    ), start = Offset(0f, Float.POSITIVE_INFINITY), end = Offset(0f, 0f)
-                )
-            )) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(230.dp)
+                .clickable {
+                    onItemClick.invoke()
+                }
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            BorderBlue, // #2C3EA2
+                            PrimaryBlue  // #101942
+                        ), start = Offset(0f, Float.POSITIVE_INFINITY), end = Offset(0f, 0f)
+                    )
+                )) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -129,9 +131,19 @@ fun DrawerHeader(
                     var textName = stringResource(R.string.user_name)
                     var textEmail = stringResource(R.string.user_profile)
 
+                    var fullName = if (profileData != null) {
+                        "${profileData.firstname} ${profileData.lastname}"
+                    } else {
+                        stringResource(R.string.user_name)
+                    }
+
                     Text(
                         text = if (profileData?.firstname != null || profileData?.lastname != null) {
-                            "${profileData.firstname} ${profileData.lastname}"
+                            if (fullName.length > 20) {
+                                fullName.take(20) + "..."
+                            } else {
+                                fullName
+                            }
                         } else {
                             textName
                         }, color = White, fontSize = 19.sp, fontFamily = fontMedium
@@ -139,7 +151,7 @@ fun DrawerHeader(
 
                     Text(
                         text = if (profileData?.userTypeName != null) {
-                            textEmail
+                            profileData.userTypeName.toString()
                         } else {
                             textEmail
                         }, color = LightPurple04, fontSize = 13.sp, fontFamily = fontRegular
@@ -155,7 +167,10 @@ fun DrawerHeader(
                                 .wrapContentSize()
                                 .border(
                                     width = 1.dp, color = White, shape = RoundedCornerShape(8.dp)
-                                ), colors = CardDefaults.cardColors(
+                                )
+                                .clickable {
+                                    onEditClick.invoke()
+                                }, colors = CardDefaults.cardColors(
                                 containerColor = White.copy(alpha = 0.2f) // Set semi-transparent background here
                             ), shape = RoundedCornerShape(8.dp)
                             // Do not set containerColor, let the Box inside handle the gradient
@@ -207,12 +222,13 @@ fun DrawerBody(
                 )
         ) {
             items(items) { item ->
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        onItemClick(item.id)
-                    }
-                    .padding(start = 20.dp, end = 20.dp, top = 20.dp),
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            onItemClick(item.id)
+                        }
+                        .padding(start = 20.dp, end = 20.dp, top = 20.dp),
                     verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = item.icon,
@@ -328,37 +344,37 @@ fun BottomNavigationBar(
         item.forEach { screen ->
             NavigationBarItem(
                 icon = {
-                Box(
-                    modifier = Modifier
-                        .background(
-                            color = if (currentDestination == screen.appRoute) MenuSelectedColor else Color.Transparent,
-                            shape = RoundedCornerShape(70.dp) // curved rectangle
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = if (currentDestination == screen.appRoute) MenuSelectedColor else Color.Transparent,
+                                shape = RoundedCornerShape(70.dp) // curved rectangle
+                            )
+                            .padding(horizontal = 12.dp), // control size of background
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            modifier = Modifier.padding(vertical = 4.dp, horizontal = 5.dp),
+                            imageVector = if (currentDestination == screen.appRoute) screen.selectedIcon else screen.unSelectedIcon,
+                            contentDescription = null,
+                            tint = Color.Unspecified,
                         )
-                        .padding(horizontal = 12.dp), // control size of background
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        modifier = Modifier.padding(vertical = 4.dp, horizontal = 5.dp),
-                        imageVector = if (currentDestination == screen.appRoute) screen.selectedIcon else screen.unSelectedIcon,
-                        contentDescription = null,
-                        tint = Color.Unspecified,
+                    }
+                }, selected = currentDestination == screen.appRoute, onClick = {
+                    if (currentDestination != screen.appRoute) {
+                        onNavigateTo(screen.appRoute)
+                    }
+                }, label = {
+                    Text(
+                        text = screen.title,
+                        fontStyle = FontStyle.Normal,
+                        fontFamily = fontMedium,
+                        color = if (currentDestination == screen.appRoute) activeColor else inactiveColor,
+                        fontSize = 12.sp
                     )
-                }
-            }, selected = currentDestination == screen.appRoute, onClick = {
-                if (currentDestination != screen.appRoute) {
-                    onNavigateTo(screen.appRoute)
-                }
-            }, label = {
-                Text(
-                    text = screen.title,
-                    fontStyle = FontStyle.Normal,
-                    fontFamily = fontMedium,
-                    color = if (currentDestination == screen.appRoute) activeColor else inactiveColor,
-                    fontSize = 12.sp
+                }, colors = NavigationBarItemDefaults.colors(
+                    indicatorColor = White // disable default background
                 )
-            }, colors = NavigationBarItemDefaults.colors(
-                indicatorColor = White // disable default background
-            )
             )
         }
     }

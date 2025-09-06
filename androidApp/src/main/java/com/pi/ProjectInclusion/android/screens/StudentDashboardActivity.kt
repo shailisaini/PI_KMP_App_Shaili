@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -70,10 +71,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -90,6 +93,7 @@ import coil.request.ImageRequest
 import coil.size.Size
 import com.example.kmptemplate.logger.LoggerProvider
 import com.example.kmptemplate.logger.LoggerProvider.logger
+import com.pi.ProjectInclusion.BannerColor03
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.BorderBlue
 import com.pi.ProjectInclusion.DARK_BODY_TEXT
@@ -147,6 +151,7 @@ import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneRepor
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ScreeningOneScreen
 import com.pi.ProjectInclusion.android.screens.screeningScreen.ViewScreeningProfileDetailsScreen
 import com.pi.ProjectInclusion.android.utils.fontBold
+import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.CommonFunction.NoDataFound
 import com.pi.ProjectInclusion.constants.CommonFunction.ShowError
@@ -163,6 +168,7 @@ import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import androidx.core.net.toUri
 
 class StudentDashboardActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -193,11 +199,8 @@ class StudentDashboardActivity : ComponentActivity() {
             logger.d("Profile details on dashboard page for header in drawer :- $encryptedUserName")
             var profileData by remember { mutableStateOf<ViewProfileResponse.ProfileResponse?>(null) }
 
-            var allUdiseDetails = remember { mutableStateListOf<ViewProfileResponse>() }
-
             LaunchedEffect(Unit) {
-//                viewModel.getUserProfileViewModel(encryptedUserName)
-                viewModel.getUserProfileViewModel(strToken, "lhWmhODMnBvTyxCkajySXQ==")
+                viewModel.getUserProfileViewModel(strToken, encryptedUserName)
             }
 
             LaunchedEffect(viewProfile) {
@@ -243,6 +246,7 @@ class StudentDashboardActivity : ComponentActivity() {
                         val scope = rememberCoroutineScope()
                         var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
                         var isLanguageBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
+                        var isBottomSheetReferVisible by rememberSaveable { mutableStateOf(false) }
                         val sheetState = rememberModalBottomSheetState(
                             skipPartiallyExpanded = true, /*confirmValueChange = { it != SheetValue.Hidden }*/
                         )
@@ -267,11 +271,26 @@ class StudentDashboardActivity : ComponentActivity() {
                             viewModel
                         )
 
+                        BottomSheetReferUIScreen(
+                            isBottomSheetVisible = isBottomSheetReferVisible,
+                            sheetState = sheetState,
+                            onDismiss = {
+                                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                    isBottomSheetReferVisible = false
+                                }
+                            })
+
                         DrawerHeader(
                             drawerState, onItemClick = {
                                 scope.launch {
                                     drawerState.close()
                                     navigateTo(AppRoute.ProfileScreen.route)
+                                }
+                            },
+                            onEditClick = {
+                                scope.launch {
+                                    drawerState.close()
+                                    navigateTo(AppRoute.EditProfileScreen.route)
                                 }
                             }, profileData
                         )
@@ -327,6 +346,7 @@ class StudentDashboardActivity : ComponentActivity() {
                                     coroutineScope,
                                     openContactUs = { isBottomSheetVisible = true },
                                     openLanguage = { isLanguageBottomSheetVisible = true },
+                                    openReferUI = { isBottomSheetReferVisible = true },
                                     drawerState
                                 )
                             })
@@ -382,7 +402,7 @@ class StudentDashboardActivity : ComponentActivity() {
                             when (route) {
                                 AppRoute.DashboardScreen.route -> DashboardScreen()
 
-                                    AppRoute.CourseScreen.route -> LMSCourseHomeScreen()
+                                AppRoute.CourseScreen.route -> LMSCourseHomeScreen()
 //                                    AppRoute.CourseScreen.route -> PrivacyPolicy()
 
                                 AppRoute.ProfileScreen.route -> ViewProfileScreen(
@@ -559,6 +579,7 @@ fun onMenuItemClick(
     coroutineScope: CoroutineScope,
     openContactUs: () -> Unit,
     openLanguage: () -> Unit,
+    openReferUI: () -> Unit,
     drawerState: DrawerState,
 ) {
     // Handle the click event here
@@ -583,13 +604,13 @@ fun onMenuItemClick(
         }
 
         AppRoute.LanguageScreen.route -> {
-            logger.d("Screen: Change language dialog open screen")
             coroutineScope.launch { drawerState.close() }
             openLanguage()
         }
 
         AppRoute.ReferScreen.route -> {
-            logger.d("Screen: Refer dialog open screen")
+            coroutineScope.launch { drawerState.close() }
+            openReferUI()
         }
 
         AppRoute.ContactUsScreen.route -> {
@@ -1175,6 +1196,414 @@ fun ItemLanguageChangeCard(
                         .wrapContentWidth()
                         .padding(top = 5.dp)
                 )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BottomSheetReferUIScreen(
+    isBottomSheetVisible: Boolean,
+    sheetState: SheetState,
+    onDismiss: () -> Unit,
+) {
+    val context: Context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
+    val shareableStr = stringResource(id = R.string.txt_play_Store_text)
+    val playStoreLinkStr = stringResource(id = R.string.txt_playStore_Link)
+    val textPlanStr = stringResource(id = R.string.txt_text_plan)
+    val copiedStr = stringResource(id = R.string.txt_Text_copied)
+    val whatsAppPkgStr = stringResource(id = R.string.txt_whatsAppPkg)
+    val drivePkgStr = stringResource(id = R.string.txt_DrivePkg)
+    val facebookPkgStr = stringResource(id = R.string.txt_FacebookPck)
+    val instagramPkgStr = stringResource(id = R.string.txt_InstagramPck)
+    val gmailPkgStr = stringResource(id = R.string.txt_gmailPkg)
+
+    if (isBottomSheetVisible) {
+        ModalBottomSheet(
+            onDismissRequest = onDismiss,
+            sheetState = sheetState,
+            containerColor = if (isSystemInDarkTheme()) {
+                Dark_01
+            } else {
+                White
+            },
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+            dragHandle = null,
+            scrimColor = if (isSystemInDarkTheme()) {
+                DARK_TITLE_TEXT.copy(alpha = 0.5f)
+            } else {
+                Color.Black.copy(alpha = 0.5f)
+            },
+            windowInsets = WindowInsets.ime
+        ) {
+            Column(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(vertical = 16.dp, horizontal = 16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.CenterHorizontally),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "", style = MaterialTheme.typography.headlineLarge.copy(
+                                color = if (isSystemInDarkTheme()) {
+                                    DARK_TITLE_TEXT
+                                } else {
+                                    Black
+                                }, fontSize = 18.sp, fontFamily = FontFamily(
+                                    Font(R.font.roboto_bold, FontWeight.Bold)
+                                ), textAlign = TextAlign.Start
+                            )
+                        )
+
+                        Image(
+                            painter = painterResource(R.drawable.line),
+                            contentDescription = IMG_DESCRIPTION,
+                            modifier = Modifier
+                                .wrapContentWidth()
+                                .align(Alignment.CenterVertically)
+                                .padding(top = 8.dp, start = 16.dp, end = 16.dp)
+                                .clickable {
+                                    onDismiss.invoke()
+                                }
+                                .clip(RoundedCornerShape(100.dp))
+                                .border(
+                                    width = 2.dp, color = if (isSystemInDarkTheme()) {
+                                        DARK_TITLE_TEXT
+                                    } else {
+                                        Gray
+                                    }, shape = CircleShape
+                                ))
+
+                        Text(
+                            text = "", style = MaterialTheme.typography.headlineLarge.copy(
+                                color = if (isSystemInDarkTheme()) {
+                                    DARK_TITLE_TEXT
+                                } else {
+                                    Black
+                                }, fontSize = 18.sp, fontFamily = FontFamily(
+                                    Font(R.font.roboto_bold, FontWeight.Bold)
+                                ), textAlign = TextAlign.Start
+                            )
+                        )
+                    }
+
+                    Card(
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp)
+                            .wrapContentHeight(),
+                        colors = if (isSystemInDarkTheme()) {
+                            CardDefaults.cardColors(BannerColor03)
+                        } else {
+                            CardDefaults.cardColors(
+                                containerColor = BannerColor03,
+                                contentColor = BannerColor03,
+                                disabledContentColor = BannerColor03,
+                                disabledContainerColor = BannerColor03
+                            )
+                        }
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                                .wrapContentHeight()
+                                .background(BannerColor03),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = shareableStr,
+                                modifier = Modifier
+                                    .width(275.dp)
+                                    .padding(start = 8.dp, end = 8.dp),
+                                fontFamily = fontRegular,
+                                fontSize = 12.sp,
+                                color = if (isSystemInDarkTheme()) {
+                                    DARK_TITLE_TEXT
+                                } else {
+                                    Black
+                                },
+                                textAlign = TextAlign.Start
+                            )
+
+                            Image(
+                                painter = painterResource(R.drawable.copy_img),
+                                contentDescription = IMG_DESCRIPTION,
+                                modifier = Modifier
+                                    .size(35.dp)
+                                    .padding(start = 8.dp, end = 8.dp)
+                                    .background(Color.Unspecified)
+                                    .clickable {
+                                        clipboardManager.setText(AnnotatedString(shareableStr))
+                                        context.toast(copiedStr)
+                                    })
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp, bottom = 32.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .align(Alignment.CenterVertically)
+                                .padding(start = 8.dp, end = 8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            IconButton(onClick = {
+                                val appPackageName = context.packageName
+                                val appLink = "$playStoreLinkStr$appPackageName"
+
+                                val intent = Intent(Intent.ACTION_SEND).apply {
+                                    type = textPlanStr
+                                    putExtra(
+                                        Intent.EXTRA_TEXT, shareableStr
+                                    )
+                                    setPackage(whatsAppPkgStr)
+                                }
+
+                                try {
+                                    context.startActivity(intent)
+                                } catch (e: Exception) {
+                                    val fallbackIntent =
+                                        Intent(Intent.ACTION_VIEW, appLink.toUri())
+                                    context.startActivity(fallbackIntent)
+                                }
+                            }) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.whats_app_icon),
+                                    contentDescription = IMG_DESCRIPTION,
+                                    modifier = Modifier
+                                        .size(75.dp)
+                                        .align(Alignment.CenterHorizontally)
+                                )
+                            }
+
+                            Text(
+                                text = stringResource(R.string.txt_WhatsApp),
+                                fontSize = 12.sp,
+                                textAlign = TextAlign.Start,
+                                fontFamily = fontRegular,
+                                color = if (isSystemInDarkTheme()) {
+                                    DARK_TITLE_TEXT
+                                } else {
+                                    contactUsTxt
+                                }
+                            )
+                        }
+
+                        Column(
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .align(Alignment.CenterVertically)
+                                .padding(start = 8.dp, end = 8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            IconButton(onClick = {
+                                val appPackageName = context.packageName
+                                val appLink = "$playStoreLinkStr$appPackageName"
+                                val intent = Intent(Intent.ACTION_SEND).apply {
+                                    type = textPlanStr
+                                    putExtra(
+                                        Intent.EXTRA_TEXT, shareableStr
+                                    )
+                                    `package` = drivePkgStr
+                                }
+                                val resolveInfo = context.packageManager.resolveActivity(intent, 0)
+                                if (resolveInfo != null) {
+                                    startActivity(context, intent, null)
+                                } else {
+                                    val browserIntent =
+                                        Intent(Intent.ACTION_VIEW, appLink.toUri())
+                                    startActivity(context, browserIntent, null)
+                                }
+                            }) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.drive_img),
+                                    contentDescription = IMG_DESCRIPTION,
+                                    modifier = Modifier
+                                        .size(75.dp)
+                                        .align(Alignment.CenterHorizontally)
+                                )
+                            }
+
+                            Text(
+                                text = stringResource(R.string.txt_Drive),
+                                fontSize = 12.sp,
+                                textAlign = TextAlign.Start,
+                                fontFamily = fontRegular,
+                                color = if (isSystemInDarkTheme()) {
+                                    DARK_TITLE_TEXT
+                                } else {
+                                    contactUsTxt
+                                }
+                            )
+                        }
+
+                        Column(
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .align(Alignment.CenterVertically)
+                                .padding(start = 8.dp, end = 8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            IconButton(onClick = {
+                                val appPackageName = context.packageName
+                                val appLink = "$playStoreLinkStr$appPackageName"
+                                val intent = Intent(Intent.ACTION_SEND).apply {
+                                    type = textPlanStr
+                                    putExtra(
+                                        Intent.EXTRA_TEXT, shareableStr
+                                    )
+                                    `package` = facebookPkgStr
+                                }
+                                val resolveInfo = context.packageManager.resolveActivity(intent, 0)
+                                if (resolveInfo != null) {
+                                    startActivity(context, intent, null)
+                                } else {
+                                    val browserIntent =
+                                        Intent(Intent.ACTION_VIEW, appLink.toUri())
+                                    startActivity(context, browserIntent, null)
+                                }
+                            }) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.facebook_img),
+                                    contentDescription = IMG_DESCRIPTION,
+                                    modifier = Modifier
+                                        .size(75.dp)
+                                        .align(Alignment.CenterHorizontally)
+                                )
+                            }
+
+                            Text(
+                                text = stringResource(R.string.txt_Facebook),
+                                fontSize = 12.sp,
+                                textAlign = TextAlign.Start,
+                                fontFamily = fontRegular,
+                                color = if (isSystemInDarkTheme()) {
+                                    DARK_TITLE_TEXT
+                                } else {
+                                    contactUsTxt
+                                }
+                            )
+                        }
+
+                        Column(
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .align(Alignment.CenterVertically)
+                                .padding(start = 8.dp, end = 8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            IconButton(onClick = {
+                                val appPackageName = context.packageName
+                                val appLink = "$playStoreLinkStr$appPackageName"
+                                val intent = Intent(Intent.ACTION_SEND).apply {
+                                    type = textPlanStr
+                                    putExtra(
+                                        Intent.EXTRA_TEXT, shareableStr
+                                    )
+                                    `package` = instagramPkgStr
+                                }
+                                val resolveInfo = context.packageManager.resolveActivity(intent, 0)
+                                if (resolveInfo != null) {
+                                    startActivity(context, intent, null)
+                                } else {
+                                    val browserIntent =
+                                        Intent(Intent.ACTION_VIEW, appLink.toUri())
+                                    startActivity(context, browserIntent, null)
+                                }
+                            }) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.instagram_img),
+                                    contentDescription = IMG_DESCRIPTION,
+                                    modifier = Modifier
+                                        .size(75.dp)
+                                        .align(Alignment.CenterHorizontally)
+                                )
+                            }
+
+                            Text(
+                                text = stringResource(R.string.txt_Instagram),
+                                fontSize = 12.sp,
+                                textAlign = TextAlign.Start,
+                                fontFamily = fontRegular,
+                                color = if (isSystemInDarkTheme()) {
+                                    DARK_TITLE_TEXT
+                                } else {
+                                    contactUsTxt
+                                }
+                            )
+                        }
+
+                        Column(
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .align(Alignment.CenterVertically)
+                                .padding(start = 8.dp, end = 8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            IconButton(onClick = {
+                                val appPackageName = context.packageName
+                                val appLink = "$playStoreLinkStr$appPackageName"
+                                val intent = Intent(Intent.ACTION_SEND).apply {
+                                    type = textPlanStr
+                                    putExtra(
+                                        Intent.EXTRA_TEXT, shareableStr
+                                    )
+                                    `package` = gmailPkgStr
+                                }
+                                val resolveInfo = context.packageManager.resolveActivity(intent, 0)
+                                if (resolveInfo != null) {
+                                    startActivity(context, intent, null)
+                                } else {
+                                    val browserIntent =
+                                        Intent(Intent.ACTION_VIEW, appLink.toUri())
+                                    startActivity(context, browserIntent, null)
+                                }
+                            }) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.gmail_icon),
+                                    contentDescription = IMG_DESCRIPTION,
+                                    modifier = Modifier
+                                        .size(75.dp)
+                                        .align(Alignment.CenterHorizontally)
+                                )
+                            }
+
+                            Text(
+                                text = stringResource(R.string.txt_gmail),
+                                fontSize = 12.sp,
+                                textAlign = TextAlign.Start,
+                                fontFamily = fontRegular,
+                                color = if (isSystemInDarkTheme()) {
+                                    DARK_TITLE_TEXT
+                                } else {
+                                    contactUsTxt
+                                }
+                            )
+                        }
+                    }
+                }
             }
         }
     }

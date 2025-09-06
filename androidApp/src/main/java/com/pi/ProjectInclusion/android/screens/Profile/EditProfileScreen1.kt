@@ -33,6 +33,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -69,6 +71,7 @@ import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.AESEncryption.decrypt
+import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
 import com.pi.ProjectInclusion.android.common_UI.CameraGalleryDialog
 import com.pi.ProjectInclusion.android.common_UI.CameraPermission
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
@@ -85,6 +88,7 @@ import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_FEMALE
@@ -92,11 +96,19 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_MALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_OTHER
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
 import com.pi.ProjectInclusion.data.remote.ApiService.Companion.PROFILE_BASE_URL
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import java.io.ByteArrayOutputStream
+import java.time.LocalDate
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun EditProfileScreen1(onNextTeacher: () -> Unit,  //EditProfileScreen2
@@ -153,7 +165,7 @@ fun EditProfileScreenUI(
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
-    val isInternetAvailable by remember { mutableStateOf(true) }
+    var isInternetAvailable by remember { mutableStateOf(true) }
 
     var isDialogVisible by remember { mutableStateOf(false) }
     val invalidMobNo = stringResource(id = R.string.text_enter_no)
@@ -187,13 +199,42 @@ fun EditProfileScreenUI(
 
     val decryptUserName = decrypt(encryptedUserName.toString().trim())
     val firstNameFromApi = remember { mutableStateOf(decryptUserName) }
-    val firstName = remember { mutableStateOf(decryptUserName) }
-    val lastName = remember { mutableStateOf(decryptUserName) }
+    val firstName = remember { mutableStateOf("") }
+    val lastName = remember { mutableStateOf("") }
     val email = remember { mutableStateOf("") }
     val mobNo = remember { mutableStateOf("") }
     val whatsappNo = remember { mutableStateOf("") }
     val profilePic = remember { mutableStateOf("") }
     val noInternet = stringResource(id=R.string.txt_oops_no_internet)
+
+    val firstStepProfileState by loginViewModel.firstStepProfilePasswordResponse.collectAsStateWithLifecycle()
+    LaunchedEffect(firstStepProfileState) {
+        when {
+            firstStepProfileState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            firstStepProfileState.error.isNotEmpty() -> {
+                logger.d("First step profile state error : ${firstStepProfileState.success}")
+                isDialogVisible = false
+            }
+
+            firstStepProfileState.success != null -> {
+                logger.d("First step profile state response : ${loginViewModel.getPrefData(USER_TYPE_ID)}")
+                if (firstStepProfileState.success!!.status == true) {
+                    context.toast(firstStepProfileState.success!!.message.toString())
+                    if (loginViewModel.getPrefData(USER_TYPE_ID) == "7") {
+                        onNextSpecialEducator()
+                    } else if (loginViewModel.getPrefData(USER_TYPE_ID) == "8") {
+                        onNextProfessional()
+                    } else{
+                        onNextTeacher()
+                    }
+                }
+                isDialogVisible = false
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         loginViewModel.getUserProfileViewModel(strToken,encryptedUserName)
@@ -217,11 +258,32 @@ fun EditProfileScreenUI(
                     viewProfile.success?.response?.let { response ->
 //                        firstName.value = response.username ?: "" // it will use later
 //                        lastName.value = response.username ?: ""
-                        email.value = response.email ?: ""
-                        mobNo.value = response.mobile ?: ""
-                        whatsappNo.value = response.mobile ?: ""
+                        email.value = decrypt(response.email.toString().trim())
+                        mobNo.value = decrypt(response.mobile.toString().trim())
+                        whatsappNo.value = decrypt(response.whatsapp.toString().trim())
+                        firstName.value = response.firstname ?: ""
+                        lastName.value = response.lastname ?: ""
+
+                        // date format
+                        date = response.dob ?: ""
+
+                        val parsedDate = OffsetDateTime.parse(date)
+                        val formattedDate = parsedDate.toLocalDate().format(DateTimeFormatter.ISO_LOCAL_DATE) // "2021-09-04"
+
+                        // Assign this to your state
+                        date = formattedDate
+
                         profilePic.value = PROFILE_BASE_URL + response.profilepic
                         selectedUri.value =  Uri.parse(profilePic.value)
+
+                        if (response.gender.equals("M")){
+                            selectedGender.value = KEY_MALE
+                        } else if (response.gender.equals("F")){
+                            selectedGender.value = KEY_FEMALE
+                        }
+                        else{
+
+                        }
                     }
                 }
                 else{
@@ -337,18 +399,7 @@ fun EditProfileScreenUI(
                                                     .build()
                                             )
                                         }
-//                                        will use this later
-                                        /*!profilePic.value.isNullOrEmpty() -> {
-                                            // Case 2: API URL
-                                            rememberAsyncImagePainter(
-                                                ImageRequest.Builder(context)
-                                                    .data(profilePic.value)
-                                                    .placeholder(R.drawable.profile_user_icon)
-                                                    .error(R.drawable.profile_user_icon)
-                                                    .crossfade(true)
-                                                    .build()
-                                            )
-                                        }*/
+
                                         else -> {
                                             // Case 3: Default fallback
                                             painterResource(id = R.drawable.profile_user_icon)
@@ -472,7 +523,7 @@ fun EditProfileScreenUI(
                                 icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
                                 colors = colors,
                                 text = firstName,
-                                trueFalse = firstNameFromApi.value.isEmpty(),
+                                trueFalse = firstName.value.isEmpty(),
                                 hint = textNameEg.toString()
                             )
 
@@ -530,16 +581,16 @@ fun EditProfileScreenUI(
                                 }
                             )
                             TextFieldWithLeftIcon(
-                                text = if (date.isEmpty()) {
+                                text = if (date.isNotEmpty()) {
                                     date
                                 } else {
                                     ""
                                 },
                                 modifier = Modifier.clickable {
                                     showDatePickerDialog(context) { year, month, dayOfMonth ->
-                                        date = "$year-${
-                                            month.toString().padStart(2, '0')
-                                        }-${dayOfMonth.toString().padStart(2, '0')}"
+                                        val localDate = LocalDate.of(year, month, dayOfMonth)
+                                        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                                        date = localDate.format(formatter)
                                     }
                                 },
                                 value = remember { mutableStateOf(date) },
@@ -671,15 +722,13 @@ fun EditProfileScreenUI(
                                     .wrapContentHeight(),
                                 horizontalAlignment = Alignment.End
                             ) {
-                                val apiMobile = encryptedPhoneNo(mobNo.value.toString())
-                                val apiEmail = encryptedEmail(email.value.toString())
+                                /*val apiMobile = encryptedPhoneNo(mobNo.value.toString())
+                                val apiEmail = encryptedEmail(email.value.toString())*/
 
                                 SmallBtnUi(
                                     enabled = mobNo.value.length >= 10,
                                     title = txtContinue,
                                     onClick = {
-//                                        onNext()
-                                        onNextProfessional()
                                         if (mobNo.value.isEmpty()) {
                                             inValidMobNo = true
                                         } else if (firstName.value.toString().isEmpty()) {
@@ -704,6 +753,13 @@ fun EditProfileScreenUI(
                                                 if (firstDigit < 6) {
                                                     inValidMobNo = true
                                                 } else {
+                                                    if (selectedGender.value == "Female"){
+                                                        selectedGender.value = "F"
+                                                    }else if (selectedGender.value == "Male"){
+                                                        selectedGender.value = "M"
+                                                    }else{
+                                                        "O"
+                                                    }
                                                     isDialogVisible = true
                                                     val firstStepProfileRequest =
                                                         FirstStepProfileRequest(
@@ -711,10 +767,10 @@ fun EditProfileScreenUI(
                                                             "",
                                                             lastName.value.toString(),
                                                             selectedGender.value.toString(),
-                                                            apiMobile,
-                                                            whatsappNo.value.toString(),
+                                                            mobNo.value.encryptAES().toString().trim(),
+                                                            whatsappNo.value.encryptAES().toString().trim(),
                                                             date.toString(),
-                                                            apiEmail
+                                                            email.value.encryptAES().toString().trim()
                                                         )
 
                                                     logger.d(
@@ -722,17 +778,28 @@ fun EditProfileScreenUI(
                                                                 + strToken + " .. " + mobNo.value.toString() + " .. " + fileName + " .. "
                                                     )
                                                     // check Internet
+                                                    isInternetAvailable = isNetworkAvailable(context)
                                                     if (!isInternetAvailable) {
                                                         context.toast(noInternet)
                                                     } else {
                                                         // call Api
                                                         isDialogVisible = true
-                                                        loginViewModel.createFirstStepProfileRepo(
-                                                            firstStepProfileRequest,
-                                                            strToken,
-                                                            byteArray,
-                                                            fileName
-                                                        )
+                                                        // if image is not empty
+                                                        if (selectedUri.value != null) {
+
+                                                            loginViewModel.createFirstStepProfileRepo(
+                                                                firstStepProfileRequest,
+                                                                strToken,
+                                                                byteArray,
+                                                                fileName
+                                                            )
+                                                        }
+                                                        else{
+                                                            loginViewModel.createFirstStepProfileRepo(
+                                                                firstStepProfileRequest,
+                                                                strToken
+                                                            )
+                                                        }
                                                     }
                                                 }
                                             }

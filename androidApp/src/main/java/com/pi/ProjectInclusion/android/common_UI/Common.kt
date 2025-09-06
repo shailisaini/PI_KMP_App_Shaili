@@ -566,9 +566,9 @@ fun MobileTextField(
     val isFocused by interactionSource.collectIsFocusedAsState()
 
     val keyboardController = LocalSoftwareKeyboardController.current
-    val shownMobile = decryptedPhoneNo(number.value.trim())
+//    val shownMobile = decryptedPhoneNo(number.value.trim())
     TextField(
-        value = shownMobile,
+        value = number.value,
         onValueChange = {
             if (it.length <= 10 && it.all { char -> char.isDigit() }) {
                 number.value = it

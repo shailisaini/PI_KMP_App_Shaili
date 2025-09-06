@@ -71,9 +71,12 @@ import com.pi.ProjectInclusion.android.common_UI.MobileTextField
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.AESEncryption.decrypt
+import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
 import com.pi.ProjectInclusion.android.common_UI.ChooseOneBottomSheet
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_MOBILE_NO
 import com.pi.ProjectInclusion.contactUsTxt
 import kotlinx.coroutines.launch
 
@@ -89,7 +92,7 @@ fun ForgetPasswordScreen(
 
     val colors = MaterialTheme.colorScheme
     val context = LocalContext.current
-    var mobNo = rememberSaveable { mutableStateOf("") }
+    val mobNo = rememberSaveable { mutableStateOf("") }
     val enterMobile = stringResource(R.string.txt_enter_mobile_no_)
     val txtContinue = stringResource(R.string.txt_Send_OTP)
     val invalidMobNo = stringResource(R.string.txt_Enter_valid_mobile_number)
@@ -102,6 +105,9 @@ fun ForgetPasswordScreen(
     var showBottomSheet by remember { mutableStateOf(false) }
     var sendOtpViaWhatsApp by remember { mutableStateOf(false) }
     var sendOtpViaCall by remember { mutableStateOf(false) }
+
+    mobNo.value = viewModel.userNameValue.toString()
+    println("User mobile number :- ${decrypt(mobNo.value).toString().trim()}")
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
         onBack()
@@ -161,7 +167,10 @@ fun ForgetPasswordScreen(
                 MobileTextField(
                     isIcon = false,
                     icon = null,
-                    colors = colors, number = mobNo, enable = true, hint = enterMobile.toString()
+                    colors = colors,
+                    number = mobNo,
+                    enable = false,
+                    hint = enterMobile.toString()
                 )
 
                 if (inValidMobNo) {
@@ -203,12 +212,12 @@ fun ForgetPasswordScreen(
 
                     BtnUi(
                         title = txtContinue, onClick = {
-                            if (mobNo.value.isEmpty()) {
+                            if (mobNo.value.isEmpty() || mobNo.value.length != 10) {
                                 context.toast(enterMobileNoStr)
                             } else {
-//                                showBottomSheet = true
+                                showBottomSheet = true
 
-                                showError = mobNo.value.isEmpty()
+                                /*showError = mobNo.value.isEmpty()
                                 val firstDigitChar = mobNo.value.toString().first()
                                 val firstDigit = firstDigitChar.digitToInt()
                                 if (showError || mobNo.value.length < 10) {
@@ -222,7 +231,7 @@ fun ForgetPasswordScreen(
                                         buttonClicked = true
                                         onNext()
                                     }
-                                }
+                                }*/
                             }
                         }, countNumber != null
                     )
@@ -241,5 +250,4 @@ fun ForgetPasswordScreen(
             showBottomSheet = false
         })
     }
-
 }
