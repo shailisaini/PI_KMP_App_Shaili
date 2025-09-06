@@ -81,6 +81,7 @@ import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
@@ -92,6 +93,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByU
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SpecializationListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
+import com.pi.ProjectInclusion.data.model.profileModel.response.ViewProfileResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -218,10 +220,50 @@ fun SpeEducatorScreenUI(
     var msgSpecialization = stringResource(R.string.key_select_specialization)
     var msgCRRN = stringResource(R.string.key_CRR_No)
 
+    var encryptedUserName = loginViewModel.getPrefData(USER_NAME)
+    var profileData by remember { mutableStateOf<ViewProfileResponse?>(null) }
+    var isDropDownSelected by rememberSaveable { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
-        loginViewModel.getAllStateList()
+        loginViewModel.getUserProfileViewModel(strToken, encryptedUserName)
     }
 
+    val viewProfile by loginViewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
+    LaunchedEffect(viewProfile) {
+        when {
+            viewProfile.isLoading -> {
+                isDialogVisible = true
+            }
+
+            viewProfile.error.isNotEmpty() -> {
+                logger.d("viewProfileData: ${viewProfile.success}")
+                isDialogVisible = false
+            }
+
+            viewProfile.success != null -> {
+                logger.d("viewProfileData: ${viewProfile.success}")
+                if (viewProfile.success!!.status == true) {
+                    profileData = viewProfile.success!!
+                    crrText.value = profileData!!.response?.CRRNum.toString()
+                    stateSelectedId.intValue = profileData!!.response?.stateId?.toInt()!!
+                    districtSelectedId.intValue = profileData!!.response?.districtId?.toInt()!!
+                    blockSelectedId.intValue = profileData!!.response?.blockId?.toInt()!!
+                    schoolSelectedId.intValue = profileData!!.response?.schoolId?.toInt()!!
+                    professionId.intValue = profileData!!.response?.professionId?.toInt()!!
+                    specializationId.intValue = profileData!!.response?.specializationId?.toInt()!!
+                    qualificationId.intValue = profileData!!.response?.qualificationId?.toInt()!!
+                    reasonSelectedId.intValue = profileData!!.response?.reasonId?.toInt()!!
+
+                    logger.d("viewProfileData 1: ${viewProfile.success}")
+                } else {
+                    context.toast(viewProfile.success!!.message.toString())
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
+    loginViewModel.getAllStateList()
     LaunchedEffect(allStatesState) {
         when {
             allStatesState.isLoading -> {
@@ -237,9 +279,24 @@ fun SpeEducatorScreenUI(
                 logger.d("All state response : ${allStatesState.success}")
                 if (allStatesState.success?.size != 0) {
                     allDistricts.clear()
-                    allStatesState.success.let {
-                        it.let { it1 -> allState.addAll(it1!!.toList()) }
+                    allStatesState.success?.let { stateList ->
+                        stateList.let { it1 ->
+                            allState.clear()
+                            allState.addAll(it1.toList())
+
+                            // Find matching state
+                            if (!isDropDownSelected) {
+                                val matchedState = it1.find { state ->
+                                    state.id == profileData?.response?.stateId?.toInt()
+                                }
+
+                                matchedState?.let { state ->
+                                    selectedState = state.name!! // assuming field is stateName
+                                }
+                            }
+                        }
                     }
+
                     println("All states list data :- $allState")
                 }
                 isDialogVisible = false
@@ -247,27 +304,47 @@ fun SpeEducatorScreenUI(
         }
     }
 
+    if (stateSelectedId.intValue != -1) {
+        loginViewModel.getAllDistrictByStateId(stateSelectedId.intValue)
+    }
+    if (districtSelectedId.intValue != -1) {
+        loginViewModel.getAllBlockByDistrictId(districtSelectedId.intValue)
+    }
+    if (blockSelectedId.intValue != -1) {
+        loginViewModel.getAllSchoolsByBlockId(blockSelectedId.intValue)
+    }
+
     LaunchedEffect(allDistrictsState) {
         when {
             allDistrictsState.isLoading -> {
-                isDialogVisible = true
+//                isDialogVisible = true
             }
 
             allDistrictsState.error.isNotEmpty() -> {
                 logger.d("All district error : ${allDistrictsState.success}")
-                isDialogVisible = false
+//                isDialogVisible = false
             }
 
             allDistrictsState.success != null -> {
                 logger.d("All district response : ${allDistrictsState.success}")
-                if (allDistrictsState.success?.size != 0) {
-                    allBlocks.clear()
-                    allDistrictsState.success.let {
-                        it.let { it2 -> allDistricts.addAll(it2!!.toList()) }
+                allDistrictsState.success?.let { districtList ->
+                    districtList.let { it1 ->
+                        allDistricts.clear()
+                        allDistricts.addAll(it1.toList())
+                        districtSelectedId.intValue = profileData?.response?.districtId?.toInt()!!
+                        // Find matching state
+                        if (!isDropDownSelected) {
+                            val matchedState = it1.find { district ->
+                                district.id == profileData?.response?.districtId?.toInt()
+                            }
+
+                            matchedState?.let { district ->
+                                selectedDistrict = district.name!! // assuming field is stateName
+                            }
+                        }
                     }
-                    println("All district list data :- $allDistricts")
                 }
-                isDialogVisible = false
+//                isDialogVisible = false
             }
         }
     }
@@ -275,24 +352,38 @@ fun SpeEducatorScreenUI(
     LaunchedEffect(allBlocksState) {
         when {
             allBlocksState.isLoading -> {
-                isDialogVisible = true
+//                isDialogVisible = true
             }
 
             allBlocksState.error.isNotEmpty() -> {
                 logger.d("All Blocks error : ${allBlocksState.success}")
-                isDialogVisible = false
+//                isDialogVisible = false
             }
 
             allBlocksState.success != null -> {
                 logger.d("All Blocks response : ${allBlocksState.success}")
                 if (allBlocksState.success?.size != 0) {
                     allSchools.clear()
-                    allBlocksState.success.let {
-                        it.let { it3 -> allBlocks.addAll(it3!!.toList()) }
+                    allBlocksState.success?.let { blockList ->
+                        blockList.let { it1 ->
+                            allBlocks.clear()
+                            allBlocks.addAll(it1.toList())
+
+                            // Find matching state
+                            if (!isDropDownSelected) {
+                                val matchedState = it1.find { block ->
+                                    block.id == profileData?.response?.blockId?.toInt()
+                                }
+
+                                matchedState?.let { block ->
+                                    selectedBlock = block.name!! // assuming field is stateName
+                                }
+                            }
+                        }
                     }
                     println("All Blocks list data :- $allBlocks")
                 }
-                isDialogVisible = false
+//                isDialogVisible = false
             }
         }
     }
@@ -302,17 +393,27 @@ fun SpeEducatorScreenUI(
             allSchoolsState.isLoading -> {
                 isDialogVisible = true
             }
-
             allSchoolsState.error.isNotEmpty() -> {
                 logger.d("All Schools error : ${allSchoolsState.success}")
                 isDialogVisible = false
             }
-
             allSchoolsState.success != null -> {
                 logger.d("All Schools response : ${allSchoolsState.success}")
                 if (allSchoolsState.success?.status == 1) {
-                    allSchoolsState.success!!.response.let {
-                        it.let { it4 -> allSchools.addAll(it4!!.toList()) }
+                    allSchoolsState.success?.response?.let { schoolList ->
+                        allSchools.clear()
+                        allSchools.addAll(schoolList.toList())
+
+                        // Find matching school only if user hasn't selected from dropdown
+                        if (!isDropDownSelected) {
+                            val matchedSchool = schoolList.find { school ->
+                                school.id == profileData?.response?.schoolId?.toInt()
+                            }
+
+                            matchedSchool?.let { school ->
+                                selectedSchool = school.name!!
+                            }
+                        }
                     }
                     println("All Schools list data :- $allSchools")
                 }

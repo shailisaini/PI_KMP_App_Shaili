@@ -80,6 +80,7 @@ import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
@@ -90,6 +91,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByU
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SpecializationListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
+import com.pi.ProjectInclusion.data.model.profileModel.response.ViewProfileResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -205,14 +207,56 @@ fun ProfessionalScreenUI(
     var qualificationId = remember { mutableIntStateOf(-1) }
     var specializationId = remember { mutableIntStateOf(-1) }
     var strToken = loginViewModel.getPrefData(TOKEN_PREF_KEY)
+    var encryptedUserName = loginViewModel.getPrefData(USER_NAME)
+    var profileData by remember { mutableStateOf<ViewProfileResponse?>(null) }
+    var isDropDownSelected by rememberSaveable { mutableStateOf(false) }
 
-    var isDistrictListCalled by rememberSaveable { mutableStateOf(false) }
+   /* var isDistrictListCalled by rememberSaveable { mutableStateOf(false) }
     var isBlockListCalled by rememberSaveable { mutableStateOf(false) }
-    var isSchoolListCalled by rememberSaveable { mutableStateOf(false) }
+    var isSchoolListCalled by rememberSaveable { mutableStateOf(false) }*/
     var isUdiseCalled by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) { loginViewModel.getAllStateList()}
     val allStatesState by loginViewModel.allStatesResponse.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        loginViewModel.getUserProfileViewModel(strToken, encryptedUserName)
+    }
+
+    val viewProfile by loginViewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
+    LaunchedEffect(viewProfile) {
+        when {
+            viewProfile.isLoading -> {
+                isDialogVisible = true
+            }
+
+            viewProfile.error.isNotEmpty() -> {
+                logger.d("viewProfileData: ${viewProfile.success}")
+                isDialogVisible = false
+            }
+
+            viewProfile.success != null -> {
+                logger.d("viewProfileData: ${viewProfile.success}")
+                if (viewProfile.success!!.status == true) {
+                    profileData = viewProfile.success!!
+                    crrText.value = profileData!!.response?.CRRNum.toString()
+                    stateSelectedId.intValue = profileData!!.response?.stateId?.toInt()!!
+                    districtSelectedId.intValue = profileData!!.response?.districtId?.toInt()!!
+                    blockSelectedId.intValue = profileData!!.response?.blockId?.toInt()!!
+                    schoolSelectedId.intValue = profileData!!.response?.schoolId?.toInt()!!
+                    professionId.intValue = profileData!!.response?.professionId?.toInt()!!
+                    specializationId.intValue = profileData!!.response?.specializationId?.toInt()!!
+                    qualificationId.intValue = profileData!!.response?.qualificationId?.toInt()!!
+
+                    logger.d("viewProfileData 1: ${viewProfile.success}")
+                } else {
+                    context.toast(viewProfile.success!!.message.toString())
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
+    loginViewModel.getAllStateList()
     LaunchedEffect(allStatesState) {
         when {
             allStatesState.isLoading -> {
@@ -228,9 +272,24 @@ fun ProfessionalScreenUI(
                 logger.d("All state response : ${allStatesState.success}")
                 if (allStatesState.success?.size != 0) {
                     allDistricts.clear()
-                    allStatesState.success.let {
-                        it.let { it1 -> allState.addAll(it1!!.toList()) }
+                    allStatesState.success?.let { stateList ->
+                        stateList.let { it1 ->
+                            allState.clear()
+                            allState.addAll(it1.toList())
+
+                            // Find matching state
+                            if (!isDropDownSelected) {
+                                val matchedState = it1.find { state ->
+                                    state.id == profileData?.response?.stateId?.toInt()
+                                }
+
+                                matchedState?.let { state ->
+                                    selectedState = state.name!! // assuming field is stateName
+                                }
+                            }
+                        }
                     }
+
                     println("All states list data :- $allState")
                 }
                 isDialogVisible = false
@@ -238,86 +297,123 @@ fun ProfessionalScreenUI(
         }
     }
 
-    if (isDistrictListCalled && stateSelectedId.intValue != -1){
+    if (stateSelectedId.intValue != -1) {
         loginViewModel.getAllDistrictByStateId(stateSelectedId.intValue)
-        val allDistrictsState by loginViewModel.allDistrictsResponse.collectAsStateWithLifecycle()
-        LaunchedEffect(allDistrictsState) {
-            when {
-                allDistrictsState.isLoading -> {
-                    isDialogVisible = true
-                }
+    }
+    if (districtSelectedId.intValue != -1) {
+        loginViewModel.getAllBlockByDistrictId(districtSelectedId.intValue)
+    }
+    if (blockSelectedId.intValue != -1) {
+        loginViewModel.getAllSchoolsByBlockId(blockSelectedId.intValue)
+    }
 
-                allDistrictsState.error.isNotEmpty() -> {
-                    logger.d("All district error : ${allDistrictsState.success}")
-                    isDialogVisible = false
-                }
+    val allDistrictsState by loginViewModel.allDistrictsResponse.collectAsStateWithLifecycle()
+    LaunchedEffect(allDistrictsState) {
+        when {
+            allDistrictsState.isLoading -> {
+//                isDialogVisible = true
+            }
 
-                allDistrictsState.success != null -> {
-                    logger.d("All district response : ${allDistrictsState.success}")
-                    isDistrictListCalled = false
-                    if (allDistrictsState.success?.size != 0) {
-                        allBlocks.clear()
-                        allDistrictsState.success.let {
-                            it.let { it2 -> allDistricts.addAll(it2!!.toList()) }
+            allDistrictsState.error.isNotEmpty() -> {
+                logger.d("All district error : ${allDistrictsState.success}")
+//                isDialogVisible = false
+            }
+
+            allDistrictsState.success != null -> {
+                logger.d("All district response : ${allDistrictsState.success}")
+                allDistrictsState.success?.let { districtList ->
+                    districtList.let { it1 ->
+                        allDistricts.clear()
+                        allDistricts.addAll(it1.toList())
+                        districtSelectedId.intValue = profileData?.response?.districtId?.toInt()!!
+                        // Find matching state
+                        if (!isDropDownSelected) {
+                            val matchedState = it1.find { district ->
+                                district.id == profileData?.response?.districtId?.toInt()
+                            }
+
+                            matchedState?.let { district ->
+                                selectedDistrict = district.name!! // assuming field is stateName
+                            }
                         }
-                        println("All district list data :- $allDistricts")
                     }
-                    isDialogVisible = false
                 }
+//                isDialogVisible = false
             }
         }
     }
 
-    if (isBlockListCalled) {
-        val allBlocksState by loginViewModel.allBlocksResponse.collectAsStateWithLifecycle()
-        LaunchedEffect(allBlocksState) {
-            when {
-                allBlocksState.isLoading -> {
-                    isDialogVisible = true
-                }
+    val allBlocksState by loginViewModel.allBlocksResponse.collectAsStateWithLifecycle()
+    LaunchedEffect(allBlocksState) {
+        when {
+            allBlocksState.isLoading -> {
+//                isDialogVisible = true
+            }
 
-                allBlocksState.error.isNotEmpty() -> {
-                    logger.d("All Blocks error : ${allBlocksState.success}")
-                    isDialogVisible = false
-                }
+            allBlocksState.error.isNotEmpty() -> {
+                logger.d("All Blocks error : ${allBlocksState.success}")
+//                isDialogVisible = false
+            }
 
-                allBlocksState.success != null -> {
-                    logger.d("All Blocks response : ${allBlocksState.success}")
-                    if (allBlocksState.success?.size != 0) {
+            allBlocksState.success != null -> {
+                logger.d("All Blocks response : ${allBlocksState.success}")
+                if (allBlocksState.success?.size != 0) {
+                    allSchools.clear()
+                    allBlocksState.success?.let { blockList ->
+                        blockList.let { it1 ->
+                            allBlocks.clear()
+                            allBlocks.addAll(it1.toList())
+
+                            // Find matching state
+                            if (!isDropDownSelected) {
+                                val matchedState = it1.find { block ->
+                                    block.id == profileData?.response?.blockId?.toInt()
+                                }
+
+                                matchedState?.let { block ->
+                                    selectedBlock = block.name!! // assuming field is stateName
+                                }
+                            }
+                        }
+                    }
+                    println("All Blocks list data :- $allBlocks")
+                }
+//                isDialogVisible = false
+            }
+        }
+    }
+
+    val allSchoolsState by loginViewModel.allSchoolsResponse.collectAsStateWithLifecycle()
+    LaunchedEffect(allSchoolsState) {
+        when {
+            allSchoolsState.isLoading -> {
+                isDialogVisible = true
+            }
+            allSchoolsState.error.isNotEmpty() -> {
+                logger.d("All Schools error : ${allSchoolsState.success}")
+                isDialogVisible = false
+            }
+            allSchoolsState.success != null -> {
+                logger.d("All Schools response : ${allSchoolsState.success}")
+                if (allSchoolsState.success?.status == 1) {
+                    allSchoolsState.success?.response?.let { schoolList ->
                         allSchools.clear()
-                        allBlocksState.success.let {
-                            it.let { it3 -> allBlocks.addAll(it3!!.toList()) }
-                        }
-                        println("All Blocks list data :- $allBlocks")
-                    }
-                    isDialogVisible = false
-                }
-            }
-        }
-    }
-    if (isSchoolListCalled) {
-        val allSchoolsState by loginViewModel.allSchoolsResponse.collectAsStateWithLifecycle()
-        LaunchedEffect(allSchoolsState) {
-            when {
-                allSchoolsState.isLoading -> {
-                    isDialogVisible = true
-                }
+                        allSchools.addAll(schoolList.toList())
 
-                allSchoolsState.error.isNotEmpty() -> {
-                    logger.d("All Schools error : ${allSchoolsState.success}")
-                    isDialogVisible = false
-                }
+                        // Find matching school only if user hasn't selected from dropdown
+                        if (!isDropDownSelected) {
+                            val matchedSchool = schoolList.find { school ->
+                                school.id == profileData?.response?.schoolId?.toInt()
+                            }
 
-                allSchoolsState.success != null -> {
-                    logger.d("All Schools response : ${allSchoolsState.success}")
-                    if (allSchoolsState.success?.status == 1) {
-                        allSchoolsState.success!!.response.let {
-                            it.let { it4 -> allSchools.addAll(it4!!.toList()) }
+                            matchedSchool?.let { school ->
+                                selectedSchool = school.name!!
+                            }
                         }
-                        println("All Schools list data :- $allSchools")
                     }
-                    isDialogVisible = false
+                    println("All Schools list data :- $allSchools")
                 }
+                isDialogVisible = false
             }
         }
     }
@@ -655,7 +751,7 @@ fun ProfessionalScreenUI(
                         selectedState = state.toString()
                         allState.find { it.name == state }?.id?.let {
                             stateSelectedId.intValue = it
-                            isDistrictListCalled = true
+                            isDropDownSelected = true
                         }
                     },
                     allState.map { it.name }.toMutableList() as List<String>
@@ -709,7 +805,6 @@ fun ProfessionalScreenUI(
                         selectedDistrict = districts
                         allDistricts.find { it.name == districts }?.id?.let {
                             districtSelectedId.intValue = it
-                            isBlockListCalled = true
                             loginViewModel.getAllBlockByDistrictId(it)
                         }
                     },
@@ -765,7 +860,6 @@ fun ProfessionalScreenUI(
                         selectedBlock = block
                         allBlocks.find { it.name == block }?.id?.let {
                             blockSelectedId.intValue = it
-                            isSchoolListCalled = true
                             loginViewModel.getAllSchoolsByBlockId(it)
                         }
                     },
