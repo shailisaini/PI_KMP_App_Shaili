@@ -26,7 +26,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -55,7 +54,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.kmptemplate.logger.LoggerProvider
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Bg_Gray
 import com.pi.ProjectInclusion.Bg_Gray1
@@ -64,7 +62,6 @@ import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Gray
-import com.pi.ProjectInclusion.LightRed01
 import com.pi.ProjectInclusion.OrangeSubTitle
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.Transparent
@@ -80,6 +77,7 @@ import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
@@ -88,20 +86,23 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetLangua
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByUdiseCodeResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
+import com.pi.ProjectInclusion.data.model.profileModel.response.ViewProfileResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.launch
 import org.koin.ext.clearQuotes
 
 @Composable
-fun EditProfileScreen2(onNext: () -> Unit,  //EditProfileScreen2
-                       onBack: () -> Unit,
-                       loginViewModel: LoginViewModel) {
+fun EditProfileScreen2(
+    onNext: () -> Unit,  //Dashboard
+    onBack: () -> Unit,
+    loginViewModel: LoginViewModel
+) {
 
     val context = LocalContext.current
     logger.d("Screen: " + "EditProfileScreen2()")
 
     BackHandler {
-       onBack()
+        onBack()
     }
 
     Surface(
@@ -113,7 +114,12 @@ fun EditProfileScreen2(onNext: () -> Unit,  //EditProfileScreen2
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            EditProfileScreen2UI(context, onNext = onNext, onBack = onBack, loginViewModel = loginViewModel)
+            EditProfileScreen2UI(
+                context,
+                onNext = onNext,
+                onBack = onBack,
+                loginViewModel = loginViewModel
+            )
         }
     }
 }
@@ -160,12 +166,13 @@ fun EditProfileScreen2UI(
     var isBottomSheetDistrictVisible by rememberSaveable { mutableStateOf(false) }
     var isBottomSheetBlockVisible by rememberSaveable { mutableStateOf(false) }
     var isBottomSheetSchoolVisible by rememberSaveable { mutableStateOf(false) }
-
-    var isStateListCalled by rememberSaveable { mutableStateOf(false) }
-    var isDistrictListCalled by rememberSaveable { mutableStateOf(false) }
-    var isBlockListCalled by rememberSaveable { mutableStateOf(false) }
-    var isSchoolListCalled by rememberSaveable { mutableStateOf(false) }
     var isUdiseCalled by rememberSaveable { mutableStateOf(false) }
+    var isDropDownSelected by rememberSaveable { mutableStateOf(false) }
+
+    var stateSelectedId = remember { mutableIntStateOf(-1) }
+    var districtSelectedId = remember { mutableIntStateOf(-1) }
+    var blockSelectedId = remember { mutableIntStateOf(-1) }
+    var schoolSelectedId = remember { mutableIntStateOf(-1) }
 
     val allStatesState by loginViewModel.allStatesResponse.collectAsStateWithLifecycle()
     var allState = remember { mutableStateListOf<StateListResponse>() }
@@ -175,136 +182,221 @@ fun EditProfileScreen2UI(
     var allUdiseDetails =
         remember { mutableStateListOf<SchoolByUdiseCodeResponse.UdiseCodeResponse>() }
 
-    var stateSelectedId = remember { mutableIntStateOf(-1) }
-    var districtSelectedId = remember { mutableIntStateOf(-1) }
-    var blockSelectedId = remember { mutableIntStateOf(-1) }
-    var schoolSelectedId = remember { mutableIntStateOf(-1) }
-    val scope = rememberCoroutineScope()
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true,)
+    var profileData by remember { mutableStateOf<ViewProfileResponse?>(null) }
 
+    val scope = rememberCoroutineScope()
+    var encryptedUserName = loginViewModel.getPrefData(USER_NAME)
+
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+    )
     var strToken = loginViewModel.getPrefData(TOKEN_PREF_KEY)
+
+    val professionalProfileState by loginViewModel.professionalProfileResponse.collectAsStateWithLifecycle()
 
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
         message = stringResource(R.string.txt_loading)
     )
+    LaunchedEffect(Unit) {
+        loginViewModel.getUserProfileViewModel(strToken, encryptedUserName)
+    }
 
-        loginViewModel.getAllStateList()
-        LaunchedEffect(allStatesState) {
-            when {
-                allStatesState.isLoading -> {
-                    isDialogVisible = true
-                }
+    val viewProfile by loginViewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
+    LaunchedEffect(viewProfile) {
+        when {
+            viewProfile.isLoading -> {
+                isDialogVisible = true
+            }
 
-                allStatesState.error.isNotEmpty() -> {
-                    logger.d("All state error : ${allStatesState.success}")
-                    isDialogVisible = false
-                }
+            viewProfile.error.isNotEmpty() -> {
+                logger.d("viewProfileData: ${viewProfile.success}")
+                isDialogVisible = false
+            }
 
-                allStatesState.success != null -> {
-                    logger.d("All state response : ${allStatesState.success}")
-                    if (allStatesState.success?.size != 0) {
-                        allDistricts.clear()
-                        allStatesState.success.let {
-                            it.let { it1 -> allState.addAll(it1!!.toList()) }
-                        }
-                        println("All states list data :- $allState")
-                    }
-                    isDialogVisible = false
+            viewProfile.success != null -> {
+                logger.d("viewProfileData: ${viewProfile.success}")
+                if (viewProfile.success!!.status == true) {
+                    profileData = viewProfile.success!!
+
+                    stateSelectedId.intValue = profileData!!.response?.stateId?.toInt()!!
+                    districtSelectedId.intValue = profileData!!.response?.districtId?.toInt()!!
+                    blockSelectedId.intValue = profileData!!.response?.blockId?.toInt()!!
+                    schoolSelectedId.intValue = profileData!!.response?.schoolId?.toInt()!!
+
+                    logger.d("viewProfileData 1: ${viewProfile.success}")
+                } else {
+                    context.toast(viewProfile.success!!.message.toString())
                 }
+                isDialogVisible = false
             }
         }
+    }
 
-    if (isDistrictListCalled && stateSelectedId.intValue != -1){
+    loginViewModel.getAllStateList()
+    LaunchedEffect(allStatesState) {
+        when {
+            allStatesState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            allStatesState.error.isNotEmpty() -> {
+                logger.d("All state error : ${allStatesState.success}")
+                isDialogVisible = false
+            }
+
+            allStatesState.success != null -> {
+                logger.d("All state response : ${allStatesState.success}")
+                if (allStatesState.success?.size != 0) {
+                    allDistricts.clear()
+                    allStatesState.success?.let { stateList ->
+                        stateList.let { it1 ->
+                            allState.clear()
+                            allState.addAll(it1.toList())
+
+                            // Find matching state
+                            if (!isDropDownSelected) {
+                                val matchedState = it1.find { state ->
+                                    state.id == profileData?.response?.stateId?.toInt()
+                                }
+
+                                matchedState?.let { state ->
+                                    selectedState = state.name!! // assuming field is stateName
+                                }
+                            }
+                        }
+                    }
+
+                    println("All states list data :- $allState")
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
+    if (stateSelectedId.intValue != -1) {
         loginViewModel.getAllDistrictByStateId(stateSelectedId.intValue)
-        val allDistrictsState by loginViewModel.allDistrictsResponse.collectAsStateWithLifecycle()
-        LaunchedEffect(allDistrictsState) {
-            when {
-                allDistrictsState.isLoading -> {
-                    isDialogVisible = true
-                }
+    }
+    if (districtSelectedId.intValue != -1) {
+        loginViewModel.getAllBlockByDistrictId(districtSelectedId.intValue)
+    }
+    if (blockSelectedId.intValue != -1) {
+        loginViewModel.getAllSchoolsByBlockId(blockSelectedId.intValue)
+    }
 
-                allDistrictsState.error.isNotEmpty() -> {
-                    logger.d("All district error : ${allDistrictsState.success}")
-                    isDialogVisible = false
-                }
-
-                allDistrictsState.success != null -> {
-                    logger.d("All district response : ${allDistrictsState.success}")
-                    isDistrictListCalled = false
-                    if (allDistrictsState.success?.size != 0) {
-                        allBlocks.clear()
-                        allDistrictsState.success.let {
-                            it.let { it2 -> allDistricts.addAll(it2!!.toList()) }
-                        }
-                        println("All district list data :- $allDistricts")
-                    }
-                    isDialogVisible = false
-                }
+    val allDistrictsState by loginViewModel.allDistrictsResponse.collectAsStateWithLifecycle()
+    LaunchedEffect(allDistrictsState) {
+        when {
+            allDistrictsState.isLoading -> {
+//                isDialogVisible = true
             }
-            isDistrictListCalled = false
+
+            allDistrictsState.error.isNotEmpty() -> {
+                logger.d("All district error : ${allDistrictsState.success}")
+//                isDialogVisible = false
+            }
+
+            allDistrictsState.success != null -> {
+                logger.d("All district response : ${allDistrictsState.success}")
+                allDistrictsState.success?.let { districtList ->
+                    districtList.let { it1 ->
+                        allDistricts.clear()
+                        allDistricts.addAll(it1.toList())
+                        districtSelectedId.intValue = profileData?.response?.districtId?.toInt()!!
+                        // Find matching state
+                        if (!isDropDownSelected) {
+                            val matchedState = it1.find { district ->
+                                district.id == profileData?.response?.districtId?.toInt()
+                            }
+
+                            matchedState?.let { district ->
+                                selectedDistrict = district.name!! // assuming field is stateName
+                            }
+                        }
+                    }
+                }
+//                isDialogVisible = false
+            }
         }
     }
 
-    if (isBlockListCalled) {
-        val allBlocksState by loginViewModel.allBlocksResponse.collectAsStateWithLifecycle()
-        LaunchedEffect(allBlocksState) {
-            when {
-                allBlocksState.isLoading -> {
-                    isDialogVisible = true
-                }
+    val allBlocksState by loginViewModel.allBlocksResponse.collectAsStateWithLifecycle()
+    LaunchedEffect(allBlocksState) {
+        when {
+            allBlocksState.isLoading -> {
+//                isDialogVisible = true
+            }
 
-                allBlocksState.error.isNotEmpty() -> {
-                    logger.d("All Blocks error : ${allBlocksState.success}")
-                    isDialogVisible = false
-                }
+            allBlocksState.error.isNotEmpty() -> {
+                logger.d("All Blocks error : ${allBlocksState.success}")
+//                isDialogVisible = false
+            }
 
-                allBlocksState.success != null -> {
-                    logger.d("All Blocks response : ${allBlocksState.success}")
-                    if (allBlocksState.success?.size != 0) {
+            allBlocksState.success != null -> {
+                logger.d("All Blocks response : ${allBlocksState.success}")
+                if (allBlocksState.success?.size != 0) {
+                    allSchools.clear()
+                    allBlocksState.success?.let { blockList ->
+                        blockList.let { it1 ->
+                            allBlocks.clear()
+                            allBlocks.addAll(it1.toList())
+
+                            // Find matching state
+                            if (!isDropDownSelected) {
+                                val matchedState = it1.find { block ->
+                                    block.id == profileData?.response?.blockId?.toInt()
+                                }
+
+                                matchedState?.let { block ->
+                                    selectedBlock = block.name!! // assuming field is stateName
+                                }
+                            }
+                        }
+                    }
+                    println("All Blocks list data :- $allBlocks")
+                }
+//                isDialogVisible = false
+            }
+        }
+    }
+
+    val allSchoolsState by loginViewModel.allSchoolsResponse.collectAsStateWithLifecycle()
+    LaunchedEffect(allSchoolsState) {
+        when {
+            allSchoolsState.isLoading -> {
+                isDialogVisible = true
+            }
+            allSchoolsState.error.isNotEmpty() -> {
+                logger.d("All Schools error : ${allSchoolsState.success}")
+                isDialogVisible = false
+            }
+            allSchoolsState.success != null -> {
+                logger.d("All Schools response : ${allSchoolsState.success}")
+                if (allSchoolsState.success?.status == 1) {
+                    allSchoolsState.success?.response?.let { schoolList ->
                         allSchools.clear()
-                        allBlocksState.success.let {
-                            it.let { it3 -> allBlocks.addAll(it3!!.toList()) }
-                        }
-                        println("All Blocks list data :- $allBlocks")
-                    }
-                    isDialogVisible = false
-                }
-            }
-            isBlockListCalled = false
-        }
-    }
-    if (isSchoolListCalled) {
-        val allSchoolsState by loginViewModel.allSchoolsResponse.collectAsStateWithLifecycle()
-        LaunchedEffect(allSchoolsState) {
-            when {
-                allSchoolsState.isLoading -> {
-                    isDialogVisible = true
-                }
+                        allSchools.addAll(schoolList.toList())
 
-                allSchoolsState.error.isNotEmpty() -> {
-                    logger.d("All Schools error : ${allSchoolsState.success}")
-                    isDialogVisible = false
-                }
+                        // Find matching school only if user hasn't selected from dropdown
+                        if (!isDropDownSelected) {
+                            val matchedSchool = schoolList.find { school ->
+                                school.id == profileData?.response?.schoolId?.toInt()
+                            }
 
-                allSchoolsState.success != null -> {
-                    logger.d("All Schools response : ${allSchoolsState.success}")
-                    if (allSchoolsState.success?.status == 1) {
-                        allSchoolsState.success!!.response.let {
-                            it.let { it4 -> allSchools.addAll(it4!!.toList()) }
+                            matchedSchool?.let { school ->
+                                selectedSchool = school.name!!
+                            }
                         }
-                        println("All Schools list data :- $allSchools")
                     }
-                    isDialogVisible = false
+                    println("All Schools list data :- $allSchools")
                 }
+                isDialogVisible = false
             }
-            isSchoolListCalled = false
         }
     }
 
-    if (isUdiseCalled){
+    if (isUdiseCalled) {
         loginViewModel.getAllDetailsByUdiseId(udiseCode.value.toString())
         isDialogVisible = true
         val allUdiseState by loginViewModel.allUdiseCodeResponse.collectAsStateWithLifecycle()
@@ -353,6 +445,28 @@ fun EditProfileScreen2UI(
         }
     }
 
+    LaunchedEffect(professionalProfileState) {
+        when {
+            professionalProfileState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            professionalProfileState.error.isNotEmpty() -> {
+                logger.d("All professional error : ${professionalProfileState.success}")
+                isDialogVisible = false
+            }
+
+            professionalProfileState.success != null -> {
+                logger.d("All professional response : ${professionalProfileState.success}")
+                if (professionalProfileState.success?.statusCode == 200) {
+                    println("All professional data :- ${professionalProfileState.success?.message}")
+                    onNext()
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
     DetailsNoImgBackgroundUi(
         backgroundColor = White,
         textColor = Black,
@@ -361,7 +475,7 @@ fun EditProfileScreen2UI(
         isShowBackButton = true,
         isShowMoreInfo = false,
         onBackButtonClick = {
-           onBack()
+            onBack()
         },
         onMoreInfoClick = {
 //            showSheetMenu = true
@@ -558,7 +672,8 @@ fun EditProfileScreen2UI(
                                 },
                                 onClick = {
                                     scope.launch {
-                                        isBottomSheetStateVisible = true // true under development code
+                                        isBottomSheetStateVisible =
+                                            true // true under development code
                                         sheetState.expand()
                                     }
                                 })
@@ -568,14 +683,26 @@ fun EditProfileScreen2UI(
                                 sheetState = sheetState,
                                 onDismiss = {
                                     scope.launch { sheetState.hide() }
-                                         isBottomSheetStateVisible = false
+                                    isBottomSheetStateVisible = false
                                 },
                                 onDecline = {},
                                 onTextSelected = { state ->
                                     selectedState = state.toString()
                                     allState.find { it.name == state }?.id?.let {
                                         stateSelectedId.intValue = it
-                                        isDistrictListCalled = true
+                                        isDropDownSelected = true
+
+                                        districtSelectedId.value = -1
+                                        selectedDistrict = ""
+                                        blockSelectedId.value = -1
+                                        selectedBlock = ""
+                                        schoolSelectedId.value = -1
+                                        selectedSchool = ""
+                                        allDistricts.clear()
+                                        allBlocks.clear()
+                                        allSchools.clear()
+
+                                        loginViewModel.getAllDistrictByStateId(stateSelectedId.intValue)
                                     }
                                 },
                                 allState.map { it.name }.toMutableList() as List<String>
@@ -613,7 +740,8 @@ fun EditProfileScreen2UI(
                                 },
                                 onClick = {
                                     scope.launch {
-                                        isBottomSheetDistrictVisible = true // true under development code
+                                        isBottomSheetDistrictVisible =
+                                            true // true under development code
                                         sheetState.expand()
                                     }
                                 })
@@ -623,14 +751,19 @@ fun EditProfileScreen2UI(
                                 sheetState = sheetState,
                                 onDismiss = {
                                     scope.launch { sheetState.hide() }
-                                        isBottomSheetDistrictVisible = false
+                                    isBottomSheetDistrictVisible = false
                                 },
                                 onDecline = {},
                                 onTextSelected = { districts ->
                                     selectedDistrict = districts
                                     allDistricts.find { it.name == districts }?.id?.let {
                                         districtSelectedId.intValue = it
-                                        isBlockListCalled = true
+                                        blockSelectedId.value = -1
+                                        schoolSelectedId.value = -1
+                                        allBlocks.clear()
+                                        allSchools.clear()
+                                        selectedBlock = ""
+                                        selectedSchool = ""
                                         loginViewModel.getAllBlockByDistrictId(it)
                                     }
                                 },
@@ -669,7 +802,8 @@ fun EditProfileScreen2UI(
                                 },
                                 onClick = {
                                     scope.launch {
-                                        isBottomSheetBlockVisible = true // true under development code
+                                        isBottomSheetBlockVisible =
+                                            true // true under development code
                                         sheetState.expand()
                                     }
                                 })
@@ -686,7 +820,9 @@ fun EditProfileScreen2UI(
                                     selectedBlock = block
                                     allBlocks.find { it.name == block }?.id?.let {
                                         blockSelectedId.intValue = it
-                                        isSchoolListCalled = true
+                                        schoolSelectedId.value = -1
+                                        selectedSchool = ""
+                                        allSchools.clear()
                                         loginViewModel.getAllSchoolsByBlockId(it)
                                     }
                                 },
@@ -725,7 +861,8 @@ fun EditProfileScreen2UI(
                                 },
                                 onClick = {
                                     scope.launch {
-                                        isBottomSheetSchoolVisible = true // true under development code
+                                        isBottomSheetSchoolVisible =
+                                            true // true under development code
                                         sheetState.expand()
                                     }
                                 })
@@ -775,29 +912,33 @@ fun EditProfileScreen2UI(
                                 title = txtContinue,
                                 onClick = {
 
-                                    if (schoolSelectedId.intValue == -1){
+                                    if (schoolSelectedId.intValue == -1) {
                                         context.toast(stateError)
                                     }
-                                    if(districtSelectedId.intValue == -1){
+                                    if (districtSelectedId.intValue == -1) {
                                         context.toast(districtError)
                                     }
-                                    if(blockSelectedId.intValue == -1){
+                                    if (blockSelectedId.intValue == -1) {
                                         context.toast(blockError)
                                     }
-                                    if(schoolSelectedId.intValue == -1){
+                                    if (schoolSelectedId.intValue == -1) {
                                         context.toast(schoolError)
-                                    }
-                                    else{
-                                    val professionalProfileRequest = ProfessionalProfileRequest(
-                                        udiseCode.value.toString(),
-                                        stateSelectedId.intValue,
-                                        districtSelectedId.intValue,
-                                        blockSelectedId.intValue,
-                                        schoolSelectedId.intValue
-                                    )
-                                    loginViewModel.createProfessionalProfileRepo(
-                                        professionalProfileRequest, strToken
-                                    )
+                                    } else {
+                                        val professionalProfileRequest = ProfessionalProfileRequest(
+                                            udiseCode.value.toString(),
+                                            stateSelectedId.intValue,
+                                            districtSelectedId.intValue,
+                                            blockSelectedId.intValue,
+                                            schoolSelectedId.intValue,
+                                            0,
+                                            0,
+                                            0,
+                                            0,""
+
+                                        )
+                                        loginViewModel.createProfessionalProfileRepo(
+                                            professionalProfileRequest, strToken
+                                        )
                                     }
                                 },
                             )

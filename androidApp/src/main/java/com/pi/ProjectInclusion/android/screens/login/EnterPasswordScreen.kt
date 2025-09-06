@@ -226,13 +226,13 @@ fun PasswordUI(
                         )
                         viewModel.savePrefData(USER_MOBILE_NO, loginResponse.success!!.response?.user?.mobile.toString())
                         context.toast(loginSuccess)
-                        onNextProfile()
-                        /*context.startActivity(
+//                        onNextProfile()
+                        context.startActivity(
                             Intent(
                                 context,
                                 StudentDashboardActivity::class.java
                             )
-                        )*/
+                        )
                     }
                     else{
                         isValidMobNo = true
