@@ -103,6 +103,7 @@ import com.pi.ProjectInclusion.android.common_UI.LogoutDialog
 import com.pi.ProjectInclusion.android.common_UI.ProfileWithProgress
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
 import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
+import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.formatDate
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
@@ -138,7 +139,7 @@ fun ViewProfileScreen(
     onNext: () -> Unit,  //EnterUserProfileScreen
     onBackLogin: () -> Unit,
     onBack: () -> Unit,
-    onTrackRequest: () -> Unit
+    onTrackRequest: () -> Unit,
 ) {
     var isDialogVisible by remember { mutableStateOf(false) }
 
@@ -165,7 +166,7 @@ fun ViewProfileScreen(
     CameraPermission(hasAllPermissions, context)
     var profileData by remember { mutableStateOf<ViewProfileResponse?>(null) }
 
-    logger.d("Screen: " + "ViewProfileScreen()"+ strToken)
+    logger.d("Screen: " + "ViewProfileScreen()" + strToken)
 
     LaunchedEffect(Unit) {
         logger.d("viewProfileUI: $languageId  .. $encryptedUserName")
@@ -296,14 +297,14 @@ fun ProfileViewUI(
 
                             // Find matching state
 
-                                val matchedState = it1.find { state ->
-                                    state.id == profileData.response?.stateId?.toInt()
-                                }
-
-                                matchedState?.let { state ->
-                                    selectedState = state.name!! // assuming field is stateName
-                                }
+                            val matchedState = it1.find { state ->
+                                state.id == profileData.response?.stateId?.toInt()
                             }
+
+                            matchedState?.let { state ->
+                                selectedState = state.name!! // assuming field is stateName
+                            }
+                        }
                     }
 
                     println("All states list data :- $selectedState")
@@ -339,12 +340,12 @@ fun ProfileViewUI(
                 logger.d("All district response : ${allDistrictsState.success}")
                 allDistrictsState.success?.let { districtList ->
                     districtList.let { it1 ->
-                            val matchedState = it1.find { district ->
-                                district.id == profileData.response?.districtId?.toInt()
-                            }
+                        val matchedState = it1.find { district ->
+                            district.id == profileData.response?.districtId?.toInt()
+                        }
 
-                            matchedState?.let { district ->
-                                selectedDistrict = district.name!! // assuming field is stateName
+                        matchedState?.let { district ->
+                            selectedDistrict = district.name!! // assuming field is stateName
                         }
                     }
                 }
@@ -372,14 +373,14 @@ fun ProfileViewUI(
                         blockList.let { it1 ->
 
                             // Find matching state
-                                val matchedState = it1.find { block ->
-                                    block.id == profileData.response?.blockId?.toInt()
-                                }
-
-                                matchedState?.let { block ->
-                                    selectedBlock = block.name!! // assuming field is stateName
-                                }
+                            val matchedState = it1.find { block ->
+                                block.id == profileData.response?.blockId?.toInt()
                             }
+
+                            matchedState?.let { block ->
+                                selectedBlock = block.name!! // assuming field is stateName
+                            }
+                        }
                     }
                     println("All Blocks list data :- $selectedBlock")
                 }
@@ -456,17 +457,15 @@ fun ProfileViewUI(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     ProfileWithProgress(
-                        image = PROFILE_BASE_URL + profileData.response?.profilepic,
-                        progress = 0.8f
+                        image = PROFILE_BASE_URL + profileData.response?.profilepic, progress = 0.8f
                     )
 
                     Text(
-                        text = profileData.response?.firstname +" "+ profileData.response?.lastname,
+                        text = profileData.response?.firstname + " " + profileData.response?.lastname,
                         fontSize = 19.sp,
                         fontFamily = fontBold,
                         color = Black,
-                        modifier = Modifier
-                            .padding(top = 10.dp)
+                        modifier = Modifier.padding(top = 10.dp)
                     )
 
                     Text(
@@ -482,8 +481,7 @@ fun ProfileViewUI(
                         fontSize = 13.sp,
                         fontFamily = fontMedium,
                         color = OrangeSubTitle,
-                        modifier = Modifier
-                            .padding(vertical = 5.dp)
+                        modifier = Modifier.padding(vertical = 5.dp)
                     )
 
                     Button(
@@ -493,12 +491,9 @@ fun ProfileViewUI(
                             .wrapContentSize()
                             .clip(RoundedCornerShape(4.dp)),
 
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = White,
-                            contentColor = BorderBlue
-                        ),
-                        border = BorderStroke(1.dp, color = BorderBlue)
+                        shape = RoundedCornerShape(8.dp), colors = ButtonDefaults.buttonColors(
+                            containerColor = White, contentColor = BorderBlue
+                        ), border = BorderStroke(1.dp, color = BorderBlue)
                     ) {
                         TextWithIconOnLeft(
                             text = stringResource(R.string.edit_profile),
@@ -524,8 +519,7 @@ fun ProfileViewUI(
                         ),
                 ) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize()
+                        modifier = Modifier.fillMaxSize()
                     ) {
                         Column(
                             modifier = Modifier
@@ -537,24 +531,29 @@ fun ProfileViewUI(
                                     } else {
                                         GrayLight02
                                     }, shape = RoundedCornerShape(8.dp)
-                                ),
-                            horizontalAlignment = Alignment.Start
+                                ), horizontalAlignment = Alignment.Start
                         ) {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(15.dp)
                             ) {
+
+                                val formatted =
+                                    formatDate(profileData.response?.dob.toString())
+
                                 TextWithIconOnLeft(
                                     moreSpace = true,
-                                    text = profileData.response?.dob ?: N_A,
+                                    text = formatted.toString() ?: N_A,
                                     icon = ImageVector.vectorResource(id = R.drawable.calendar_blue),
                                     textColor = PrimaryBlue,
                                     iconColor = Color.Unspecified,
                                     onClick = {
 
                                     })
+
                                 Spacer(modifier = Modifier.height(4.dp))
+
                                 TextWithIconOnLeft(
                                     moreSpace = true,
                                     text = decrypt(profileData.response?.mobile.toString().trim()),
@@ -564,10 +563,14 @@ fun ProfileViewUI(
                                     onClick = {
 
                                     })
+
                                 Spacer(modifier = Modifier.height(4.dp))
+
                                 TextWithIconOnLeft(
                                     moreSpace = true,
-                                    text = decrypt(profileData.response?.whatsapp.toString().trim()),
+                                    text = decrypt(
+                                        profileData.response?.whatsapp.toString().trim()
+                                    ),
                                     icon = ImageVector.vectorResource(id = R.drawable.ic_whatsapp_blue),
                                     textColor = PrimaryBlue,
                                     iconColor = Color.Unspecified,
@@ -588,8 +591,7 @@ fun ProfileViewUI(
                                     } else {
                                         Black
                                     }, shape = RoundedCornerShape(8.dp)
-                                ),
-                            verticalAlignment = Alignment.CenterVertically
+                                ), verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
                                 stringResource(R.string.txt_complete_email),
@@ -607,8 +609,7 @@ fun ProfileViewUI(
                                 fontSize = 15.sp,
                                 fontFamily = fontMedium,
                                 color = PrimaryBlue,
-                                modifier = Modifier
-                                    .padding(15.dp)
+                                modifier = Modifier.padding(15.dp)
                             )
                         }
 
@@ -622,8 +623,7 @@ fun ProfileViewUI(
                                     } else {
                                         GrayLight02
                                     }, shape = RoundedCornerShape(8.dp)
-                                ),
-                            horizontalAlignment = Alignment.Start
+                                ), horizontalAlignment = Alignment.Start
                         ) {
                             Row(
                                 modifier = Modifier
@@ -661,116 +661,131 @@ fun ProfileViewUI(
                                     } else {
                                         GrayLight02
                                     }, shape = RoundedCornerShape(8.dp)
-                                ),
-                            horizontalAlignment = Alignment.Start
+                                ), horizontalAlignment = Alignment.Start
                         ) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(
-                                        start = 15.dp,
-                                        end = 15.dp,
-                                        top = 15.dp,
-                                        bottom = 5.dp
+                                        start = 15.dp, end = 15.dp, top = 15.dp, bottom = 5.dp
                                     ),
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
                                     stringResource(R.string.txt_state),
                                     textAlign = TextAlign.Start,
-                                    fontSize = 15.sp,
+                                    fontSize = 13.sp,
                                     fontFamily = fontMedium,
                                     color = LightText,
                                     modifier = Modifier
                                         .padding(end = 15.dp)
                                         .weight(1f)
                                 )
+
                                 Text(
                                     selectedState,
                                     textAlign = TextAlign.End,
-                                    fontSize = 15.sp,
+                                    fontSize = 13.sp,
                                     fontFamily = fontMedium,
-                                    color = PrimaryBlue
+                                    color = PrimaryBlue,
+                                    modifier = Modifier
+                                        .padding(start = 15.dp)
+                                        .weight(1f)
                                 )
                             }
+
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(start = 15.dp, end = 15.dp, top = 5.dp, bottom = 5.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
                                     stringResource(R.string.txt_district),
                                     textAlign = TextAlign.Start,
-                                    fontSize = 15.sp,
+                                    fontSize = 13.sp,
                                     fontFamily = fontMedium,
                                     color = LightText,
                                     modifier = Modifier
                                         .padding(end = 15.dp)
                                         .weight(1f)
                                 )
+
                                 Text(
-                                   selectedDistrict,
+                                    selectedDistrict,
                                     textAlign = TextAlign.End,
-                                    fontSize = 15.sp,
+                                    fontSize = 13.sp,
                                     fontFamily = fontMedium,
-                                    color = PrimaryBlue
+                                    color = PrimaryBlue,
+                                    modifier = Modifier
+                                        .padding(start = 15.dp)
+                                        .weight(1f)
                                 )
                             }
+
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(start = 15.dp, end = 15.dp, top = 5.dp, bottom = 5.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
                                     stringResource(R.string.txt_block_zone),
                                     textAlign = TextAlign.Start,
-                                    fontSize = 15.sp,
+                                    fontSize = 13.sp,
                                     fontFamily = fontMedium,
                                     color = LightText,
                                     modifier = Modifier
                                         .padding(end = 15.dp)
                                         .weight(1f)
                                 )
+
                                 Text(
                                     selectedBlock,
                                     textAlign = TextAlign.End,
-                                    fontSize = 15.sp,
+                                    fontSize = 13.sp,
                                     fontFamily = fontMedium,
-                                    color = PrimaryBlue
+                                    color = PrimaryBlue,
+                                    modifier = Modifier
+                                        .padding(start = 15.dp)
+                                        .weight(1f)
                                 )
                             }
+
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(
-                                        start = 15.dp,
-                                        end = 15.dp,
-                                        top = 5.dp,
-                                        bottom = 15.dp
+                                        start = 15.dp, end = 15.dp, top = 5.dp, bottom = 15.dp
                                     ),
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
                                     stringResource(R.string.txt_school_name),
                                     textAlign = TextAlign.Start,
-                                    fontSize = 15.sp,
+                                    fontSize = 13.sp,
                                     fontFamily = fontMedium,
                                     color = LightText,
                                     modifier = Modifier
                                         .padding(end = 15.dp)
                                         .weight(1f)
                                 )
+
                                 Text(
                                     selectedSchool,
                                     textAlign = TextAlign.End,
-                                    fontSize = 15.sp,
+                                    fontSize = 13.sp,
                                     fontFamily = fontMedium,
-                                    color = PrimaryBlue
+                                    color = PrimaryBlue,
+                                    modifier = Modifier
+                                        .padding(start = 15.dp)
+                                        .weight(1f)
                                 )
                             }
-
                         }
 
                         Column(
@@ -783,8 +798,7 @@ fun ProfileViewUI(
                                     } else {
                                         GrayLight02
                                     }, shape = RoundedCornerShape(8.dp)
-                                ),
-                            horizontalAlignment = Alignment.Start
+                                ), horizontalAlignment = Alignment.Start
                         ) {
                             Column(
                                 modifier = Modifier
@@ -797,19 +811,18 @@ fun ProfileViewUI(
                                     fontSize = 13.sp,
                                     fontFamily = fontRegular,
                                     color = Black,
-                                    modifier = Modifier
-                                        .padding(5.dp)
+                                    modifier = Modifier.padding(5.dp)
                                 )
                                 Button(
                                     onClick = {
                                         isChangeRequestBottomSheet = true
-                                    }, modifier = Modifier
+                                    },
+                                    modifier = Modifier
                                         .wrapContentSize()
                                         .clip(RoundedCornerShape(4.dp)),
                                     shape = RoundedCornerShape(8.dp),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = White,
-                                        contentColor = BorderBlue
+                                        containerColor = White, contentColor = BorderBlue
                                     ),
                                     border = BorderStroke(1.dp, color = BorderBlue)
                                 ) {
@@ -841,33 +854,26 @@ fun ProfileBottomSheetMenu(
     var logOutSheet by remember { mutableStateOf(false) }
     // show logout sheet while click on logout
     if (logOutSheet) {
-        LogoutDialog(
-            onDismiss = { logOutSheet = false },
-            onClick = {
-                logOutSheet = false
-                viewModel?.clearPref()
-                onBackLogin() // move to Login Screen
-            }
-        )
+        LogoutDialog(onDismiss = { logOutSheet = false }, onClick = {
+            logOutSheet = false
+            viewModel?.clearPref()
+            onBackLogin() // move to Login Screen
+        })
     }
     var confirmDeleteState by remember { mutableStateOf(false) }
     var deleteAccountDialog by remember { mutableStateOf(false) }
     // show logout sheet while click on logout
     if (confirmDeleteState) {
-        DeleteAccountPasswordDialog(
-            onSubmit = {
-                confirmDeleteState = false
-                deleteAccountDialog = true
-            },
-            onDismiss = { confirmDeleteState = false })
+        DeleteAccountPasswordDialog(onSubmit = {
+            confirmDeleteState = false
+            deleteAccountDialog = true
+        }, onDismiss = { confirmDeleteState = false })
     }
     if (deleteAccountDialog) {
-        AccountDeleteDialog(
-            onDismiss = { deleteAccountDialog = false },
-            onClick = {
-                deleteAccountDialog = false
-                onBackLogin()
-            }  // move to Login Screen
+        AccountDeleteDialog(onDismiss = { deleteAccountDialog = false }, onClick = {
+            deleteAccountDialog = false
+            onBackLogin()
+        }  // move to Login Screen
         )
     }
 
@@ -901,9 +907,7 @@ fun ProfileBottomSheetMenu(
                     Text(
                         text = stringResource(R.string.txt_track_request),
                         style = MaterialTheme.typography.headlineLarge.copy(
-                            color = Black,
-                            fontSize = 16.sp,
-                            fontFamily = fontMedium
+                            color = Black, fontSize = 16.sp, fontFamily = fontMedium
                         )
                     )
                 }
@@ -927,9 +931,7 @@ fun ProfileBottomSheetMenu(
                     Text(
                         text = stringResource(R.string.txt_deactivate),
                         style = MaterialTheme.typography.headlineLarge.copy(
-                            color = Black,
-                            fontSize = 16.sp,
-                            fontFamily = fontMedium
+                            color = Black, fontSize = 16.sp, fontFamily = fontMedium
                         )
                     )
                 }
@@ -953,9 +955,7 @@ fun ProfileBottomSheetMenu(
                     Text(
                         text = stringResource(R.string.txt_logout),
                         style = MaterialTheme.typography.headlineLarge.copy(
-                            color = Black,
-                            fontSize = 16.sp,
-                            fontFamily = fontMedium
+                            color = Black, fontSize = 16.sp, fontFamily = fontMedium
                         )
                     )
                 }
@@ -971,7 +971,7 @@ fun ProfileBottomSheetMenu(
 fun ChangeRequestSheet(
     viewModel: LoginViewModel?,
     onTrackRequest: () -> Unit = {},
-    onDismiss: () -> Unit = {}
+    onDismiss: () -> Unit = {},
 ) {
     val sheetState = rememberModalBottomSheetState()
     var isSelectedSchool by remember { mutableStateOf(false) }
@@ -1022,7 +1022,8 @@ fun ChangeRequestSheet(
     if (isRequestedAlready) {
         RequestSubmittedDialog(
             stringResource(R.string.txt_request_submitted_already),
-            requestTrackState.success!!.response?.message?: stringResource(R.string.txt_submit_review),
+            requestTrackState.success!!.response?.message
+                ?: stringResource(R.string.txt_submit_review),
             onTrackRequest = onTrackRequest,
         ) {
             isRequestedAlready = false
@@ -1035,8 +1036,11 @@ fun ChangeRequestSheet(
                 strToken,
                 isDialogVisible,
                 dashboardViewModel = dashboardViewModel,
-                viewModel, schoolChangeRequestId, schoolChangeDescription,
-                stringResource(R.string.txt_upload_clear_id_school), onTrackRequest = onTrackRequest
+                viewModel,
+                schoolChangeRequestId,
+                schoolChangeDescription,
+                stringResource(R.string.txt_upload_clear_id_school),
+                onTrackRequest = onTrackRequest
             ) {
                 uploadShowDialog = false
             }
@@ -1076,9 +1080,7 @@ fun ChangeRequestSheet(
                 Text(
                     text = stringResource(R.string.txt_change_request),
                     style = MaterialTheme.typography.headlineLarge.copy(
-                        color = Black,
-                        fontSize = 18.sp,
-                        fontFamily = fontBold
+                        color = Black, fontSize = 18.sp, fontFamily = fontBold
                     )
                 )
                 Text(
@@ -1096,8 +1098,7 @@ fun ChangeRequestSheet(
                         isSelectedSchool = true
                         requestTypeId = schoolChangeRequestId
                         isSelectedName = false
-                    },
-                verticalAlignment = Alignment.CenterVertically
+                    }, verticalAlignment = Alignment.CenterVertically
             ) {
 
                 Row(
@@ -1134,8 +1135,7 @@ fun ChangeRequestSheet(
                         isSelectedSchool = false
                         requestTypeId = nameChangeRequestId
                         isSelectedName = true
-                    },
-                verticalAlignment = Alignment.CenterVertically
+                    }, verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
                     modifier = Modifier
@@ -1154,13 +1154,11 @@ fun ChangeRequestSheet(
                 }
 
                 RadioButton(
-                    selected = isSelectedName,
-                    onClick = {
+                    selected = isSelectedName, onClick = {
                         isSelectedSchool = false
                         requestTypeId = nameChangeRequestId
                         isSelectedName = true
-                    }
-                )
+                    })
             }
 
             BtnUi(
@@ -1188,7 +1186,7 @@ fun UploadIdDialog(
     requestDescription: String = "",
     subText: String = "",
     onTrackRequest: () -> Unit = {},
-    onDismiss: () -> Unit = {}
+    onDismiss: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val dashboardViewModel: DashboardViewModel = koinViewModel()
@@ -1207,8 +1205,7 @@ fun UploadIdDialog(
     var appVersion: String = ""
 
     appPackageName = context.packageName
-    val pInfo: PackageInfo =
-        context.packageManager.getPackageInfo(appPackageName, 0)
+    val pInfo: PackageInfo = context.packageManager.getPackageInfo(appPackageName, 0)
     appVersion = pInfo.versionName.toString()
 
     var isSubmitted by remember { mutableStateOf(false) }
@@ -1348,8 +1345,7 @@ fun UploadIdDialog(
                                 dashLength = 4.dp,
                                 gapLength = 5.dp,
                                 cornerRadius = 12.dp
-                            ),
-                        contentAlignment = Alignment.Center
+                            ), contentAlignment = Alignment.Center
                     ) {
                         if (selectedUri.value == null) {
                             Column(
@@ -1404,14 +1400,13 @@ fun UploadIdDialog(
                                     modifier = Modifier.padding(vertical = 10.dp)
                                 ) {
                                     Image(
-                                        painter =
-                                            rememberAsyncImagePainter(
-                                                ImageRequest.Builder(LocalContext.current)
-                                                    .data(selectedUri.value)
-                                                    .placeholder(R.drawable.profile_user_icon)
-                                                    .crossfade(true) // Optional: Add a fade transition
-                                                    .build()
-                                            ),
+                                        painter = rememberAsyncImagePainter(
+                                            ImageRequest.Builder(LocalContext.current)
+                                                .data(selectedUri.value)
+                                                .placeholder(R.drawable.profile_user_icon)
+                                                .crossfade(true) // Optional: Add a fade transition
+                                                .build()
+                                        ),
                                         contentDescription = IMG_DESCRIPTION,
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -1425,8 +1420,7 @@ fun UploadIdDialog(
                                         iconColor = BorderBlue,
                                         onClick = {
                                             selectedUri.value = null
-                                        }
-                                    )
+                                        })
                                 }
                             }
                         }
@@ -1435,8 +1429,7 @@ fun UploadIdDialog(
                     Row(
                         modifier = Modifier
                             .padding(vertical = 15.dp, horizontal = 10.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
+                            .fillMaxWidth(), horizontalArrangement = Arrangement.Center
                     ) {
                         Button(
                             onClick = { onDismiss() },
@@ -1447,8 +1440,7 @@ fun UploadIdDialog(
                                 .clip(RoundedCornerShape(8.dp)),
                             shape = RoundedCornerShape(8.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = White,
-                                contentColor = BorderBlue
+                                containerColor = White, contentColor = BorderBlue
                             ),
                             border = BorderStroke(1.dp, BorderBlue)
                         ) {
@@ -1464,9 +1456,9 @@ fun UploadIdDialog(
                                 if (selectedUri.value != null) {
                                     isDialogVisible.value = true
                                     dashboardViewModel.getProfileChangeRequest(
-                                        ProfileNameChangeRequest(requestId, appVersion, requestDescription),
-                                        strToken.toString(), byteArray,
-                                        fileName
+                                        ProfileNameChangeRequest(
+                                            requestId, appVersion, requestDescription
+                                        ), strToken.toString(), byteArray, fileName
                                     )
                                 } else {
                                     context.toast(docError)
@@ -1485,8 +1477,7 @@ fun UploadIdDialog(
                                 )
                             } else {
                                 ButtonDefaults.buttonColors(
-                                    containerColor = Gray,
-                                    contentColor = White
+                                    containerColor = Gray, contentColor = White
                                 )
                             },
                             enabled = selectedUri.value != null
@@ -1510,12 +1501,11 @@ fun Modifier.drawDashedBorder(
     strokeWidth: Dp,
     dashLength: Dp,
     gapLength: Dp,
-    cornerRadius: Dp = 0.dp
+    cornerRadius: Dp = 0.dp,
 ) = this.then(
     Modifier.drawBehind {
         val stroke = Stroke(
-            width = strokeWidth.toPx(),
-            pathEffect = PathEffect.dashPathEffect(
+            width = strokeWidth.toPx(), pathEffect = PathEffect.dashPathEffect(
                 floatArrayOf(dashLength.toPx(), gapLength.toPx()), 0f
             )
         )
@@ -1529,8 +1519,7 @@ fun Modifier.drawDashedBorder(
             cornerRadius = CornerRadius(corner, corner),
             style = stroke
         )
-    }
-)
+    })
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Preview
@@ -1539,7 +1528,7 @@ fun RequestSubmittedDialog(
     title: String = "",
     subText: String = "",
     onTrackRequest: () -> Unit = {},
-    onDismiss: () -> Unit = {}
+    onDismiss: () -> Unit = {},
 ) {
     val context = LocalContext.current
     var strTitle = stringResource(R.string.txt_request_submitted_already)
@@ -1597,11 +1586,10 @@ fun RequestSubmittedDialog(
                         Button(
                             onClick = {
                                 onDismiss()
-                                if (title != strTitle){
+                                if (title != strTitle) {
                                     context.startActivity(
                                         Intent(
-                                            context,
-                                            StudentDashboardActivity::class.java
+                                            context, StudentDashboardActivity::class.java
                                         )
                                     )
                                 }
@@ -1613,8 +1601,7 @@ fun RequestSubmittedDialog(
                                 .clip(RoundedCornerShape(8.dp)),
                             shape = RoundedCornerShape(8.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = White,
-                                contentColor = BorderBlue
+                                containerColor = White, contentColor = BorderBlue
                             ),
                             border = BorderStroke(1.dp, BorderBlue)
                         ) {
@@ -1638,8 +1625,7 @@ fun RequestSubmittedDialog(
                                 .clip(RoundedCornerShape(8.dp)),
                             shape = RoundedCornerShape(8.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue,
-                                contentColor = White
+                                containerColor = PrimaryBlue, contentColor = White
                             ),
                             border = BorderStroke(1.dp, BorderBlue)
                         ) {
@@ -1758,8 +1744,7 @@ fun NameRequestDialog(
                             .clip(RoundedCornerShape(8.dp)),
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = White,
-                            contentColor = PrimaryBlue
+                            containerColor = White, contentColor = PrimaryBlue
                         ),
                         border = BorderStroke(1.dp, BorderBlue)
                     ) {
@@ -1783,8 +1768,7 @@ fun NameRequestDialog(
                             .clip(RoundedCornerShape(8.dp)),
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = PrimaryBlue,
-                            contentColor = White
+                            containerColor = PrimaryBlue, contentColor = White
                         ),
                         border = BorderStroke(1.dp, BorderBlue)
                     ) {
