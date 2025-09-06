@@ -235,13 +235,18 @@ fun ProfileViewUI(
         message = stringResource(R.string.txt_loading)
     )
     var stateSelectedId = remember { mutableIntStateOf(-1) }
+    stateSelectedId.intValue = profileData.response?.stateId?.toInt()!!
+
     var districtSelectedId = remember { mutableIntStateOf(-1) }
+    districtSelectedId.intValue = profileData.response?.districtId?.toInt()!!
+
     var blockSelectedId = remember { mutableIntStateOf(-1) }
+    blockSelectedId.intValue = profileData.response?.blockId?.toInt()!!
+
+    var schoolSelectedId = remember { mutableIntStateOf(-1) }
+    schoolSelectedId.intValue = profileData.response?.schoolId?.toInt()!!
 
     val allStatesState by viewModel!!.allStatesResponse.collectAsStateWithLifecycle()
-    val allDistrictsState by viewModel.allDistrictsResponse.collectAsStateWithLifecycle()
-    val allBlocksState by viewModel.allBlocksResponse.collectAsStateWithLifecycle()
-    val allSchoolsState by viewModel.allSchoolsResponse.collectAsStateWithLifecycle()
 
     val decryptUserName = decrypt(profileData.response?.username.toString().trim())
     val scrollState = rememberScrollState()
@@ -249,108 +254,145 @@ fun ProfileViewUI(
     var isChangeRequestBottomSheet by remember { mutableStateOf(false) }
     var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
 
-    if (stateSelectedId.intValue != -1){
-        viewModel.getAllDistrictByStateId(stateSelectedId.intValue)
-    }
-    if (districtSelectedId.intValue != -1){
-        viewModel.getAllBlockByDistrictId(districtSelectedId.intValue)
-    }
-    if (blockSelectedId.intValue != -1){
-        viewModel.getAllSchoolsByBlockId(blockSelectedId.intValue)
-    }
+    var selectedState by remember { mutableStateOf("") }
+    var selectedDistrict by remember { mutableStateOf("") }
+    var selectedBlock by remember { mutableStateOf("") }
+    var selectedSchool by remember { mutableStateOf("") }
 
+    viewModel.getAllStateList()
     LaunchedEffect(allStatesState) {
         when {
             allStatesState.isLoading -> {
-                isDialogVisible = true
+//                isDialogVisible = true
             }
 
             allStatesState.error.isNotEmpty() -> {
                 logger.d("All state error : ${allStatesState.success}")
-                isDialogVisible = false
+//                isDialogVisible = false
             }
 
             allStatesState.success != null -> {
                 logger.d("All state response : ${allStatesState.success}")
                 if (allStatesState.success?.size != 0) {
-                    /* allStatesState.success.let {
-                         it.let { it1 -> allState.addAll(it1!!.toList()) }
-                     }
-                     println("All states list data :- $allState")*/
+                    allStatesState.success?.let { stateList ->
+                        stateList.let { it1 ->
+
+                            // Find matching state
+
+                                val matchedState = it1.find { state ->
+                                    state.id == profileData.response?.stateId?.toInt()
+                                }
+
+                                matchedState?.let { state ->
+                                    selectedState = state.name!! // assuming field is stateName
+                                }
+                            }
+                    }
+
+                    println("All states list data :- $selectedState")
                 }
-                isDialogVisible = false
+//                isDialogVisible = false
             }
         }
     }
 
+    if (stateSelectedId.intValue != -1) {
+        viewModel.getAllDistrictByStateId(stateSelectedId.intValue)
+    }
+    if (districtSelectedId.intValue != -1) {
+        viewModel.getAllBlockByDistrictId(districtSelectedId.intValue)
+    }
+    if (blockSelectedId.intValue != -1) {
+        viewModel.getAllSchoolsByBlockId(blockSelectedId.intValue)
+    }
+
+    val allDistrictsState by viewModel.allDistrictsResponse.collectAsStateWithLifecycle()
     LaunchedEffect(allDistrictsState) {
         when {
             allDistrictsState.isLoading -> {
-                isDialogVisible = true
+//                isDialogVisible = true
             }
 
             allDistrictsState.error.isNotEmpty() -> {
                 logger.d("All district error : ${allDistrictsState.success}")
-                isDialogVisible = false
+//                isDialogVisible = false
             }
 
             allDistrictsState.success != null -> {
                 logger.d("All district response : ${allDistrictsState.success}")
-                if (allDistrictsState.success?.size != 0) {
-                    /*  allBlocks.clear()
-                      allDistrictsState.success.let {
-                          it.let { it2 -> allDistricts.addAll(it2!!.toList()) }
-                      }
-                      println("All district list data :- $allDistricts")*/
+                allDistrictsState.success?.let { districtList ->
+                    districtList.let { it1 ->
+                            val matchedState = it1.find { district ->
+                                district.id == profileData.response?.districtId?.toInt()
+                            }
+
+                            matchedState?.let { district ->
+                                selectedDistrict = district.name!! // assuming field is stateName
+                        }
+                    }
                 }
-                isDialogVisible = false
+//                isDialogVisible = false
             }
         }
     }
 
+    val allBlocksState by viewModel.allBlocksResponse.collectAsStateWithLifecycle()
     LaunchedEffect(allBlocksState) {
         when {
             allBlocksState.isLoading -> {
-                isDialogVisible = true
+//                isDialogVisible = true
             }
 
             allBlocksState.error.isNotEmpty() -> {
                 logger.d("All Blocks error : ${allBlocksState.success}")
-                isDialogVisible = false
+//                isDialogVisible = false
             }
 
             allBlocksState.success != null -> {
                 logger.d("All Blocks response : ${allBlocksState.success}")
                 if (allBlocksState.success?.size != 0) {
-                    /*  allSchools.clear()
-                      allBlocksState.success.let {
-                          it.let { it3 -> allBlocks.addAll(it3!!.toList()) }
-                      }
-                      println("All Blocks list data :- $allBlocks")*/
+                    allBlocksState.success?.let { blockList ->
+                        blockList.let { it1 ->
+
+                            // Find matching state
+                                val matchedState = it1.find { block ->
+                                    block.id == profileData.response?.blockId?.toInt()
+                                }
+
+                                matchedState?.let { block ->
+                                    selectedBlock = block.name!! // assuming field is stateName
+                                }
+                            }
+                    }
+                    println("All Blocks list data :- $selectedBlock")
                 }
-                isDialogVisible = false
+//                isDialogVisible = false
             }
         }
     }
 
+    val allSchoolsState by viewModel.allSchoolsResponse.collectAsStateWithLifecycle()
     LaunchedEffect(allSchoolsState) {
         when {
             allSchoolsState.isLoading -> {
                 isDialogVisible = true
             }
-
             allSchoolsState.error.isNotEmpty() -> {
                 logger.d("All Schools error : ${allSchoolsState.success}")
                 isDialogVisible = false
             }
-
             allSchoolsState.success != null -> {
                 logger.d("All Schools response : ${allSchoolsState.success}")
                 if (allSchoolsState.success?.status == 1) {
-                    /* allSchoolsState.success!!.response.let {
-                         it.let { it4 -> allSchools.addAll(it4!!.toList()) }
-                     }
-                     println("All Schools list data :- $allSchools")*/
+                    allSchoolsState.success?.response?.let { schoolList ->
+                        val matchedSchool = schoolList.find { school ->
+                            school.id == profileData.response?.schoolId?.toInt()
+                        }
+                        matchedSchool?.let { school ->
+                            selectedSchool = school.name!!
+                        }
+                    }
+                    println("All Schools list data :- $selectedSchool")
                 }
                 isDialogVisible = false
             }
@@ -627,7 +669,7 @@ fun ProfileViewUI(
                                         .weight(1f)
                                 )
                                 Text(
-                                    profileData.response?.stateId ?: N_A,
+                                    selectedState,
                                     textAlign = TextAlign.End,
                                     fontSize = 15.sp,
                                     fontFamily = fontMedium,
@@ -651,7 +693,7 @@ fun ProfileViewUI(
                                         .weight(1f)
                                 )
                                 Text(
-                                    profileData.response?.districtId ?: N_A,
+                                   selectedDistrict,
                                     textAlign = TextAlign.End,
                                     fontSize = 15.sp,
                                     fontFamily = fontMedium,
@@ -675,7 +717,7 @@ fun ProfileViewUI(
                                         .weight(1f)
                                 )
                                 Text(
-                                    profileData.response?.blockId ?: N_A,
+                                    selectedBlock,
                                     textAlign = TextAlign.End,
                                     fontSize = 15.sp,
                                     fontFamily = fontMedium,
@@ -704,7 +746,7 @@ fun ProfileViewUI(
                                         .weight(1f)
                                 )
                                 Text(
-                                    profileData.response?.schoolId ?: N_A,
+                                    selectedSchool,
                                     textAlign = TextAlign.End,
                                     fontSize = 15.sp,
                                     fontFamily = fontMedium,

@@ -71,6 +71,7 @@ import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.AESEncryption.decrypt
+import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
 import com.pi.ProjectInclusion.android.common_UI.CameraGalleryDialog
 import com.pi.ProjectInclusion.android.common_UI.CameraPermission
 import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
@@ -766,10 +767,10 @@ fun EditProfileScreenUI(
                                                             "",
                                                             lastName.value.toString(),
                                                             selectedGender.value.toString(),
-                                                            mobNo.value,
-                                                            whatsappNo.value.toString(),
+                                                            mobNo.value.encryptAES().toString().trim(),
+                                                            whatsappNo.value.encryptAES().toString().trim(),
                                                             date.toString(),
-                                                            email.value
+                                                            email.value.encryptAES().toString().trim()
                                                         )
 
                                                     logger.d(

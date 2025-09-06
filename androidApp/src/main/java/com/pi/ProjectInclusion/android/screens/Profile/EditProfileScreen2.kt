@@ -26,7 +26,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -55,7 +54,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.kmptemplate.logger.LoggerProvider
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Bg_Gray
 import com.pi.ProjectInclusion.Bg_Gray1
@@ -64,7 +62,6 @@ import com.pi.ProjectInclusion.DARK_BODY_TEXT
 import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.Gray
-import com.pi.ProjectInclusion.LightRed01
 import com.pi.ProjectInclusion.OrangeSubTitle
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.Transparent
@@ -90,7 +87,6 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolByU
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
 import com.pi.ProjectInclusion.data.model.profileModel.response.ViewProfileResponse
-import com.pi.ProjectInclusion.data.remote.ApiService.Companion.PROFILE_BASE_URL
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.launch
 import org.koin.ext.clearQuotes
@@ -173,6 +169,11 @@ fun EditProfileScreen2UI(
     var isUdiseCalled by rememberSaveable { mutableStateOf(false) }
     var isDropDownSelected by rememberSaveable { mutableStateOf(false) }
 
+    var stateSelectedId = remember { mutableIntStateOf(-1) }
+    var districtSelectedId = remember { mutableIntStateOf(-1) }
+    var blockSelectedId = remember { mutableIntStateOf(-1) }
+    var schoolSelectedId = remember { mutableIntStateOf(-1) }
+
     val allStatesState by loginViewModel.allStatesResponse.collectAsStateWithLifecycle()
     var allState = remember { mutableStateListOf<StateListResponse>() }
     var allDistricts = remember { mutableStateListOf<DistrictListResponse>() }
@@ -181,17 +182,14 @@ fun EditProfileScreen2UI(
     var allUdiseDetails =
         remember { mutableStateListOf<SchoolByUdiseCodeResponse.UdiseCodeResponse>() }
 
-    var stateSelectedId = remember { mutableIntStateOf(-1) }
-    var districtSelectedId = remember { mutableIntStateOf(-1) }
-    var blockSelectedId = remember { mutableIntStateOf(-1) }
-    var schoolSelectedId = remember { mutableIntStateOf(-1) }
+    var profileData by remember { mutableStateOf<ViewProfileResponse?>(null) }
+
     val scope = rememberCoroutineScope()
     var encryptedUserName = loginViewModel.getPrefData(USER_NAME)
-    var profileData by remember { mutableStateOf<ViewProfileResponse?>(null) }
+
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true,
     )
-
     var strToken = loginViewModel.getPrefData(TOKEN_PREF_KEY)
 
     CustomDialog(
@@ -219,6 +217,12 @@ fun EditProfileScreen2UI(
                 logger.d("viewProfileData: ${viewProfile.success}")
                 if (viewProfile.success!!.status == true) {
                     profileData = viewProfile.success!!
+
+                    stateSelectedId.intValue = profileData!!.response?.stateId?.toInt()!!
+                    districtSelectedId.intValue = profileData!!.response?.districtId?.toInt()!!
+                    blockSelectedId.intValue = profileData!!.response?.blockId?.toInt()!!
+                    schoolSelectedId.intValue = profileData!!.response?.schoolId?.toInt()!!
+
                     logger.d("viewProfileData 1: ${viewProfile.success}")
                 } else {
                     context.toast(viewProfile.success!!.message.toString())
@@ -283,12 +287,12 @@ fun EditProfileScreen2UI(
     LaunchedEffect(allDistrictsState) {
         when {
             allDistrictsState.isLoading -> {
-                isDialogVisible = true
+//                isDialogVisible = true
             }
 
             allDistrictsState.error.isNotEmpty() -> {
                 logger.d("All district error : ${allDistrictsState.success}")
-                isDialogVisible = false
+//                isDialogVisible = false
             }
 
             allDistrictsState.success != null -> {
@@ -297,7 +301,7 @@ fun EditProfileScreen2UI(
                     districtList.let { it1 ->
                         allDistricts.clear()
                         allDistricts.addAll(it1.toList())
-
+                        districtSelectedId.intValue = profileData?.response?.districtId?.toInt()!!
                         // Find matching state
                         if (!isDropDownSelected) {
                             val matchedState = it1.find { district ->
@@ -310,24 +314,21 @@ fun EditProfileScreen2UI(
                         }
                     }
                 }
-                isDialogVisible = false
+//                isDialogVisible = false
             }
         }
     }
 
-    if (stateSelectedId.intValue != -1) {
-        loginViewModel.getAllDistrictByStateId(stateSelectedId.intValue)
-    }
     val allBlocksState by loginViewModel.allBlocksResponse.collectAsStateWithLifecycle()
     LaunchedEffect(allBlocksState) {
         when {
             allBlocksState.isLoading -> {
-                isDialogVisible = true
+//                isDialogVisible = true
             }
 
             allBlocksState.error.isNotEmpty() -> {
                 logger.d("All Blocks error : ${allBlocksState.success}")
-                isDialogVisible = false
+//                isDialogVisible = false
             }
 
             allBlocksState.success != null -> {
@@ -353,7 +354,7 @@ fun EditProfileScreen2UI(
                     }
                     println("All Blocks list data :- $allBlocks")
                 }
-                isDialogVisible = false
+//                isDialogVisible = false
             }
         }
     }
@@ -364,29 +365,25 @@ fun EditProfileScreen2UI(
             allSchoolsState.isLoading -> {
                 isDialogVisible = true
             }
-
             allSchoolsState.error.isNotEmpty() -> {
                 logger.d("All Schools error : ${allSchoolsState.success}")
                 isDialogVisible = false
             }
-
             allSchoolsState.success != null -> {
                 logger.d("All Schools response : ${allSchoolsState.success}")
                 if (allSchoolsState.success?.status == 1) {
-                    allSchoolsState.success?.response.let { schoolList ->
-                        schoolList.let { it1 ->
+                    allSchoolsState.success?.response?.let { schoolList ->
+                        allSchools.clear()
+                        allSchools.addAll(schoolList.toList())
 
-                            allSchools.addAll(it1!!.toList())
+                        // Find matching school only if user hasn't selected from dropdown
+                        if (!isDropDownSelected) {
+                            val matchedSchool = schoolList.find { school ->
+                                school.id == profileData?.response?.schoolId?.toInt()
+                            }
 
-                            // Find matching state
-                            if (!isDropDownSelected) {
-                                val matchedState = it1.find { school ->
-                                    school.id == profileData?.response?.blockId?.toInt()
-                                }
-
-                                matchedState?.let { school ->
-                                    selectedSchool = school.name!! // assuming field is stateName
-                                }
+                            matchedSchool?.let { school ->
+                                selectedSchool = school.name!!
                             }
                         }
                     }
@@ -395,7 +392,6 @@ fun EditProfileScreen2UI(
                 isDialogVisible = false
             }
         }
-
     }
 
     if (isUdiseCalled) {
@@ -671,6 +667,17 @@ fun EditProfileScreen2UI(
                                     allState.find { it.name == state }?.id?.let {
                                         stateSelectedId.intValue = it
                                         isDropDownSelected = true
+
+                                        districtSelectedId.value = -1
+                                        selectedDistrict = ""
+                                        blockSelectedId.value = -1
+                                        selectedBlock = ""
+                                        schoolSelectedId.value = -1
+                                        selectedSchool = ""
+                                        allDistricts.clear()
+                                        allBlocks.clear()
+                                        allSchools.clear()
+
                                         loginViewModel.getAllDistrictByStateId(stateSelectedId.intValue)
                                     }
                                 },
@@ -727,6 +734,12 @@ fun EditProfileScreen2UI(
                                     selectedDistrict = districts
                                     allDistricts.find { it.name == districts }?.id?.let {
                                         districtSelectedId.intValue = it
+                                        blockSelectedId.value = -1
+                                        schoolSelectedId.value = -1
+                                        allBlocks.clear()
+                                        allSchools.clear()
+                                        selectedBlock = ""
+                                        selectedSchool = ""
                                         loginViewModel.getAllBlockByDistrictId(it)
                                     }
                                 },
@@ -783,6 +796,9 @@ fun EditProfileScreen2UI(
                                     selectedBlock = block
                                     allBlocks.find { it.name == block }?.id?.let {
                                         blockSelectedId.intValue = it
+                                        schoolSelectedId.value = -1
+                                        selectedSchool = ""
+                                        allSchools.clear()
                                         loginViewModel.getAllSchoolsByBlockId(it)
                                     }
                                 },
