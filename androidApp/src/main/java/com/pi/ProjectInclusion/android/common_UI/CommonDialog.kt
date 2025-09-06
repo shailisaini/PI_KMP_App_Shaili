@@ -2,6 +2,7 @@ package com.pi.ProjectInclusion.android.common_UI
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -49,6 +50,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -87,7 +89,7 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 @Composable
 fun DeleteAccountPasswordDialog(
     onDismiss: () -> Unit = {},
-    onSubmit: () -> Unit = {}
+    onSubmit: () -> Unit = {},
 ) {
     var enterPasswordStr = rememberSaveable { mutableStateOf("") }
     val enterPassword = stringResource(R.string.txt_Enter_your_password)
@@ -214,8 +216,10 @@ fun DeleteAccountPasswordDialog(
 @Preview
 @Composable
 fun AccountDeleteDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
-    Dialog(onDismissRequest = { onDismiss() },
-        properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    Dialog(
+        onDismissRequest = { onDismiss() },
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier
@@ -264,7 +268,7 @@ fun AccountDeleteDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
                             .fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically,
-                        ) {
+                    ) {
                         Button(
                             onClick = {
                                 onDismiss()
@@ -326,8 +330,13 @@ fun AccountDeleteDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
 @Composable
 fun LogoutDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
 
-    Dialog(onDismissRequest = { onDismiss() },
-        properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    val context = LocalContext.current
+    val activity = context as? Activity
+
+    Dialog(
+        onDismissRequest = { onDismiss() },
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier
@@ -404,6 +413,7 @@ fun LogoutDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
                         Button(
                             onClick = {
                                 onClick()
+                                activity?.finish()
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -437,8 +447,13 @@ fun LogoutDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
 @Preview
 @Composable
 fun AccountRecoverDialog(msg: String = "", onDismiss: () -> Unit = {}, onRestore: () -> Unit = {}) {
-    Dialog(onDismissRequest = { onDismiss() },
-        properties = DialogProperties(usePlatformDefaultWidth = false, dismissOnClickOutside = false)) {
+    Dialog(
+        onDismissRequest = { onDismiss() },
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            dismissOnClickOutside = false
+        )
+    ) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier
@@ -554,7 +569,10 @@ fun AccountRecoverDialog(msg: String = "", onDismiss: () -> Unit = {}, onRestore
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Preview
 @Composable
-fun CameraGalleryDialog(selectedUri: MutableState<Uri?> = mutableStateOf(null) , onDismiss: () -> Unit = {}) {
+fun CameraGalleryDialog(
+    selectedUri: MutableState<Uri?> = mutableStateOf(null),
+    onDismiss: () -> Unit = {},
+) {
     val sheetState = rememberModalBottomSheetState()
     ModalBottomSheet(
         onDismissRequest = {
@@ -641,9 +659,9 @@ fun CameraPermission(hasAllPermissions: MutableState<Boolean>, context: Context)
         hasAllPermissions.value = permissionsToCheck.all {
             permissions[it] == true
         }
-       /* if (!hasAllPermissions.value) {
-            context.toast(context.getString(R.string.txt_permission_grant))
-        }*/
+        /* if (!hasAllPermissions.value) {
+             context.toast(context.getString(R.string.txt_permission_grant))
+         }*/
     }
 
     LaunchedEffect(hasAllPermissions.value) {
@@ -660,8 +678,10 @@ fun CameraPermission(hasAllPermissions: MutableState<Boolean>, context: Context)
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun TransferSuccessfulDialog(name: String, onDismiss: () -> Unit = {}) {
-    Dialog(onDismissRequest = { onDismiss() },
-        properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    Dialog(
+        onDismissRequest = { onDismiss() },
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier
@@ -706,7 +726,7 @@ fun TransferSuccessfulDialog(name: String, onDismiss: () -> Unit = {}) {
                                     fontWeight = FontWeight.Bold
                                 )
                             ) {
-                                append(" "+name + " ")
+                                append(" " + name + " ")
                             }
                             withStyle(style = SpanStyle(color = GrayLight04)) {
                                 append(stringResource(R.string.txt_trans_success_dec2))
@@ -764,8 +784,10 @@ fun TransferSuccessfulDialog(name: String, onDismiss: () -> Unit = {}) {
 @Preview
 @Composable
 fun AlreadyRequested(onDismiss: () -> Unit = {}) {
-    Dialog(onDismissRequest = { onDismiss() },
-        properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    Dialog(
+        onDismissRequest = { onDismiss() },
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier
@@ -848,8 +870,6 @@ fun AlreadyRequested(onDismiss: () -> Unit = {}) {
 }
 
 
-
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun TransferSuccessfulDialogPreview() {
@@ -863,7 +883,7 @@ fun AlreadyAssessedDialog(
     assessorName: String,
     schoolName: String,
     onCancel: () -> Unit = {},
-    onTransferRequest: () -> Unit = {}
+    onTransferRequest: () -> Unit = {},
 ) {
     Dialog(
         onDismissRequest = { onCancel() },
@@ -1020,7 +1040,7 @@ fun TransferConfirmationDialog(
     studentName: String,
     schoolName: String,
     onCancel: () -> Unit = {},
-    onConfirmTransfer: () -> Unit = {}
+    onConfirmTransfer: () -> Unit = {},
 ) {
     Dialog(
         onDismissRequest = { onCancel() },
@@ -1063,11 +1083,21 @@ fun TransferConfirmationDialog(
                     Text(
                         text = buildAnnotatedString {
                             append(stringResource(R.string.txt_confirm_dec))
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = Black)) {
-                                append(" "+studentName)
+                            withStyle(
+                                style = SpanStyle(
+                                    fontWeight = FontWeight.Bold,
+                                    color = Black
+                                )
+                            ) {
+                                append(" " + studentName)
                             }
                             append(" from ")
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = Black)) {
+                            withStyle(
+                                style = SpanStyle(
+                                    fontWeight = FontWeight.Bold,
+                                    color = Black
+                                )
+                            ) {
                                 append(schoolName)
                             }
                             append(".")
@@ -1158,8 +1188,10 @@ fun TransferConfirmationDialogPreview() {
 @Preview
 @Composable
 fun RequestSendDialog(onDismiss: () -> Unit = {}) {
-    Dialog(onDismissRequest = { onDismiss() },
-        properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    Dialog(
+        onDismissRequest = { onDismiss() },
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier
@@ -1245,8 +1277,10 @@ fun RequestSendDialog(onDismiss: () -> Unit = {}) {
 @Preview
 @Composable
 fun ReScreeningDialog(onReScreening: () -> Unit = {}) {
-    Dialog(onDismissRequest = { onReScreening() },
-        properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    Dialog(
+        onDismissRequest = { onReScreening() },
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier
@@ -1333,10 +1367,12 @@ fun ReScreeningDialog(onReScreening: () -> Unit = {}) {
 @Composable
 fun CommonAlertDialog(
     alertMessage: String = "",
-    onDismiss: () -> Unit = {}
+    onDismiss: () -> Unit = {},
 ) {
-    Dialog(onDismissRequest = { onDismiss() },
-        properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    Dialog(
+        onDismissRequest = { onDismiss() },
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier
@@ -1379,7 +1415,7 @@ fun CommonAlertDialog(
                         Button(
                             onClick = {
                                 onDismiss()
-                                      },
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f)
