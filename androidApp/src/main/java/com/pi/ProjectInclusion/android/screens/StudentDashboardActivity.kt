@@ -425,7 +425,14 @@ class StudentDashboardActivity : ComponentActivity() {
                                     onRegister = {
                                         navigateTo(AppRoute.OtpSendVerifyUI.route)
                                     },
+                                    onPrivacyPolicy = {
+                                        navigateTo(AppRoute.PrivacyPolicyScreen.route)
+                                    },
                                     onBack = { navigateBack(AppRoute.UserTypeSelect.route) })
+
+                                AppRoute.PrivacyPolicyScreen.route -> PrivacyPolicy(
+                                    onBack = { navigateBack(AppRoute.UserNameScreen.route) }
+                                )
 
                                 AppRoute.EditProfileScreen.route -> EditProfileScreen1(
                                     loginViewModel = viewModel,

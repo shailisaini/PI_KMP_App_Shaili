@@ -21,15 +21,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
 import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.White
+import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.constants.BackHandler
 
 @Composable
-fun PrivacyPolicy() {
+fun PrivacyPolicy(onBack: () -> Unit) {
 
-    var strLMSUrl =  "https://projectinclusion.in/privacy-policy.aspx"
+    var strLMSUrl = "https://projectinclusion.in/privacy-policy.aspx"
     var strPartnerName by remember { mutableStateOf("") }
     var strLanguageName by remember { mutableStateOf("") }
     var userId by remember { mutableStateOf(0) }
     var languageId by remember { mutableStateOf(0) }
+
+    BackHandler {
+        onBack()
+    }
 
     Column(
         modifier = Modifier
@@ -106,11 +112,14 @@ fun WebViewScreen(url: String) {
         }
     }
 }
+
 enum class WebViewState {
     Loading, Loaded, Error;
 }
+
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
 fun PrivacyPolicyScreen() {
-    PrivacyPolicy()
+    val onBack: () -> Unit = {}
+    PrivacyPolicy(onBack)
 }
