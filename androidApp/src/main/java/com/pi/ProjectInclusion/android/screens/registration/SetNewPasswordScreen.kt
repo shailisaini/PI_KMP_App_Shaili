@@ -94,7 +94,7 @@ fun SetNewPasswordScreen(
 
     val minLength = enterConfirmPasswordStr.value.length >= 8 || enterPasswordStr.value.length >= 8
     val hasLetter =
-        enterConfirmPasswordStr.value.any { it.isLetter() } || enterPasswordStr.value.any { it.isLetter() }
+        enterConfirmPasswordStr.value.any { it.isUpperCase() } || enterPasswordStr.value.any { it.isUpperCase() }
     val hasDigit =
         enterConfirmPasswordStr.value.any { it.isDigit() } || enterPasswordStr.value.any { it.isDigit() }
     val hasSymbol = Pattern.compile("[^a-zA-Z0-9]").matcher(enterConfirmPasswordStr.value)

@@ -199,8 +199,6 @@ class StudentDashboardActivity : ComponentActivity() {
             logger.d("Profile details on dashboard page for header in drawer :- $encryptedUserName")
             var profileData by remember { mutableStateOf<ViewProfileResponse.ProfileResponse?>(null) }
 
-            var allUdiseDetails = remember { mutableStateListOf<ViewProfileResponse>() }
-
             LaunchedEffect(Unit) {
                 viewModel.getUserProfileViewModel(strToken, encryptedUserName)
             }
@@ -287,6 +285,12 @@ class StudentDashboardActivity : ComponentActivity() {
                                 scope.launch {
                                     drawerState.close()
                                     navigateTo(AppRoute.ProfileScreen.route)
+                                }
+                            },
+                            onEditClick = {
+                                scope.launch {
+                                    drawerState.close()
+                                    navigateTo(AppRoute.EditProfileScreen.route)
                                 }
                             }, profileData
                         )
@@ -398,7 +402,7 @@ class StudentDashboardActivity : ComponentActivity() {
                             when (route) {
                                 AppRoute.DashboardScreen.route -> DashboardScreen()
 
-                                    AppRoute.CourseScreen.route -> LMSCourseHomeScreen()
+                                AppRoute.CourseScreen.route -> LMSCourseHomeScreen()
 //                                    AppRoute.CourseScreen.route -> PrivacyPolicy()
 
                                 AppRoute.ProfileScreen.route -> ViewProfileScreen(

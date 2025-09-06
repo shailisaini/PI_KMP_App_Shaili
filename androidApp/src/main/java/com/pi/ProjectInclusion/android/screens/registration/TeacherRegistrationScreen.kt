@@ -104,7 +104,7 @@ fun TeacherRegistrationScreen(
         onBack()
     }
 
-    logger.d("Screen: " + "EnterUserScreen2()")
+    logger.d("Screen: " + "TeacherRegistrationScreen()")
 
     Surface(
         modifier = Modifier.fillMaxWidth(), color = White
@@ -194,9 +194,11 @@ fun TeacherScreenUI(
             allStatesState.error.isNotEmpty() -> {
                 logger.d("All state error : ${allStatesState.success}")
                 isDialogVisible = false
+                allState.clear()
             }
 
             allStatesState.success != null -> {
+                allState.clear()
                 logger.d("All state response : ${allStatesState.success}")
                 if (allStatesState.success?.size != 0) {
                     allDistricts.clear()
@@ -219,10 +221,12 @@ fun TeacherScreenUI(
             allDistrictsState.error.isNotEmpty() -> {
                 logger.d("All district error : ${allDistrictsState.success}")
                 isDialogVisible = false
+                allDistricts.clear()
             }
 
             allDistrictsState.success != null -> {
                 logger.d("All district response : ${allDistrictsState.success}")
+                allDistricts.clear()
                 if (allDistrictsState.success?.size != 0) {
                     allBlocks.clear()
                     allDistrictsState.success.let {
@@ -244,10 +248,12 @@ fun TeacherScreenUI(
             allBlocksState.error.isNotEmpty() -> {
                 logger.d("All Blocks error : ${allBlocksState.success}")
                 isDialogVisible = false
+                allBlocks.clear()
             }
 
             allBlocksState.success != null -> {
                 logger.d("All Blocks response : ${allBlocksState.success}")
+                allBlocks.clear()
                 if (allBlocksState.success?.size != 0) {
                     allSchools.clear()
                     allBlocksState.success.let {
@@ -269,10 +275,12 @@ fun TeacherScreenUI(
             allSchoolsState.error.isNotEmpty() -> {
                 logger.d("All Schools error : ${allSchoolsState.success}")
                 isDialogVisible = false
+                allSchools.clear()
             }
 
             allSchoolsState.success != null -> {
                 logger.d("All Schools response : ${allSchoolsState.success}")
+                allSchools.clear()
                 if (allSchoolsState.success?.status == 1) {
                     allSchoolsState.success!!.response.let {
                         it.let { it4 -> allSchools.addAll(it4!!.toList()) }
@@ -293,10 +301,12 @@ fun TeacherScreenUI(
             allUdiseState.error.isNotEmpty() -> {
                 logger.d("All Udise error : ${allUdiseState.success}")
                 isDialogVisible = false
+                allUdiseDetails.clear()
             }
 
             allUdiseState.success != null -> {
                 logger.d("All Udise response : ${allUdiseState.success}")
+                allUdiseDetails.clear()
                 if (allUdiseState.success?.status == 1) {
                     allUdiseState.success!!.response.let {
                         it.let { it5 ->
@@ -319,6 +329,8 @@ fun TeacherScreenUI(
 
                     println("All Udise list data :- $allUdiseDetails")
                     isUdiseDetails = true
+                    isDialogVisible = false
+                } else {
                     isDialogVisible = false
                 }
             }
@@ -466,6 +478,8 @@ fun TeacherScreenUI(
 
                                             selectedSchool = ""
                                             schoolSelectedId.intValue = -1
+
+                                            viewModel.getAllStateList()
                                         })
                             } else {
                                 Icon(
@@ -738,7 +752,7 @@ fun TeacherScreenUI(
                         enabled = udiseNo.value.length >= 11,
                         title = txtContinue,
                         onClick = {
-                            if (udiseNo.value.isEmpty()) {
+                            if (udiseNo.value.isEmpty() || udiseNo.value.length != 11) {
                                 inValidUdiseNo = true
                             } else if (selectedState.isEmpty() || stateSelectedId.intValue == -1) {
                                 context.toast(msgState)
@@ -749,7 +763,25 @@ fun TeacherScreenUI(
                             } else if (selectedSchool.isEmpty() || schoolSelectedId.intValue == -1) {
                                 context.toast(msgSchool)
                             } else {
-                                if (showError || udiseNo.value.length < 11) {
+                                isInternetAvailable = isNetworkAvailable(context)
+                                if (!isInternetAvailable) {
+                                    context.toast(noDataMessage)
+                                } else {
+                                    isDialogVisible = true
+                                    val professionalProfileRequest =
+                                        ProfessionalProfileRequest(
+                                            udiseNo.value.toString(),
+                                            stateSelectedId.intValue,
+                                            districtSelectedId.intValue,
+                                            blockSelectedId.intValue,
+                                            schoolSelectedId.intValue
+                                        )
+                                    viewModel.createProfessionalProfileRepo(
+                                        professionalProfileRequest, strToken
+                                    )
+                                }
+
+                                /*if (showError || udiseNo.value.length <= 11) {
                                     inValidUdiseNo = true
                                 } else {
                                     showError = udiseNo.value.isEmpty()
@@ -758,25 +790,9 @@ fun TeacherScreenUI(
                                     if (firstDigit < 6) {
                                         inValidUdiseNo = true
                                     } else {
-                                        isInternetAvailable = isNetworkAvailable(context)
-                                        if (!isInternetAvailable) {
-                                            context.toast(noDataMessage)
-                                        } else {
-                                            isDialogVisible = true
-                                            val professionalProfileRequest =
-                                                ProfessionalProfileRequest(
-                                                    udiseNo.value.toString(),
-                                                    stateSelectedId.intValue,
-                                                    districtSelectedId.intValue,
-                                                    blockSelectedId.intValue,
-                                                    schoolSelectedId.intValue
-                                                )
-                                            viewModel.createProfessionalProfileRepo(
-                                                professionalProfileRequest, strToken
-                                            )
-                                        }
+
                                     }
-                                }
+                                }*/
                             }
                         },
                     )
@@ -788,8 +804,7 @@ fun TeacherScreenUI(
 
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
-fun UserProfile2UI() {
-    val navController = rememberNavController()
+fun TeacherScreenUIPreview() {
     val context = LocalContext.current
     val onNext: () -> Unit = {}
     val onBack: () -> Unit = {}

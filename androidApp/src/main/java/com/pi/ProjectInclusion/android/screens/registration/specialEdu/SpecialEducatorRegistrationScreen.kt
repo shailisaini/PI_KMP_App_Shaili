@@ -119,7 +119,7 @@ fun SpecialEducatorRegistrationScreen(
         onBack()
     }
 
-    logger.d("Screen: " + "EnterUserScreen2()")
+    logger.d("Screen: " + "SpecialEducatorRegistrationScreen()")
 
     Surface(
         modifier = Modifier.fillMaxWidth(), color = White
@@ -235,12 +235,14 @@ fun SpeEducatorScreenUI(
             allStatesState.error.isNotEmpty() -> {
                 logger.d("All state error : ${allStatesState.success}")
                 isDialogVisible = false
+                allState.clear()
             }
 
             allStatesState.success != null -> {
                 logger.d("All state response : ${allStatesState.success}")
+                allState.clear()
+                allDistricts.clear()
                 if (allStatesState.success?.size != 0) {
-                    allDistricts.clear()
                     allStatesState.success.let {
                         it.let { it1 -> allState.addAll(it1!!.toList()) }
                     }
@@ -260,9 +262,11 @@ fun SpeEducatorScreenUI(
             allDistrictsState.error.isNotEmpty() -> {
                 logger.d("All district error : ${allDistrictsState.success}")
                 isDialogVisible = false
+                allDistricts.clear()
             }
 
             allDistrictsState.success != null -> {
+                allDistricts.clear()
                 logger.d("All district response : ${allDistrictsState.success}")
                 if (allDistrictsState.success?.size != 0) {
                     allBlocks.clear()
@@ -285,10 +289,12 @@ fun SpeEducatorScreenUI(
             allBlocksState.error.isNotEmpty() -> {
                 logger.d("All Blocks error : ${allBlocksState.success}")
                 isDialogVisible = false
+                allBlocks.clear()
             }
 
             allBlocksState.success != null -> {
                 logger.d("All Blocks response : ${allBlocksState.success}")
+                allBlocks.clear()
                 if (allBlocksState.success?.size != 0) {
                     allSchools.clear()
                     allBlocksState.success.let {
@@ -310,10 +316,12 @@ fun SpeEducatorScreenUI(
             allSchoolsState.error.isNotEmpty() -> {
                 logger.d("All Schools error : ${allSchoolsState.success}")
                 isDialogVisible = false
+                allSchools.clear()
             }
 
             allSchoolsState.success != null -> {
                 logger.d("All Schools response : ${allSchoolsState.success}")
+                allSchools.clear()
                 if (allSchoolsState.success?.status == 1) {
                     allSchoolsState.success!!.response.let {
                         it.let { it4 -> allSchools.addAll(it4!!.toList()) }
@@ -334,10 +342,12 @@ fun SpeEducatorScreenUI(
             allReasonState.error.isNotEmpty() -> {
                 logger.d("All Reason error : ${allReasonState.success}")
                 isDialogVisible = false
+                allReasons.clear()
             }
 
             allReasonState.success != null -> {
                 logger.d("All Reason response : ${allReasonState.success}")
+                allReasons.clear()
                 if (allReasonState.success?.status == true) {
                     allReasonState.success!!.response.let {
                         it.let { it5 -> allReasons.addAll(it5!!.toList()) }
@@ -358,10 +368,12 @@ fun SpeEducatorScreenUI(
             allUdiseState.error.isNotEmpty() -> {
                 logger.d("All Udise error : ${allUdiseState.success}")
                 isDialogVisible = false
+                allUdiseDetails.clear()
             }
 
             allUdiseState.success != null -> {
                 logger.d("All Udise response : ${allUdiseState.success}")
+                allUdiseDetails.clear()
                 if (allUdiseState.success?.status == 1) {
                     allUdiseState.success!!.response.let {
                         it.let { it5 ->
@@ -386,6 +398,11 @@ fun SpeEducatorScreenUI(
                     println("All Udise list data :- $allUdiseDetails")
                     isUdiseDetails = true
                     isDialogVisible = false
+
+                    viewModel.getAllProfessionRepo()
+                    viewModel.getAllReasonRepo()
+                } else {
+                    isDialogVisible = false
                 }
             }
         }
@@ -400,10 +417,12 @@ fun SpeEducatorScreenUI(
             allProfessionState.error.isNotEmpty() -> {
                 logger.d("All Profession error : ${allProfessionState.success}")
                 isDialogVisible = false
+                allProfession.clear()
             }
 
             allProfessionState.success != null -> {
                 logger.d("All Profession response : ${allProfessionState.success}")
+                allProfession.clear()
                 if (allProfessionState.success?.size != 0) {
                     allProfessionState.success!!.let {
                         it.let { it5 ->
@@ -429,10 +448,12 @@ fun SpeEducatorScreenUI(
             allQualificationState.error.isNotEmpty() -> {
                 logger.d("All Qualification error : ${allQualificationState.success}")
                 isDialogVisible = false
+                allQualification.clear()
             }
 
             allQualificationState.success != null -> {
                 logger.d("All Qualification response : ${allQualificationState.success}")
+                allQualification.clear()
                 if (allQualificationState.success?.size != 0) {
                     allQualificationState.success!!.let {
                         it.let { it5 ->
@@ -458,10 +479,12 @@ fun SpeEducatorScreenUI(
             allSpecializationState.error.isNotEmpty() -> {
                 logger.d("All Specialization error : ${allSpecializationState.success}")
                 isDialogVisible = false
+                allSpecialization.clear()
             }
 
             allSpecializationState.success != null -> {
                 logger.d("All Specialization response : ${allSpecializationState.success}")
+                allSpecialization.clear()
                 if (allSpecializationState.success?.size != 0) {
                     allSpecializationState.success!!.let {
                         it.let { it5 ->
@@ -614,6 +637,8 @@ fun SpeEducatorScreenUI(
 
                                             selectedSchool = ""
                                             schoolSelectedId.intValue = -1
+
+                                            viewModel.getAllStateList()
                                         })
                             } else {
                                 Icon(
@@ -863,54 +888,58 @@ fun SpeEducatorScreenUI(
                 }
 
                 // Reason
-                Text(
-                    text = stringResource(R.string.txt_reason_empty_school),
-                    modifier = Modifier.padding(
-                        top = 24.dp, bottom = 10.dp, start = 8.dp, end = 8.dp
-                    ),
-                    textAlign = TextAlign.Start,
-                    fontFamily = fontMedium,
-                    fontSize = 15.sp,
-                    color = if (isSystemInDarkTheme()) {
-                        DARK_BODY_TEXT
-                    } else {
-                        Bg_Gray
-                    }
-                )
-
-                DropdownMenuUi(
-                    options = listOf(),
-                    onItemSelected = {},
-                    modifier = Modifier.clickable {},
-                    placeholder = if (selectedReason.isNotEmpty()) {
-                        selectedReason.toString()
-                    } else {
-                        stringResource(R.string.choose_option)
-                    },
-                    onClick = {
-                        scope.launch {
-                            isBottomReasonVisible = true // true under development code
-                            sheetState.expand()
+                if (schoolSelectedId.intValue != -1) {
+                    logger.d("You have selected school name...")
+                } else {
+                    Text(
+                        text = stringResource(R.string.txt_reason_empty_school),
+                        modifier = Modifier.padding(
+                            top = 24.dp, bottom = 10.dp, start = 8.dp, end = 8.dp
+                        ),
+                        textAlign = TextAlign.Start,
+                        fontFamily = fontMedium,
+                        fontSize = 15.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_BODY_TEXT
+                        } else {
+                            Bg_Gray
                         }
-                    })
+                    )
 
-                SchoolListBottomSheet(
-                    isBottomSheetVisible = isBottomReasonVisible,
-                    sheetState = sheetState,
-                    onDismiss = {
-                        scope.launch { sheetState.hide() }
-                            .invokeOnCompletion { isBottomReasonVisible = false }
-                    },
-                    onDecline = {},
-                    onTextSelected = { reason ->
-                        selectedReason = reason
-                        allReasons.find { it.name == reason }?.id?.let {
-                            reasonSelectedId.intValue = it.toInt()
-                            viewModel.getAllProfessionRepo()
-                        }
-                    },
-                    allReasons.map { it.name }.toList() as List<String>
-                )
+                    DropdownMenuUi(
+                        options = listOf(),
+                        onItemSelected = {},
+                        modifier = Modifier.clickable {},
+                        placeholder = if (selectedReason.isNotEmpty()) {
+                            selectedReason.toString()
+                        } else {
+                            stringResource(R.string.choose_option)
+                        },
+                        onClick = {
+                            scope.launch {
+                                isBottomReasonVisible = true // true under development code
+                                sheetState.expand()
+                            }
+                        })
+
+                    SchoolListBottomSheet(
+                        isBottomSheetVisible = isBottomReasonVisible,
+                        sheetState = sheetState,
+                        onDismiss = {
+                            scope.launch { sheetState.hide() }
+                                .invokeOnCompletion { isBottomReasonVisible = false }
+                        },
+                        onDecline = {},
+                        onTextSelected = { reason ->
+                            selectedReason = reason
+                            allReasons.find { it.name == reason }?.id?.let {
+                                reasonSelectedId.intValue = it.toInt()
+                                viewModel.getAllProfessionRepo()
+                            }
+                        },
+                        allReasons.map { it.name }.toList() as List<String>
+                    )
+                }
 
                 // Profession
                 Text(
@@ -1110,7 +1139,7 @@ fun SpeEducatorScreenUI(
                         enabled = udiseNo.value.length >= 11,
                         title = txtContinue,
                         onClick = {
-                            if (udiseNo.value.isEmpty()) {
+                            if (udiseNo.value.isEmpty() || udiseNo.value.length != 11) {
                                 inValidUdiseNo = true
                             } else if (selectedState.isEmpty() || stateSelectedId.intValue == -1) {
                                 context.toast(msgState)
@@ -1120,7 +1149,7 @@ fun SpeEducatorScreenUI(
                                 context.toast(msgBlock)
                             } else if (selectedSchool.isEmpty() || schoolSelectedId.intValue == -1) {
                                 context.toast(msgSchool)
-                            } else if (selectedReason.isEmpty() || reasonSelectedId.intValue == -1) {
+                            } /*else if (selectedReason.isEmpty() || reasonSelectedId.intValue == -1) {
                                 context.toast(msgReason)
                             } else if (selectedProfession.isEmpty() || professionId.intValue == -1) {
                                 context.toast(msgProfession)
@@ -1130,8 +1159,27 @@ fun SpeEducatorScreenUI(
                                 context.toast(msgSpecialization)
                             } else if (crrText.value.isEmpty()) {
                                 context.toast(msgCRRN)
-                            } else {
-                                if (showError || udiseNo.value.length < 11) {
+                            }*/ else {
+                                isDialogVisible = true
+                                val professionalProfileRequest = ProfessionalProfileRequest(
+                                    udiseNo.value.toString(),
+                                    stateSelectedId.intValue,
+                                    districtSelectedId.intValue,
+                                    blockSelectedId.intValue,
+                                    schoolSelectedId.intValue,
+                                    reasonSelectedId.intValue,
+                                    professionId.intValue,
+                                    qualificationId.intValue,
+                                    specializationId.intValue,
+                                    crrText.value.toString()
+                                )
+
+                                viewModel.createProfessionalProfileRepo(
+                                    professionalProfileRequest, strToken
+                                )
+
+
+                                /*if (showError || udiseNo.value.length <= 11) {
                                     inValidUdiseNo = true
                                 } else {
                                     showError = udiseNo.value.isEmpty()
@@ -1158,7 +1206,7 @@ fun SpeEducatorScreenUI(
                                             professionalProfileRequest, strToken
                                         )
                                     }
-                                }
+                                }*/
                             }
                         },
                     )
@@ -1170,8 +1218,7 @@ fun SpeEducatorScreenUI(
 
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
-fun UserProfile2UI() {
-    val navController = rememberNavController()
+fun SpeEducatorScreenUIPreview() {
     val context = LocalContext.current
     val onNext: () -> Unit = {}
     val onBack: () -> Unit = {}
