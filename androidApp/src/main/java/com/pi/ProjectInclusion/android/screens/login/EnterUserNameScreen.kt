@@ -69,12 +69,14 @@ fun EnterUserNameScreen(
     viewModel: LoginViewModel,
     onNext: () -> Unit,
     onRegister: () -> Unit,
+    onPrivacyPolicy: () -> Unit,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
     BackHandler {
         onBack()
     }
+
     LoggerProvider.logger.d("Screen: " + "EnterUserNameScreen()")
 
     Surface(
@@ -91,7 +93,8 @@ fun EnterUserNameScreen(
                 context,
                 onNext = onNext,
                 onBack = onBack,
-                onRegister = onRegister
+                onRegister = onRegister,
+                onPrivacyPolicy = onPrivacyPolicy
             )
         }
     }
@@ -103,11 +106,12 @@ fun LoginUI(
     context: Context,
     onBack: () -> Unit,
     onRegister: () -> Unit,
+    onPrivacyPolicy: () -> Unit,
     onNext: () -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
     var isDialogVisible by remember { mutableStateOf(false) }
-    var noData  = stringResource(R.string.txt_oops_no_data_found)
+    var noData = stringResource(R.string.txt_oops_no_data_found)
     var isInternetAvailable by remember { mutableStateOf(true) }
     val internetMessage = stringResource(R.string.txt_oops_no_internet)
     var noDataMessage by remember { mutableStateOf(noData) }
@@ -258,6 +262,7 @@ fun LoginUI(
                 sendOtpState.isLoading -> {
                     isDialogVisible = true
                 }
+
                 sendOtpState.error.isNotEmpty() -> {
                     LoggerProvider.logger.d("Error: ${sendOtpState.error}")
                     isDialogVisible = false
@@ -269,10 +274,9 @@ fun LoginUI(
                     isDialogVisible = false
                     viewModel.savePrefData(USER_MOBILE_NO, encryptedPhoneNo)
                     viewModel.savePrefData(IS_COMING_FROM, REGISTER_NEW)
-                    if (sendOtpState.success!!.response?.message == UnableToSendMsg){
+                    if (sendOtpState.success!!.response?.message == UnableToSendMsg) {
                         context.toast(sendOtpState.success!!.response?.message.toString())
-                    }
-                    else {
+                    } else {
                         onRegister() // Go to OTP Verify screen
                     }
                 }
@@ -373,9 +377,11 @@ fun LoginUI(
                     ) {
                         TermsAndPrivacyText(
                             onTermsClick = {
-
+                                onPrivacyPolicy()
                             },
-                            onPrivacyClick = { }
+                            onPrivacyClick = {
+                                onPrivacyPolicy()
+                            }
                         )
                     }
                 }

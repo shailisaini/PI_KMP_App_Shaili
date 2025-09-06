@@ -24,11 +24,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.android.MyApplicationTheme
 import com.pi.ProjectInclusion.android.navigation.AppRoute
+import com.pi.ProjectInclusion.android.screens.Profile.PrivacyPolicy
 import com.pi.ProjectInclusion.android.screens.login.EnterPasswordScreen
 import com.pi.ProjectInclusion.android.screens.login.EnterUserNameScreen
 import com.pi.ProjectInclusion.android.screens.login.ForgetPasswordScreen
@@ -142,8 +141,14 @@ class LoginNavigationScreen : ComponentActivity() {
                             onRegister = {
                                 navigateTo(AppRoute.OtpSendVerifyUI.route)
                             },
-
+                            onPrivacyPolicy = {
+                                navigateTo(AppRoute.PrivacyPolicyScreen.route)
+                            },
                             onBack = { navigateBack(AppRoute.UserTypeSelect.route) }
+                        )
+
+                        AppRoute.PrivacyPolicyScreen.route -> PrivacyPolicy(
+                            onBack = { navigateBack(AppRoute.UserNameScreen.route) }
                         )
 
                         AppRoute.OtpSendVerifyUI.route -> OtpSendVerifyScreen(

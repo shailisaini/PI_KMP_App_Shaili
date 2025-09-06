@@ -32,6 +32,8 @@ sealed class AppRoute(val route: String) {
     data object EditSpeEduEditProfile : AppRoute("edit_special_edu_edit_profile")     // edit Special Edu profile after Dashboard
     data object EditProfessionalEditProfile : AppRoute("edit_professional_edit_profile_screen")     // edit professional profile after Dashboard
 
+    data object PrivacyPolicyScreen : AppRoute("privacy_policy_screen")
+
     data object CourseScreen : AppRoute("course_screen")
     data object CertificateScreen : AppRoute("certificate_screen")
     data object JoinMeetingScreen : AppRoute("join_meeting_screen")
