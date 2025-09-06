@@ -57,6 +57,11 @@ class LoginViewModel(
     // check if which API has to call if internet comes
     private var shouldRefreshLanguages = false
     private var shouldRefreshUserType = false
+    private var shouldRefreshProfile = false
+    private var shouldRefreshState = false
+    private var shouldRefreshProfessional = false
+    private var shouldRefreshSpecialization = false
+    private var shouldRefreshQualification = false
 
     fun isNetworkAvailable(): Boolean {
         return connectivityObserver.getCurrentStatus() == ConnectivityObserver.Status.Available
@@ -222,6 +227,10 @@ class LoginViewModel(
 
                         if (shouldRefreshLanguages) getLanguages()
                         if (shouldRefreshUserType) getUserType()
+                        if (shouldRefreshState) getAllStateList()
+                        if (shouldRefreshProfile) getUserProfileViewModel(localData.getValue("user_token"),localData.getValue("userName"))
+                        if (shouldRefreshProfessional) getAllProfessionRepo()
+                        if (shouldRefreshQualification) getAllStateList()
 
                     }
 
@@ -525,12 +534,29 @@ class LoginViewModel(
     }
 
     fun getUserProfileViewModel(token: String, data: String) = viewModelScope.launch {
-        // no need to sync data
-        viewUserProfile.update { UiState(isLoading = true) }
+        // with sync data
+        if (!isNetworkAvailable()) {
+            shouldRefreshProfile = true
+            viewUserProfile.update {
+                UiState(error = noInternetConnection)
+            }
+            return@launch
+        }
+
+        shouldRefreshProfile = false // Reset on successful start
+
+        viewUserProfile.update { it.copy(isLoading = true, error = "") }
+
         getAuthViewModel.getViewUserProfile(token, data)
             .catch { exception ->
-                viewUserProfile.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true) {
+                    viewUserProfile.update {
+                        UiState(error = serverMsg)
+                    }
+                } else {
+                    viewUserProfile.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             }
             .collect { result ->
@@ -539,8 +565,14 @@ class LoginViewModel(
                         viewUserProfile.update { UiState(success = data) }
                     },
                     onFailure = { exception ->
-                        viewUserProfile.update {
-                            UiState(error = exception.message ?: somethingWentWrong)
+                        if (exception.message?.contains(serverError) == true) {
+                            viewUserProfile.update {
+                                UiState(error = serverMsg)
+                            }
+                        } else {
+                            viewUserProfile.update {
+                                UiState(error = exception.message ?: somethingWentWrong)
+                            }
                         }
                     }
                 )
@@ -580,11 +612,28 @@ class LoginViewModel(
     }
 
     fun getAllStateList() = viewModelScope.launch {
-        allStates.update { UiState(isLoading = true) }
+        if (!isNetworkAvailable()) {
+            shouldRefreshState = true
+            allStates.update {
+                UiState(error = noInternetConnection)
+            }
+            return@launch
+        }
+
+        shouldRefreshState = false // Reset on successful start
+
+        allStates.update { it.copy(isLoading = true, error = "") }
+
         getAuthViewModel.getAllStateListRepo()
             .catch { exception ->
-                allStates.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true) {
+                    allStates.update {
+                        UiState(error = serverMsg)
+                    }
+                } else {
+                    allStates.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             }
             .collect { result ->
@@ -593,8 +642,14 @@ class LoginViewModel(
                         allStates.update { UiState(success = data) }
                     },
                     onFailure = { exception ->
-                        allStates.update {
-                            UiState(error = exception.message ?: somethingWentWrong)
+                        if (exception.message?.contains(serverError) == true) {
+                            allStates.update {
+                                UiState(error = serverMsg)
+                            }
+                        } else {
+                            allStates.update {
+                                UiState(error = exception.message ?: somethingWentWrong)
+                            }
                         }
                     }
                 )
@@ -715,11 +770,28 @@ class LoginViewModel(
     }
 
     fun getAllProfessionRepo() = viewModelScope.launch {
-        professionList.update { UiState(isLoading = true) }
+        if (!isNetworkAvailable()) {
+            shouldRefreshProfessional = true
+            professionList.update {
+                UiState(error = noInternetConnection)
+            }
+            return@launch
+        }
+
+        shouldRefreshProfessional = false // Reset on successful start
+
+        professionList.update { it.copy(isLoading = true, error = "") }
+
         getAuthViewModel.getAllProfessionRepo()
             .catch { exception ->
-                professionList.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true) {
+                    professionList.update {
+                        UiState(error = serverMsg)
+                    }
+                } else {
+                    professionList.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             }
             .collect { result ->
@@ -728,8 +800,14 @@ class LoginViewModel(
                         professionList.update { UiState(success = data) }
                     },
                     onFailure = { exception ->
-                        professionList.update {
-                            UiState(error = exception.message ?: somethingWentWrong)
+                        if (exception.message?.contains(serverError) == true) {
+                            professionList.update {
+                                UiState(error = serverMsg)
+                            }
+                        } else {
+                            professionList.update {
+                                UiState(error = exception.message ?: somethingWentWrong)
+                            }
                         }
                     }
                 )
@@ -737,11 +815,28 @@ class LoginViewModel(
     }
 
     fun getAllQualificationRepo(profession: Int) = viewModelScope.launch {
-        qualificationList.update { UiState(isLoading = true) }
+        if (!isNetworkAvailable()) {
+            shouldRefreshQualification = true
+            qualificationList.update {
+                UiState(error = noInternetConnection)
+            }
+            return@launch
+        }
+
+        shouldRefreshQualification = false // Reset on successful start
+
+        qualificationList.update { it.copy(isLoading = true, error = "") }
+
         getAuthViewModel.getAllQualificationRepo(profession)
             .catch { exception ->
-                qualificationList.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true) {
+                    qualificationList.update {
+                        UiState(error = serverMsg)
+                    }
+                } else {
+                    qualificationList.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             }
             .collect { result ->
@@ -750,8 +845,14 @@ class LoginViewModel(
                         qualificationList.update { UiState(success = data) }
                     },
                     onFailure = { exception ->
-                        qualificationList.update {
-                            UiState(error = exception.message ?: somethingWentWrong)
+                        if (exception.message?.contains(serverError) == true) {
+                            qualificationList.update {
+                                UiState(error = serverMsg)
+                            }
+                        } else {
+                            qualificationList.update {
+                                UiState(error = exception.message ?: somethingWentWrong)
+                            }
                         }
                     }
                 )
@@ -762,11 +863,19 @@ class LoginViewModel(
         profession: Int,
         qualification: Int,
     ) = viewModelScope.launch {
-        specializationList.update { UiState(isLoading = true) }
+
+        specializationList.update { it.copy(isLoading = true, error = "") }
+
         getAuthViewModel.getAllSpecializationRepo(profession, qualification)
             .catch { exception ->
-                specializationList.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true) {
+                    specializationList.update {
+                        UiState(error = serverMsg)
+                    }
+                } else {
+                    specializationList.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             }
             .collect { result ->
@@ -775,8 +884,14 @@ class LoginViewModel(
                         specializationList.update { UiState(success = data) }
                     },
                     onFailure = { exception ->
-                        specializationList.update {
-                            UiState(error = exception.message ?: somethingWentWrong)
+                        if (exception.message?.contains(serverError) == true) {
+                            specializationList.update {
+                                UiState(error = serverMsg)
+                            }
+                        } else {
+                            specializationList.update {
+                                UiState(error = exception.message ?: somethingWentWrong)
+                            }
                         }
                     }
                 )

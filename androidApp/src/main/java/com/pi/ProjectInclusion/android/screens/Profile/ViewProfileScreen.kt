@@ -108,6 +108,9 @@ import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
+import com.pi.ProjectInclusion.constants.CommonFunction.NoDataFound
+import com.pi.ProjectInclusion.constants.CommonFunction.ShowError
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.N_A
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
@@ -150,8 +153,13 @@ fun ViewProfileScreen(
     var encryptedUserName = viewModel.getPrefData(USER_NAME)
     val profilePic = remember { mutableStateOf("") }
 
-    var strToken = viewModel.getPrefData(TOKEN_PREF_KEY).toString()
+    val errColor = PrimaryBlue
+    var noData  = stringResource(R.string.txt_oops_no_data_found)
+    var isInternetAvailable by remember { mutableStateOf(true) }
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
+    var noDataMessage by remember { mutableStateOf(noData) }
 
+    var strToken = viewModel.getPrefData(TOKEN_PREF_KEY).toString()
 
     var hasAllPermissions = remember { mutableStateOf(false) }
     CameraPermission(hasAllPermissions, context)
@@ -192,26 +200,35 @@ fun ViewProfileScreen(
         }
     }
 
-
     BackHandler {
         onBack()
     }
 
-    Surface(
-        modifier = Modifier.fillMaxWidth(), color = White
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 10.dp)
-                .background(color = White),
-            verticalArrangement = Arrangement.Top
+    isInternetAvailable = isNetworkAvailable(context)
+    if (profileData == null){
+    if (!isInternetAvailable) {
+        ShowError(internetMessage, errColor, painterResource(R.drawable.sad_emoji))
+    } else {
+        NoDataFound(noDataMessage, painterResource(R.drawable.sad_emoji))
+    }
+    }
+    else {
+        Surface(
+            modifier = Modifier.fillMaxWidth(), color = White
         ) {
-            profileData?.let {
-                ProfileViewUI(
-                    context, onNext = onNext, onBack = onBack, onBackLogin = onBackLogin,
-                    onTrackRequest = onTrackRequest, profileData = it, viewModel = viewModel
-                )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 10.dp)
+                    .background(color = White),
+                verticalArrangement = Arrangement.Top
+            ) {
+                profileData?.let {
+                    ProfileViewUI(
+                        context, onNext = onNext, onBack = onBack, onBackLogin = onBackLogin,
+                        onTrackRequest = onTrackRequest, profileData = it, viewModel = viewModel
+                    )
+                }
             }
         }
     }
@@ -227,13 +244,13 @@ fun ProfileViewUI(
     profileData: ViewProfileResponse,
     viewModel: LoginViewModel?
 ) {
-    var isDialogVisible by remember { mutableStateOf(false) }
+//    var isDialogVisible by remember { mutableStateOf(false) }
 
-    CustomDialog(
+    /*CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
         message = stringResource(R.string.txt_loading)
-    )
+    )*/
     var stateSelectedId = remember { mutableIntStateOf(-1) }
     stateSelectedId.intValue = profileData.response?.stateId?.toInt()!!
 
@@ -375,11 +392,11 @@ fun ProfileViewUI(
     LaunchedEffect(allSchoolsState) {
         when {
             allSchoolsState.isLoading -> {
-                isDialogVisible = true
+//                isDialogVisible = true
             }
             allSchoolsState.error.isNotEmpty() -> {
                 logger.d("All Schools error : ${allSchoolsState.success}")
-                isDialogVisible = false
+//                isDialogVisible = false
             }
             allSchoolsState.success != null -> {
                 logger.d("All Schools response : ${allSchoolsState.success}")
@@ -394,7 +411,7 @@ fun ProfileViewUI(
                     }
                     println("All Schools list data :- $selectedSchool")
                 }
-                isDialogVisible = false
+//                isDialogVisible = false
             }
         }
     }
