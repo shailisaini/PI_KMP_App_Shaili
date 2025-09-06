@@ -70,6 +70,7 @@ import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
 import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
+import java.util.regex.Pattern
 
 class ChangePasswordActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -134,6 +135,15 @@ private fun ShowChangePasswordData(
     var isCheckedAtleastOne by remember { mutableStateOf(false) }
     var isCheckedSpecialCharacter by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
+
+
+    val minLength = enterConfirmPasswordStr.value.length >= 8 || enterPasswordStr.value.length >= 8
+    val hasLetter =
+        enterConfirmPasswordStr.value.any { it.isLetter() } || enterPasswordStr.value.any { it.isLetter() }
+    val hasDigit =
+        enterConfirmPasswordStr.value.any { it.isDigit() } || enterPasswordStr.value.any { it.isDigit() }
+    val hasSymbol = Pattern.compile("[^a-zA-Z0-9]").matcher(enterConfirmPasswordStr.value)
+        .find() || Pattern.compile("[^a-zA-Z0-9]").matcher(enterPasswordStr.value).find()
 
     if (showDialog) {
         PasswordUpdateDialog {
@@ -240,9 +250,7 @@ private fun ShowChangePasswordData(
                     )
                 ) {
                     Checkbox(
-                        checked = isCheckedCharacter, onCheckedChange = {
-                            isCheckedCharacter = it
-                        }, // Disabled for display-only
+                        checked = minLength, onCheckedChange = null,
                         colors = if (isSystemInDarkTheme()) {
                             CheckboxDefaults.colors(
                                 checkedColor = Color.Transparent,     // Light purple-gray
@@ -284,9 +292,7 @@ private fun ShowChangePasswordData(
                     )
                 ) {
                     Checkbox(
-                        checked = isCheckedUppercase, onCheckedChange = {
-                            isCheckedUppercase = it
-                        }, // Disabled for display-only
+                        checked = hasLetter, onCheckedChange = null, // Disabled for display-only
                         colors = if (isSystemInDarkTheme()) {
                             CheckboxDefaults.colors(
                                 checkedColor = Color.Transparent,     // Light purple-gray
@@ -328,9 +334,7 @@ private fun ShowChangePasswordData(
                     )
                 ) {
                     Checkbox(
-                        checked = isCheckedAtleastOne, onCheckedChange = {
-                            isCheckedAtleastOne = it
-                        }, // Disabled for display-only
+                        checked = hasDigit, onCheckedChange = null, // Disabled for display-only
                         colors = if (isSystemInDarkTheme()) {
                             CheckboxDefaults.colors(
                                 checkedColor = Color.Transparent,     // Light purple-gray
@@ -372,9 +376,7 @@ private fun ShowChangePasswordData(
                     )
                 ) {
                     Checkbox(
-                        checked = isCheckedSpecialCharacter, onCheckedChange = {
-                            isCheckedSpecialCharacter = it
-                        }, // Disabled for display-only
+                        checked = hasSymbol, onCheckedChange = null, // Disabled for display-only
                         colors = if (isSystemInDarkTheme()) {
                             CheckboxDefaults.colors(
                                 checkedColor = Color.Transparent,     // Light purple-gray

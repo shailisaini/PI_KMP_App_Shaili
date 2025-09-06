@@ -70,12 +70,14 @@ fun EnterUserNameScreen(
     viewModel: LoginViewModel,
     onNext: () -> Unit,
     onRegister: () -> Unit,
+    onPrivacyPolicy: () -> Unit,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
     BackHandler {
         onBack()
     }
+
     LoggerProvider.logger.d("Screen: " + "EnterUserNameScreen()")
 
     Surface(
@@ -92,7 +94,8 @@ fun EnterUserNameScreen(
                 context,
                 onNext = onNext,
                 onBack = onBack,
-                onRegister = onRegister
+                onRegister = onRegister,
+                onPrivacyPolicy = onPrivacyPolicy
             )
         }
     }
@@ -104,11 +107,12 @@ fun LoginUI(
     context: Context,
     onBack: () -> Unit,
     onRegister: () -> Unit,
+    onPrivacyPolicy: () -> Unit,
     onNext: () -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
     var isDialogVisible by remember { mutableStateOf(false) }
-    var noData  = stringResource(R.string.txt_oops_no_data_found)
+    var noData = stringResource(R.string.txt_oops_no_data_found)
     var isInternetAvailable by remember { mutableStateOf(true) }
     val internetMessage = stringResource(R.string.txt_oops_no_internet)
     var noDataMessage by remember { mutableStateOf(noData) }
@@ -178,7 +182,10 @@ fun LoginUI(
                             }
                         } else if (apiResponse?.message == USER_EXIST) {
                             // if login with password
-                            viewModel.savePrefData(USER_MOBILE_NO, apiResponse.user!!.mobile.toString())
+                            viewModel.savePrefData(
+                                USER_MOBILE_NO,
+                                apiResponse.user!!.mobile.toString()
+                            )
                             onNext()
                         } else {
                             // if account deactivated
@@ -252,6 +259,7 @@ fun LoginUI(
                 sendOtpState.isLoading -> {
                     isDialogVisible = true
                 }
+
                 sendOtpState.error.isNotEmpty() -> {
                     LoggerProvider.logger.d("Error: ${sendOtpState.error}")
                     isDialogVisible = false
@@ -368,9 +376,11 @@ fun LoginUI(
                     ) {
                         TermsAndPrivacyText(
                             onTermsClick = {
-
+                                onPrivacyPolicy()
                             },
-                            onPrivacyClick = { }
+                            onPrivacyClick = {
+                                onPrivacyPolicy()
+                            }
                         )
                     }
                 }
