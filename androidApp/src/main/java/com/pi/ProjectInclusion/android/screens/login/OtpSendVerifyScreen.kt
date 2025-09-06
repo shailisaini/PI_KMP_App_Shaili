@@ -78,6 +78,7 @@ fun OtpSendVerifyScreen(
     onNext: () -> Unit,
     onBack: () -> Unit,
     onBackUserName: () -> Unit,
+    onBackPassword: () -> Unit,
     onNextCreatePass: () -> Unit,
     viewModel: LoginViewModel,
 ) {
