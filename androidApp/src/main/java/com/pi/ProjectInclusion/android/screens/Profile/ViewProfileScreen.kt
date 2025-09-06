@@ -1,6 +1,7 @@
 package com.pi.ProjectInclusion.android.screens.dashboardScreen
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
@@ -71,6 +72,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -102,6 +104,7 @@ import com.pi.ProjectInclusion.android.common_UI.DetailsNoImgBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.LogoutDialog
 import com.pi.ProjectInclusion.android.common_UI.ProfileWithProgress
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
+import com.pi.ProjectInclusion.android.screens.LoginNavigationScreen
 import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.formatDate
 import com.pi.ProjectInclusion.android.utils.fontBold
@@ -155,7 +158,7 @@ fun ViewProfileScreen(
     val profilePic = remember { mutableStateOf("") }
 
     val errColor = PrimaryBlue
-    var noData  = stringResource(R.string.txt_oops_no_data_found)
+    var noData = stringResource(R.string.txt_oops_no_data_found)
     var isInternetAvailable by remember { mutableStateOf(true) }
     val internetMessage = stringResource(R.string.txt_oops_no_internet)
     var noDataMessage by remember { mutableStateOf(noData) }
@@ -191,6 +194,7 @@ fun ViewProfileScreen(
                     profileData = viewProfile.success!!
                     logger.d("viewProfileData 1: ${viewProfile.success}")
                     profilePic.value = PROFILE_BASE_URL + profileData!!.response?.profilepic
+                    viewModel.saveUserName(profileData?.response?.username.toString())
 
 //                    context.toast(sendOtpState.success!!.response!!.message.toString())
                 } else {
@@ -206,14 +210,13 @@ fun ViewProfileScreen(
     }
 
     isInternetAvailable = isNetworkAvailable(context)
-    if (profileData == null){
-    if (!isInternetAvailable) {
-        ShowError(internetMessage, errColor, painterResource(R.drawable.sad_emoji))
+    if (profileData == null) {
+        if (!isInternetAvailable) {
+            ShowError(internetMessage, errColor, painterResource(R.drawable.sad_emoji))
+        } else {
+            NoDataFound(noDataMessage, painterResource(R.drawable.sad_emoji))
+        }
     } else {
-        NoDataFound(noDataMessage, painterResource(R.drawable.sad_emoji))
-    }
-    }
-    else {
         Surface(
             modifier = Modifier.fillMaxWidth(), color = White
         ) {
@@ -243,7 +246,7 @@ fun ProfileViewUI(
     onNext: () -> Unit,
     onTrackRequest: () -> Unit,
     profileData: ViewProfileResponse,
-    viewModel: LoginViewModel?
+    viewModel: LoginViewModel?,
 ) {
 //    var isDialogVisible by remember { mutableStateOf(false) }
 
@@ -395,10 +398,12 @@ fun ProfileViewUI(
             allSchoolsState.isLoading -> {
 //                isDialogVisible = true
             }
+
             allSchoolsState.error.isNotEmpty() -> {
                 logger.d("All Schools error : ${allSchoolsState.success}")
 //                isDialogVisible = false
             }
+
             allSchoolsState.success != null -> {
                 logger.d("All Schools response : ${allSchoolsState.success}")
                 if (allSchoolsState.success?.status == 1) {
@@ -850,6 +855,7 @@ fun ProfileBottomSheetMenu(
     onDismiss: () -> Unit = {},
 ) {
     val sheetState = rememberModalBottomSheetState()
+    val context = LocalContext.current
 
     var logOutSheet by remember { mutableStateOf(false) }
     // show logout sheet while click on logout
@@ -857,7 +863,10 @@ fun ProfileBottomSheetMenu(
         LogoutDialog(onDismiss = { logOutSheet = false }, onClick = {
             logOutSheet = false
             viewModel?.clearPref()
-            onBackLogin() // move to Login Screen
+//            onBackLogin() // move to Login Screen
+            ContextCompat.startActivity(
+                context, Intent(context, LoginNavigationScreen::class.java), null
+            ).apply { (context as? Activity)?.finish() }
         })
     }
     var confirmDeleteState by remember { mutableStateOf(false) }

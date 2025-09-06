@@ -398,7 +398,7 @@ and make a difference together!</string>
     <string name="txt_90_days_left"> Days Left</string>
     <string name="txt_account_found">An Account Found</string>
     <string name="txt_logout_desc">Are you sure you want to logout?</string>
-    <string name="txt_restore">Restore</string>
+    <string name="txt_restore">Yes, Restore My Profile</string>
     <string name="txt_recover_desc">Your profile is marked for deletion. Would you like to restore your account?</string>
     <string name="txt_account_delete_desc">All your data (courses, certificates, student records, etc.) will be permanently deleted after 90 days. You can recover your account within this period by simply logging in.</string>
     <string name="txt_Select_statement_from_following">Select one statement from the following that best reflects the overall academic performance of the child.</string>

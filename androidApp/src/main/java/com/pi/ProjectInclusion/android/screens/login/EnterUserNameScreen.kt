@@ -71,7 +71,7 @@ fun EnterUserNameScreen(
     onNext: () -> Unit,
     onRegister: () -> Unit,
     onPrivacyPolicy: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
 ) {
     val context = LocalContext.current
     BackHandler {
@@ -190,7 +190,8 @@ fun LoginUI(
                         } else {
                             // if account deactivated
                             confirmRecoverState = true
-                            recoverMessage = validateUserState.success?.response?.message.toString()
+                            recoverMessage =
+                                validateUserState.success?.response?.daysLeft.toString()
                         }
                     } else {
                         context.toast(validateUserState.success!!.message.toString())
@@ -245,8 +246,8 @@ fun LoginUI(
             msg = recoverMessage,
             onRestore = {
                 confirmRecoverState = false
-//                LoggerProvider.logger.d("Screen: Moving to$onRegister.route")
-                viewModel.getOTPViewModel(userName.value)
+                showOtpBottomSheet = true
+//                viewModel.getOTPViewModel(userName.value)
             },
             onDismiss = {
                 confirmRecoverState = false
@@ -254,35 +255,34 @@ fun LoginUI(
         )
     }
 
-        LaunchedEffect(sendOtpState) {
-            when {
-                sendOtpState.isLoading -> {
-                    isDialogVisible = true
-                }
+    LaunchedEffect(sendOtpState) {
+        when {
+            sendOtpState.isLoading -> {
+                isDialogVisible = true
+            }
 
-                sendOtpState.error.isNotEmpty() -> {
-                    LoggerProvider.logger.d("Error: ${sendOtpState.error}")
-                    isDialogVisible = false
-                }
+            sendOtpState.error.isNotEmpty() -> {
+                LoggerProvider.logger.d("Error: ${sendOtpState.error}")
+                isDialogVisible = false
+            }
 
-                sendOtpState.success != null -> {
-                    isDialogVisible = false
-                    viewModel.savePrefData(USER_MOBILE_NO, encryptedPhoneNo)
-                    viewModel.savePrefData(IS_COMING_FROM, REGISTER_NEW)
-                    if (sendOtpState.success!!.response?.message == SUCCESS){
-                        onRegister() // Go to OTP Verify screen
-                        sendOtpViaWhatsApp = false
-                        sendOtpViaCall = false
-                    }
-                    else {
+            sendOtpState.success != null -> {
+                isDialogVisible = false
+                viewModel.savePrefData(USER_MOBILE_NO, encryptedPhoneNo)
+                viewModel.savePrefData(IS_COMING_FROM, REGISTER_NEW)
+                if (sendOtpState.success!!.response?.message == SUCCESS) {
+                    onRegister() // Go to OTP Verify screen
+                    sendOtpViaWhatsApp = false
+                    sendOtpViaCall = false
+                } else {
 
-                        sendOtpViaWhatsApp = false
-                        sendOtpViaCall = false
-                        context.toast(sendOtpState.success!!.response?.message.toString())
-                    }
+                    sendOtpViaWhatsApp = false
+                    sendOtpViaCall = false
+                    context.toast(sendOtpState.success!!.response?.message.toString())
                 }
             }
         }
+    }
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
         onBack()

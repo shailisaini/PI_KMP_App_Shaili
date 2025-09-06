@@ -2,6 +2,7 @@ package com.pi.ProjectInclusion.data.repository
 
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.AccountDeleteResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
@@ -29,16 +30,16 @@ class DashboardRepoImpl(private val apiService: ApiService) : DashboardRepositor
         changeRequest: ProfileNameChangeRequest,
         strToken: String,
         profilePic: ByteArray?,
-        fileName: String?
+        fileName: String?,
     ): ChangeRequestResponse {
-        return apiService.changeRequestApi(changeRequest, strToken,profilePic, fileName)
+        return apiService.changeRequestApi(changeRequest, strToken, profilePic, fileName)
     }
 
     override suspend fun TrackRequestResponseRepo(
         strToken: String,
-        requstTypeId: String
+        requstTypeId: String,
     ): TrackRequestResponse {
-        return apiService.trackChangeRequestApi(strToken,requstTypeId)
+        return apiService.trackChangeRequestApi(strToken, requstTypeId)
     }
 
     override suspend fun getAllCategoryRepo(): List<CategoryListResponse> {
@@ -87,5 +88,12 @@ class DashboardRepoImpl(private val apiService: ApiService) : DashboardRepositor
         meetingId: Long,
     ): ZoomMeetingsJoinResponse {
         return apiService.getJoinZoomMeetings(tokenKey, meetingId)
+    }
+
+    override suspend fun deactivateUserRepo(
+        tokenKey: String,
+        userId: String,
+    ): AccountDeleteResponse {
+        return apiService.deactivateUser(tokenKey, userId)
     }
 }

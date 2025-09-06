@@ -162,7 +162,6 @@ fun CreateNewPasswordUI(
     var showError by remember { mutableStateOf(false) }
     var inValidPassword by remember { mutableStateOf(false) }
     var isDialogVisible by remember { mutableStateOf(false) }
-    var buttonClicked by remember { mutableStateOf(false) }
     val showPassword = remember { mutableStateOf(false) }
     val showConfirmPassword = remember { mutableStateOf(false) }
     val txtCharacter = stringResource(R.string.txt_Passwords_must_be_8_16_characters)
@@ -182,11 +181,11 @@ fun CreateNewPasswordUI(
     val hasSymbol = Pattern.compile("[^a-zA-Z0-9]").matcher(enterConfirmPasswordStr.value)
         .find() || Pattern.compile("[^a-zA-Z0-9]").matcher(enterPasswordStr.value).find()
 
-    var mobileNo = "8851291824"  // will remove this after Api implementation
+    var mobileNo = viewModel.userNameValue  // will remove this after Api implementation
     val createRegisterPasswordState by viewModel.createRegPasswordResponse.collectAsStateWithLifecycle()
     val encryptedPassword = enterConfirmPasswordStr.value.encryptAES().toString().trim()
     val encryptedUserName = viewModel.userNameValue!!.encryptAES().toString().trim()
-    val encryptedMobile = isEncryptedPhone(mobileNo.encryptAES().toString().trim())
+    val encryptedMobile = isEncryptedPhone(mobileNo?.encryptAES().toString().trim())
     var languageId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
     var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
     var strToken = viewModel.getPrefData(TOKEN_PREF_KEY)
@@ -602,7 +601,6 @@ fun CreateNewPasswordUI(
                                 inValidPassword = true
                             } else {
                                 isDialogVisible = true
-                                buttonClicked = true
                                 val passwordRequest = CreatePasswordRequest(
                                     encryptedUserName,
                                     encryptedPassword,
