@@ -93,7 +93,7 @@ import org.koin.ext.clearQuotes
 
 @Composable
 fun EditProfileScreen2(
-    onNext: () -> Unit,  //EditProfileScreen2
+    onNext: () -> Unit,  //Dashboard
     onBack: () -> Unit,
     loginViewModel: LoginViewModel
 ) {
@@ -191,6 +191,8 @@ fun EditProfileScreen2UI(
         skipPartiallyExpanded = true,
     )
     var strToken = loginViewModel.getPrefData(TOKEN_PREF_KEY)
+
+    val professionalProfileState by loginViewModel.professionalProfileResponse.collectAsStateWithLifecycle()
 
     CustomDialog(
         isVisible = isDialogVisible,
@@ -439,6 +441,28 @@ fun EditProfileScreen2UI(
                     }
 
                 }
+            }
+        }
+    }
+
+    LaunchedEffect(professionalProfileState) {
+        when {
+            professionalProfileState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            professionalProfileState.error.isNotEmpty() -> {
+                logger.d("All professional error : ${professionalProfileState.success}")
+                isDialogVisible = false
+            }
+
+            professionalProfileState.success != null -> {
+                logger.d("All professional response : ${professionalProfileState.success}")
+                if (professionalProfileState.success?.statusCode == 200) {
+                    println("All professional data :- ${professionalProfileState.success?.message}")
+                    onNext()
+                }
+                isDialogVisible = false
             }
         }
     }

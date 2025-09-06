@@ -258,9 +258,9 @@ fun EditProfileScreenUI(
                     viewProfile.success?.response?.let { response ->
 //                        firstName.value = response.username ?: "" // it will use later
 //                        lastName.value = response.username ?: ""
-                        email.value = response.email ?: ""
-                        mobNo.value = response.mobile ?: ""
-                        whatsappNo.value = response.whatsapp ?: ""
+                        email.value = decrypt(response.email.toString().trim())
+                        mobNo.value = decrypt(response.mobile.toString().trim())
+                        whatsappNo.value = decrypt(response.whatsapp.toString().trim())
                         firstName.value = response.firstname ?: ""
                         lastName.value = response.lastname ?: ""
 
@@ -722,8 +722,8 @@ fun EditProfileScreenUI(
                                     .wrapContentHeight(),
                                 horizontalAlignment = Alignment.End
                             ) {
-                                val apiMobile = encryptedPhoneNo(mobNo.value.toString())
-                                val apiEmail = encryptedEmail(email.value.toString())
+                                /*val apiMobile = encryptedPhoneNo(mobNo.value.toString())
+                                val apiEmail = encryptedEmail(email.value.toString())*/
 
                                 SmallBtnUi(
                                     enabled = mobNo.value.length >= 10,

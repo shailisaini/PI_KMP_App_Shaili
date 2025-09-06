@@ -540,7 +540,7 @@ fun ProfileViewUI(
                                 Spacer(modifier = Modifier.height(4.dp))
                                 TextWithIconOnLeft(
                                     moreSpace = true,
-                                    text = profileData.response?.mobile ?: N_A,
+                                    text = decrypt(profileData.response?.mobile.toString().trim()),
                                     icon = ImageVector.vectorResource(id = R.drawable.ic_call_blue),
                                     textColor = PrimaryBlue,
                                     iconColor = Color.Unspecified,
@@ -550,7 +550,7 @@ fun ProfileViewUI(
                                 Spacer(modifier = Modifier.height(4.dp))
                                 TextWithIconOnLeft(
                                     moreSpace = true,
-                                    text = profileData.response?.whatsapp ?: N_A,
+                                    text = decrypt(profileData.response?.whatsapp.toString().trim()),
                                     icon = ImageVector.vectorResource(id = R.drawable.ic_whatsapp_blue),
                                     textColor = PrimaryBlue,
                                     iconColor = Color.Unspecified,
