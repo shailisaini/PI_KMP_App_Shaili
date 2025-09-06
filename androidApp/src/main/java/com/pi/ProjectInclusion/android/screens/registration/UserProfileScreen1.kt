@@ -69,6 +69,7 @@ import com.pi.ProjectInclusion.OrangeSubTitle
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.AESEncryption.decrypt
 import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
 import com.pi.ProjectInclusion.android.common_UI.CameraGalleryDialog
 import com.pi.ProjectInclusion.android.common_UI.CameraPermission
@@ -165,11 +166,11 @@ fun ProfileScreenUI(
     val txtContinue = stringResource(id = R.string.text_continue)
     val tvMobNo = stringResource(id = R.string.text_mobile_no_user)
 
- /*   var encryptedPhoneNo = viewModel.getPrefData(USER_MOBILE_NO)  // encrypted from shared Pref
-    var decryptedPhoneNo = decrypt(encryptedPhoneNo)  // decrypted no
-    logger.d(
-        "FileNotConvertedException " + "2.. " + decryptedPhoneNo+ encryptedPhoneNo
-    )*/
+    /*   var encryptedPhoneNo = viewModel.getPrefData(USER_MOBILE_NO)  // encrypted from shared Pref
+       var decryptedPhoneNo = decrypt(encryptedPhoneNo)  // decrypted no
+       logger.d(
+           "FileNotConvertedException " + "2.. " + decryptedPhoneNo+ encryptedPhoneNo
+       )*/
     val mobNo = rememberSaveable { mutableStateOf("") }
     var firstName = rememberSaveable { mutableStateOf("") }
     var lastName = rememberSaveable { mutableStateOf("") }
@@ -199,6 +200,9 @@ fun ProfileScreenUI(
 
     val firstStepProfileState by viewModel.firstStepProfilePasswordResponse.collectAsStateWithLifecycle()
 
+    mobNo.value = viewModel.userNameValue.toString()
+    println("User type :- ${viewModel.getPrefData(USER_TYPE_ID)}")
+
     var byteArray: ByteArray? = null
     var fileName: String? = null
     lateinit var bitmap: Bitmap
@@ -222,15 +226,19 @@ fun ProfileScreenUI(
 
             firstStepProfileState.success != null -> {
                 logger.d("First step profile state response : ${firstStepProfileState.success}")
-                if (firstStepProfileState.success!!.status != true) {
+                if (firstStepProfileState.success!!.status == true) {
                     context.toast(firstStepProfileState.success!!.message.toString())
                     if (viewModel.getPrefData(USER_TYPE_ID) == "7") {
                         onNextSpecialEdu()
                     } else if (viewModel.getPrefData(USER_TYPE_ID) == "8") {
                         onNextProfessional()
-                    } else  {
+                    } else if (viewModel.getPrefData(USER_TYPE_ID) == "3") {
                         onNextTeacher()
+                    } else {
+                        // This condition used for reviewer
                     }
+                } else {
+                    logger.d("Api response status false : ${firstStepProfileState.success?.status}")
                 }
                 isDialogVisible = false
             }
@@ -312,12 +320,12 @@ fun ProfileScreenUI(
                         .padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically
                 ) {
                     Image(
-                        modifier = Modifier.size(90.dp), // adjust the size as needed,
+                        modifier = Modifier.size(90.dp),
                         painter = if (selectedUri.value != null) {
                             rememberAsyncImagePainter(
                                 ImageRequest.Builder(LocalContext.current).data(selectedUri.value)
                                     .placeholder(R.drawable.profile_user_icon)
-                                    .crossfade(true) // Optional: Add a fade transition
+                                    .crossfade(true)
                                     .build()
                             )
                         } else {
@@ -406,7 +414,7 @@ fun ProfileScreenUI(
                     icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
                     colors = colors,
                     number = mobNo,
-                    enable = true,
+                    enable = false,
                     hint = enterMobile.toString()
                 )
 
@@ -639,44 +647,46 @@ fun ProfileScreenUI(
                             } else if (email.value.toString().isEmpty()) {
                                 context.toast(mailEg)
                             } else {
-                                if (selectedGender.value == "Female"){
+                                if (selectedGender.value == "Female") {
                                     selectedGender.value = "F"
-                                }else if (selectedGender.value == "Male"){
+                                } else if (selectedGender.value == "Male") {
                                     selectedGender.value = "M"
-                                }else{
+                                } else {
                                     "O"
                                 }
-                                    isInternetAvailable = isNetworkAvailable(context)
-                                    val firstStepProfileRequest = FirstStepProfileRequest(
-                                        firstName.value.toString(),
-                                        "",
-                                        lastName.value.toString(),
-                                        selectedGender.value.toString(),
-                                        mobNo.value,
-                                        whatsappNo.value,
-                                        date.toString(),
-                                        email.value
-                                    )
+                                isInternetAvailable = isNetworkAvailable(context)
+                                val firstStepProfileRequest = FirstStepProfileRequest(
+                                    firstName.value.toString().trim(),
+                                    "",
+                                    lastName.value.toString().trim(),
+                                    selectedGender.value.toString(),
+                                    mobNo.value.encryptAES().toString().trim(),
+                                    whatsappNo.value.encryptAES().toString().trim(),
+                                    date.toString().trim(),
+                                    email.value.encryptAES().toString().trim()
+                                )
 
-                                    if (!isInternetAvailable) {
-                                        context.toast(internetMessage)
+                                if (!isInternetAvailable) {
+                                    context.toast(internetMessage)
+                                } else {
+                                    // if image is not empty
+                                    isDialogVisible = true
+                                    if (selectedUri.value != null) {
+                                        logger.d("Profile details with image :- $firstStepProfileRequest ")
+                                        viewModel.createFirstStepProfileRepo(
+                                            firstStepProfileRequest,
+                                            strToken,
+                                            byteArray,
+                                            fileName
+                                        )
                                     } else {
-                                        // if image is not empty
-                                        isDialogVisible = true
-                                        if (selectedUri.value != null) {
-                                            viewModel.createFirstStepProfileRepo(
-                                                firstStepProfileRequest,
-                                                strToken,
-                                                byteArray,
-                                                fileName
-                                            )
-                                        } else {
-                                            viewModel.createFirstStepProfileRepo(
-                                                firstStepProfileRequest,
-                                                strToken
-                                            )
-                                        }
+                                        logger.d("Profile details without image :- $firstStepProfileRequest ")
+                                        viewModel.createFirstStepProfileRepo(
+                                            firstStepProfileRequest,
+                                            strToken
+                                        )
                                     }
+                                }
                             }
                         },
                     )
