@@ -155,6 +155,7 @@ class LoginNavigationScreen : ComponentActivity() {
                             onNext = { navigateTo(AppRoute.SetNewPasswordUI.route) },
                             onNextCreatePass = { navigateTo(AppRoute.CreatePasswordScreen.route) },
                             onBackUserName = { navigateBack() },
+                            onBackPassword = { navigateBack() },
                             onBack = { navigateBack(AppRoute.ForgetPasswordUI.route) },
                             viewModel = viewModel
                         )
