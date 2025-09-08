@@ -3,6 +3,7 @@ package com.pi.ProjectInclusion.domain.useCases
 import com.example.kmptemplate.logger.LoggerProvider
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.AccountDeleteResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
@@ -128,10 +129,11 @@ class DashboardUsesCases(private val repository: DashboardRepository) {
         changeRequest: ProfileNameChangeRequest,
         strToken: String,
         docPic: ByteArray? = null,
-        fileName: String? = null
+        fileName: String? = null,
     ): Flow<Result<ChangeRequestResponse>> = flow {
         try {
-            val response = repository.getChangeRequestRepo(changeRequest, strToken, docPic, fileName)
+            val response =
+                repository.getChangeRequestRepo(changeRequest, strToken, docPic, fileName)
             emit(Result.success(response))
         } catch (e: Exception) {
             val errorMessage = e.message ?: unableToConnectServer
@@ -142,7 +144,7 @@ class DashboardUsesCases(private val repository: DashboardRepository) {
 
     fun getTrackRequestCases(
         strToken: String,
-       requestTypeId: String
+        requestTypeId: String,
     ): Flow<Result<TrackRequestResponse>> = flow {
         try {
             val response = repository.TrackRequestResponseRepo(strToken, requestTypeId)
@@ -179,6 +181,21 @@ class DashboardUsesCases(private val repository: DashboardRepository) {
         } catch (e: Exception) {
             val errorMessage = e.message ?: unableToConnectServer
             logger.d("Exception in getJoinZoomMeetingsRepo() $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun deactivateUserRepo(
+        tokenKey: String,
+        userId: String,
+    ): Flow<Result<AccountDeleteResponse>> = flow {
+        try {
+            val response =
+                repository.deactivateUserRepo(tokenKey, userId)
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            logger.d("Exception in deactivateUser() $errorMessage")
             emit(Result.failure(Exception(errorMessage)))
         }
     }.flowOn(Dispatchers.IO)

@@ -2,6 +2,7 @@ package com.pi.ProjectInclusion.domain.repository
 
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.AccountDeleteResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
@@ -33,7 +34,7 @@ interface DashboardRepository {
 
     suspend fun TrackRequestResponseRepo(
         strToken: String,
-       requestTypeId: String,
+        requestTypeId: String,
     ): TrackRequestResponse
 
     suspend fun getAllCategoryRepo(): List<CategoryListResponse>
@@ -72,4 +73,9 @@ interface DashboardRepository {
         passwordRequest: ChangePasswordRequest,
         strToken: String,
     ): ForgetPasswordResponse
+
+    suspend fun deactivateUserRepo(
+        tokenKey: String,
+        userId: String,
+    ): AccountDeleteResponse
 }

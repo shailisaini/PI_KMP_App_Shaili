@@ -17,6 +17,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepP
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.AccountDeleteResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
@@ -63,10 +64,14 @@ class ApiService(private val client: HttpClient) {
     companion object {
 
         const val PRODUCTION_BASE_URL = "https://api-pi.projectinclusion.in/api"   // staging base
-        const val STUDENT_BASE_URL = "https://staging-pi-api.projectinclusion.in/api/v2"   // staging base
-//        const val STUDENT_BASE_URL = "http://192.168.0.116:3500/api/v2"                // local base
-        const val PROFILE_BASE_URL = "https://staging-pi-api.projectinclusion.in/uploads/profile/"   // staging profile
-//        const val PROFILE_BASE_URL = "http://192.168.0.116:3500/uploads/profile/"                  // local profile
+        const val STUDENT_BASE_URL =
+            "https://staging-pi-api.projectinclusion.in/api/v2"   // staging base
+
+        //        const val STUDENT_BASE_URL = "http://192.168.0.116:3500/api/v2"                // local base
+        const val PROFILE_BASE_URL =
+            "https://staging-pi-api.projectinclusion.in/uploads/profile/"   // staging profile
+
+        //        const val PROFILE_BASE_URL = "http://192.168.0.116:3500/uploads/profile/"                  // local profile
         const val CERTIFICATE_BASE_URL = "https://lmsapi.projectinclusion.in/api"
         const val BASIC_LIVE_BASE_URL = "https://api-pi.projectinclusion.in"
         const val SCHOOL_LIVE_BASE_URL = "https://api-school.projectinclusion.in"
@@ -259,16 +264,17 @@ class ApiService(private val client: HttpClient) {
     }.body<CertificateListResponse>()
 
     // user Profile
-    suspend fun getViewUserProfile(token: String,username: String): ViewProfileResponse = client.get {
-        url {
-            takeFrom(STUDENT_BASE_URL)
-            appendPathSegments(appendUser, "get-user-by-username", username)
-        }
-        headers {
-            append(HttpHeaders.Accept, "application/json")
-            append(HttpHeaders.Authorization, token)
-        }
-    }.body<ViewProfileResponse>()
+    suspend fun getViewUserProfile(token: String, username: String): ViewProfileResponse =
+        client.get {
+            url {
+                takeFrom(STUDENT_BASE_URL)
+                appendPathSegments(appendUser, "get-user-by-username", username)
+            }
+            headers {
+                append(HttpHeaders.Accept, "application/json")
+                append(HttpHeaders.Authorization, token)
+            }
+        }.body<ViewProfileResponse>()
 
     suspend fun createFirstStepProfile(
         firstStepProfileRequest: FirstStepProfileRequest,
@@ -603,7 +609,7 @@ class ApiService(private val client: HttpClient) {
 
     suspend fun trackChangeRequestApi(
         strToken: String,
-        requestTypeId : String
+        requestTypeId: String,
     ): TrackRequestResponse = client.get {
 
         url {
@@ -616,5 +622,22 @@ class ApiService(private val client: HttpClient) {
         }
 
     }.body<TrackRequestResponse>()
+
+    suspend fun deactivateUser(
+        strToken: String,
+        userId: String,
+    ): AccountDeleteResponse = client.post {
+
+        url {
+            takeFrom(STUDENT_BASE_URL)
+            appendPathSegments(appendUser, "deactivate-user")
+            parameters.append("userId", userId)
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+            append(HttpHeaders.Authorization, strToken)
+        }
+
+    }.body<AccountDeleteResponse>()
 
 }

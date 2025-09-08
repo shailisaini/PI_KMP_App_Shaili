@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.AccountDeleteResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
@@ -84,6 +85,9 @@ class DashboardViewModel(
 
     val getTrackRequest = MutableStateFlow(UiState<TrackRequestResponse>())
     val getTrackRequestResponse: StateFlow<UiState<TrackRequestResponse>> = getTrackRequest
+
+    val getAccountDelete = MutableStateFlow(UiState<AccountDeleteResponse>())
+    val getAccountDeleteResponse: StateFlow<UiState<AccountDeleteResponse>> = getAccountDelete
 
     private val changePassword = MutableStateFlow(UiState<ForgetPasswordResponse>())
     val changePasswordResponse: StateFlow<UiState<ForgetPasswordResponse>> = changePassword
@@ -239,30 +243,31 @@ class DashboardViewModel(
         requestChange: ProfileNameChangeRequest,
         strToken: String,
         docPic: ByteArray? = null,
-        fileName: String? = null
+        fileName: String? = null,
     ) = viewModelScope.launch {
         getChangeRequest.update { UiState(isLoading = true) }
-        getUsesCases.getChangeRequestCases(requestChange, strToken, docPic,fileName ).catch { exception ->
-            getChangeRequest.update {
-                UiState(error = exception.message ?: somethingWentWrong)
-            }
-        }.collect { result ->
-            result.fold(onSuccess = { data ->
-                getChangeRequest.update { UiState(success = data) }
-            }, onFailure = { exception ->
+        getUsesCases.getChangeRequestCases(requestChange, strToken, docPic, fileName)
+            .catch { exception ->
                 getChangeRequest.update {
                     UiState(error = exception.message ?: somethingWentWrong)
                 }
-            })
-        }
+            }.collect { result ->
+                result.fold(onSuccess = { data ->
+                    getChangeRequest.update { UiState(success = data) }
+                }, onFailure = { exception ->
+                    getChangeRequest.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
+                })
+            }
     }
 
     fun getTrackChangeRequest(
         strToken: String,
-        requestTypeId: String
+        requestTypeId: String,
     ) = viewModelScope.launch {
         getTrackRequest.update { UiState(isLoading = true) }
-        getUsesCases.getTrackRequestCases(strToken,requestTypeId).catch { exception ->
+        getUsesCases.getTrackRequestCases(strToken, requestTypeId).catch { exception ->
             getTrackRequest.update {
                 UiState(error = exception.message ?: somethingWentWrong)
             }
@@ -340,6 +345,27 @@ class DashboardViewModel(
                         }
                     }
                 )
+            }
+    }
+
+    fun deactivateUser(
+        tokenKey: String,
+        userId: String,
+    ) = viewModelScope.launch {
+        getAccountDelete.update { UiState(isLoading = true) }
+        getUsesCases.deactivateUserRepo(tokenKey, userId)
+            .catch { exception ->
+                getAccountDelete.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }.collect { result ->
+                result.fold(onSuccess = { data ->
+                    getAccountDelete.update { UiState(success = data) }
+                }, onFailure = { exception ->
+                    getAccountDelete.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
+                })
             }
     }
 

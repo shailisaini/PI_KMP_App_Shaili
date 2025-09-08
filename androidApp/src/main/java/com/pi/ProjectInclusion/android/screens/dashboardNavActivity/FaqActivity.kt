@@ -208,10 +208,12 @@ private fun ShowFAQData(
             categoryListState.error.isNotEmpty() -> {
                 logger.d("Category List Error: ${categoryListState.error}")
                 isDialogVisible = false
+                categoryListData.clear()
             }
 
             categoryListState.success != null -> {
                 logger.d("Category List Response :- ${categoryListState.success}")
+                categoryListData.clear()
                 if (categoryListState.success?.size != 0) {
                     categoryListState.success.let { it.let { it1 -> categoryListData.addAll(it1!!.toList()) } }
                     println("Category List Data :- $categoryListData")
@@ -232,10 +234,12 @@ private fun ShowFAQData(
             subCategoryListState.error.isNotEmpty() -> {
                 logger.d("SubCategory List Error: ${subCategoryListState.error}")
                 isDialogVisible = false
+                subCategoryListData.clear()
             }
 
             subCategoryListState.success != null -> {
                 logger.d("SubCategory List Response :- ${subCategoryListState.success}")
+                subCategoryListData.clear()
                 if (subCategoryListState.success?.size != 0) {
                     subCategoryListState.success.let {
                         it.let { it2 ->
@@ -262,10 +266,12 @@ private fun ShowFAQData(
             subCategoryCategoryIdListState.error.isNotEmpty() -> {
                 logger.d("SubCategory By Id List Error: ${subCategoryCategoryIdListState.error}")
                 isDialogVisible = false
+                subCategoryCategoryIdListData.clear()
             }
 
             subCategoryCategoryIdListState.success != null -> {
                 logger.d("SubCategory By Id List Response :- ${subCategoryCategoryIdListState.success}")
+                subCategoryCategoryIdListData.clear()
                 if (subCategoryCategoryIdListState.success?.response?.size != 0) {
                     subCategoryCategoryIdListState.success?.response.let {
                         it.let { it3 ->
@@ -292,10 +298,12 @@ private fun ShowFAQData(
             faqsListState.error.isNotEmpty() -> {
                 logger.d("Faqs List Error: ${faqsListState.error}")
                 isDialogVisible = false
+                faqsListData.clear()
             }
 
             faqsListState.success != null -> {
                 logger.d("Faqs List Response :- ${faqsListState.success}")
+                faqsListData.clear()
                 if (faqsListState.success?.response?.size != 0) {
                     faqsListState.success?.response.let { it.let { it3 -> faqsListData.addAll(it3!!.toList()) } }
                     println("Faqs List Data :- $faqsListData")
@@ -383,6 +391,15 @@ private fun ShowFAQData(
                                         selectedCategory.value = name.toString()
                                         categorySelectedId.intValue = id.hashCode()
                                         isCategoryVisible = false
+
+                                        viewModel.getAllFAQs(
+                                            searchKeyName.value.toString(),
+                                            userTypeId.toString(),
+                                            categorySelectedId.intValue.toString(),
+                                            "1",
+                                            "",
+                                            languageId.toString()
+                                        )
                                     },
                                     onDismiss = { isCategoryVisible = false })
                             }
@@ -422,6 +439,14 @@ private fun ShowFAQData(
                                         selectedSubCategoryById.value = name.toString()
                                         subCategoryByIdSelectedId.intValue = id
                                         isSubCategoryVisible = false
+                                        viewModel.getAllFAQs(
+                                            searchKeyName.value.toString(),
+                                            userTypeId.toString(),
+                                            categorySelectedId.intValue.toString(),
+                                            subCategoryByIdSelectedId.intValue.toString(),
+                                            "",
+                                            languageId.toString()
+                                        )
                                     },
                                     onDismiss = { isSubCategoryVisible = false })
                             }

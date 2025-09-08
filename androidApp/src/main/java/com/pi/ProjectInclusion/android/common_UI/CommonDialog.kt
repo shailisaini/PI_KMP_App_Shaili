@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -66,6 +67,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.kmptemplate.logger.LoggerProvider
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.BorderBlue
 import com.pi.ProjectInclusion.DarkGrey02
@@ -78,11 +82,25 @@ import com.pi.ProjectInclusion.LightYellow2
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.RedLogout
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
+import com.pi.ProjectInclusion.android.screens.LoginNavigationScreen
+import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
+import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.FaqActivity
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
+import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_MOBILE_NO
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
+import com.pi.ProjectInclusion.constants.CustomDialog
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
+import com.pi.ProjectInclusion.ui.viewModel.DashboardViewModel
+import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
+import org.koin.androidx.compose.koinViewModel
 
 // Dialog for delete profile
 @Preview
@@ -95,9 +113,52 @@ fun DeleteAccountPasswordDialog(
     val enterPassword = stringResource(R.string.txt_Enter_your_password)
     val showPassword = remember { mutableStateOf(false) }
     var isValidPassword by remember { mutableStateOf(true) }
+    val viewModel: LoginViewModel = koinViewModel()
+
+    var isDialogVisible by remember { mutableStateOf(false) }
+    var languageId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
+    var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
+    var encryptedPhoneNo = viewModel.getPrefData(USER_MOBILE_NO)  // encrypted from shared Pref
+    var userName = viewModel.userNameValue
+
+    println("User name :- $userName")
+
+    val encryptedUserName = userName?.encryptAES().toString().trim()
+    val encryptedPassword = enterPasswordStr.value.encryptAES().toString().trim()
+    logger.d("Delete with password: $languageId .. $userTypeId .. $encryptedPhoneNo")
+    val loginResponse by viewModel.uiStateLoginResponse.collectAsStateWithLifecycle()
+
+    CustomDialog(
+        isVisible = isDialogVisible,
+        onDismiss = { isDialogVisible = false },
+        message = stringResource(R.string.txt_loading)
+    )
+
+    LaunchedEffect(loginResponse) {
+        when {
+            loginResponse.isLoading -> {
+                isDialogVisible = true
+            }
+
+            loginResponse.error.isNotEmpty() -> {
+                logger.d("Error: ${loginResponse.error}")
+                isDialogVisible = false
+            }
+
+            loginResponse.success != null -> {
+                if (loginResponse.success!!.status == true) {
+                    viewModel.saveUserId(loginResponse.success?.response?.user?.id.toString())
+                    onSubmit()
+                } else {
+                    loginResponse.success!!.message.toString()
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
     Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+        onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Box(
             Modifier
@@ -107,8 +168,7 @@ fun DeleteAccountPasswordDialog(
             Card(
                 shape = RoundedCornerShape(12.dp),
                 elevation = CardDefaults.cardElevation(8.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Column(
                     modifier = Modifier
@@ -124,6 +184,7 @@ fun DeleteAccountPasswordDialog(
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(10.dp))
+
                     PasswordTextField(
                         password = enterPasswordStr,
                         showPassword = showPassword,
@@ -157,8 +218,7 @@ fun DeleteAccountPasswordDialog(
                                 .clip(RoundedCornerShape(9.dp)),
                             shape = RoundedCornerShape(9.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = White,
-                                contentColor = BorderBlue
+                                containerColor = White, contentColor = BorderBlue
                             ),
                             border = BorderStroke(1.dp, BorderBlue)
                         ) {
@@ -174,14 +234,20 @@ fun DeleteAccountPasswordDialog(
                         // check Status
                         Button(
                             onClick = {
-
                                 if (enterPasswordStr.value.isEmpty()) {
                                     isValidPassword = false
                                 } else {
                                     isValidPassword = true
-                                    onSubmit()
+                                    isDialogVisible = true
+                                    viewModel.loginWithPasswordViewModel(
+                                        LoginRequest(
+                                            encryptedUserName,
+                                            encryptedPassword,
+                                            userTypeId.toInt(),
+                                            languageId.toInt()
+                                        )
+                                    )
                                 }
-
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -189,8 +255,7 @@ fun DeleteAccountPasswordDialog(
                                 .clip(RoundedCornerShape(9.dp)),
                             shape = RoundedCornerShape(9.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue,
-                                contentColor = White
+                                containerColor = PrimaryBlue, contentColor = White
                             ),
                             border = BorderStroke(1.dp, BorderBlue)
                         ) {
@@ -216,6 +281,52 @@ fun DeleteAccountPasswordDialog(
 @Preview
 @Composable
 fun AccountDeleteDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
+
+    val context = LocalContext.current
+    val viewModel: DashboardViewModel = koinViewModel()
+    val loginViewModel: LoginViewModel = koinViewModel()
+
+    var isDialogVisible by remember { mutableStateOf(false) }
+    var userId = loginViewModel.userIdValue
+    var strToken = loginViewModel.getPrefData(TOKEN_PREF_KEY).toString()
+
+    println("User ID :- $userId")
+
+    val deleteResponse by viewModel.getAccountDeleteResponse.collectAsStateWithLifecycle()
+
+    LaunchedEffect(deleteResponse) {
+        when {
+            deleteResponse.isLoading -> {
+                isDialogVisible = true
+            }
+
+            deleteResponse.error.isNotEmpty() -> {
+                logger.d("Error: ${deleteResponse.error}")
+                isDialogVisible = false
+            }
+
+            deleteResponse.success != null -> {
+                if (deleteResponse.success!!.status == true) {
+                    context.toast(deleteResponse.success!!.response.toString())
+                    onClick()
+                    loginViewModel.clearPref()
+                    ContextCompat.startActivity(
+                        context, Intent(context, LoginNavigationScreen::class.java), null
+                    ).apply { (context as? Activity)?.finish() }
+                } else {
+                    context.toast(deleteResponse.success!!.message.toString())
+                }
+                isDialogVisible = false
+            }
+        }
+    }
+
+    CustomDialog(
+        isVisible = isDialogVisible,
+        onDismiss = { isDialogVisible = false },
+        message = stringResource(R.string.txt_loading)
+    )
+
     Dialog(
         onDismissRequest = { onDismiss() },
         properties = DialogProperties(usePlatformDefaultWidth = false)
@@ -280,8 +391,7 @@ fun AccountDeleteDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
                                 .clip(RoundedCornerShape(9.dp)),
                             shape = RoundedCornerShape(9.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = White,
-                                contentColor = BorderBlue
+                                containerColor = White, contentColor = BorderBlue
                             ),
                             border = BorderStroke(1.dp, BorderBlue)
                         ) {
@@ -295,7 +405,8 @@ fun AccountDeleteDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
                         // check Status
                         Button(
                             onClick = {
-                                onClick()
+                                isDialogVisible = true
+                                viewModel.deactivateUser(strToken, userId.toString())
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -304,8 +415,7 @@ fun AccountDeleteDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
                                 .clip(RoundedCornerShape(9.dp)),
                             shape = RoundedCornerShape(9.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue,
-                                contentColor = White
+                                containerColor = PrimaryBlue, contentColor = White
                             ),
                             border = BorderStroke(1.dp, BorderBlue)
                         ) {
@@ -397,8 +507,7 @@ fun LogoutDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
                                 .clip(RoundedCornerShape(9.dp)),
                             shape = RoundedCornerShape(9.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = White,
-                                contentColor = BorderBlue
+                                containerColor = White, contentColor = BorderBlue
                             ),
                             border = BorderStroke(1.dp, BorderBlue)
                         ) {
@@ -422,8 +531,7 @@ fun LogoutDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
                                 .clip(RoundedCornerShape(9.dp)),
                             shape = RoundedCornerShape(9.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue,
-                                contentColor = White
+                                containerColor = PrimaryBlue, contentColor = White
                             ),
                             border = BorderStroke(1.dp, BorderBlue)
                         ) {
@@ -448,10 +556,8 @@ fun LogoutDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
 @Composable
 fun AccountRecoverDialog(msg: String = "", onDismiss: () -> Unit = {}, onRestore: () -> Unit = {}) {
     Dialog(
-        onDismissRequest = { onDismiss() },
-        properties = DialogProperties(
-            usePlatformDefaultWidth = false,
-            dismissOnClickOutside = false
+        onDismissRequest = { onDismiss() }, properties = DialogProperties(
+            usePlatformDefaultWidth = false, dismissOnClickOutside = false
         )
     ) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
@@ -492,7 +598,11 @@ fun AccountRecoverDialog(msg: String = "", onDismiss: () -> Unit = {}, onRestore
                     )
 
                     Text(
-                        text = msg + stringResource(R.string.txt_90_days_left),
+                        text = if (msg != "") {
+                            msg + stringResource(R.string.txt_90_days_left)
+                        } else {
+                            "90 " + stringResource(R.string.txt_90_days_left)
+                        },
                         modifier = Modifier
                             .wrapContentWidth()
                             .padding(top = 3.dp, start = 9.dp, end = 9.dp),
@@ -514,14 +624,12 @@ fun AccountRecoverDialog(msg: String = "", onDismiss: () -> Unit = {}, onRestore
                                 onDismiss()
                             },
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
+                                .wrapContentWidth()
                                 .padding(end = 9.dp)
                                 .clip(RoundedCornerShape(9.dp)),
                             shape = RoundedCornerShape(9.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = White,
-                                contentColor = BorderBlue
+                                containerColor = White, contentColor = BorderBlue
                             ),
                             border = BorderStroke(1.dp, BorderBlue)
                         ) {
@@ -544,8 +652,7 @@ fun AccountRecoverDialog(msg: String = "", onDismiss: () -> Unit = {}, onRestore
                                 .clip(RoundedCornerShape(9.dp)),
                             shape = RoundedCornerShape(9.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue,
-                                contentColor = White
+                                containerColor = PrimaryBlue, contentColor = White
                             ),
                             border = BorderStroke(1.dp, BorderBlue)
                         ) {
@@ -591,8 +698,7 @@ fun CameraGalleryDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp, start = 8.dp, end = 8.dp)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.Start
+                    .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.Start
             ) {
                 Text(
                     text = stringResource(R.string.choose_an_option),
@@ -636,8 +742,7 @@ fun CameraGalleryDialog(
 fun CameraPermission(hasAllPermissions: MutableState<Boolean>, context: Context) {
     val permissionsToCheck = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         listOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.READ_MEDIA_IMAGES
+            Manifest.permission.CAMERA, Manifest.permission.READ_MEDIA_IMAGES
         )
     } else {
         listOf(
@@ -658,8 +763,7 @@ fun CameraPermission(hasAllPermissions: MutableState<Boolean>, context: Context)
     ) { permissions ->
         hasAllPermissions.value = permissionsToCheck.all {
             permissions[it] == true
-        }
-        /* if (!hasAllPermissions.value) {
+        }/* if (!hasAllPermissions.value) {
              context.toast(context.getString(R.string.txt_permission_grant))
          }*/
     }
@@ -722,8 +826,7 @@ fun TransferSuccessfulDialog(name: String, onDismiss: () -> Unit = {}) {
                             }
                             withStyle(
                                 style = SpanStyle(
-                                    color = Black,
-                                    fontWeight = FontWeight.Bold
+                                    color = Black, fontWeight = FontWeight.Bold
                                 )
                             ) {
                                 append(" " + name + " ")
@@ -759,8 +862,7 @@ fun TransferSuccessfulDialog(name: String, onDismiss: () -> Unit = {}) {
                                 .clip(RoundedCornerShape(9.dp)),
                             shape = RoundedCornerShape(9.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue,
-                                contentColor = White
+                                containerColor = PrimaryBlue, contentColor = White
                             ),
                             border = BorderStroke(1.dp, BorderBlue)
                         ) {
@@ -848,8 +950,7 @@ fun AlreadyRequested(onDismiss: () -> Unit = {}) {
                                 .clip(RoundedCornerShape(9.dp)),
                             shape = RoundedCornerShape(9.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue,
-                                contentColor = White
+                                containerColor = PrimaryBlue, contentColor = White
                             ),
                             border = BorderStroke(1.dp, BorderBlue)
                         ) {
@@ -915,8 +1016,7 @@ fun AlreadyAssessedDialog(
                     // Title
                     Text(
                         text = stringResource(R.string.txt_already_assessed),
-                        modifier = Modifier
-                            .padding(top = 12.dp),
+                        modifier = Modifier.padding(top = 12.dp),
                         fontFamily = fontBold,
                         fontSize = 18.sp,
                         color = Black,
@@ -947,8 +1047,7 @@ fun AlreadyAssessedDialog(
                                 gapLength = 5.dp,
                                 cornerRadius = 12.dp
                             )
-                            .padding(12.dp),
-                        contentAlignment = Alignment.Center
+                            .padding(12.dp), contentAlignment = Alignment.Center
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
@@ -969,8 +1068,7 @@ fun AlreadyAssessedDialog(
                     // Bottom Description
                     Text(
                         text = stringResource(R.string.txt_transfer_request_msg),
-                        modifier = Modifier
-                            .padding(top = 15.dp, start = 12.dp, end = 12.dp),
+                        modifier = Modifier.padding(top = 15.dp, start = 12.dp, end = 12.dp),
                         fontFamily = fontRegular,
                         fontSize = 14.sp,
                         color = GrayLight04,
@@ -1007,8 +1105,7 @@ fun AlreadyAssessedDialog(
                             modifier = Modifier.weight(1.2f),
                             shape = RoundedCornerShape(9.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue,
-                                contentColor = White
+                                containerColor = PrimaryBlue, contentColor = White
                             )
                         ) {
                             Text(
@@ -1085,8 +1182,7 @@ fun TransferConfirmationDialog(
                             append(stringResource(R.string.txt_confirm_dec))
                             withStyle(
                                 style = SpanStyle(
-                                    fontWeight = FontWeight.Bold,
-                                    color = Black
+                                    fontWeight = FontWeight.Bold, color = Black
                                 )
                             ) {
                                 append(" " + studentName)
@@ -1094,8 +1190,7 @@ fun TransferConfirmationDialog(
                             append(" from ")
                             withStyle(
                                 style = SpanStyle(
-                                    fontWeight = FontWeight.Bold,
-                                    color = Black
+                                    fontWeight = FontWeight.Bold, color = Black
                                 )
                             ) {
                                 append(schoolName)
@@ -1157,8 +1252,7 @@ fun TransferConfirmationDialog(
                             modifier = Modifier.weight(1.2f),
                             shape = RoundedCornerShape(9.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue,
-                                contentColor = White
+                                containerColor = PrimaryBlue, contentColor = White
                             )
                         ) {
                             Text(
@@ -1252,8 +1346,7 @@ fun RequestSendDialog(onDismiss: () -> Unit = {}) {
                                 .clip(RoundedCornerShape(9.dp)),
                             shape = RoundedCornerShape(9.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue,
-                                contentColor = White
+                                containerColor = PrimaryBlue, contentColor = White
                             ),
                             border = BorderStroke(1.dp, BorderBlue)
                         ) {
@@ -1341,8 +1434,7 @@ fun ReScreeningDialog(onReScreening: () -> Unit = {}) {
                                 .clip(RoundedCornerShape(9.dp)),
                             shape = RoundedCornerShape(9.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue,
-                                contentColor = White
+                                containerColor = PrimaryBlue, contentColor = White
                             ),
                             border = BorderStroke(1.dp, BorderBlue)
                         ) {
@@ -1423,8 +1515,7 @@ fun CommonAlertDialog(
                                 .clip(RoundedCornerShape(9.dp)),
                             shape = RoundedCornerShape(9.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue,
-                                contentColor = White
+                                containerColor = PrimaryBlue, contentColor = White
                             ),
                             border = BorderStroke(1.dp, BorderBlue)
                         ) {

@@ -55,6 +55,8 @@ import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.SUCCESS
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_MOBILE_NO
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import okhttp3.Route
@@ -78,7 +80,6 @@ fun SetNewPasswordScreen(
     var showError by remember { mutableStateOf(false) }
     var inValidPassword by remember { mutableStateOf(false) }
     var isDialogVisible by remember { mutableStateOf(false) }
-    var buttonClicked by remember { mutableStateOf(false) }
     val showPassword = remember { mutableStateOf(false) }
     val showConfirmPassword = remember { mutableStateOf(false) }
     val txtCharacter = stringResource(R.string.txt_Passwords_must_be_8_16_characters)
@@ -104,6 +105,8 @@ fun SetNewPasswordScreen(
 
     val encryptedPassword = enterConfirmPasswordStr.value.encryptAES().toString().trim()
     val encryptedUserName = viewModel.userNameValue!!.encryptAES().toString().trim()
+    var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
+    var userName = viewModel.userNameValue
 
     var strToken = viewModel.getPrefData(TOKEN_PREF_KEY)
 
@@ -410,16 +413,14 @@ fun SetNewPasswordScreen(
                                 if (showError || enterConfirmPasswordStr.value.length < 10) {
                                     inValidPassword = true
                                 } else {
-                                    if (enterConfirmPasswordStr.value.length < 6) {
-                                        inValidPassword = true
-                                    } else {
-                                        isDialogVisible = true
-                                        buttonClicked = true
-                                        isDialogVisible = true
-                                        val passwordRequest =
-                                            ForgetPasswordRequest("", 3, encryptedPassword)
-                                        viewModel.forgetPassword(passwordRequest, strToken)
-                                    }
+                                    isDialogVisible = true
+                                    val passwordRequest =
+                                        ForgetPasswordRequest(
+                                            userName,
+                                            userTypeId.toInt(),
+                                            encryptedPassword
+                                        )
+                                    viewModel.forgetPassword(passwordRequest, strToken)
                                 }
                             }
                         }, true
