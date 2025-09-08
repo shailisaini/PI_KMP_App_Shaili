@@ -12,6 +12,14 @@ class FakeLocalDataSource : LocalDataSource {
     override fun getValue(key: String, defaultValue: String): String {
         return ""
     }
+
+    override fun clearValue(key: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun clearAll() {
+        TODO("Not yet implemented")
+    }
 }
 
 class FakeConnectivityObserver : ConnectivityObserver {

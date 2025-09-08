@@ -4,14 +4,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.AccountDeleteResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingTokenResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
+import com.pi.ProjectInclusion.data.model.profileModel.ChangePasswordRequest
 import com.pi.ProjectInclusion.data.model.profileModel.ProfileNameChangeRequest
 import com.pi.ProjectInclusion.data.model.profileModel.response.ChangeRequestResponse
 import com.pi.ProjectInclusion.data.model.profileModel.response.TrackRequestResponse
@@ -81,6 +85,12 @@ class DashboardViewModel(
 
     val getTrackRequest = MutableStateFlow(UiState<TrackRequestResponse>())
     val getTrackRequestResponse: StateFlow<UiState<TrackRequestResponse>> = getTrackRequest
+
+    val getAccountDelete = MutableStateFlow(UiState<AccountDeleteResponse>())
+    val getAccountDeleteResponse: StateFlow<UiState<AccountDeleteResponse>> = getAccountDelete
+
+    private val changePassword = MutableStateFlow(UiState<ForgetPasswordResponse>())
+    val changePasswordResponse: StateFlow<UiState<ForgetPasswordResponse>> = changePassword
 
     fun isNetworkAvailable(): Boolean {
         return connectivityObserver.getCurrentStatus() == ConnectivityObserver.Status.Available
@@ -233,30 +243,31 @@ class DashboardViewModel(
         requestChange: ProfileNameChangeRequest,
         strToken: String,
         docPic: ByteArray? = null,
-        fileName: String? = null
+        fileName: String? = null,
     ) = viewModelScope.launch {
         getChangeRequest.update { UiState(isLoading = true) }
-        getUsesCases.getChangeRequestCases(requestChange, strToken, docPic,fileName ).catch { exception ->
-            getChangeRequest.update {
-                UiState(error = exception.message ?: somethingWentWrong)
-            }
-        }.collect { result ->
-            result.fold(onSuccess = { data ->
-                getChangeRequest.update { UiState(success = data) }
-            }, onFailure = { exception ->
+        getUsesCases.getChangeRequestCases(requestChange, strToken, docPic, fileName)
+            .catch { exception ->
                 getChangeRequest.update {
                     UiState(error = exception.message ?: somethingWentWrong)
                 }
-            })
-        }
+            }.collect { result ->
+                result.fold(onSuccess = { data ->
+                    getChangeRequest.update { UiState(success = data) }
+                }, onFailure = { exception ->
+                    getChangeRequest.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
+                })
+            }
     }
 
     fun getTrackChangeRequest(
         strToken: String,
-        requestTypeId: String
+        requestTypeId: String,
     ) = viewModelScope.launch {
         getTrackRequest.update { UiState(isLoading = true) }
-        getUsesCases.getTrackRequestCases(strToken,requestTypeId).catch { exception ->
+        getUsesCases.getTrackRequestCases(strToken, requestTypeId).catch { exception ->
             getTrackRequest.update {
                 UiState(error = exception.message ?: somethingWentWrong)
             }
@@ -306,6 +317,52 @@ class DashboardViewModel(
                     getMeetingJoin.update { UiState(success = data) }
                 }, onFailure = { exception ->
                     getMeetingJoin.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
+                })
+            }
+    }
+
+    fun changePassword(
+        passwordRequest: ChangePasswordRequest,
+        strToken: String,
+    ) = viewModelScope.launch {
+        changePassword.update { UiState(isLoading = true) }
+        getUsesCases.changePassword(passwordRequest, strToken)
+            .catch { exception ->
+                changePassword.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        changePassword.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        changePassword.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
+            }
+    }
+
+    fun deactivateUser(
+        tokenKey: String,
+        userId: String,
+    ) = viewModelScope.launch {
+        getAccountDelete.update { UiState(isLoading = true) }
+        getUsesCases.deactivateUserRepo(tokenKey, userId)
+            .catch { exception ->
+                getAccountDelete.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }.collect { result ->
+                result.fold(onSuccess = { data ->
+                    getAccountDelete.update { UiState(success = data) }
+                }, onFailure = { exception ->
+                    getAccountDelete.update {
                         UiState(error = exception.message ?: somethingWentWrong)
                     }
                 })

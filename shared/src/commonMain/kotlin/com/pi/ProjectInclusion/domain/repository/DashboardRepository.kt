@@ -2,14 +2,18 @@ package com.pi.ProjectInclusion.domain.repository
 
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.AccountDeleteResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingTokenResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
+import com.pi.ProjectInclusion.data.model.profileModel.ChangePasswordRequest
 import com.pi.ProjectInclusion.data.model.profileModel.ProfileNameChangeRequest
 import com.pi.ProjectInclusion.data.model.profileModel.response.ChangeRequestResponse
 import com.pi.ProjectInclusion.data.model.profileModel.response.TrackRequestResponse
@@ -30,7 +34,7 @@ interface DashboardRepository {
 
     suspend fun TrackRequestResponseRepo(
         strToken: String,
-       requestTypeId: String,
+        requestTypeId: String,
     ): TrackRequestResponse
 
     suspend fun getAllCategoryRepo(): List<CategoryListResponse>
@@ -64,4 +68,14 @@ interface DashboardRepository {
         tokenKey: String,
         meetingId: Long,
     ): ZoomMeetingsJoinResponse
+
+    suspend fun changePasswordRepo(
+        passwordRequest: ChangePasswordRequest,
+        strToken: String,
+    ): ForgetPasswordResponse
+
+    suspend fun deactivateUserRepo(
+        tokenKey: String,
+        userId: String,
+    ): AccountDeleteResponse
 }

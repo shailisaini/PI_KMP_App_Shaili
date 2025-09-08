@@ -29,8 +29,11 @@ data class ValidateUserResponse(
         @SerialName("message")
         val message: String? = null,
 
+        @SerialName("daysLeft")
+        val daysLeft: Int? = null,
+
         @SerialName("user")
-        val user: ValidateUser? = null
+        val user: ValidateUser? = null,
     )
 
     @Serializable
@@ -48,6 +51,6 @@ data class ValidateUserResponse(
         val email: String? = null,
 
         @SerialName("mobile")
-        val mobile: String? = null
+        val mobile: String? = null,
     )
 }
