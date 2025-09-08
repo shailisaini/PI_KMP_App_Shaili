@@ -2,15 +2,18 @@ package com.pi.ProjectInclusion.data.repository
 
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.AccountDeleteResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingTokenResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
+import com.pi.ProjectInclusion.data.model.profileModel.ChangePasswordRequest
 import com.pi.ProjectInclusion.data.model.profileModel.ProfileNameChangeRequest
 import com.pi.ProjectInclusion.data.model.profileModel.response.ChangeRequestResponse
 import com.pi.ProjectInclusion.data.model.profileModel.response.TrackRequestResponse
@@ -95,5 +98,12 @@ class DashboardRepoImpl(private val apiService: ApiService) : DashboardRepositor
         userId: String,
     ): AccountDeleteResponse {
         return apiService.deactivateUser(tokenKey, userId)
+    }
+
+    override suspend fun changePasswordRepo(
+        passwordRequest: ChangePasswordRequest,
+        strToken: String
+    ): ForgetPasswordResponse {
+        return apiService.changePassword(passwordRequest, strToken)
     }
 }
