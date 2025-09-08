@@ -77,6 +77,9 @@ class LoginViewModel(
     private val _uiStateLogin = MutableStateFlow(UiState<LoginApiResponse>())
     val uiStateLoginResponse: StateFlow<UiState<LoginApiResponse>> = _uiStateLogin
 
+    private val loginWithOtpState = MutableStateFlow(UiState<LoginApiResponse>())
+    val loginWithOtpResponse: StateFlow<UiState<LoginApiResponse>> = loginWithOtpState
+
     private val viewUserProfile = MutableStateFlow(UiState<ViewProfileResponse>())
     val viewUserProfileResponse: StateFlow<UiState<ViewProfileResponse>> = viewUserProfile
 
@@ -510,20 +513,20 @@ class LoginViewModel(
     fun getLoginWithOtpViewModel(request: LoginWithOtpRequest) = viewModelScope.launch {
         // no need to sync data
 
-        _uiStateLogin.update { UiState(isLoading = true) }
+        loginWithOtpState.update { UiState(isLoading = true) }
         getAuthViewModel.getLoginWithOtp(request)
             .catch { exception ->
-                _uiStateLogin.update {
+                loginWithOtpState.update {
                     UiState(error = exception.message ?: somethingWentWrong)
                 }
             }
             .collect { result ->
                 result.fold(
                     onSuccess = { data ->
-                        _uiStateLogin.update { UiState(success = data) }
+                        loginWithOtpState.update { UiState(success = data) }
                     },
                     onFailure = { exception ->
-                        _uiStateLogin.update {
+                        loginWithOtpState.update {
                             UiState(error = exception.message ?: somethingWentWrong)
                         }
                     }

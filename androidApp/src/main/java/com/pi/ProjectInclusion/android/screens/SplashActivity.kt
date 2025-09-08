@@ -22,15 +22,18 @@ import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -57,6 +60,8 @@ import com.pi.ProjectInclusion.Black
 import com.pi.ProjectInclusion.DARK_TITLE_TEXT
 import com.pi.ProjectInclusion.Dark_02
 import com.pi.ProjectInclusion.Gray
+import com.pi.ProjectInclusion.Transparent
+import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.MyApplicationTheme
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
@@ -179,7 +184,7 @@ class SplashActivity : ComponentActivity() {
                     }
                 }
             }
-
+            SplashUI(appVersion)
             MyApplicationTheme {
                 AnimatedContent(
                     targetState = currentRoute,
@@ -247,6 +252,26 @@ class SplashActivity : ComponentActivity() {
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun SplashActivity.SplashUI(appVersion: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Transparent), // or your splash bg
+        contentAlignment = Alignment.Center
+    ) {
+        // Version text at bottom
+        Text(
+            text = "version: $appVersion",
+            fontFamily = fontBold,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 16.dp),
+            color = White
+        )
     }
 }
 
@@ -340,7 +365,7 @@ fun ServerDownDialog(onDismiss: () -> Unit) {
 @Composable
 fun SplashScreen(onDone: () -> Unit) {
     LaunchedEffect(Unit) {
-        delay(3000) // simulate loading
+        delay(2000) // simulate loading
         onDone()
     }
 }

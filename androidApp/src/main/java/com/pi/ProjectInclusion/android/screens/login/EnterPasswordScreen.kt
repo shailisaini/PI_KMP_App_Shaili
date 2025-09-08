@@ -248,7 +248,7 @@ fun PasswordUI(
     if (sendOtpViaCall) {
     LaunchedEffect(Unit) {
             viewModel.getOTPViewModel(encryptedPhoneNo)
-            sendOtpViaCall = false
+
         }
     }
 
@@ -256,7 +256,7 @@ fun PasswordUI(
     if (sendOtpViaWhatsApp) {
     LaunchedEffect(Unit) {
             viewModel.getOTPWhatsappViewModel(encryptedPhoneNo)
-            sendOtpViaWhatsApp = false
+
         }
     }
 
@@ -281,7 +281,8 @@ fun PasswordUI(
                 } else {
                     context.toast(sendOtpState.success!!.response!!.message.toString())
                 }
-
+                sendOtpViaWhatsApp = false
+                sendOtpViaCall = false
                 isDialogVisible = false
             }
         }
