@@ -8,3 +8,8 @@ data class ProfileNameChangeRequest(
     val appVersion: String? = null,
     val description: String? = null,
 )
+@Serializable
+data class ChangePasswordRequest(
+    val oldPassword: String? = null,
+    val newPassword: String? = null,
+)

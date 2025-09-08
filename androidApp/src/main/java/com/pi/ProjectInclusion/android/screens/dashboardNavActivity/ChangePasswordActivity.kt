@@ -27,6 +27,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.kmptemplate.logger.LoggerProvider.logger
@@ -64,12 +66,19 @@ import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.android.MyApplicationTheme
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
 import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
+import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
+import com.pi.ProjectInclusion.data.model.profileModel.ChangePasswordRequest
+import com.pi.ProjectInclusion.ui.viewModel.DashboardViewModel
+import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
+import org.koin.androidx.compose.koinViewModel
 import java.util.regex.Pattern
 
 class ChangePasswordActivity : ComponentActivity() {
@@ -78,6 +87,7 @@ class ChangePasswordActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
             val context = LocalContext.current
+            val viewModel: DashboardViewModel = koinViewModel()
 
             BackHandler {
                 ContextCompat.startActivity(
@@ -93,7 +103,7 @@ class ChangePasswordActivity : ComponentActivity() {
                         .background(color = White),
                     verticalArrangement = Arrangement.Top
                 ) {
-                    ShowChangePasswordData(navController, context)
+                    ShowChangePasswordData(navController, context, viewModel)
                 }
             }
         }
@@ -104,7 +114,9 @@ class ChangePasswordActivity : ComponentActivity() {
 private fun ShowChangePasswordData(
     controller: NavHostController,
     context: Context,
-) {
+    viewModel: DashboardViewModel
+) {            val loginViewModel: LoginViewModel = koinViewModel()
+
     var enterOldPasswordStr = rememberSaveable { mutableStateOf("") }
     var enterPasswordStr = rememberSaveable { mutableStateOf("") }
     var enterConfirmPasswordStr = rememberSaveable { mutableStateOf("") }
@@ -135,6 +147,8 @@ private fun ShowChangePasswordData(
     var isCheckedAtleastOne by remember { mutableStateOf(false) }
     var isCheckedSpecialCharacter by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
+    var strToken = loginViewModel.getPrefData(TOKEN_PREF_KEY)
+    val changePasswordState by viewModel.changePasswordResponse.collectAsStateWithLifecycle()
 
 
     val minLength = enterConfirmPasswordStr.value.length >= 8 || enterPasswordStr.value.length >= 8
@@ -144,6 +158,31 @@ private fun ShowChangePasswordData(
         enterConfirmPasswordStr.value.any { it.isDigit() } || enterPasswordStr.value.any { it.isDigit() }
     val hasSymbol = Pattern.compile("[^a-zA-Z0-9]").matcher(enterConfirmPasswordStr.value)
         .find() || Pattern.compile("[^a-zA-Z0-9]").matcher(enterPasswordStr.value).find()
+
+
+
+    LaunchedEffect(changePasswordState) {
+        when {
+            changePasswordState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            changePasswordState.error.isNotEmpty() -> {
+                logger.d("Forget Password Error: ${changePasswordState.error}")
+                isDialogVisible = false
+            }
+
+            changePasswordState.success != null -> {
+                logger.d("Forget Password Response :- ${changePasswordState.success!!.response}")
+                if (changePasswordState.success!!.status == true) {
+                    context.toast(changePasswordState.success!!.response!!)
+                } else {
+                    context.toast(changePasswordState.success!!.response!!)
+                }
+                isDialogVisible = false
+            }
+        }
+    }
 
     if (showDialog) {
         PasswordUpdateDialog {
@@ -444,18 +483,15 @@ private fun ShowChangePasswordData(
                                 context.toast(confirmPasswordSameMsgStr)
                             } else {
                                 showError = enterConfirmPasswordStr.value.isEmpty()
-                                val firstDigitChar =
-                                    enterConfirmPasswordStr.value.toString().first()
-                                val firstDigit = firstDigitChar.digitToInt()
                                 if (showError || enterConfirmPasswordStr.value.length < 10) {
                                     inValidPassword = true
-                                } else { // if first digit of mobile is less than 6 then error will show
-                                    if (firstDigit < 6) {
-                                        inValidPassword = true
-                                    } else {
-                                        isDialogVisible = true
-                                        buttonClicked = true
-                                    }
+                                } else {
+
+                                    val passwordRequest = ChangePasswordRequest(
+                                        enterOldPasswordStr.value.encryptAES().toString().trim(),
+                                        enterPasswordStr.value.encryptAES().toString().trim())
+                                    viewModel.changePassword(passwordRequest, strToken)
+
                                 }
                             }
                         }, true
@@ -558,5 +594,5 @@ fun PasswordUpdateDialog(onDismiss: () -> Unit) {
 fun ChangePasswordUIPreview() {
     val navController = rememberNavController()
     val context = LocalContext.current
-    ShowChangePasswordData(navController, context)
+//    ShowChangePasswordData(navController, context)
 }
