@@ -66,7 +66,9 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IS_COMING_FROM
 import com.pi.ProjectInclusion.constants.ConstantVariables.LOGIN_WITH_OTP
 import com.pi.ProjectInclusion.constants.ConstantVariables.REGISTER_NEW
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
+import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_MOBILE_NO
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
@@ -84,7 +86,7 @@ fun OtpSendVerifyScreen(
 ) {
     val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
     val verifyOtpState by viewModel.verifyLoginResponse.collectAsStateWithLifecycle()
-    val loginWithOtp by viewModel.uiStateLoginResponse.collectAsStateWithLifecycle()
+    val loginWithOtp by viewModel.loginWithOtpResponse.collectAsStateWithLifecycle()
     logger.d("Screen: " + "OtpSendVerifyScreen()")
 
     var otpValue by remember { mutableStateOf("") }
@@ -203,10 +205,9 @@ fun OtpSendVerifyScreen(
             verifyOtpState.success != null -> {
                 logger.d("VerifyOtp: ${verifyOtpState.success!!.response!!.message}")
                 if (verifyOtpState.success!!.status == true) {
-                    if (viewModel.getPrefData(IS_COMING_FROM) == REGISTER_NEW){
+                    if (viewModel.getPrefData(IS_COMING_FROM) == REGISTER_NEW) {
                         onNextCreatePass()
-                    }
-                    else {
+                    } else {
                         onNext()
                     }
                 } else {
@@ -233,6 +234,20 @@ fun OtpSendVerifyScreen(
 
             loginWithOtp.success != null -> {
                 if (loginWithOtp.success!!.status == true) {
+// save token
+                    viewModel.savePrefData(
+                        TOKEN_PREF_KEY,
+                        "Bearer " + loginWithOtp.success!!.response?.accessToken.toString()
+                    )
+                    // save UserName
+                    viewModel.savePrefData(
+                        USER_NAME,
+                        loginWithOtp.success!!.response?.user?.username.toString().trim()
+                    )
+                    viewModel.savePrefData(
+                        USER_MOBILE_NO,
+                        loginWithOtp.success!!.response?.user?.mobile.toString()
+                    )
                     context.toast(loginSuccess)
                     context.startActivity(
                         Intent(
@@ -295,7 +310,9 @@ fun OtpSendVerifyScreen(
                 )
 
                 Text(
-                    text = stringResource(R.string.txt_OTP_received_phone)+decryptedPhoneNo.takeLast(4),
+                    text = stringResource(R.string.txt_OTP_received_phone) + decryptedPhoneNo.takeLast(
+                        4
+                    ),
                     modifier = Modifier.padding(top = 8.dp, start = 10.dp, end = 10.dp),
                     textAlign = TextAlign.Center,
                     fontStyle = FontStyle.Normal,
@@ -399,8 +416,10 @@ fun OtpSendVerifyScreen(
     )
 }
 
-fun handleBack(viewModel: LoginViewModel, onBack: () -> Unit,
-               onBackUserName: () -> Unit,) {
+fun handleBack(
+    viewModel: LoginViewModel, onBack: () -> Unit,
+    onBackUserName: () -> Unit,
+) {
     val comingFrom = viewModel.getPrefData(IS_COMING_FROM)
     if (comingFrom == REGISTER_NEW || comingFrom == LOGIN_WITH_OTP) {
         logger.d("OtpSendVerify:Back to UserName -> $comingFrom")

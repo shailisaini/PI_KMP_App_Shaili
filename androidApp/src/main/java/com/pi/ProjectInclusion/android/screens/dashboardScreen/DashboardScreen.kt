@@ -191,7 +191,7 @@ fun DashboardScreen() {
                             text = if (profileData != null) {
                                 profileData?.firstname.toString()
                             } else {
-                                stringResource(R.string.welcome_name)
+                                ""
                             },
                             fontSize = 28.sp,
                             fontFamily = fontBold,
