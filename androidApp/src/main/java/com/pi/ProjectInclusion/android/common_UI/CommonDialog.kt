@@ -1534,3 +1534,112 @@ fun CommonAlertDialog(
         }
     }
 }
+
+
+@SuppressLint("UnusedBoxWithConstraintsScope")
+@Composable
+fun AddConcernDialog(
+    onCancel: () -> Unit = {},
+    onConfirmTransfer: () -> Unit = {},
+) {
+    Dialog(
+        onDismissRequest = { onCancel() },
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .padding(20.dp)
+                    .clip(RoundedCornerShape(21.dp))
+                    .background(if (isSystemInDarkTheme()) Dark_02 else White)
+                    .fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(vertical = 20.dp, horizontal = 15.dp)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    // Top Warning Icon
+                    Icon(
+                        painter = painterResource(id = R.drawable.tick_icon),
+                        contentDescription = null,
+                        modifier = Modifier.size(100.dp),
+                        tint = Color.Unspecified
+                    )
+                    Text(
+                        text = stringResource(R.string.txt_add_concern),
+                        modifier = Modifier
+                            .padding(top = 6.dp)
+                            .fillMaxWidth(),
+                        fontFamily = fontRegular,
+                        fontSize = 15.sp,
+                        color = GrayLight04,
+                        textAlign = TextAlign.Center
+                    )
+                    Box(
+                        modifier = Modifier
+                            .padding(top = 15.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(LightYellow2)
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.txt_add_concern_note),
+                            fontSize = 13.sp,
+                            fontFamily = fontRegular,
+                            color = GrayLight04,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                    Row(
+                        modifier = Modifier
+                            .padding(top = 20.dp, bottom = 10.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = { onCancel() },
+                            modifier = Modifier.weight(1.0f),
+                            shape = RoundedCornerShape(9.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = BorderBlue
+                            ),
+                            border = BorderStroke(1.dp, PrimaryBlue)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.txt_check_again),
+                                fontSize = 15.sp,
+                                fontFamily = fontMedium
+                            )
+                        }
+                        Button(
+                            onClick = { onConfirmTransfer() },
+                            modifier = Modifier.weight(1.0f),
+                            shape = RoundedCornerShape(9.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = PrimaryBlue, contentColor = White
+                            )
+                        ) {
+                            Text(
+                                text = stringResource(R.string.txt_submit),
+                                fontSize = 15.sp,
+                                fontFamily = fontMedium,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun AddConcernDialogPreview() {
+    AddConcernDialog()
+}
