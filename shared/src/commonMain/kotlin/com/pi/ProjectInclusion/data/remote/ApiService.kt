@@ -35,6 +35,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResp
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingTokenResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
+import com.pi.ProjectInclusion.data.model.profileModel.ChangePasswordRequest
 import com.pi.ProjectInclusion.data.model.profileModel.ProfileNameChangeRequest
 import com.pi.ProjectInclusion.data.model.profileModel.response.ChangeRequestResponse
 import com.pi.ProjectInclusion.data.model.profileModel.response.TrackRequestResponse
@@ -198,6 +199,23 @@ class ApiService(private val client: HttpClient) {
         url {
             takeFrom(STUDENT_BASE_URL)
             appendPathSegments(appendUser, "forget-password")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+            append(HttpHeaders.Authorization, strToken)
+        }
+        contentType(ContentType.Application.Json)
+        setBody(passwordRequest)
+    }.body<ForgetPasswordResponse>()
+
+    suspend fun changePassword(
+        passwordRequest: ChangePasswordRequest,
+        strToken: String,
+    ): ForgetPasswordResponse = client.patch {
+
+        url {
+            takeFrom(STUDENT_BASE_URL)
+            appendPathSegments(appendUser, "change-password")
         }
         headers {
             append(HttpHeaders.Accept, "application/json")

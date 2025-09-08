@@ -4,14 +4,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingTokenResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
+import com.pi.ProjectInclusion.data.model.profileModel.ChangePasswordRequest
 import com.pi.ProjectInclusion.data.model.profileModel.ProfileNameChangeRequest
 import com.pi.ProjectInclusion.data.model.profileModel.response.ChangeRequestResponse
 import com.pi.ProjectInclusion.data.model.profileModel.response.TrackRequestResponse
@@ -81,6 +84,9 @@ class DashboardViewModel(
 
     val getTrackRequest = MutableStateFlow(UiState<TrackRequestResponse>())
     val getTrackRequestResponse: StateFlow<UiState<TrackRequestResponse>> = getTrackRequest
+
+    private val changePassword = MutableStateFlow(UiState<ForgetPasswordResponse>())
+    val changePasswordResponse: StateFlow<UiState<ForgetPasswordResponse>> = changePassword
 
     fun isNetworkAvailable(): Boolean {
         return connectivityObserver.getCurrentStatus() == ConnectivityObserver.Status.Available
@@ -309,6 +315,31 @@ class DashboardViewModel(
                         UiState(error = exception.message ?: somethingWentWrong)
                     }
                 })
+            }
+    }
+
+    fun changePassword(
+        passwordRequest: ChangePasswordRequest,
+        strToken: String,
+    ) = viewModelScope.launch {
+        changePassword.update { UiState(isLoading = true) }
+        getUsesCases.changePassword(passwordRequest, strToken)
+            .catch { exception ->
+                changePassword.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+            .collect { result ->
+                result.fold(
+                    onSuccess = { data ->
+                        changePassword.update { UiState(success = data) }
+                    },
+                    onFailure = { exception ->
+                        changePassword.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
+                    }
+                )
             }
     }
 
