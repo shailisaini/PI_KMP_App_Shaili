@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -69,6 +68,9 @@ import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.ConstantVariables.DASHBOARD_SCREEN
+import com.pi.ProjectInclusion.constants.ConstantVariables.IS_COMING_FROM
+import com.pi.ProjectInclusion.constants.ConstantVariables.LOGIN_WITH_OTP
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.constants.CustomDialog
@@ -79,7 +81,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen() {
+fun DashboardScreen(onProfile: () -> Unit) {
     var isDialogVisible by remember { mutableStateOf(false) }
 
     val logger = AppLoggerImpl()
@@ -155,6 +157,10 @@ fun DashboardScreen() {
                 logger.d("Check profile completion response Data:- ${checkProfile.success}")
                 if (checkProfile.success!!.status == true) {
                     logger.d("Check profile completion data details : ${checkProfile.success?.response}")
+                    if (checkProfile.success?.response?.profileCompleted == false) {
+                        viewModel.savePrefData(IS_COMING_FROM, DASHBOARD_SCREEN)
+                        onProfile()
+                    }
                 } else {
                     context.toast(checkProfile.success!!.message.toString())
                 }
@@ -589,7 +595,8 @@ fun ItemStudentAchievement(context: Context) {
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
 fun DashboardScreenUI() {
-    DashboardScreen()
+    val onProfile: () -> Unit = {}
+    DashboardScreen(onProfile)
 }
 
 @Composable
