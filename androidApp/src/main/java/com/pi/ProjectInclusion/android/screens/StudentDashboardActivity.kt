@@ -85,6 +85,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
@@ -189,6 +190,7 @@ class StudentDashboardActivity : ComponentActivity() {
             val context = LocalContext.current
             val viewModel: LoginViewModel = koinViewModel()
             var strToken = viewModel.getPrefData(TOKEN_PREF_KEY)
+            var logOutSheet by remember { mutableStateOf(false) }
 
             fun navigateTo(route: String) {
                 isForward = true
@@ -362,7 +364,22 @@ class StudentDashboardActivity : ComponentActivity() {
                                     drawerState
                                 )
                             },
-                            onLogout = { logOutSheet = true })
+                            onLogout = {
+                                logOutSheet = true
+                            }
+                        )
+
+                        if (logOutSheet) {
+                            LogoutDialog(
+                                onDismiss = { logOutSheet = false },
+                                onClick = {
+                                    logOutSheet = false
+                                    viewModel.clearPref()
+                                    context.startActivity(Intent(context, LoginNavigationScreen::class.java))
+                                    (context as? Activity)?.finish()
+                                }
+                            )
+                        }
                     }
                 },
             ) {
