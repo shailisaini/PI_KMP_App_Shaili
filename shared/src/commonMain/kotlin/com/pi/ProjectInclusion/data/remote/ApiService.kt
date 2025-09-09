@@ -21,6 +21,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.Profession
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.AccountDeleteResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CheckProfileCompletionResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForceUpdateResponse
@@ -642,5 +643,18 @@ class ApiService(private val client: HttpClient) {
         }
 
     }.body<AccountDeleteResponse>()
+
+    suspend fun checkProfileCompletion(
+        strToken: String,
+    ): CheckProfileCompletionResponse = client.get {
+        url {
+            takeFrom(STUDENT_BASE_URL)
+            appendPathSegments(appendUser, "check-profile-completion")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+            append(HttpHeaders.Authorization, strToken)
+        }
+    }.body<CheckProfileCompletionResponse>()
 
 }
