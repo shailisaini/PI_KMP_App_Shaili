@@ -115,7 +115,6 @@ fun LoginUI(
     var noData = stringResource(R.string.txt_oops_no_data_found)
     var isInternetAvailable by remember { mutableStateOf(true) }
     val internetMessage = stringResource(R.string.txt_oops_no_internet)
-    var noDataMessage by remember { mutableStateOf(noData) }
     val invalidMobNo = stringResource(id = R.string.txt_enter_valid_mob_user)
 
     val txtContinue = stringResource(id = R.string.text_continue)
@@ -175,10 +174,12 @@ fun LoginUI(
                         if (apiResponse?.message == NEW_USER) {
                             if (userName.value.length == 10 && userName.value.all { char -> char.isDigit() }) {
                                 // if new User & has mobile no only then register
+                                isNewUserError = false
                                 showOtpBottomSheet = true
 
                             } else {
 //                                    show error message of only digits
+                                showOtpBottomSheet = false
                                 isNewUserError = true
                             }
                         } else if (apiResponse?.message == USER_EXIST) {
