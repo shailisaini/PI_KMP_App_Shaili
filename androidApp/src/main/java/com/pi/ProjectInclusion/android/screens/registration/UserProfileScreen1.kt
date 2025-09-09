@@ -80,6 +80,7 @@ import com.pi.ProjectInclusion.android.common_UI.SmallBtnUi
 import com.pi.ProjectInclusion.android.common_UI.TextFieldWithLeftIcon
 import com.pi.ProjectInclusion.android.common_UI.TextViewField
 import com.pi.ProjectInclusion.android.common_UI.showDatePickerDialog
+import com.pi.ProjectInclusion.android.screens.dashboardScreen.PermissionScreen
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
@@ -118,6 +119,7 @@ fun EnterUserScreen1(
     BackHandler {
         onBack()
     }
+
     logger.d("Screen: " + "EnterUserScreen1()")
 
     Surface(
@@ -171,6 +173,7 @@ fun ProfileScreenUI(
        logger.d(
            "FileNotConvertedException " + "2.. " + decryptedPhoneNo+ encryptedPhoneNo
        )*/
+
     val mobNo = rememberSaveable { mutableStateOf("") }
     var firstName = rememberSaveable { mutableStateOf("") }
     var lastName = rememberSaveable { mutableStateOf("") }
@@ -251,17 +254,15 @@ fun ProfileScreenUI(
         message = "Loading your data..."
     )
 
-    CameraPermission(hasAllPermissions, context)
+//    CameraPermission(hasAllPermissions, context)
+    PermissionScreen()
 
     if (isAddImageClicked) {
         CameraGalleryDialog(selectedUri) {
             isAddImageClicked = false
         }
-        /* } else {
-             context.toast(context.getString(R.string.txt_permission_grant))
-             isAddImageClicked = false
-         }*/
     }
+
     if (selectedUri.value != null) {
         LaunchedEffect(Unit) {
             try {
@@ -281,7 +282,6 @@ fun ProfileScreenUI(
             }
         }
     }
-
 
     Box(
         modifier = Modifier
