@@ -476,6 +476,8 @@ and make a difference together!</string>
     <string name="txt_transfer_note">Note: Upon transfer, all other transfer requests for this student will be automatically canceled.</string>
     <string name="txt_confirm_transfer">Confirm Transfer</string>
     <string name="txt_confirm_dec">You are about to transfer this student to </string>
+    <string name="txt_add_concern">Do you want to check again before submitting it.</string>
+    <string name="txt_add_concern_note">Note: Once you submit a concern, you won’t be able to add another one for the same case</string>
     <string name="txt_noti_case_trans">has sent a student transfer request. </string>
     <string name="txt_transfer">Transfer</string>
     <string name="txt_et_first_name">Enter first name</string>
