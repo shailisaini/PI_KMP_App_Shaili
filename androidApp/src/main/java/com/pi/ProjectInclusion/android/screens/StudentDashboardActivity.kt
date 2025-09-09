@@ -34,7 +34,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -91,7 +90,6 @@ import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import coil.size.Size
-import com.example.kmptemplate.logger.LoggerProvider
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.BannerColor03
 import com.pi.ProjectInclusion.Black
@@ -118,11 +116,7 @@ import com.pi.ProjectInclusion.android.screens.Profile.professionals.Professiona
 import com.pi.ProjectInclusion.android.screens.Profile.specialEdu.SpecialEducatorEditProfile
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentDetailsScreen
 import com.pi.ProjectInclusion.android.screens.addStudentScreen.AddNewStudentMoreDetailsScreen
-import com.pi.ProjectInclusion.android.screens.Profile.EditProfileScreen2
 import com.pi.ProjectInclusion.android.screens.Profile.PrivacyPolicy
-import com.pi.ProjectInclusion.android.screens.Profile.TrackRequestScreen
-import com.pi.ProjectInclusion.android.screens.Profile.professionals.ProfessionalsEditProfile
-import com.pi.ProjectInclusion.android.screens.Profile.specialEdu.SpecialEducatorEditProfile
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.CertificateListActivity
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.ChangePasswordActivity
 import com.pi.ProjectInclusion.android.screens.dashboardNavActivity.FaqActivity
@@ -136,7 +130,6 @@ import com.pi.ProjectInclusion.android.screens.interventionScreens.InterventionS
 import com.pi.ProjectInclusion.android.screens.interventionScreens.TeachingPlanScreen
 import com.pi.ProjectInclusion.android.screens.interventionScreens.UploadedDocumentsScreen
 import com.pi.ProjectInclusion.android.screens.login.EnterUserNameScreen
-import com.pi.ProjectInclusion.android.screens.login.ItemLanguageCard
 import com.pi.ProjectInclusion.android.screens.menu.AppBar
 import com.pi.ProjectInclusion.android.screens.menu.BottomNavigationBar
 import com.pi.ProjectInclusion.android.screens.menu.DrawerBody
@@ -170,6 +163,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import androidx.core.net.toUri
 import com.pi.ProjectInclusion.android.common_UI.LogoutDialog
+import com.pi.ProjectInclusion.android.screens.registration.EnterUserScreen1
 
 class StudentDashboardActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -413,10 +407,20 @@ class StudentDashboardActivity : ComponentActivity() {
                             currentRoute = currentRoute, isForward = isForward
                         ) { route ->
                             when (route) {
-                                AppRoute.DashboardScreen.route -> DashboardScreen()
+                                AppRoute.DashboardScreen.route -> DashboardScreen(
+                                    onProfile = { navigateTo(AppRoute.EnterUserProfileScreen.route) },
+                                )
+
+                                AppRoute.EnterUserProfileScreen.route -> EnterUserScreen1(
+                                    viewModel = viewModel,
+                                    onNextTeacher = { navigateTo(AppRoute.EnterTeacherRegScreen.route) },
+                                    onNextSpecialEdu = { navigateTo(AppRoute.SpecialEducatorRegistration.route) },
+                                    onNextProfessional = { navigateTo(AppRoute.EnterProfessionalScreen.route) },
+                                    onBack = { navigateBack(AppRoute.UserNameScreen.route) },
+                                    onBackDashboard = { navigateBack(AppRoute.DashboardScreen.route) }
+                                )
 
                                 AppRoute.CourseScreen.route -> LMSCourseHomeScreen()
-//                                    AppRoute.CourseScreen.route -> PrivacyPolicy()
 
                                 AppRoute.ProfileScreen.route -> ViewProfileScreen(
                                     viewModel = viewModel,

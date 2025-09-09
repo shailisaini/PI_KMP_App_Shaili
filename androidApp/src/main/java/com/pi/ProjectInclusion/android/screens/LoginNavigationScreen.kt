@@ -184,7 +184,8 @@ class LoginNavigationScreen : ComponentActivity() {
                             onNextTeacher = { navigateTo(AppRoute.EnterTeacherRegScreen.route) },
                             onNextSpecialEdu = { navigateTo(AppRoute.SpecialEducatorRegistration.route) },
                             onNextProfessional = { navigateTo(AppRoute.EnterProfessionalScreen.route) },
-                            onBack = { navigateBack(AppRoute.UserNameScreen.route) }
+                            onBack = { navigateBack(AppRoute.UserNameScreen.route) },
+                            onBackDashboard = { navigateBack(AppRoute.DashboardScreen.route) }
                         )
 
                         // teacher

@@ -87,12 +87,15 @@ import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
 import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
+import com.pi.ProjectInclusion.constants.ConstantVariables.DASHBOARD_SCREEN
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
+import com.pi.ProjectInclusion.constants.ConstantVariables.IS_COMING_FROM
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_FEMALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_MALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_OTHER
+import com.pi.ProjectInclusion.constants.ConstantVariables.REGISTER_NEW
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
-import com.pi.ProjectInclusion.constants.ConstantVariables.USER_MOBILE_NO
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
@@ -106,6 +109,7 @@ import java.time.format.DateTimeFormatter
 fun EnterUserScreen1(
     onNextTeacher: () -> Unit,  //EnterUserProfessionalScreen
     onBack: () -> Unit,  //UserNameScreen
+    onBackDashboard: () -> Unit,  //go to Dashboard screen
     onNextSpecialEdu: () -> Unit,
     onNextProfessional: () -> Unit,
     viewModel: LoginViewModel,
@@ -115,9 +119,12 @@ fun EnterUserScreen1(
 
     CameraPermission(hasAllPermissions, context)
 
-
     BackHandler {
-        onBack()
+        if (viewModel.getPrefData(IS_COMING_FROM) == DASHBOARD_SCREEN) {
+            onBackDashboard()
+        } else {
+            onBack()
+        }
     }
 
     logger.d("Screen: " + "EnterUserScreen1()")
@@ -134,6 +141,7 @@ fun EnterUserScreen1(
             ProfileScreenUI(
                 context,
                 onBack = onBack,
+                onBackDashboard = onBackDashboard,
                 onNextTeacher = onNextTeacher,
                 onNextProfessional = onNextProfessional,
                 onNextSpecialEdu = onNextSpecialEdu,
@@ -147,6 +155,7 @@ fun EnterUserScreen1(
 fun ProfileScreenUI(
     context: Context,
     onBack: () -> Unit,
+    onBackDashboard: () -> Unit,
     onNextTeacher: () -> Unit,
     onNextSpecialEdu: () -> Unit,
     onNextProfessional: () -> Unit,
@@ -203,7 +212,11 @@ fun ProfileScreenUI(
 
     val firstStepProfileState by viewModel.firstStepProfilePasswordResponse.collectAsStateWithLifecycle()
 
-    mobNo.value = viewModel.userNameValue.toString()
+    if (viewModel.userNameValue != null) {
+        mobNo.value = viewModel.userNameValue.toString()
+    } else {
+        mobNo.value = decrypt(viewModel.getPrefData(USER_NAME))
+    }
     println("User type :- ${viewModel.getPrefData(USER_TYPE_ID)}")
 
     var byteArray: ByteArray? = null
@@ -303,7 +316,11 @@ fun ProfileScreenUI(
                 stringResource(R.string.txt_step_1),
                 OrangeSubTitle,
                 onBackButtonClick = {
-                    onBack()
+                    if (viewModel.getPrefData(IS_COMING_FROM) == DASHBOARD_SCREEN) {
+                        onBackDashboard()
+                    } else {
+                        onBack()
+                    }
                 })
             Column(
                 modifier = Modifier
@@ -702,8 +719,9 @@ fun UserProfileUI() {
     val context = LocalContext.current
     val onNext: () -> Unit = {}
     val onBack: () -> Unit = {}
+    val onBackDashboard: () -> Unit = {}
     val speEdu: () -> Unit = {}
     val profession: () -> Unit = {}
     val viewModel: LoginViewModel = koinViewModel()
-    ProfileScreenUI(context, onNext, onBack, profession, speEdu, viewModel)
+    ProfileScreenUI(context, onNext, onBack, onBackDashboard, profession, speEdu, viewModel)
 }

@@ -77,6 +77,7 @@ import com.pi.ProjectInclusion.android.common_UI.ChooseOneBottomSheet
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_MOBILE_NO
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.contactUsTxt
 import kotlinx.coroutines.launch
 
@@ -106,7 +107,11 @@ fun ForgetPasswordScreen(
     var sendOtpViaWhatsApp by remember { mutableStateOf(false) }
     var sendOtpViaCall by remember { mutableStateOf(false) }
 
-    mobNo.value = viewModel.userNameValue.toString()
+    if (viewModel.userNameValue != null) {
+        mobNo.value = viewModel.userNameValue.toString()
+    } else {
+        mobNo.value = decrypt(viewModel.getPrefData(USER_NAME))
+    }
     println("User mobile number :- ${decrypt(mobNo.value).toString().trim()}")
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
