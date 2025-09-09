@@ -288,8 +288,8 @@ class StudentDashboardActivity : ComponentActivity() {
                             LogoutDialog(onDismiss = { logOutSheet = false }, onClick = {
                                 logOutSheet = false
                                 viewModel.clearPref()
-//                                onBackLogin() // move to Login Screen
-                                AppRoute.UserNameScreen.route
+                                context.startActivity(Intent(context, LoginNavigationScreen::class.java))
+                                    (context as? Activity)?.finish()
                             })
                         }
 
