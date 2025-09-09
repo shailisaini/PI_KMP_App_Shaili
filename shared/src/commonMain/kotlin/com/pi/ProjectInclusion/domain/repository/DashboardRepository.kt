@@ -5,6 +5,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.Certificat
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.AccountDeleteResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CheckProfileCompletionResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
@@ -78,4 +79,6 @@ interface DashboardRepository {
         tokenKey: String,
         userId: String,
     ): AccountDeleteResponse
+
+    suspend fun checkProfileCompletionRepo(tokenKey: String): CheckProfileCompletionResponse
 }

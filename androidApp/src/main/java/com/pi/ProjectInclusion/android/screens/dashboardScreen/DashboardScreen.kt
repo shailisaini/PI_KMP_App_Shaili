@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -72,6 +73,7 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.profileModel.response.ViewProfileResponse
+import com.pi.ProjectInclusion.ui.viewModel.DashboardViewModel
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -83,6 +85,7 @@ fun DashboardScreen() {
     val logger = AppLoggerImpl()
     val query by rememberSaveable { mutableStateOf("") }
     val viewModel: LoginViewModel = koinViewModel()
+    val dashboardViewModel: DashboardViewModel = koinViewModel()
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
     val scrollState = rememberLazyGridState()
     val context = LocalContext.current
@@ -100,6 +103,7 @@ fun DashboardScreen() {
 
     var strToken = viewModel.getPrefData(TOKEN_PREF_KEY)
     val viewProfile by viewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
+    val checkProfile by dashboardViewModel.checkProfileResponse.collectAsStateWithLifecycle()
     var encryptedUserName = viewModel.getPrefData(USER_NAME)
     logger.d("Profile details on dashboard page :- $encryptedUserName")
     var profileData by remember { mutableStateOf<ViewProfileResponse.ProfileResponse?>(null) }
@@ -122,6 +126,7 @@ fun DashboardScreen() {
             viewProfile.success != null -> {
                 logger.d("Profile response Data:- ${viewProfile.success}")
                 if (viewProfile.success!!.status == true) {
+                    dashboardViewModel.checkProfileCompletion(strToken)
                     profileData = viewProfile.success!!.response
                     logger.d("Profile Data details : ${viewProfile.success?.response}")
                     if (profileData != null) {
@@ -130,6 +135,28 @@ fun DashboardScreen() {
                     }
                 } else {
                     context.toast(viewProfile.success!!.message.toString())
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(checkProfile) {
+        when {
+            checkProfile.isLoading -> {
+                isDialogVisible = true
+            }
+
+            checkProfile.error.isNotEmpty() -> {
+                logger.d("Check profile completion error data: ${checkProfile.success}")
+                isDialogVisible = false
+            }
+
+            checkProfile.success != null -> {
+                logger.d("Check profile completion response Data:- ${checkProfile.success}")
+                if (checkProfile.success!!.status == true) {
+                    logger.d("Check profile completion data details : ${checkProfile.success?.response}")
+                } else {
+                    context.toast(checkProfile.success!!.message.toString())
                 }
                 isDialogVisible = false
             }
@@ -153,57 +180,56 @@ fun DashboardScreen() {
                     color = Transparent
                 )
                 .padding(10.dp),
-            // Add horizontal padding,
-        )
-        {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            )
-            {
-                Column(
-                    modifier = Modifier.padding(horizontal = 10.dp),
-                )
-                {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
+        ) {
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                item {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            text = stringResource(R.string.txt_hi),
-                            fontSize = 28.sp,
-                            fontFamily = fontRegular,
-                            color = Gray,
-                            modifier = Modifier.padding(top = 10.dp)
-                        )
+                        Column(
+                            modifier = Modifier.padding(horizontal = 10.dp),
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.txt_hi),
+                                    fontSize = 28.sp,
+                                    fontFamily = fontRegular,
+                                    color = Gray,
+                                    modifier = Modifier.padding(top = 8.dp)
+                                )
 
-                        Text(
-                            text = if (profileData?.firstname != null) {
-                                profileData?.firstname.toString()
-                            } else {
-                                ""
-                            },
-                            fontSize = 28.sp,
-                            fontFamily = fontBold,
-                            color = Black,
-                            modifier = Modifier.padding(top = 10.dp, start = 8.dp)
-                        )
+                                Text(
+                                    text = if (profileData?.firstname != null) {
+                                        profileData?.firstname.toString()
+                                    } else {
+                                        ""
+                                    },
+                                    fontSize = 28.sp,
+                                    fontFamily = fontBold,
+                                    color = Black,
+                                    modifier = Modifier.padding(top = 8.dp, start = 8.dp)
+                                )
+                            }
+
+                            Text(
+                                text = stringResource(R.string.welcome_desc),
+                                fontSize = 13.sp,
+                                fontFamily = fontRegular,
+                                color = Gray,
+                                modifier = Modifier.padding(vertical = 5.dp)
+                            )
+
+                        }
+                        ItemStudentAchievement(context)
+
+                        ItemCard(context)
+
+                        ItemReferCard(context)
                     }
-
-                    Text(
-                        text = stringResource(R.string.welcome_desc),
-                        fontSize = 13.sp,
-                        fontFamily = fontRegular,
-                        color = Gray,
-                        modifier = Modifier
-                            .padding(vertical = 5.dp)
-                    )
-
                 }
-                ItemStudentAchievement(context)
-                ItemCard(context)
-                ItemReferCard(context)
-
             }
         }
     }
@@ -222,8 +248,7 @@ fun ItemCard(
                 .fillMaxWidth()
                 .wrapContentHeight(),
             horizontalArrangement = Arrangement.Absolute.Center // or Arrangement.Start/Center
-        )
-        {
+        ) {
             Card(
                 modifier = Modifier
                     .padding(start = 10.dp, end = 5.dp)
@@ -231,11 +256,9 @@ fun ItemCard(
                     .weight(1f),
                 shape = RoundedCornerShape(12.dp), // optional
                 colors = CardDefaults.cardColors(
-                    containerColor = DashboardCard1,
-                    contentColor = Black
+                    containerColor = DashboardCard1, contentColor = Black
                 )
-            )
-            {
+            ) {
                 Column(
                     modifier = Modifier
                         .padding(15.dp)
@@ -266,11 +289,9 @@ fun ItemCard(
                     .weight(1f),
                 shape = RoundedCornerShape(12.dp), // optional
                 colors = CardDefaults.cardColors(
-                    containerColor = DashboardCard2,
-                    contentColor = Black
+                    containerColor = DashboardCard2, contentColor = Black
                 )
-            )
-            {
+            ) {
                 Column(
                     modifier = Modifier
                         .padding(15.dp)
@@ -301,8 +322,7 @@ fun ItemCard(
                 .fillMaxWidth()
                 .wrapContentHeight(),
             horizontalArrangement = Arrangement.Absolute.Center // or Arrangement.Start/Center
-        )
-        {
+        ) {
             Card(
                 modifier = Modifier
                     .padding(start = 10.dp, end = 5.dp)
@@ -310,11 +330,9 @@ fun ItemCard(
                     .weight(1f),
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = DashboardCard3,
-                    contentColor = Black
+                    containerColor = DashboardCard3, contentColor = Black
                 )
-            )
-            {
+            ) {
                 Column(
                     modifier = Modifier
                         .padding(15.dp)
@@ -344,11 +362,9 @@ fun ItemCard(
                     .weight(1f),
                 shape = RoundedCornerShape(12.dp), // optional
                 colors = CardDefaults.cardColors(
-                    containerColor = DashboardCard4,
-                    contentColor = Black
+                    containerColor = DashboardCard4, contentColor = Black
                 )
-            )
-            {
+            ) {
                 Column(
                     modifier = Modifier
                         .padding(15.dp)
@@ -380,23 +396,19 @@ fun ItemReferCard(context: Context) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp)
+            .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 80.dp)
             .wrapContentHeight()
-    )
-    {
+    ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-        )
-        {
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
                         brush = Brush.linearGradient(
                             colors = listOf(
-                                GreenGradient1,
-                                GreenGradient2
+                                GreenGradient1, GreenGradient2
                             )
                         )
                     ),
@@ -425,8 +437,7 @@ fun ItemReferCard(context: Context) {
                             .background(color = White)
                             .wrapContentWidth(),
                         colors = CardDefaults.cardColors(
-                            containerColor = White,
-                            contentColor = Black
+                            containerColor = White, contentColor = Black
                         ),
                         shape = RoundedCornerShape(4.dp),
                         // Do not set containerColor, let the Box inside handle the gradient
@@ -442,8 +453,7 @@ fun ItemReferCard(context: Context) {
                     }
                 }
                 Column(
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
+                    modifier = Modifier.align(Alignment.CenterEnd)
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.refer_banner),
@@ -460,15 +470,12 @@ fun ItemReferCard(context: Context) {
 fun ItemStudentAchievement(context: Context) {
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-    )
-    {
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Card(
             modifier = Modifier
                 .padding(10.dp)
-                .fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
+                .fillMaxWidth(), shape = RoundedCornerShape(16.dp),
             // Do not set containerColor, let the Box inside handle the gradient
             colors = CardDefaults.cardColors(containerColor = Color.Transparent)
         ) {
@@ -483,8 +490,7 @@ fun ItemStudentAchievement(context: Context) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 10.dp, vertical = 15.dp)
-                )
-                {
+                ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -495,75 +501,55 @@ fun ItemStudentAchievement(context: Context) {
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "Achievements",
-                            fontFamily = fontRegular,
-                            fontSize = 15.sp
+                            text = "Achievements", fontFamily = fontRegular, fontSize = 15.sp
                         )
                     }
                     Row(
-                        modifier = Modifier
-                            .padding(
-                                start = 5.dp, end = 5.dp, top = 15.dp
-                            )
+                        modifier = Modifier.padding(
+                            start = 5.dp, end = 5.dp, top = 15.dp
+                        ),
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f)
                                 .background(
-                                    color = White,
-                                    shape = RoundedCornerShape(size = 8.dp)
+                                    color = White, shape = RoundedCornerShape(size = 8.dp)
                                 )
                         ) {
                             Text(
                                 modifier = Modifier.padding(
-                                    start = 15.dp,
-                                    end = 15.dp,
-                                    top = 10.dp,
-                                    bottom = 5.dp
-                                ),
-                                text = "4",
-                                fontFamily = fontBold,
-                                fontSize = 24.sp
+                                    start = 15.dp, end = 15.dp, top = 10.dp, bottom = 5.dp
+                                ), text = "4", fontFamily = fontBold, fontSize = 24.sp
                             )
                             Text(
                                 modifier = Modifier.padding(
-                                    start = 15.dp,
-                                    end = 15.dp,
-                                    bottom = 10.dp
+                                    start = 15.dp, end = 15.dp, bottom = 10.dp
                                 ),
                                 text = stringResource(R.string.txt_course_completed),
                                 fontFamily = fontRegular,
                                 fontSize = 13.sp
                             )
                         }
+
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 5.dp)
                                 .weight(1f)
                                 .background(
-                                    color = White,
-                                    shape = RoundedCornerShape(size = 8.dp)
+                                    color = White, shape = RoundedCornerShape(size = 8.dp)
                                 )
 
                         ) {
                             Text(
                                 modifier = Modifier.padding(
-                                    start = 15.dp,
-                                    end = 10.dp,
-                                    top = 10.dp,
-                                    bottom = 5.dp
-                                ),
-                                text = "4",
-                                fontFamily = fontBold,
-                                fontSize = 24.sp
+                                    start = 15.dp, end = 10.dp, top = 10.dp, bottom = 5.dp
+                                ), text = "4", fontFamily = fontBold, fontSize = 24.sp
                             )
                             Text(
                                 modifier = Modifier.padding(
-                                    start = 15.dp,
-                                    end = 15.dp,
-                                    bottom = 10.dp
+                                    start = 15.dp, end = 15.dp, bottom = 10.dp
                                 ),
                                 text = stringResource(R.string.txt_course_certificates),
                                 fontFamily = fontRegular,
@@ -576,26 +562,17 @@ fun ItemStudentAchievement(context: Context) {
                                 .fillMaxWidth()
                                 .weight(1f)
                                 .background(
-                                    color = White,
-                                    shape = RoundedCornerShape(size = 8.dp)
+                                    color = White, shape = RoundedCornerShape(size = 8.dp)
                                 )
                         ) {
                             Text(
                                 modifier = Modifier.padding(
-                                    start = 15.dp,
-                                    end = 15.dp,
-                                    top = 10.dp,
-                                    bottom = 5.dp
-                                ),
-                                text = "4",
-                                fontFamily = fontBold,
-                                fontSize = 24.sp
+                                    start = 15.dp, end = 15.dp, top = 10.dp, bottom = 5.dp
+                                ), text = "4", fontFamily = fontBold, fontSize = 24.sp
                             )
                             Text(
                                 modifier = Modifier.padding(
-                                    start = 15.dp,
-                                    end = 15.dp,
-                                    bottom = 10.dp
+                                    start = 15.dp, end = 15.dp, bottom = 10.dp
                                 ),
                                 text = stringResource(R.string.txt_modules_certificates),
                                 fontFamily = fontRegular,
@@ -621,27 +598,20 @@ fun PermissionScreen() {
     val context = LocalContext.current
     val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         listOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.READ_MEDIA_IMAGES
+            Manifest.permission.CAMERA, Manifest.permission.READ_MEDIA_IMAGES
         )
     } else {
         listOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.READ_EXTERNAL_STORAGE
+            Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE
         )
     }
 
-    MultiplePermissionsRequest(
-        permissions = permissions,
-        onPermissionsGranted = {
-//            context.toast("All Permissions Granted ✅")
-            logger.d("All Permissions Granted ✅")
-        },
-        onPermissionsDenied = {
-            context.toast("Permissions Denied ❌")
-            logger.d("Permissions Denied ❌")
-        }
-    )
+    MultiplePermissionsRequest(permissions = permissions, onPermissionsGranted = {
+        logger.d("All Permissions Granted")
+    }, onPermissionsDenied = {
+        context.toast("Permissions Denied")
+        logger.d("Permissions Denied")
+    })
 }
 
 @Composable

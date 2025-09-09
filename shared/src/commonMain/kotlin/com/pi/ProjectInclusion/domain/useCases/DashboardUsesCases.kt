@@ -7,6 +7,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.AccountDe
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CheckProfileCompletionResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
@@ -209,8 +210,20 @@ class DashboardUsesCases(private val repository: DashboardRepository) {
             emit(Result.success(response))
         } catch (e: Exception) {
             val errorMessage = e.message ?: unableToConnectServer
-            LoggerProvider.logger.d("Exception in forgetPassword() $errorMessage")
+            logger.d("Exception in changePassword() $errorMessage")
             emit(Result.failure(Exception(errorMessage)))
         }
     }.flowOn(Dispatchers.IO)
+
+    fun checkProfileCompletionRepo(strToken: String): Flow<Result<CheckProfileCompletionResponse>> =
+        flow {
+            try {
+                val response = repository.checkProfileCompletionRepo(strToken)
+                emit(Result.success(response))
+            } catch (e: Exception) {
+                val errorMessage = e.message ?: unableToConnectServer
+                logger.d("Exception in checkProfileCompletionRepo() $errorMessage")
+                emit(Result.failure(Exception(errorMessage)))
+            }
+        }.flowOn(Dispatchers.IO)
 }

@@ -7,6 +7,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.Certificat
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.AccountDeleteResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CheckProfileCompletionResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
@@ -69,16 +70,13 @@ class DashboardViewModel(
         getZoomMeetingToken
 
     private val getToken = MutableStateFlow(UiState<TokenResponse>())
-    val getTokenResponse: StateFlow<UiState<TokenResponse>> =
-        getToken
+    val getTokenResponse: StateFlow<UiState<TokenResponse>> = getToken
 
     private val getMeetingList = MutableStateFlow(UiState<ZoomMeetingListResponse>())
-    val getMeetingListResponse: StateFlow<UiState<ZoomMeetingListResponse>> =
-        getMeetingList
+    val getMeetingListResponse: StateFlow<UiState<ZoomMeetingListResponse>> = getMeetingList
 
     private val getMeetingJoin = MutableStateFlow(UiState<ZoomMeetingsJoinResponse>())
-    val getMeetingJoinResponse: StateFlow<UiState<ZoomMeetingsJoinResponse>> =
-        getMeetingJoin
+    val getMeetingJoinResponse: StateFlow<UiState<ZoomMeetingsJoinResponse>> = getMeetingJoin
 
     val getChangeRequest = MutableStateFlow(UiState<ChangeRequestResponse>())
     val getChangeRequestResponse: StateFlow<UiState<ChangeRequestResponse>> = getChangeRequest
@@ -91,6 +89,9 @@ class DashboardViewModel(
 
     private val changePassword = MutableStateFlow(UiState<ForgetPasswordResponse>())
     val changePasswordResponse: StateFlow<UiState<ForgetPasswordResponse>> = changePassword
+
+    private val checkProfile = MutableStateFlow(UiState<CheckProfileCompletionResponse>())
+    val checkProfileResponse: StateFlow<UiState<CheckProfileCompletionResponse>> = checkProfile
 
     fun isNetworkAvailable(): Boolean {
         return connectivityObserver.getCurrentStatus() == ConnectivityObserver.Status.Available
@@ -286,20 +287,19 @@ class DashboardViewModel(
         tokenKey: String,
     ) = viewModelScope.launch {
         getMeetingList.update { UiState(isLoading = true) }
-        getUsesCases.getAllZoomMeetingsRepo(tokenKey)
-            .catch { exception ->
+        getUsesCases.getAllZoomMeetingsRepo(tokenKey).catch { exception ->
+            getMeetingList.update {
+                UiState(error = exception.message ?: somethingWentWrong)
+            }
+        }.collect { result ->
+            result.fold(onSuccess = { data ->
+                getMeetingList.update { UiState(success = data) }
+            }, onFailure = { exception ->
                 getMeetingList.update {
                     UiState(error = exception.message ?: somethingWentWrong)
                 }
-            }.collect { result ->
-                result.fold(onSuccess = { data ->
-                    getMeetingList.update { UiState(success = data) }
-                }, onFailure = { exception ->
-                    getMeetingList.update {
-                        UiState(error = exception.message ?: somethingWentWrong)
-                    }
-                })
-            }
+            })
+        }
     }
 
     fun getJoinZoomMeetings(
@@ -307,20 +307,19 @@ class DashboardViewModel(
         meetingId: Long,
     ) = viewModelScope.launch {
         getMeetingJoin.update { UiState(isLoading = true) }
-        getUsesCases.getJoinZoomMeetingsRepo(tokenKey, meetingId)
-            .catch { exception ->
+        getUsesCases.getJoinZoomMeetingsRepo(tokenKey, meetingId).catch { exception ->
+            getMeetingJoin.update {
+                UiState(error = exception.message ?: somethingWentWrong)
+            }
+        }.collect { result ->
+            result.fold(onSuccess = { data ->
+                getMeetingJoin.update { UiState(success = data) }
+            }, onFailure = { exception ->
                 getMeetingJoin.update {
                     UiState(error = exception.message ?: somethingWentWrong)
                 }
-            }.collect { result ->
-                result.fold(onSuccess = { data ->
-                    getMeetingJoin.update { UiState(success = data) }
-                }, onFailure = { exception ->
-                    getMeetingJoin.update {
-                        UiState(error = exception.message ?: somethingWentWrong)
-                    }
-                })
-            }
+            })
+        }
     }
 
     fun changePassword(
@@ -328,24 +327,19 @@ class DashboardViewModel(
         strToken: String,
     ) = viewModelScope.launch {
         changePassword.update { UiState(isLoading = true) }
-        getUsesCases.changePassword(passwordRequest, strToken)
-            .catch { exception ->
+        getUsesCases.changePassword(passwordRequest, strToken).catch { exception ->
+            changePassword.update {
+                UiState(error = exception.message ?: somethingWentWrong)
+            }
+        }.collect { result ->
+            result.fold(onSuccess = { data ->
+                changePassword.update { UiState(success = data) }
+            }, onFailure = { exception ->
                 changePassword.update {
                     UiState(error = exception.message ?: somethingWentWrong)
                 }
-            }
-            .collect { result ->
-                result.fold(
-                    onSuccess = { data ->
-                        changePassword.update { UiState(success = data) }
-                    },
-                    onFailure = { exception ->
-                        changePassword.update {
-                            UiState(error = exception.message ?: somethingWentWrong)
-                        }
-                    }
-                )
-            }
+            })
+        }
     }
 
     fun deactivateUser(
@@ -353,20 +347,37 @@ class DashboardViewModel(
         userId: String,
     ) = viewModelScope.launch {
         getAccountDelete.update { UiState(isLoading = true) }
-        getUsesCases.deactivateUserRepo(tokenKey, userId)
-            .catch { exception ->
+        getUsesCases.deactivateUserRepo(tokenKey, userId).catch { exception ->
+            getAccountDelete.update {
+                UiState(error = exception.message ?: somethingWentWrong)
+            }
+        }.collect { result ->
+            result.fold(onSuccess = { data ->
+                getAccountDelete.update { UiState(success = data) }
+            }, onFailure = { exception ->
                 getAccountDelete.update {
                     UiState(error = exception.message ?: somethingWentWrong)
                 }
-            }.collect { result ->
-                result.fold(onSuccess = { data ->
-                    getAccountDelete.update { UiState(success = data) }
-                }, onFailure = { exception ->
-                    getAccountDelete.update {
-                        UiState(error = exception.message ?: somethingWentWrong)
-                    }
-                })
-            }
+            })
+        }
     }
 
+    fun checkProfileCompletion(
+        tokenKey: String,
+    ) = viewModelScope.launch {
+        checkProfile.update { UiState(isLoading = true) }
+        getUsesCases.checkProfileCompletionRepo(tokenKey).catch { exception ->
+            checkProfile.update {
+                UiState(error = exception.message ?: somethingWentWrong)
+            }
+        }.collect { result ->
+            result.fold(onSuccess = { data ->
+                checkProfile.update { UiState(success = data) }
+            }, onFailure = { exception ->
+                checkProfile.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            })
+        }
+    }
 }
