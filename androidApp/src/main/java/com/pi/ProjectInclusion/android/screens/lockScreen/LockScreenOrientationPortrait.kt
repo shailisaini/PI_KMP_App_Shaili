@@ -1,10 +1,12 @@
 package com.pi.ProjectInclusion.android.screens.lockScreen
 
+import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 
+@SuppressLint("SourceLockedOrientationActivity")
 @Composable
 fun LockScreenOrientationPortrait() {
     val activity = LocalActivity.current

@@ -5,6 +5,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.Certificat
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.AccountDeleteResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CheckProfileCompletionResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
@@ -102,8 +103,12 @@ class DashboardRepoImpl(private val apiService: ApiService) : DashboardRepositor
 
     override suspend fun changePasswordRepo(
         passwordRequest: ChangePasswordRequest,
-        strToken: String
+        strToken: String,
     ): ForgetPasswordResponse {
         return apiService.changePassword(passwordRequest, strToken)
+    }
+
+    override suspend fun checkProfileCompletionRepo(tokenKey: String): CheckProfileCompletionResponse {
+        return apiService.checkProfileCompletion(tokenKey)
     }
 }
