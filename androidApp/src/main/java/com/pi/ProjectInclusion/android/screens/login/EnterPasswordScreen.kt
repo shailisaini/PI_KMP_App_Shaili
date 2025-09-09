@@ -175,6 +175,7 @@ fun PasswordUI(
     var sendOtpViaCall by remember { mutableStateOf(false) }
     var loginWithPassword by remember { mutableStateOf(false) }
     var sendOtpViaWhatsApp by remember { mutableStateOf(false) }
+    var error = stringResource(R.string.key_error_response)
     var languageId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
     var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
     var encryptedPhoneNo = viewModel.getPrefData(USER_MOBILE_NO)  // encrypted from shared Pref
@@ -274,12 +275,15 @@ fun PasswordUI(
             }
 
             sendOtpState.success != null -> {
-//                LoggerProvider.logger.d("Languages fetched: ${list.size}")
-                if (sendOtpState.success!!.response!!.message.equals(SUCCESS)) {
+                if (sendOtpState.success!!.status == true) {
                     viewModel.savePrefData(IS_COMING_FROM, LOGIN_WITH_OTP)
                     onNext()
                 } else {
-                    context.toast(sendOtpState.success!!.response!!.message.toString())
+                    val errorMessage = sendOtpState.success?.message
+                        ?: sendOtpState.success?.error
+                        ?: sendOtpState.success?.exception
+                        ?: error
+                    context.toast(errorMessage)
                 }
                 sendOtpViaWhatsApp = false
                 sendOtpViaCall = false

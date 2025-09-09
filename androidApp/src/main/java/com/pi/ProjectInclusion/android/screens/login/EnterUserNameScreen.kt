@@ -137,6 +137,7 @@ fun LoginUI(
     val encryptedPhoneNo = userName.value.encryptAES().toString().trim()
     var sendOtpViaCall by remember { mutableStateOf(false) }
     var sendOtpViaWhatsApp by remember { mutableStateOf(false) }
+    var errorResponse = stringResource(R.string.key_error_response)
     val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
 
     CustomDialog(
@@ -268,18 +269,21 @@ fun LoginUI(
 
             sendOtpState.success != null -> {
                 isDialogVisible = false
+                if (sendOtpState.success!!.status == true) {
                 viewModel.savePrefData(USER_MOBILE_NO, encryptedPhoneNo)
                 viewModel.savePrefData(IS_COMING_FROM, REGISTER_NEW)
-                if (sendOtpState.success!!.response?.message == SUCCESS) {
                     onRegister() // Go to OTP Verify screen
-                    sendOtpViaWhatsApp = false
-                    sendOtpViaCall = false
-                } else {
 
-                    sendOtpViaWhatsApp = false
-                    sendOtpViaCall = false
-                    context.toast(sendOtpState.success!!.response?.message.toString())
+                } else {
+                    val errorMessage = sendOtpState.success?.message
+                        ?: sendOtpState.success?.error
+                        ?: sendOtpState.success?.exception
+                        ?: errorResponse
+
+                    context.toast(errorMessage)
                 }
+                sendOtpViaWhatsApp = false
+                sendOtpViaCall = false
             }
         }
     }

@@ -8,14 +8,18 @@ data class SendOTPResponse(
     @SerialName("message")
     val message: String? = null,
 
+    @SerialName("error")
+    val error: String? = null,
+
     @SerialName("statusCode")
     val statusCode: Int? = null,
 
     @SerialName("status")
     val status: Boolean? = null,
 
-    @SerialName("response")
-    val response: OTPResponse? = null,
+    @SerialName("response") val response: OTPResponse? = null,
+
+    @SerialName("exception") val exception: String? = null
 
     ) {
     @Serializable

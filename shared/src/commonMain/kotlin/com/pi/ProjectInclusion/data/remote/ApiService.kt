@@ -16,6 +16,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.CreatePass
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginWithOtpRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.OtpRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.AccountDeleteResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
@@ -153,22 +154,24 @@ class ApiService(private val client: HttpClient) {
         url {
             takeFrom(STUDENT_BASE_URL)
             appendPathSegments(appendUser, "otp-on-call")
-            parameters.append("mobileNo", mobNo)
         }
         headers {
             append(HttpHeaders.Accept, "application/json")
         }
+        contentType(ContentType.Application.Json)
+        setBody(OtpRequest(mobNo))
     }.body<SendOTPResponse>()
 
     suspend fun getOTPOnWhatsapp(mobNo: String): SendOTPResponse = client.post {
         url {
             takeFrom(STUDENT_BASE_URL)
             appendPathSegments(appendUser, "send-otp-whatsapp") // → /language/get-all
-            parameters.append("mobileNe", mobNo)
         }
         headers {
             append(HttpHeaders.Accept, "application/json")
         }
+        contentType(ContentType.Application.Json)
+        setBody(OtpRequest(mobNo))
     }.body<SendOTPResponse>()
 
     // registration, forgot password & recover user
