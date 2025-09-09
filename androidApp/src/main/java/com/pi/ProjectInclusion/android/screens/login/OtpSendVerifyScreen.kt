@@ -93,7 +93,8 @@ fun OtpSendVerifyScreen(
     var phoneNo by remember { mutableStateOf("") }
     var inValidOTP by remember { mutableStateOf(false) }
     var isVerifyOtpApi by remember { mutableStateOf(false) }
-    var invalidText by remember { mutableStateOf(R.string.txt_Enter_valid_OTP) }
+    var invalidOtp = stringResource(R.string.txt_Enter_valid_OTP)
+    var invalidText by remember { mutableStateOf(invalidOtp) }
     var isDialogVisible by remember { mutableStateOf(false) }
     var isFinished by remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -216,8 +217,8 @@ fun OtpSendVerifyScreen(
                         onNext()
                     }
                 } else {
-                    invalidText = R.string.txt_Enter_valid_OTP
                     inValidOTP = true
+                    invalidText = verifyOtpState.success!!.message.toString()
                 }
 
                 isDialogVisible = false
@@ -354,6 +355,7 @@ fun OtpSendVerifyScreen(
                                 .fillMaxWidth()
                                 .clickable {
                                     showBottomSheet = true
+                                    inValidOTP = false
                                 },
                             fontFamily = fontBold,
                             textAlign = TextAlign.Center,
@@ -400,11 +402,9 @@ fun OtpSendVerifyScreen(
                         onClick = {
                             if (otpValue.trim().length < 6) {
                                 inValidOTP = true
-                                invalidText = R.string.txt_Enter_valid_OTP
                             } else {
                                 if (!isInternetAvailable) {
-                                    inValidOTP = true
-                                    invalidText = R.string.txt_oops_no_internet
+                                    context.toast(internetMessage)
                                 } else {
                                     // call Api
                                     isVerifyOtpApi = true

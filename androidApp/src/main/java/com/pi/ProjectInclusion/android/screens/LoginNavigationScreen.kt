@@ -85,11 +85,11 @@ class LoginNavigationScreen : ComponentActivity() {
                             backStack.removeAt(backStack.lastIndex)
                         }
                     } else {
-                        // Instead of just adding, reset to that route
+                        // Instead of adding at the end, reset stack to that route
                         backStack.clear()
                         backStack.add(toRoute)
                     }
-                } else if (backStack.size > 1) {
+                } else if (backStack.isNotEmpty()) {
                     backStack.removeAt(backStack.lastIndex)
                 }
                 currentRoute = backStack.last()

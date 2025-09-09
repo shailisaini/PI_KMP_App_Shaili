@@ -171,6 +171,13 @@ class LoginViewModel(
     private val lastName = MutableStateFlow<String?>(null)
     val lastNameValue: String? get() = lastName.value
 
+    private val userId = MutableStateFlow<String?>(null)
+    val userIdValue: String? get() = userId.value
+
+    fun saveUserId(userIds: String) {
+        userId.value = userIds
+    }
+
     fun saveUserName(number: String) {
         userName.value = number
     }

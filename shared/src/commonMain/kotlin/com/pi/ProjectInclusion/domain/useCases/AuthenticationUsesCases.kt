@@ -104,7 +104,7 @@ class AuthenticationUsesCases(private val repository: AuthenticationRepository) 
             emit(Result.success(response))
         } catch (e: Exception) {
             val errorMessage = e.message ?: unableToConnectServer
-            LoggerProvider.logger.d("Exception in otpOnWhatsapp() $errorMessage")
+            logger.d("Exception in otpOnWhatsapp() $errorMessage")
             emit(Result.failure(Exception(errorMessage)))
         }
     }.flowOn(Dispatchers.IO)

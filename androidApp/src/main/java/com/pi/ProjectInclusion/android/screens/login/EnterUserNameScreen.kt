@@ -174,10 +174,12 @@ fun LoginUI(
                         if (apiResponse?.message == NEW_USER) {
                             if (userName.value.length == 10 && userName.value.all { char -> char.isDigit() }) {
                                 // if new User & has mobile no only then register
+                                isNewUserError = false
                                 showOtpBottomSheet = true
 
                             } else {
 //                                    show error message of only digits
+                                showOtpBottomSheet = false
                                 isNewUserError = true
                             }
                         } else if (apiResponse?.message == USER_EXIST) {
