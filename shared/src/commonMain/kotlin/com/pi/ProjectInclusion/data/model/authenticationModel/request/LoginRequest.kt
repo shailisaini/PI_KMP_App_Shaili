@@ -11,6 +11,12 @@ data class LoginRequest(
 )
 
 @Serializable
+data class OtpRequest(
+    val mobileNo: String? = null,
+)
+
+
+@Serializable
 data class LoginWithOtpRequest(
     val username: String? = null,
     val otp: String? = null,

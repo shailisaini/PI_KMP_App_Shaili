@@ -102,6 +102,7 @@ fun OtpSendVerifyScreen(
     var languageId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
     var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
     val loginSuccess = stringResource(id = R.string.txt_login_success)
+    var errorResponse = stringResource(R.string.key_error_response)
 
     var isInternetAvailable by remember { mutableStateOf(true) }
     val internetMessage = stringResource(R.string.txt_oops_no_internet)
@@ -183,7 +184,12 @@ fun OtpSendVerifyScreen(
             sendOtpState.success != null -> {
                 logger.d("ResendOtp: ${sendOtpState.success}")
                 if (sendOtpState.success!!.status != true) {
-                    context.toast(sendOtpState.success!!.response!!.message.toString())
+                    val errorMessage = sendOtpState.success?.message
+                        ?: sendOtpState.success?.error
+                        ?: sendOtpState.success?.exception
+                        ?: errorResponse
+
+                    context.toast(errorMessage)
                 }
                 isDialogVisible = false
             }
@@ -234,7 +240,8 @@ fun OtpSendVerifyScreen(
 
             loginWithOtp.success != null -> {
                 if (loginWithOtp.success!!.status == true) {
-// save token
+
+                    // save token
                     viewModel.savePrefData(
                         TOKEN_PREF_KEY,
                         "Bearer " + loginWithOtp.success!!.response?.accessToken.toString()

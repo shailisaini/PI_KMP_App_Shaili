@@ -524,6 +524,7 @@ and make a difference together!</string>
     <string name="app_upgradation">Upgradation in Progress</string>
     <string name="key_Retry">Retry</string>
     <string name="key_Confirm">Confirm</string>
+    <string name="key_error_response">Something went wrong</string>
 
 
 </resources>
