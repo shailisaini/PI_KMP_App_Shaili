@@ -2,6 +2,9 @@ package com.pi.ProjectInclusion.android.screens.dashboardScreen
 
 import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -44,8 +47,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.kmptemplate.logger.AppLoggerImpl
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Bg1_Gray
 import com.pi.ProjectInclusion.Bg_Gray
 import com.pi.ProjectInclusion.Bg_Gray1
@@ -91,14 +96,7 @@ fun DashboardScreen() {
 
     val selectedLanguage = remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
-    var hasCameraPermission by remember { mutableStateOf(false) }
-
     var showDialog by remember { mutableStateOf(false) }
-    val cameraPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        hasCameraPermission = isGranted
-    }
 
     var strToken = viewModel.getPrefData(TOKEN_PREF_KEY)
     val viewProfile by viewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
@@ -138,15 +136,7 @@ fun DashboardScreen() {
         }
     }
 
-    if (hasCameraPermission) {
-
-    } else {
-        try {
-            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-        } catch (exc: Exception) {
-            // Handle exception
-        }
-    }
+    PermissionScreen()
 
     Surface(
         modifier = Modifier
@@ -188,7 +178,7 @@ fun DashboardScreen() {
                         )
 
                         Text(
-                            text = if (profileData != null) {
+                            text = if (profileData?.firstname != null) {
                                 profileData?.firstname.toString()
                             } else {
                                 ""
@@ -623,4 +613,64 @@ fun ItemStudentAchievement(context: Context) {
 @Preview(showBackground = true, showSystemUi = true)
 fun DashboardScreenUI() {
     DashboardScreen()
+}
+
+@Composable
+fun PermissionScreen() {
+
+    val context = LocalContext.current
+    val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        listOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.READ_MEDIA_IMAGES
+        )
+    } else {
+        listOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
+    }
+
+    MultiplePermissionsRequest(
+        permissions = permissions,
+        onPermissionsGranted = {
+//            context.toast("All Permissions Granted ✅")
+            logger.d("All Permissions Granted ✅")
+        },
+        onPermissionsDenied = {
+            context.toast("Permissions Denied ❌")
+            logger.d("Permissions Denied ❌")
+        }
+    )
+}
+
+@Composable
+fun MultiplePermissionsRequest(
+    permissions: List<String>,
+    onPermissionsGranted: () -> Unit,
+    onPermissionsDenied: () -> Unit,
+) {
+    val context = LocalContext.current
+    // Launcher for multiple permissions
+    val multiplePermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissionsResult ->
+        val allGranted = permissionsResult.all { it.value }
+        if (allGranted) {
+            onPermissionsGranted()
+        } else {
+            onPermissionsDenied()
+        }
+    }
+
+    LaunchedEffect(Unit) {   // Check if already granted
+        val notGranted = permissions.filter {
+            ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
+        }
+        if (notGranted.isEmpty()) {
+            onPermissionsGranted()
+        } else {
+            multiplePermissionLauncher.launch(notGranted.toTypedArray())
+        }
+    }
 }

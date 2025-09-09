@@ -84,6 +84,7 @@ import com.pi.ProjectInclusion.android.common_UI.TextFieldWithLeftIcon
 import com.pi.ProjectInclusion.android.common_UI.TextViewField
 import com.pi.ProjectInclusion.android.common_UI.TextViewFieldEmail
 import com.pi.ProjectInclusion.android.common_UI.showDatePickerDialog
+import com.pi.ProjectInclusion.android.screens.dashboardScreen.PermissionScreen
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
@@ -111,11 +112,13 @@ import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun EditProfileScreen1(onNextTeacher: () -> Unit,  //EditProfileScreen2
-                       onBack: () -> Unit,
-                       onNextProfessional: () -> Unit,
-                       onNextSpecialEducator: () -> Unit,
-                       loginViewModel: LoginViewModel) {
+fun EditProfileScreen1(
+    onNextTeacher: () -> Unit,  //EditProfileScreen2
+    onBack: () -> Unit,
+    onNextProfessional: () -> Unit,
+    onNextSpecialEducator: () -> Unit,
+    loginViewModel: LoginViewModel,
+) {
     var isDialogVisible by remember { mutableStateOf(false) }
 //    val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -143,7 +146,8 @@ fun EditProfileScreen1(onNextTeacher: () -> Unit,  //EditProfileScreen2
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            EditProfileScreenUI(context, onBack = onBack,
+            EditProfileScreenUI(
+                context, onBack = onBack,
                 loginViewModel = loginViewModel,
                 onNextTeacher = onNextTeacher,
                 onNextProfessional = onNextProfessional,
@@ -205,7 +209,7 @@ fun EditProfileScreenUI(
     val mobNo = remember { mutableStateOf("") }
     val whatsappNo = remember { mutableStateOf("") }
     val profilePic = remember { mutableStateOf("") }
-    val noInternet = stringResource(id=R.string.txt_oops_no_internet)
+    val noInternet = stringResource(id = R.string.txt_oops_no_internet)
 
     val firstStepProfileState by loginViewModel.firstStepProfilePasswordResponse.collectAsStateWithLifecycle()
     LaunchedEffect(firstStepProfileState) {
@@ -220,14 +224,20 @@ fun EditProfileScreenUI(
             }
 
             firstStepProfileState.success != null -> {
-                logger.d("First step profile state response : ${loginViewModel.getPrefData(USER_TYPE_ID)}")
+                logger.d(
+                    "First step profile state response : ${
+                        loginViewModel.getPrefData(
+                            USER_TYPE_ID
+                        )
+                    }"
+                )
                 if (firstStepProfileState.success!!.status == true) {
                     context.toast(firstStepProfileState.success!!.message.toString())
                     if (loginViewModel.getPrefData(USER_TYPE_ID) == "7") {
                         onNextSpecialEducator()
                     } else if (loginViewModel.getPrefData(USER_TYPE_ID) == "8") {
                         onNextProfessional()
-                    } else{
+                    } else {
                         onNextTeacher()
                     }
                 }
@@ -237,7 +247,7 @@ fun EditProfileScreenUI(
     }
 
     LaunchedEffect(Unit) {
-        loginViewModel.getUserProfileViewModel(strToken,encryptedUserName)
+        loginViewModel.getUserProfileViewModel(strToken, encryptedUserName)
     }
 
     val viewProfile by loginViewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
@@ -254,7 +264,7 @@ fun EditProfileScreenUI(
 
             viewProfile.success != null -> {
                 logger.d("ResendOtp: ${viewProfile.success}")
-                if (viewProfile.success!!.status == true){
+                if (viewProfile.success!!.status == true) {
                     viewProfile.success?.response?.let { response ->
 //                        firstName.value = response.username ?: "" // it will use later
 //                        lastName.value = response.username ?: ""
@@ -268,25 +278,24 @@ fun EditProfileScreenUI(
                         date = response.dob ?: ""
 
                         val parsedDate = OffsetDateTime.parse(date)
-                        val formattedDate = parsedDate.toLocalDate().format(DateTimeFormatter.ISO_LOCAL_DATE) // "2021-09-04"
+                        val formattedDate = parsedDate.toLocalDate()
+                            .format(DateTimeFormatter.ISO_LOCAL_DATE) // "2021-09-04"
 
                         // Assign this to your state
                         date = formattedDate
 
                         profilePic.value = PROFILE_BASE_URL + response.profilepic
-                        selectedUri.value =  Uri.parse(profilePic.value)
+                        selectedUri.value = Uri.parse(profilePic.value)
 
-                        if (response.gender.equals("M")){
+                        if (response.gender.equals("M")) {
                             selectedGender.value = KEY_MALE
-                        } else if (response.gender.equals("F")){
+                        } else if (response.gender.equals("F")) {
                             selectedGender.value = KEY_FEMALE
-                        }
-                        else{
+                        } else {
 
                         }
                     }
-                }
-                else{
+                } else {
                     context.toast(viewProfile.success!!.message.toString())
                 }
                 isDialogVisible = false
@@ -294,16 +303,17 @@ fun EditProfileScreenUI(
         }
     }
 
-    CameraPermission(hasAllPermissions, context)
+//    CameraPermission(hasAllPermissions, context)
+    PermissionScreen()
 
     if (isAddImageClicked) {
-            CameraGalleryDialog(selectedUri) {
-                isAddImageClicked = false
-            }
+        CameraGalleryDialog(selectedUri) {
+            isAddImageClicked = false
+        }
     }
 
-        if (selectedUri.value != null) {
-            LaunchedEffect(Unit) {
+    if (selectedUri.value != null) {
+        LaunchedEffect(Unit) {
             try {
                 val imagePath = selectedUri.value!!.path
                 bitmap = BitmapFactory.decodeFile(imagePath)
@@ -322,495 +332,495 @@ fun EditProfileScreenUI(
         }
     }
 
-        DetailsNoImgBackgroundUi(
-            backgroundColor = White,
-            textColor = Black,
-            pageTitle = stringResource(R.string.edit_profile),
+    DetailsNoImgBackgroundUi(
+        backgroundColor = White,
+        textColor = Black,
+        pageTitle = stringResource(R.string.edit_profile),
 //        moreInfoIcon = painterResource(id = R.drawable.vertical_dot),
-            isShowBackButton = true,
-            isShowMoreInfo = false,
-            onBackButtonClick = {
-                onBack()
-            },
-            onMoreInfoClick = {
+        isShowBackButton = true,
+        isShowMoreInfo = false,
+        onBackButtonClick = {
+            onBack()
+        },
+        onMoreInfoClick = {
 //            showSheetMenu = true
-            },
-            content = {
-                Box(
+        },
+        content = {
+            Box(
+                modifier = Modifier
+                    .wrapContentSize(Alignment.Center)
+                    .background(
+                        color = if (isSystemInDarkTheme()) {
+                            Dark_01
+                        } else {
+                            Transparent
+                        }
+                    )
+            ) {
+                Column(
                     modifier = Modifier
-                        .wrapContentSize(Alignment.Center)
-                        .background(
-                            color = if (isSystemInDarkTheme()) {
-                                Dark_01
-                            } else {
-                                Transparent
-                            }
-                        )
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Column(
                         modifier = Modifier
-                            .fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .verticalScroll(scrollState)
+                            .background(color = Bg_Gray1)
+                            .padding(15.dp)
+                    ) {
+                        Text(
+                            stringResource(R.string.txt_step_1),
+                            textAlign = TextAlign.Center,
+                            fontSize = 13.sp,
+                            fontFamily = fontMedium,
+                            color = OrangeSubTitle,
+                            modifier = Modifier
+                                .padding(start = 10.dp)
+                        )
+                        Text(
+                            stringResource(R.string.txt_basic_information),
+                            textAlign = TextAlign.Center,
+                            fontSize = 24.sp,
+                            fontFamily = fontMedium,
+                            color = Black,
+                            modifier = Modifier
+                                .padding(start = 10.dp)
+                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight()
+                                .padding(top = 15.dp, bottom = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                modifier = Modifier.size(90.dp),
+                                painter = when {
+                                    selectedUri.value != null -> {
+                                        // Case 1: Camera/gallery selection
+                                        rememberAsyncImagePainter(
+                                            ImageRequest.Builder(context)
+                                                .data(selectedUri.value)
+                                                .placeholder(R.drawable.profile_user_icon)
+                                                .error(R.drawable.profile_user_icon)
+                                                .crossfade(true)
+                                                .build()
+                                        )
+                                    }
+
+                                    else -> {
+                                        // Case 3: Default fallback
+                                        painterResource(id = R.drawable.profile_user_icon)
+                                    }
+                                },
+                                contentDescription = IMG_DESCRIPTION
+                            )
+                            Column(
+                                modifier = Modifier
+                                    .wrapContentSize()
+                                    .wrapContentHeight()
+                                    .padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
+                                verticalArrangement = Arrangement.spacedBy(5.dp),
+                            ) {
+                                Text(
+                                    text = textUpload,
+                                    fontSize = 12.sp,
+                                    fontFamily = fontRegular,
+                                    color = Black,
+                                    modifier = Modifier
+                                        .padding(start = 10.dp, bottom = 5.dp)
+                                )
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .wrapContentHeight(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Button(
+                                        onClick = { isAddImageClicked = true },
+                                        modifier = Modifier
+                                            .wrapContentSize()
+                                            .clip(RoundedCornerShape(4.dp)),
+                                        shape = RoundedCornerShape(4.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = White,
+                                            contentColor = PrimaryBlue
+                                        ),
+                                        border = BorderStroke(1.dp, color = PrimaryBlue)
+                                    ) {
+                                        Text(
+                                            if (selectedUri.value != null) {
+                                                stringResource(R.string.txt_change_photo)
+                                            } else {
+                                                stringResource(R.string.txt_add_photo)
+                                            },
+                                            modifier = Modifier
+                                                .wrapContentSize()
+                                                .clickable {
+                                                    isAddImageClicked = true
+                                                }
+                                                .padding(bottom = 2.dp, top = 2.dp),
+                                            fontSize = 12.sp,
+                                            fontFamily = fontMedium,
+                                            color = PrimaryBlue,
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                    if (selectedUri.value != null) {
+                                        Image(
+                                            modifier = Modifier
+                                                .size(35.dp)
+                                                .clickable {
+                                                    selectedUri.value = null
+                                                }
+                                                .padding(start = 10.dp),
+                                            painter = painterResource(id = R.drawable.ic_delete_red),
+                                            contentDescription = IMG_DESCRIPTION
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Text(
+                            tvMobNo,
+                            modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),
+                            fontFamily = fontMedium,
+                            fontSize = 14.sp,
+                            color = if (isSystemInDarkTheme()) {
+                                DARK_DEFAULT_BUTTON_TEXT
+                            } else {
+                                Gray
+                            }
+                        )
+
+                        MobileTextField(
+                            isIcon = true,
+                            icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
+                            colors = colors,
+                            number = mobNo,
+                            enable = mobNo.value.length < 10,
+                            hint = enterMobile.toString()
+                        )
+
+                        // first Name
+                        Text(
+                            text = buildAnnotatedString {
+                                append(stringResource(R.string.txt_first_name))
+                                pushStyle(SpanStyle(color = Color.Red))
+                                append(ASTRICK)
+                                pop()
+                            },
+                            modifier = Modifier.padding(
+                                top = 24.dp,
+                                bottom = 10.dp,
+                                start = 8.dp, end = 8.dp
+                            ),
+                            textAlign = TextAlign.Start,
+                            fontFamily = fontMedium,
+                            fontSize = 14.sp,
+                            color = if (isSystemInDarkTheme()) {
+                                DARK_BODY_TEXT
+                            } else {
+                                Bg_Gray
+                            }
+                        )
+                        TextViewField(
+                            isIcon = false,
+                            icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
+                            colors = colors,
+                            text = firstName,
+                            trueFalse = firstName.value.isEmpty(),
+                            hint = textNameEg.toString()
+                        )
+
+                        // Last Name
+                        Text(
+                            text = buildAnnotatedString {
+                                append(stringResource(R.string.txt_last_name))
+                                pushStyle(SpanStyle(color = Color.Red))
+                                append(ASTRICK)
+                                pop()
+                            },
+                            modifier = Modifier.padding(
+                                top = 24.dp,
+                                bottom = 10.dp,
+                                start = 8.dp, end = 8.dp
+                            ),
+                            textAlign = TextAlign.Start,
+                            fontFamily = fontMedium,
+                            fontSize = 14.sp,
+                            color = if (isSystemInDarkTheme()) {
+                                DARK_BODY_TEXT
+                            } else {
+                                Bg_Gray
+                            }
+                        )
+                        TextViewField(
+                            isIcon = false,
+                            icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
+                            colors = colors,
+                            text = lastName,
+                            trueFalse = true,
+                            hint = textLastNameEg.toString()
+                        )
+
+                        // Date of birth
+                        Text(
+                            text = buildAnnotatedString {
+                                append(stringResource(R.string.txt_date_of_birth))
+                                pushStyle(SpanStyle(color = Color.Red))
+                                append(ASTRICK)
+                                pop()
+                            },
+                            modifier = Modifier.padding(
+                                top = 24.dp,
+                                bottom = 10.dp,
+                                start = 8.dp, end = 8.dp
+                            ),
+                            textAlign = TextAlign.Start,
+                            fontFamily = fontMedium,
+                            fontSize = 14.sp,
+                            color = if (isSystemInDarkTheme()) {
+                                DARK_BODY_TEXT
+                            } else {
+                                Bg_Gray
+                            }
+                        )
+                        TextFieldWithLeftIcon(
+                            text = if (date.isNotEmpty()) {
+                                date
+                            } else {
+                                ""
+                            },
+                            modifier = Modifier.clickable {
+                                showDatePickerDialog(context) { year, month, dayOfMonth ->
+                                    val localDate = LocalDate.of(year, month, dayOfMonth)
+                                    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                                    date = localDate.format(formatter)
+                                }
+                            },
+                            value = remember { mutableStateOf(date) },
+                            placeholder = if (date.isEmpty())
+                                stringResource(R.string.select_date_of_birth)
+                            else date
+                        )
+
+                        Text(
+                            text = buildAnnotatedString {
+                                append(stringResource(R.string.student_gender))
+                                pushStyle(SpanStyle(color = Color.Red))
+                                append(ASTRICK)
+                                pop()
+                            },
+                            modifier = Modifier.padding(
+                                top = 24.dp,
+                                bottom = 10.dp,
+                                start = 8.dp, end = 8.dp
+                            ),
+                            textAlign = TextAlign.Start,
+                            fontFamily = fontMedium,
+                            fontSize = 14.sp,
+                            color = if (isSystemInDarkTheme()) {
+                                DARK_BODY_TEXT
+                            } else {
+                                Bg_Gray
+                            }
+                        )
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            genderOptions.forEach { gender ->
+                                GenderOption(
+                                    gender = gender,
+                                    isSelected = selectedGender.value == gender,
+                                    onSelected = { selectedGender.value = gender }
+                                )
+                            }
+                        }
+
+                        // whatsapp
+                        Text(
+                            text = buildAnnotatedString {
+                                append(stringResource(R.string.txt_whatsapp))
+                                pushStyle(SpanStyle(color = Color.Red))
+                                append(ASTRICK)
+                                pop()
+                            },
+                            modifier = Modifier.padding(
+                                top = 24.dp,
+                                bottom = 10.dp,
+                                start = 8.dp, end = 8.dp
+                            ),
+                            textAlign = TextAlign.Start,
+                            fontFamily = fontMedium,
+                            fontSize = 14.sp,
+                            color = if (isSystemInDarkTheme()) {
+                                DARK_BODY_TEXT
+                            } else {
+                                Bg_Gray
+                            }
+                        )
+                        MobileTextField(
+                            isIcon = true,
+                            icon = ImageVector.vectorResource(id = R.drawable.ic_whatsapp_blue),
+                            colors = colors,
+                            number = whatsappNo,
+                            enable = whatsappNo.value.length < 10,
+                            hint = textWhatsappEg.toString()
+                        )
+
+                        // Email
+                        Text(
+                            text = buildAnnotatedString {
+                                append(stringResource(R.string.txt_email))
+                                pushStyle(SpanStyle(color = Color.Red))
+                                append(ASTRICK)
+                                pop()
+                            },
+                            modifier = Modifier.padding(
+                                top = 24.dp,
+                                bottom = 10.dp,
+                                start = 8.dp, end = 8.dp
+                            ),
+                            textAlign = TextAlign.Start,
+                            fontFamily = fontMedium,
+                            fontSize = 14.sp,
+                            color = if (isSystemInDarkTheme()) {
+                                DARK_BODY_TEXT
+                            } else {
+                                Bg_Gray
+                            }
+                        )
+                        TextViewFieldEmail(
+                            isIcon = true,
+                            icon = ImageVector.vectorResource(id = R.drawable.baseline_email_24),
+                            colors = colors,
+                            text = email,
+                            trueFalse = true,
+                            hint = textEmailEg.toString()
+                        )
+
+                        if (inValidMobNo) {
+                            Text(
+                                invalidMobNo.toString(),
+                                color = LightRed01,
+                                modifier = Modifier.padding(5.dp),
+                                fontSize = 10.sp
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(15.dp))
+                    }
+                    Box(
+                        modifier = Modifier
+                            .padding(20.dp)
+                            .wrapContentSize(Alignment.Center)
+                            .background(
+                                color = if (isSystemInDarkTheme()) {
+                                    Dark_01
+                                } else {
+                                    Transparent
+                                }
+                            )
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .weight(1f)
-                                .verticalScroll(scrollState)
-                                .background(color = Bg_Gray1)
-                                .padding(15.dp)
+                                .background(color = White)
+                                .wrapContentHeight(),
+                            horizontalAlignment = Alignment.End
                         ) {
-                            Text(
-                                stringResource(R.string.txt_step_1),
-                                textAlign = TextAlign.Center,
-                                fontSize = 13.sp,
-                                fontFamily = fontMedium,
-                                color = OrangeSubTitle,
-                                modifier = Modifier
-                                    .padding(start = 10.dp)
-                            )
-                            Text(
-                                stringResource(R.string.txt_basic_information),
-                                textAlign = TextAlign.Center,
-                                fontSize = 24.sp,
-                                fontFamily = fontMedium,
-                                color = Black,
-                                modifier = Modifier
-                                    .padding(start = 10.dp)
-                            )
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .wrapContentHeight()
-                                    .padding(top = 15.dp, bottom = 10.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Image(
-                                    modifier = Modifier.size(90.dp),
-                                    painter = when {
-                                        selectedUri.value != null -> {
-                                            // Case 1: Camera/gallery selection
-                                            rememberAsyncImagePainter(
-                                                ImageRequest.Builder(context)
-                                                    .data(selectedUri.value)
-                                                    .placeholder(R.drawable.profile_user_icon)
-                                                    .error(R.drawable.profile_user_icon)
-                                                    .crossfade(true)
-                                                    .build()
-                                            )
-                                        }
+                            /*val apiMobile = encryptedPhoneNo(mobNo.value.toString())
+                            val apiEmail = encryptedEmail(email.value.toString())*/
 
-                                        else -> {
-                                            // Case 3: Default fallback
-                                            painterResource(id = R.drawable.profile_user_icon)
-                                        }
-                                    },
-                                    contentDescription = IMG_DESCRIPTION
-                                )
-                                Column(
-                                    modifier = Modifier
-                                        .wrapContentSize()
-                                        .wrapContentHeight()
-                                        .padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
-                                    verticalArrangement = Arrangement.spacedBy(5.dp),
-                                ) {
-                                    Text(
-                                        text = textUpload,
-                                        fontSize = 12.sp,
-                                        fontFamily = fontRegular,
-                                        color = Black,
-                                        modifier = Modifier
-                                            .padding(start = 10.dp, bottom = 5.dp)
-                                    )
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .wrapContentHeight(),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Button(
-                                            onClick = { isAddImageClicked = true },
-                                            modifier = Modifier
-                                                .wrapContentSize()
-                                                .clip(RoundedCornerShape(4.dp)),
-                                            shape = RoundedCornerShape(4.dp),
-                                            colors = ButtonDefaults.buttonColors(
-                                                containerColor = White,
-                                                contentColor = PrimaryBlue
-                                            ),
-                                            border = BorderStroke(1.dp, color = PrimaryBlue)
-                                        ) {
-                                            Text(
-                                                if (selectedUri.value != null) {
-                                                    stringResource(R.string.txt_change_photo)
-                                                } else {
-                                                    stringResource(R.string.txt_add_photo)
-                                                },
-                                                modifier = Modifier
-                                                    .wrapContentSize()
-                                                    .clickable {
-                                                        isAddImageClicked = true
-                                                    }
-                                                    .padding(bottom = 2.dp, top = 2.dp),
-                                                fontSize = 12.sp,
-                                                fontFamily = fontMedium,
-                                                color = PrimaryBlue,
-                                                textAlign = TextAlign.Center
-                                            )
-                                        }
-                                        if (selectedUri.value != null) {
-                                            Image(
-                                                modifier = Modifier
-                                                    .size(35.dp)
-                                                    .clickable {
-                                                        selectedUri.value = null
-                                                    }
-                                                    .padding(start = 10.dp),
-                                                painter = painterResource(id = R.drawable.ic_delete_red),
-                                                contentDescription = IMG_DESCRIPTION
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                            Spacer(modifier = Modifier.height(10.dp))
-
-                            Text(
-                                tvMobNo,
-                                modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),
-                                fontFamily = fontMedium,
-                                fontSize = 14.sp,
-                                color = if (isSystemInDarkTheme()) {
-                                    DARK_DEFAULT_BUTTON_TEXT
-                                } else {
-                                    Gray
-                                }
-                            )
-
-                            MobileTextField(
-                                isIcon = true,
-                                icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
-                                colors = colors,
-                                number = mobNo,
-                                enable = mobNo.value.length < 10 ,
-                                hint = enterMobile.toString()
-                            )
-
-                            // first Name
-                            Text(
-                                text = buildAnnotatedString {
-                                    append(stringResource(R.string.txt_first_name))
-                                    pushStyle(SpanStyle(color = Color.Red))
-                                    append(ASTRICK)
-                                    pop()
-                                },
-                                modifier = Modifier.padding(
-                                    top = 24.dp,
-                                    bottom = 10.dp,
-                                    start = 8.dp, end = 8.dp
-                                ),
-                                textAlign = TextAlign.Start,
-                                fontFamily = fontMedium,
-                                fontSize = 14.sp,
-                                color = if (isSystemInDarkTheme()) {
-                                    DARK_BODY_TEXT
-                                } else {
-                                    Bg_Gray
-                                }
-                            )
-                            TextViewField(
-                                isIcon = false,
-                                icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
-                                colors = colors,
-                                text = firstName,
-                                trueFalse = firstName.value.isEmpty(),
-                                hint = textNameEg.toString()
-                            )
-
-                            // Last Name
-                            Text(
-                                text = buildAnnotatedString {
-                                    append(stringResource(R.string.txt_last_name))
-                                    pushStyle(SpanStyle(color = Color.Red))
-                                    append(ASTRICK)
-                                    pop()
-                                },
-                                modifier = Modifier.padding(
-                                    top = 24.dp,
-                                    bottom = 10.dp,
-                                    start = 8.dp, end = 8.dp
-                                ),
-                                textAlign = TextAlign.Start,
-                                fontFamily = fontMedium,
-                                fontSize = 14.sp,
-                                color = if (isSystemInDarkTheme()) {
-                                    DARK_BODY_TEXT
-                                } else {
-                                    Bg_Gray
-                                }
-                            )
-                            TextViewField(
-                                isIcon = false,
-                                icon = ImageVector.vectorResource(id = R.drawable.call_on_otp),
-                                colors = colors,
-                                text = lastName,
-                                trueFalse = true,
-                                hint = textLastNameEg.toString()
-                            )
-
-                            // Date of birth
-                            Text(
-                                text = buildAnnotatedString {
-                                    append(stringResource(R.string.txt_date_of_birth))
-                                    pushStyle(SpanStyle(color = Color.Red))
-                                    append(ASTRICK)
-                                    pop()
-                                },
-                                modifier = Modifier.padding(
-                                    top = 24.dp,
-                                    bottom = 10.dp,
-                                    start = 8.dp, end = 8.dp
-                                ),
-                                textAlign = TextAlign.Start,
-                                fontFamily = fontMedium,
-                                fontSize = 14.sp,
-                                color = if (isSystemInDarkTheme()) {
-                                    DARK_BODY_TEXT
-                                } else {
-                                    Bg_Gray
-                                }
-                            )
-                            TextFieldWithLeftIcon(
-                                text = if (date.isNotEmpty()) {
-                                    date
-                                } else {
-                                    ""
-                                },
-                                modifier = Modifier.clickable {
-                                    showDatePickerDialog(context) { year, month, dayOfMonth ->
-                                        val localDate = LocalDate.of(year, month, dayOfMonth)
-                                        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                                        date = localDate.format(formatter)
-                                    }
-                                },
-                                value = remember { mutableStateOf(date) },
-                                placeholder = if (date.isEmpty())
-                                    stringResource(R.string.select_date_of_birth)
-                                else date
-                            )
-
-                            Text(
-                                text = buildAnnotatedString {
-                                    append(stringResource(R.string.student_gender))
-                                    pushStyle(SpanStyle(color = Color.Red))
-                                    append(ASTRICK)
-                                    pop()
-                                },
-                                modifier = Modifier.padding(
-                                    top = 24.dp,
-                                    bottom = 10.dp,
-                                    start = 8.dp, end = 8.dp
-                                ),
-                                textAlign = TextAlign.Start,
-                                fontFamily = fontMedium,
-                                fontSize = 14.sp,
-                                color = if (isSystemInDarkTheme()) {
-                                    DARK_BODY_TEXT
-                                } else {
-                                    Bg_Gray
-                                }
-                            )
-                            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                                genderOptions.forEach { gender ->
-                                    GenderOption(
-                                        gender = gender,
-                                        isSelected = selectedGender.value == gender,
-                                        onSelected = { selectedGender.value = gender }
-                                    )
-                                }
-                            }
-
-                            // whatsapp
-                            Text(
-                                text = buildAnnotatedString {
-                                    append(stringResource(R.string.txt_whatsapp))
-                                    pushStyle(SpanStyle(color = Color.Red))
-                                    append(ASTRICK)
-                                    pop()
-                                },
-                                modifier = Modifier.padding(
-                                    top = 24.dp,
-                                    bottom = 10.dp,
-                                    start = 8.dp, end = 8.dp
-                                ),
-                                textAlign = TextAlign.Start,
-                                fontFamily = fontMedium,
-                                fontSize = 14.sp,
-                                color = if (isSystemInDarkTheme()) {
-                                    DARK_BODY_TEXT
-                                } else {
-                                    Bg_Gray
-                                }
-                            )
-                            MobileTextField(
-                                isIcon = true,
-                                icon = ImageVector.vectorResource(id = R.drawable.ic_whatsapp_blue),
-                                colors = colors,
-                                number = whatsappNo,
-                                enable = whatsappNo.value.length <10,
-                                hint = textWhatsappEg.toString()
-                            )
-
-                            // Email
-                            Text(
-                                text = buildAnnotatedString {
-                                    append(stringResource(R.string.txt_email))
-                                    pushStyle(SpanStyle(color = Color.Red))
-                                    append(ASTRICK)
-                                    pop()
-                                },
-                                modifier = Modifier.padding(
-                                    top = 24.dp,
-                                    bottom = 10.dp,
-                                    start = 8.dp, end = 8.dp
-                                ),
-                                textAlign = TextAlign.Start,
-                                fontFamily = fontMedium,
-                                fontSize = 14.sp,
-                                color = if (isSystemInDarkTheme()) {
-                                    DARK_BODY_TEXT
-                                } else {
-                                    Bg_Gray
-                                }
-                            )
-                            TextViewFieldEmail(
-                                isIcon = true,
-                                icon = ImageVector.vectorResource(id = R.drawable.baseline_email_24),
-                                colors = colors,
-                                text = email,
-                                trueFalse = true,
-                                hint = textEmailEg.toString()
-                            )
-
-                            if (inValidMobNo) {
-                                Text(
-                                    invalidMobNo.toString(),
-                                    color = LightRed01,
-                                    modifier = Modifier.padding(5.dp),
-                                    fontSize = 10.sp
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.height(15.dp))
-                        }
-                        Box(
-                            modifier = Modifier
-                                .padding(20.dp)
-                                .wrapContentSize(Alignment.Center)
-                                .background(
-                                    color = if (isSystemInDarkTheme()) {
-                                        Dark_01
+                            SmallBtnUi(
+                                enabled = mobNo.value.length >= 10,
+                                title = txtContinue,
+                                onClick = {
+                                    if (mobNo.value.isEmpty()) {
+                                        inValidMobNo = true
+                                    } else if (firstName.value.toString().isEmpty()) {
+                                        context.toast("Enter first name")
+                                    } else if (lastName.value.toString().isEmpty()) {
+                                        context.toast("Enter last name")
+                                    } else if (date.toString().isEmpty()) {
+                                        context.toast("Enter your date of birth")
+                                    } else if (selectedGender.value.toString().isEmpty()) {
+                                        context.toast("Select your gender")
+                                    } else if (whatsappNo.value.toString().isEmpty()) {
+                                        context.toast("Enter your whatsApp number")
+                                    } else if (email.value.toString().isEmpty()) {
+                                        context.toast("Enter your email")
                                     } else {
-                                        Transparent
-                                    }
-                                )
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(color = White)
-                                    .wrapContentHeight(),
-                                horizontalAlignment = Alignment.End
-                            ) {
-                                /*val apiMobile = encryptedPhoneNo(mobNo.value.toString())
-                                val apiEmail = encryptedEmail(email.value.toString())*/
-
-                                SmallBtnUi(
-                                    enabled = mobNo.value.length >= 10,
-                                    title = txtContinue,
-                                    onClick = {
-                                        if (mobNo.value.isEmpty()) {
+                                        if (showError || mobNo.value.length < 10) {
                                             inValidMobNo = true
-                                        } else if (firstName.value.toString().isEmpty()) {
-                                            context.toast("Enter first name")
-                                        } else if (lastName.value.toString().isEmpty()) {
-                                            context.toast("Enter last name")
-                                        } else if (date.toString().isEmpty()) {
-                                            context.toast("Enter your date of birth")
-                                        } else if (selectedGender.value.toString().isEmpty()) {
-                                            context.toast("Select your gender")
-                                        } else if (whatsappNo.value.toString().isEmpty()) {
-                                            context.toast("Enter your whatsApp number")
-                                        } else if (email.value.toString().isEmpty()) {
-                                            context.toast("Enter your email")
-                                        } else {
-                                            if (showError || mobNo.value.length < 10) {
+                                        } else { // if first digit of mobile is less than 6 then error will show
+                                            showError = mobNo.value.isEmpty()
+                                            val firstDigitChar = mobNo.value.toString().first()
+                                            val firstDigit = firstDigitChar.digitToInt()
+                                            if (firstDigit < 6) {
                                                 inValidMobNo = true
-                                            } else { // if first digit of mobile is less than 6 then error will show
-                                                showError = mobNo.value.isEmpty()
-                                                val firstDigitChar = mobNo.value.toString().first()
-                                                val firstDigit = firstDigitChar.digitToInt()
-                                                if (firstDigit < 6) {
-                                                    inValidMobNo = true
+                                            } else {
+                                                if (selectedGender.value == "Female") {
+                                                    selectedGender.value = "F"
+                                                } else if (selectedGender.value == "Male") {
+                                                    selectedGender.value = "M"
                                                 } else {
-                                                    if (selectedGender.value == "Female"){
-                                                        selectedGender.value = "F"
-                                                    }else if (selectedGender.value == "Male"){
-                                                        selectedGender.value = "M"
-                                                    }else{
-                                                        "O"
-                                                    }
-                                                    isDialogVisible = true
-                                                    val firstStepProfileRequest =
-                                                        FirstStepProfileRequest(
-                                                            firstName.value.toString(),
-                                                            "",
-                                                            lastName.value.toString(),
-                                                            selectedGender.value.toString(),
-                                                            mobNo.value.encryptAES().toString().trim(),
-                                                            whatsappNo.value.encryptAES().toString().trim(),
-                                                            date.toString(),
-                                                            email.value.encryptAES().toString().trim()
-                                                        )
-
-                                                    logger.d(
-                                                        "EditProfile: " + "1.. " + firstStepProfileRequest + " .. "
-                                                                + strToken + " .. " + mobNo.value.toString() + " .. " + fileName + " .. "
+                                                    "O"
+                                                }
+                                                isDialogVisible = true
+                                                val firstStepProfileRequest =
+                                                    FirstStepProfileRequest(
+                                                        firstName.value.toString(),
+                                                        "",
+                                                        lastName.value.toString(),
+                                                        selectedGender.value.toString(),
+                                                        mobNo.value.encryptAES().toString().trim(),
+                                                        whatsappNo.value.encryptAES().toString()
+                                                            .trim(),
+                                                        date.toString(),
+                                                        email.value.encryptAES().toString().trim()
                                                     )
-                                                    // check Internet
-                                                    isInternetAvailable = isNetworkAvailable(context)
-                                                    if (!isInternetAvailable) {
-                                                        context.toast(noInternet)
-                                                    } else {
-                                                        // call Api
-                                                        isDialogVisible = true
-                                                        // if image is not empty
-                                                        if (selectedUri.value != null) {
 
-                                                            loginViewModel.createFirstStepProfileRepo(
-                                                                firstStepProfileRequest,
-                                                                strToken,
-                                                                byteArray,
-                                                                fileName
-                                                            )
-                                                        }
-                                                        else{
-                                                            loginViewModel.createFirstStepProfileRepo(
-                                                                firstStepProfileRequest,
-                                                                strToken
-                                                            )
-                                                        }
+                                                logger.d(
+                                                    "EditProfile: " + "1.. " + firstStepProfileRequest + " .. "
+                                                            + strToken + " .. " + mobNo.value.toString() + " .. " + fileName + " .. "
+                                                )
+                                                // check Internet
+                                                isInternetAvailable = isNetworkAvailable(context)
+                                                if (!isInternetAvailable) {
+                                                    context.toast(noInternet)
+                                                } else {
+                                                    // call Api
+                                                    isDialogVisible = true
+                                                    // if image is not empty
+                                                    if (selectedUri.value != null) {
+
+                                                        loginViewModel.createFirstStepProfileRepo(
+                                                            firstStepProfileRequest,
+                                                            strToken,
+                                                            byteArray,
+                                                            fileName
+                                                        )
+                                                    } else {
+                                                        loginViewModel.createFirstStepProfileRepo(
+                                                            firstStepProfileRequest,
+                                                            strToken
+                                                        )
                                                     }
                                                 }
                                             }
                                         }
-                                    },
-                                )
-                            }
+                                    }
+                                },
+                            )
                         }
                     }
                 }
-            })
+            }
+        })
 }
 
 @Composable
