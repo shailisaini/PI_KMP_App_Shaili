@@ -59,4 +59,5 @@ object ConstantVariables {
     var UnableToSendMsg: String = "Unable to send Otp"
     var PLAY_STORE_LINK: String = "https://play.google.com/store/apps/details?id="
     var MARKET_ID: String = "market://details?id="
+    var DASHBOARD_SCREEN: String = "DashboardScreen"
 }
