@@ -115,7 +115,6 @@ fun LoginUI(
     var noData = stringResource(R.string.txt_oops_no_data_found)
     var isInternetAvailable by remember { mutableStateOf(true) }
     val internetMessage = stringResource(R.string.txt_oops_no_internet)
-    var noDataMessage by remember { mutableStateOf(noData) }
     val invalidMobNo = stringResource(id = R.string.txt_enter_valid_mob_user)
 
     val txtContinue = stringResource(id = R.string.text_continue)

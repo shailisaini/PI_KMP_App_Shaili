@@ -80,8 +80,14 @@ class LoginNavigationScreen : ComponentActivity() {
             fun navigateBack(toRoute: String? = null) {
                 isForward = false
                 if (toRoute != null) {
-                    while (backStack.isNotEmpty() && backStack.last() != toRoute) {
-                        backStack.removeAt(backStack.lastIndex)
+                    if (backStack.contains(toRoute)) {
+                        while (backStack.isNotEmpty() && backStack.last() != toRoute) {
+                            backStack.removeAt(backStack.lastIndex)
+                        }
+                    } else {
+                        // Instead of just adding, reset to that route
+                        backStack.clear()
+                        backStack.add(toRoute)
                     }
                 } else if (backStack.size > 1) {
                     backStack.removeAt(backStack.lastIndex)
@@ -154,8 +160,8 @@ class LoginNavigationScreen : ComponentActivity() {
                         AppRoute.OtpSendVerifyUI.route -> OtpSendVerifyScreen(
                             onNext = { navigateTo(AppRoute.SetNewPasswordUI.route) },
                             onNextCreatePass = { navigateTo(AppRoute.CreatePasswordScreen.route) },
-                            onBackUserName = { navigateBack() },
-                            onBackPassword = { navigateBack() },
+                            onBackUserName = { navigateBack(AppRoute.UserNameScreen.route) },
+                            onBackPassword = { navigateBack(AppRoute.UserPasswordScreen.route) },
                             onBack = { navigateBack(AppRoute.ForgetPasswordUI.route) },
                             viewModel = viewModel
                         )

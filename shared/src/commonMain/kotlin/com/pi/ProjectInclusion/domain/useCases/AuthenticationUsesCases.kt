@@ -143,7 +143,7 @@ class AuthenticationUsesCases(private val repository: AuthenticationRepository) 
             emit(Result.success(response))
         } catch (e: Exception) {
             val errorMessage = e.message ?: unableToConnectServer
-            LoggerProvider.logger.d("Exception in getVerifyOtp() $errorMessage")
+            logger.d("Exception in getVerifyOtp() $errorMessage")
             emit(Result.failure(Exception(errorMessage)))
         }
     }.flowOn(Dispatchers.IO)

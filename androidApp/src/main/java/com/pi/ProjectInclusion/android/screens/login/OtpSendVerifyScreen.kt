@@ -130,7 +130,7 @@ fun OtpSendVerifyScreen(
     }
 
     BackHandler {
-        handleBack(viewModel, onBack, onBackUserName)
+        handleBack(viewModel, onBack, onBackUserName,onBackPassword)
     }
 
     CustomDialog(
@@ -138,7 +138,7 @@ fun OtpSendVerifyScreen(
         onDismiss = { isDialogVisible = false },
         message = stringResource(R.string.txt_loading)
     )
-    logger.d("OtpSendVerify: $languageId .. $userTypeId .. $encryptedPhoneNo")
+//    logger.d("OtpSendVerify: $languageId .. $userTypeId .. $encryptedPhoneNo")
 
     // api for otp on call
     if (sendOtpViaCall) {
@@ -209,7 +209,6 @@ fun OtpSendVerifyScreen(
             }
 
             verifyOtpState.success != null -> {
-                logger.d("VerifyOtp: ${verifyOtpState.success!!.response!!.message}")
                 if (verifyOtpState.success!!.status == true) {
                     if (viewModel.getPrefData(IS_COMING_FROM) == REGISTER_NEW) {
                         onNextCreatePass()
@@ -240,7 +239,6 @@ fun OtpSendVerifyScreen(
 
             loginWithOtp.success != null -> {
                 if (loginWithOtp.success!!.status == true) {
-
                     // save token
                     viewModel.savePrefData(
                         TOKEN_PREF_KEY,
@@ -263,7 +261,6 @@ fun OtpSendVerifyScreen(
                         )
                     )
                 } else {
-//                        invalidText = loginWithOtp.success!!.message.toString()
                     inValidOTP = true
                 }
                 isDialogVisible = false
@@ -292,7 +289,7 @@ fun OtpSendVerifyScreen(
     }
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
-        handleBack(viewModel, onBack, onBackUserName)
+        handleBack(viewModel, onBack, onBackUserName,onBackPassword)
     }, content = {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -426,12 +423,16 @@ fun OtpSendVerifyScreen(
 fun handleBack(
     viewModel: LoginViewModel, onBack: () -> Unit,
     onBackUserName: () -> Unit,
+    onBackPassword: () -> Unit,
 ) {
     val comingFrom = viewModel.getPrefData(IS_COMING_FROM)
-    if (comingFrom == REGISTER_NEW || comingFrom == LOGIN_WITH_OTP) {
+    if (comingFrom == REGISTER_NEW) {
         logger.d("OtpSendVerify:Back to UserName -> $comingFrom")
         onBackUserName()
-    } else {
+    } else if (comingFrom == LOGIN_WITH_OTP) {
+        onBackPassword()
+    }
+    else{
         logger.d("OtpSendVerify:Back to ForgetPassword -> $comingFrom")
         onBack()
     }
