@@ -66,6 +66,7 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IS_COMING_FROM
 import com.pi.ProjectInclusion.constants.ConstantVariables.LOGIN_WITH_OTP
 import com.pi.ProjectInclusion.constants.ConstantVariables.REGISTER_NEW
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
+import com.pi.ProjectInclusion.constants.ConstantVariables.SUCCESS
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_MOBILE_NO
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
@@ -192,6 +193,15 @@ fun OtpSendVerifyScreen(
                         ?: errorResponse
 
                     context.toast(errorMessage)
+                }
+                else{
+                    if (sendOtpState.success!!.response?.message != SUCCESS) {
+                        val errorMessage = sendOtpState.success!!.response?.message
+                            ?: sendOtpState.success?.error
+                            ?: sendOtpState.success?.exception
+                            ?: errorResponse
+                        context.toast(errorMessage)
+                    }
                 }
                 isDialogVisible = false
             }
