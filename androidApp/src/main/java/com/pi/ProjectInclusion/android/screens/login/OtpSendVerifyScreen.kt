@@ -223,6 +223,10 @@ fun OtpSendVerifyScreen(
             verifyOtpState.success != null -> {
                 if (verifyOtpState.success!!.status == true) {
                     if (viewModel.getPrefData(IS_COMING_FROM) == REGISTER_NEW) {
+
+                        viewModel.savePrefData(TOKEN_PREF_KEY,
+                            verifyOtpState.success!!.response?.token.toString()
+                        )
                         onNextCreatePass()
                     } else {
                         onNext()

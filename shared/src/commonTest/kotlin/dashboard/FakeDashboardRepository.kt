@@ -71,7 +71,11 @@ class FakeDashboardRepository : DashboardRepository {
     }
 
     override suspend fun getAllSubCategoryRepo(): List<SubCategoryListResponse> {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            arrayListOf(SubCategoryListResponse(status = 0, name = "Faq Sub Category", id =0, priority = 0))
+        } else {
+            throw Exception("Sub-Category Not found!")
+        }
     }
 
     override suspend fun getAllSubCategoryByCategoryIdRepo(categoryId: Int): SubCategoryByCategoryIdResponse {

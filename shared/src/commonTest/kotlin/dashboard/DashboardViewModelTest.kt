@@ -5,6 +5,8 @@ import FakeConnectivityObserver
 import FakeLocalDataSource
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
 import com.pi.ProjectInclusion.data.model.profileModel.ProfileNameChangeRequest
 import com.pi.ProjectInclusion.domain.useCases.AuthenticationUsesCases
 import com.pi.ProjectInclusion.domain.useCases.DashboardUsesCases
@@ -130,9 +132,9 @@ class LoginViewModelTest {
         assertEquals("Request Not found!", state.error) // adapt to your fake response
     }
 
-        // Certificate
-        @Test
-        fun lms_certificate_emits_success() = runTest {
+     // Certificate
+    @Test
+    fun lms_certificate_emits_success() = runTest {
             // Arrange
             fakeRepo.shouldSucceed = true
 
@@ -176,10 +178,40 @@ class LoginViewModelTest {
         fakeRepo.shouldSucceed = true
 
         // Act
-        dashboardViewModel.getLMSUserCertificate(
-            CertificateRequest(),
-            strToken = "fake_token"
-        )
+        dashboardViewModel.getAllCategory()
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Assert
+        val state = dashboardViewModel.getCertificate.first { !it.isLoading }
+        assertNotNull(state.success)
+        assertEquals("FAQ request successful", state.success.message) // adapt to your fake response
+    }
+
+    @Test
+    fun faq_category_emits_error() = runTest {
+        // Arrange
+        fakeRepo.shouldSucceed = false
+
+        // Act
+        dashboardViewModel.getAllCategory()
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Assert
+        val state = dashboardViewModel.getCertificate.first { !it.isLoading }
+        assertNotNull(state.error)
+        assertEquals("Request Not found!", state.error) // adapt to your fake response
+    }
+
+    // Faq Sub Category
+    @Test
+    fun faq_sub_category_emits_success() = runTest {
+        // Arrange
+        fakeRepo.shouldSucceed = true
+
+        // Act
+        dashboardViewModel.getAllSubCategory()
 
         testDispatcher.scheduler.advanceUntilIdle()
 
@@ -190,7 +222,7 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun faq_category__emits_error() = runTest {
+    fun aq_sub_category__emits_error() = runTest {
         // Arrange
         fakeRepo.shouldSucceed = false
 
@@ -205,6 +237,7 @@ class LoginViewModelTest {
         // Assert
         val state = dashboardViewModel.getCertificate.first { !it.isLoading }
         assertNotNull(state.error)
-        assertEquals("Request Not sent!", state.error) // adapt to your fake response
+        assertEquals("Sub-Category Not found!", state.error) // adapt to your fake response
     }
+
 }
