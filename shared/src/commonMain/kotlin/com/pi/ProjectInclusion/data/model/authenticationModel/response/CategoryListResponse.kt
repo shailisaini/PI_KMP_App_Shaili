@@ -7,10 +7,10 @@ import kotlinx.serialization.Serializable
 data class CategoryListResponse(
     @SerialName("name") var name: String? = null,
     @SerialName("id") var id: Int? = null,
-    @SerialName("createdDate") var createdDate: String? = null,
+   /* @SerialName("createdDate") var createdDate: String? = null,
     @SerialName("updatedDate") var updatedDate: String? = null,
     @SerialName("createdBy") var createdBy: Int? = null,
-    @SerialName("updatedBy") var updatedBy: String? = null,
+    @SerialName("updatedBy") var updatedBy: String? = null,*/
     @SerialName("status") var status: Int? = null,
     @SerialName("priority") var priority: Int? = null,
 )

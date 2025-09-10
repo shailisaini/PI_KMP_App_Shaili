@@ -27,8 +27,8 @@ data class GetLanguageListResponse(
         @SerialName("name")
         val name: String? = null,
 
-        @SerialName("translated_name")
-        val translated_name: String? = null,
+        @SerialName("translatedName")
+        val translatedName: String? = null,
 
         @SerialName("langIcon")
         val langIcon: String? = null,

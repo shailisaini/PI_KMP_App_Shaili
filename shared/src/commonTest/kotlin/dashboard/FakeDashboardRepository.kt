@@ -4,6 +4,8 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.Certificat
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.AccountDeleteResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse.CertificateResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CheckProfileCompletionResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
@@ -25,7 +27,13 @@ class FakeDashboardRepository : DashboardRepository {
         certificateRequest: CertificateRequest,
         strToken: String
     ): CertificateListResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            CertificateListResponse(status = 0, message = "LMS request successful",
+                response = arrayListOf(CertificateResponse(0,0,0,"",0,"","","","",0,"","","","",0,"","","","","","","","","","",0,"",0,"",0,"","")),
+                errorCode ="")
+        } else {
+            throw Exception("Request Not sent!")
+        }
     }
 
     override suspend fun getChangeRequestRepo(
@@ -55,7 +63,11 @@ class FakeDashboardRepository : DashboardRepository {
     }
 
     override suspend fun getAllCategoryRepo(): List<CategoryListResponse> {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            arrayListOf(CategoryListResponse(status = 0, name = "Faq Category", id =0, priority = 0))
+        } else {
+            throw Exception("Request Not found!")
+        }
     }
 
     override suspend fun getAllSubCategoryRepo(): List<SubCategoryListResponse> {
@@ -111,6 +123,10 @@ class FakeDashboardRepository : DashboardRepository {
         tokenKey: String,
         userId: String
     ): AccountDeleteResponse {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun checkProfileCompletionRepo(tokenKey: String): CheckProfileCompletionResponse {
         TODO("Not yet implemented")
     }
 

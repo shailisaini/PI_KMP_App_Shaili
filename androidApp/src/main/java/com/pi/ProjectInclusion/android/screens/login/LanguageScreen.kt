@@ -327,7 +327,7 @@ fun ItemLanguageCard(
                     contentDescription = IMG_DESCRIPTION
                 )
                 Text(
-                    (languageIndex.translated_name?:languageIndex.name)!!,
+                    (languageIndex.translatedName?:languageIndex.name)!!,
                     textAlign = TextAlign.Start,
                     maxLines = 1,
                     fontSize = 16.sp,

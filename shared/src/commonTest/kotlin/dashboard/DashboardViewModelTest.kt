@@ -3,6 +3,7 @@ package dashboard
 import authentication.FakeAuthenticationRepository
 import FakeConnectivityObserver
 import FakeLocalDataSource
+import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
 import com.pi.ProjectInclusion.data.model.profileModel.ProfileNameChangeRequest
 import com.pi.ProjectInclusion.domain.useCases.AuthenticationUsesCases
@@ -129,4 +130,81 @@ class LoginViewModelTest {
         assertEquals("Request Not found!", state.error) // adapt to your fake response
     }
 
+        // Certificate
+        @Test
+        fun lms_certificate_emits_success() = runTest {
+            // Arrange
+            fakeRepo.shouldSucceed = true
+
+            // Act
+            dashboardViewModel.getLMSUserCertificate(
+                CertificateRequest(),
+                strToken = "fake_token"
+            )
+
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            // Assert
+            val state = dashboardViewModel.getCertificate.first { !it.isLoading }
+            assertNotNull(state.success)
+            assertEquals("LMS request successful", state.success.message) // adapt to your fake response
+        }
+
+    @Test
+    fun lms_certificate_emits_error() = runTest {
+        // Arrange
+        fakeRepo.shouldSucceed = false
+
+        // Act
+        dashboardViewModel.getLMSUserCertificate(
+            CertificateRequest(),
+            strToken = "fake_token"
+        )
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Assert
+        val state = dashboardViewModel.getCertificate.first { !it.isLoading }
+        assertNotNull(state.error)
+        assertEquals("Request Not sent!", state.error) // adapt to your fake response
+    }
+
+    // Faq Category
+    @Test
+    fun faq_category_emits_success() = runTest {
+        // Arrange
+        fakeRepo.shouldSucceed = true
+
+        // Act
+        dashboardViewModel.getLMSUserCertificate(
+            CertificateRequest(),
+            strToken = "fake_token"
+        )
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Assert
+        val state = dashboardViewModel.getCertificate.first { !it.isLoading }
+        assertNotNull(state.success)
+        assertEquals("LMS request successful", state.success.message) // adapt to your fake response
+    }
+
+    @Test
+    fun faq_category__emits_error() = runTest {
+        // Arrange
+        fakeRepo.shouldSucceed = false
+
+        // Act
+        dashboardViewModel.getLMSUserCertificate(
+            CertificateRequest(),
+            strToken = "fake_token"
+        )
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Assert
+        val state = dashboardViewModel.getCertificate.first { !it.isLoading }
+        assertNotNull(state.error)
+        assertEquals("Request Not sent!", state.error) // adapt to your fake response
+    }
 }
