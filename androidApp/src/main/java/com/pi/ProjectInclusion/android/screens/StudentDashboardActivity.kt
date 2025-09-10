@@ -407,7 +407,10 @@ class StudentDashboardActivity : ComponentActivity() {
                                 onClick = {
                                     logOutSheet = false
                                     viewModel.clearPref()
-                                    context.startActivity(Intent(context, LoginNavigationScreen::class.java))
+                                    val intent = Intent(context, LoginNavigationScreen::class.java).apply {
+                                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                    }
+                                    context.startActivity(intent)
                                     (context as? Activity)?.finish()
                                 }
                             )
