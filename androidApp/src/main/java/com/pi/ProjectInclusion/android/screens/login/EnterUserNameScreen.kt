@@ -271,10 +271,18 @@ fun LoginUI(
             sendOtpState.success != null -> {
                 isDialogVisible = false
                 if (sendOtpState.success!!.status == true) {
-                viewModel.savePrefData(USER_MOBILE_NO, encryptedPhoneNo)
-                viewModel.savePrefData(IS_COMING_FROM, REGISTER_NEW)
-                    onRegister() // Go to OTP Verify screen
-
+                    if (sendOtpState.success!!.response?.message == SUCCESS) {
+                        viewModel.savePrefData(USER_MOBILE_NO, encryptedPhoneNo)
+                        viewModel.savePrefData(IS_COMING_FROM, REGISTER_NEW)
+                        onRegister() // Go to OTP Verify screen
+                    }
+                    else{
+                        val errorMessage = sendOtpState.success!!.response?.message
+                            ?: sendOtpState.success?.error
+                            ?: sendOtpState.success?.exception
+                            ?: errorResponse
+                        context.toast(errorMessage)
+                    }
                 } else {
                     val errorMessage = sendOtpState.success?.message
                         ?: sendOtpState.success?.error

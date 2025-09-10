@@ -66,6 +66,7 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IS_COMING_FROM
 import com.pi.ProjectInclusion.constants.ConstantVariables.LOGIN_WITH_OTP
 import com.pi.ProjectInclusion.constants.ConstantVariables.REGISTER_NEW
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
+import com.pi.ProjectInclusion.constants.ConstantVariables.SUCCESS
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_MOBILE_NO
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
@@ -104,6 +105,7 @@ fun OtpSendVerifyScreen(
     var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
     val loginSuccess = stringResource(id = R.string.txt_login_success)
     var errorResponse = stringResource(R.string.key_error_response)
+    var error = stringResource(R.string.key_error_response)
 
     var isInternetAvailable by remember { mutableStateOf(true) }
     val internetMessage = stringResource(R.string.txt_oops_no_internet)
@@ -192,6 +194,15 @@ fun OtpSendVerifyScreen(
 
                     context.toast(errorMessage)
                 }
+                else{
+                    if (sendOtpState.success!!.response?.message != SUCCESS) {
+                        val errorMessage = sendOtpState.success!!.response?.message
+                            ?: sendOtpState.success?.error
+                            ?: sendOtpState.success?.exception
+                            ?: errorResponse
+                        context.toast(errorMessage)
+                    }
+                }
                 isDialogVisible = false
             }
         }
@@ -217,8 +228,13 @@ fun OtpSendVerifyScreen(
                         onNext()
                     }
                 } else {
+                    val errorMessage = sendOtpState.success?.message
+                        ?: sendOtpState.success?.error
+                        ?: sendOtpState.success?.exception
+                        ?: error
+//                    context.toast(errorMessage)
                     inValidOTP = true
-                    invalidText = verifyOtpState.success!!.message.toString()
+                    invalidText = errorMessage
                 }
 
                 isDialogVisible = false

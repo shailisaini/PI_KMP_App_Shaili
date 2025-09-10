@@ -1,6 +1,8 @@
 package com.pi.ProjectInclusion.android.screens.Profile
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -71,6 +73,7 @@ import com.pi.ProjectInclusion.android.common_UI.DropdownMenuUi
 import com.pi.ProjectInclusion.android.common_UI.SchoolListBottomSheet
 import com.pi.ProjectInclusion.android.common_UI.SmallBtnUi
 import com.pi.ProjectInclusion.android.common_UI.UdiseTextField
+import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
@@ -94,7 +97,6 @@ import org.koin.ext.clearQuotes
 @Composable
 fun EditProfileScreen2(
     onNext: () -> Unit,  //Dashboard
-    onBack: () -> Unit,
     loginViewModel: LoginViewModel
 ) {
 
@@ -102,7 +104,12 @@ fun EditProfileScreen2(
     logger.d("Screen: " + "EditProfileScreen2()")
 
     BackHandler {
-        onBack()
+        context.startActivity(
+            Intent(
+                context, StudentDashboardActivity::class.java
+            )
+        )
+        (context as? Activity)?.finish()
     }
 
     Surface(
@@ -117,7 +124,6 @@ fun EditProfileScreen2(
             EditProfileScreen2UI(
                 context,
                 onNext = onNext,
-                onBack = onBack,
                 loginViewModel = loginViewModel
             )
         }
@@ -128,7 +134,6 @@ fun EditProfileScreen2(
 @Composable
 fun EditProfileScreen2UI(
     context: Context,
-    onBack: () -> Unit,
     onNext: () -> Unit,
     loginViewModel: LoginViewModel
 ) {
@@ -471,11 +476,15 @@ fun EditProfileScreen2UI(
         backgroundColor = White,
         textColor = Black,
         pageTitle = stringResource(R.string.edit_profile),
-//        moreInfoIcon = painterResource(id = R.drawable.vertical_dot),
         isShowBackButton = true,
         isShowMoreInfo = false,
         onBackButtonClick = {
-            onBack()
+            context.startActivity(
+                Intent(
+                    context, StudentDashboardActivity::class.java
+                )
+            )
+            (context as? Activity)?.finish()
         },
         onMoreInfoClick = {
 //            showSheetMenu = true

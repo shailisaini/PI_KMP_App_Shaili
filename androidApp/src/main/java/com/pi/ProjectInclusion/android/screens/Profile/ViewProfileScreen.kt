@@ -126,7 +126,6 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.nameChangeRequestId
 import com.pi.ProjectInclusion.constants.ConstantVariables.schoolChangeDescription
 import com.pi.ProjectInclusion.constants.ConstantVariables.schoolChangeRequestId
 import com.pi.ProjectInclusion.constants.CustomDialog
-import com.pi.ProjectInclusion.data.model.authenticationModel.response.LoginApiResponse
 import com.pi.ProjectInclusion.data.model.profileModel.ProfileNameChangeRequest
 import com.pi.ProjectInclusion.data.model.profileModel.response.ViewProfileResponse
 import com.pi.ProjectInclusion.data.remote.ApiService.Companion.PROFILE_BASE_URL
@@ -585,37 +584,14 @@ fun ProfileViewUI(
                             }
                         }
 
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(15.dp)
-                                .background(color = PrimaryBlue3)
-                                .border(
-                                    width = 0.3.dp, color = if (isSystemInDarkTheme()) {
-                                        Dark_03
-                                    } else {
-                                        Black
-                                    }, shape = RoundedCornerShape(8.dp)
-                                ), verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                stringResource(R.string.txt_complete_email),
-                                textAlign = TextAlign.Start,
-                                fontSize = 13.sp,
-                                fontFamily = fontRegular,
-                                color = Black,
-                                modifier = Modifier
-                                    .padding(15.dp)
-                                    .weight(1f)
-                            )
-                            Text(
-                                stringResource(R.string.text_add),
-                                textAlign = TextAlign.End,
-                                fontSize = 15.sp,
-                                fontFamily = fontMedium,
-                                color = PrimaryBlue,
-                                modifier = Modifier.padding(15.dp)
-                            )
+                        if ((viewModel.getPrefData(USER_TYPE_ID) == "7") || (viewModel.getPrefData(USER_TYPE_ID) == "8")) {
+                            if(profileData.response!!.email!!.isEmpty() || profileData.response!!.CRRNum!!.isEmpty() ){
+                                CompleteProfile(profileData, onNext)
+                            }
+                        } else {
+                            if(profileData.response!!.email!!.isEmpty()){
+                                CompleteProfile(profileData, onNext)
+                            }
                         }
 
                         Column(
@@ -845,6 +821,47 @@ fun ProfileViewUI(
                 }
             }
         })
+}
+
+@Composable
+fun CompleteProfile(profileData: ViewProfileResponse, onNext: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(15.dp)
+            .background(color = PrimaryBlue3)
+            .border(
+                width = 0.3.dp, color = if (isSystemInDarkTheme()) {
+                    Dark_03
+                } else {
+                    Black
+                }, shape = RoundedCornerShape(8.dp)
+            ), verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            stringResource(R.string.txt_complete_email),
+            textAlign = TextAlign.Start,
+            fontSize = 13.sp,
+            fontFamily = fontRegular,
+            color = Black,
+            modifier = Modifier
+                .padding(15.dp)
+                .weight(1f)
+        )
+        Text(
+            stringResource(R.string.text_add),
+            textAlign = TextAlign.End,
+            fontSize = 15.sp,
+            fontFamily = fontMedium,
+            color = PrimaryBlue,
+            modifier = Modifier.padding(15.dp)
+                .clickable {
+                    if(profileData.response!!.email!!.isEmpty() ){
+                        onNext()
+                    }
+                }
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
