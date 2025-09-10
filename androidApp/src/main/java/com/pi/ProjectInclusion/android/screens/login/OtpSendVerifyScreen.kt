@@ -104,6 +104,7 @@ fun OtpSendVerifyScreen(
     var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
     val loginSuccess = stringResource(id = R.string.txt_login_success)
     var errorResponse = stringResource(R.string.key_error_response)
+    var error = stringResource(R.string.key_error_response)
 
     var isInternetAvailable by remember { mutableStateOf(true) }
     val internetMessage = stringResource(R.string.txt_oops_no_internet)
@@ -217,8 +218,13 @@ fun OtpSendVerifyScreen(
                         onNext()
                     }
                 } else {
+                    val errorMessage = sendOtpState.success?.message
+                        ?: sendOtpState.success?.error
+                        ?: sendOtpState.success?.exception
+                        ?: error
+//                    context.toast(errorMessage)
                     inValidOTP = true
-                    invalidText = verifyOtpState.success!!.message.toString()
+                    invalidText = errorMessage
                 }
 
                 isDialogVisible = false

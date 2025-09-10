@@ -71,27 +71,41 @@ class LoginNavigationScreen : ComponentActivity() {
 
             fun navigateTo(route: String) {
                 isForward = true
-                if (backStack.last() != route) {
+
+                // If we are navigating to a route that already exists in stack
+                if (backStack.contains(route)) {
+                    // Pop everything above it → prevents reusing old forward states
+                    while (backStack.isNotEmpty() && backStack.last() != route) {
+                        backStack.removeAt(backStack.lastIndex)
+                    }
+                } else {
+                    // Add new route at the top
                     backStack.add(route)
                 }
+
                 currentRoute = route
             }
 
             fun navigateBack(toRoute: String? = null) {
                 isForward = false
+
                 if (toRoute != null) {
                     if (backStack.contains(toRoute)) {
+                        // Pop until we reach that route
                         while (backStack.isNotEmpty() && backStack.last() != toRoute) {
                             backStack.removeAt(backStack.lastIndex)
                         }
                     } else {
-                        // Instead of adding at the end, reset stack to that route
+                        // Reset stack to only that route
                         backStack.clear()
                         backStack.add(toRoute)
                     }
-                } else if (backStack.isNotEmpty()) {
-                    backStack.removeAt(backStack.lastIndex)
+                } else {
+                    if (backStack.size > 1) {
+                        backStack.removeAt(backStack.lastIndex)
+                    }
                 }
+
                 currentRoute = backStack.last()
             }
 

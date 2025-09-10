@@ -100,10 +100,6 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.FirstStepProfileRequest
-import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.response.SchoolListResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateListResponse
 import com.pi.ProjectInclusion.data.remote.ApiService.Companion.PROFILE_BASE_URL
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import java.io.ByteArrayOutputStream
@@ -266,11 +262,21 @@ fun EditProfileScreenUI(
                 logger.d("ResendOtp: ${viewProfile.success}")
                 if (viewProfile.success!!.status == true) {
                     viewProfile.success?.response?.let { response ->
-//                        firstName.value = response.username ?: "" // it will use later
-//                        lastName.value = response.username ?: ""
-                        email.value = decrypt(response.email.toString().trim())
+                        if (response.email.toString().isNotEmpty()) {
+                            email.value = decrypt(response.email.toString().trim())
+                        }
+                        else{
+                            email.value = ""
+                        }
+
+                        if (response.whatsapp.toString().isNotEmpty()){
+                            whatsappNo.value = decrypt(response.whatsapp.toString().trim())
+                        }
+                        else{
+                            whatsappNo.value = ""
+                        }
                         mobNo.value = decrypt(response.mobile.toString().trim())
-                        whatsappNo.value = decrypt(response.whatsapp.toString().trim())
+
                         firstName.value = response.firstname ?: ""
                         lastName.value = response.lastname ?: ""
 
@@ -644,9 +650,6 @@ fun EditProfileScreenUI(
                         Text(
                             text = buildAnnotatedString {
                                 append(stringResource(R.string.txt_whatsapp))
-                                pushStyle(SpanStyle(color = Color.Red))
-                                append(ASTRICK)
-                                pop()
                             },
                             modifier = Modifier.padding(
                                 top = 24.dp,
@@ -667,7 +670,7 @@ fun EditProfileScreenUI(
                             icon = ImageVector.vectorResource(id = R.drawable.ic_whatsapp_blue),
                             colors = colors,
                             number = whatsappNo,
-                            enable = whatsappNo.value.length < 10,
+                            enable = true,
                             hint = textWhatsappEg.toString()
                         )
 
@@ -675,9 +678,6 @@ fun EditProfileScreenUI(
                         Text(
                             text = buildAnnotatedString {
                                 append(stringResource(R.string.txt_email))
-                                pushStyle(SpanStyle(color = Color.Red))
-                                append(ASTRICK)
-                                pop()
                             },
                             modifier = Modifier.padding(
                                 top = 24.dp,
@@ -749,10 +749,6 @@ fun EditProfileScreenUI(
                                         context.toast("Enter your date of birth")
                                     } else if (selectedGender.value.toString().isEmpty()) {
                                         context.toast("Select your gender")
-                                    } else if (whatsappNo.value.toString().isEmpty()) {
-                                        context.toast("Enter your whatsApp number")
-                                    } else if (email.value.toString().isEmpty()) {
-                                        context.toast("Enter your email")
                                     } else {
                                         if (showError || mobNo.value.length < 10) {
                                             inValidMobNo = true
@@ -771,6 +767,18 @@ fun EditProfileScreenUI(
                                                     "O"
                                                 }
                                                 isDialogVisible = true
+                                                 if (email.value.toString().isEmpty()) {
+                                                    email.value = ""
+                                                }
+                                                else{
+                                                    email.value = email.value.encryptAES().toString().trim()
+                                                 }
+                                                 if (whatsappNo.value.toString().isEmpty()) {
+                                                     whatsappNo.value = ""
+                                                }
+                                                else{
+                                                     whatsappNo.value = whatsappNo.value.encryptAES().toString().trim()
+                                                 }
                                                 val firstStepProfileRequest =
                                                     FirstStepProfileRequest(
                                                         firstName.value.toString(),
@@ -778,10 +786,9 @@ fun EditProfileScreenUI(
                                                         lastName.value.toString(),
                                                         selectedGender.value.toString(),
                                                         mobNo.value.encryptAES().toString().trim(),
-                                                        whatsappNo.value.encryptAES().toString()
-                                                            .trim(),
+                                                        whatsappNo.value,
                                                         date.toString(),
-                                                        email.value.encryptAES().toString().trim()
+                                                        email.value
                                                     )
 
                                                 logger.d(

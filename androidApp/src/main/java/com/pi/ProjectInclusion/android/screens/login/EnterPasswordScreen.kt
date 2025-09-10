@@ -83,44 +83,14 @@ fun EnterPasswordScreen(
     onNextProfile: () -> Unit, // complete Profile
     isForgetPassword: () -> Unit
 ) {
-    var isDialogVisible by remember { mutableStateOf(false) }
-    val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
-
     val context = LocalContext.current
     val userType = remember { mutableStateListOf<GetUserTypeResponse.UserTypeResponse>() }
 
-    CustomDialog(
-        isVisible = isDialogVisible,
-        onDismiss = { isDialogVisible = false },
-        message = stringResource(R.string.txt_loading)
-    )
     BackHandler {
         // UserNameScreen
         onBack()
     }
     LoggerProvider.logger.d("Screen: " + "EnterPasswordScreen()")
-
-
-    LaunchedEffect(uiState) {
-        when {
-            uiState.isLoading -> {
-                userType.clear()
-                isDialogVisible = true
-            }
-
-            uiState.error.isNotEmpty() -> {
-                userType.clear()
-                isDialogVisible = false
-                LoggerProvider.logger.d("Error: ${uiState.error}")
-                context.toast(uiState.error)
-            }
-
-            uiState.success != null -> {
-
-                LoggerProvider.logger.d("Languages fetched: ${uiState.success!!.response}")
-            }
-        }
-    }
 
     Surface(
         modifier = Modifier.fillMaxWidth(), color = White
@@ -183,6 +153,12 @@ fun PasswordUI(
 
     val encryptedUserName = userName?.encryptAES().toString().trim()
     val encryptedPassword = passwordText.value.encryptAES().toString().trim()
+
+    CustomDialog(
+        isVisible = isDialogVisible,
+        onDismiss = { isDialogVisible = false },
+        message = stringResource(R.string.txt_loading)
+    )
 
     if (loginWithPassword) {
         LoggerProvider.logger.d("LoginWithPassword: $languageId .. $userTypeId .. $encryptedPhoneNo")
@@ -277,7 +253,16 @@ fun PasswordUI(
             sendOtpState.success != null -> {
                 if (sendOtpState.success!!.status == true) {
                     viewModel.savePrefData(IS_COMING_FROM, LOGIN_WITH_OTP)
-                    onNext()
+                   if (sendOtpState.success!!.response?.message == SUCCESS) {
+                       onNext()
+                   }
+                    else{
+                       val errorMessage = sendOtpState.success!!.response?.message
+                           ?: sendOtpState.success?.error
+                           ?: sendOtpState.success?.exception
+                           ?: error
+                       context.toast(errorMessage)
+                   }
                 } else {
                     val errorMessage = sendOtpState.success?.message
                         ?: sendOtpState.success?.error
@@ -380,13 +365,13 @@ fun PasswordUI(
                         Spacer(modifier = Modifier.height(10.dp))
 
                         BtnUi(
-                            enabled = passwordText.value.length >= 6,
+                            enabled = passwordText.value.length >= 8,
                             title = txtContinue,
                             onClick = {
                                 if (passwordText.value.isEmpty()) {
                                     isValidMobNo = true
                                 } else {
-                                    if (passwordText.value.length < 6) {
+                                    if (passwordText.value.length < 8) {
                                         isValidMobNo = true
                                     } else {
                                         loginWithPassword = true

@@ -56,6 +56,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -185,11 +186,53 @@ class StudentDashboardActivity : ComponentActivity() {
             val viewModel: LoginViewModel = koinViewModel()
             var strToken = viewModel.getPrefData(TOKEN_PREF_KEY)
             var logOutSheet by remember { mutableStateOf(false) }
+            val backStack = remember { mutableStateListOf(startDestination) }
 
             fun navigateTo(route: String) {
                 isForward = true
+
+                // If we are navigating to a route that already exists in stack
+                if (backStack.contains(route)) {
+                    // Pop everything above it → prevents reusing old forward states
+                    while (backStack.isNotEmpty() && backStack.last() != route) {
+                        backStack.removeAt(backStack.lastIndex)
+                    }
+                } else {
+                    // Add new route at the top
+                    backStack.add(route)
+                }
+
                 currentRoute = route
             }
+
+            fun navigateBack(toRoute: String? = null) {
+                isForward = false
+
+                if (toRoute != null) {
+                    if (backStack.contains(toRoute)) {
+                        // Pop until we reach that route
+                        while (backStack.isNotEmpty() && backStack.last() != toRoute) {
+                            backStack.removeAt(backStack.lastIndex)
+                        }
+                    } else {
+                        // Reset stack to only that route
+                        backStack.clear()
+                        backStack.add(toRoute)
+                    }
+                } else {
+                    if (backStack.size > 1) {
+                        backStack.removeAt(backStack.lastIndex)
+                    }
+                }
+
+                currentRoute = backStack.last()
+            }
+
+            /*fun navigateBack(toRoute: String? = null) {
+                isForward = false
+                currentRoute = toRoute ?: AppRoute.LanguageSelect.route
+            }*/
+
 
             val viewProfile by viewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
             var encryptedUserName = viewModel.getPrefData(USER_NAME)
@@ -222,11 +265,6 @@ class StudentDashboardActivity : ComponentActivity() {
                         isDialogVisible = false
                     }
                 }
-            }
-
-            fun navigateBack(toRoute: String? = null) {
-                isForward = false
-                currentRoute = toRoute ?: AppRoute.LanguageSelect.route
             }
 
             ModalNavigationDrawer(
@@ -423,181 +461,184 @@ class StudentDashboardActivity : ComponentActivity() {
                         AnimatedRouteHost(
                             currentRoute = currentRoute, isForward = isForward
                         ) { route ->
-                            when (route) {
-                                AppRoute.DashboardScreen.route -> DashboardScreen(
-                                    onProfile = { navigateTo(AppRoute.EnterUserProfileScreen.route) },
-                                )
-
-                                AppRoute.EnterUserProfileScreen.route -> EnterUserScreen1(
-                                    viewModel = viewModel,
-                                    onNextTeacher = { navigateTo(AppRoute.EnterTeacherRegScreen.route) },
-                                    onNextSpecialEdu = { navigateTo(AppRoute.SpecialEducatorRegistration.route) },
-                                    onNextProfessional = { navigateTo(AppRoute.EnterProfessionalScreen.route) },
-                                    onBack = { navigateBack(AppRoute.UserNameScreen.route) },
-                                    onBackDashboard = { navigateBack(AppRoute.DashboardScreen.route) }
-                                )
-
-                                AppRoute.CourseScreen.route -> LMSCourseHomeScreen()
-
-                                AppRoute.ProfileScreen.route -> ViewProfileScreen(
-                                    viewModel = viewModel,
-                                    onNext = { navigateTo(AppRoute.EditProfileScreen.route) },
-                                    onTrackRequest = { navigateTo(AppRoute.TrackRequestScreen.route) },
-                                    onBackLogin = { navigateTo(AppRoute.UserNameScreen.route) },
-                                    onBack = {
-                                        context.startActivity(
-                                            Intent(
-                                                context, StudentDashboardActivity::class.java
-                                            )
-                                        )
-                                        (context as? Activity)?.finish()
-                                    })
-                                // for logout & delete account we need to route to login screen
-                                AppRoute.UserNameScreen.route -> EnterUserNameScreen(
-                                    viewModel = viewModel,
-                                    onNext = { navigateTo(AppRoute.UserPasswordScreen.route) },
-                                    onRegister = {
-                                        navigateTo(AppRoute.OtpSendVerifyUI.route)
-                                    },
-                                    onPrivacyPolicy = {
-                                        navigateTo(AppRoute.PrivacyPolicyScreen.route)
-                                    },
-                                    onBack = { navigateBack(AppRoute.UserTypeSelect.route) })
-
-                                AppRoute.PrivacyPolicyScreen.route -> PrivacyPolicy(
-                                    onBack = { navigateBack(AppRoute.UserNameScreen.route) }
-                                )
-
-                                AppRoute.EditProfileScreen.route -> EditProfileScreen1(
-                                    loginViewModel = viewModel,
-                                    onNextTeacher = { navigateTo(AppRoute.EditTeacherProfileScreen.route) },
-                                    onNextProfessional = { navigateTo(AppRoute.EditProfessionalEditProfile.route) },
-                                    onNextSpecialEducator = { navigateTo(AppRoute.EditSpeEduEditProfile.route) },
-                                    onBack = { navigateBack(AppRoute.ProfileScreen.route) })
-
-                                AppRoute.EditTeacherProfileScreen.route -> EditProfileScreen2(
-                                    loginViewModel = viewModel,
-                                    onNext = {
-                                        context.startActivity(
-                                            Intent(
-                                                context, StudentDashboardActivity::class.java
-                                            )
-                                        )
-                                        (context as? Activity)?.finish()
-                                    },
-                                    onBack = { navigateBack(AppRoute.ProfileScreen.route) })
-
-                                AppRoute.EditProfessionalEditProfile.route -> ProfessionalsEditProfile(
-                                    loginViewModel = viewModel,
-                                    onNext = {
-                                        context.startActivity(
-                                            Intent(
-                                                context, StudentDashboardActivity::class.java
-                                            )
-                                        )
-                                        (context as? Activity)?.finish()
-                                    },
-                                    onBack = { navigateBack(AppRoute.ProfileScreen.route) })
-
-                                AppRoute.EditSpeEduEditProfile.route -> SpecialEducatorEditProfile(
-                                    loginViewModel = viewModel,
-                                    onNext = {
-                                        context.startActivity(
-                                            Intent(
-                                                context, StudentDashboardActivity::class.java
-                                            )
-                                        )
-                                        (context as? Activity)?.finish()
-                                    },
-                                    onBack = { navigateBack(AppRoute.ProfileScreen.route) })
-
-                                // Screening
-                                AppRoute.ScreeningScreen.route -> ScreeningHomeScreen(
-                                    addStudent = { navigateTo(AppRoute.AddStudentRegister.route) },
-                                    screeningOne = { navigateTo(AppRoute.ScreeningOne.route) },
-                                    profilerForm = { navigateTo(AppRoute.ProfilerFormPage.route) },
-                                    advanceScreening = { navigateTo(AppRoute.AdvanceScreening.route) },
-                                    onBack = { navigateBack(AppRoute.DashboardScreen.route) })
-
-                                AppRoute.ScreeningOne.route -> ScreeningOneScreen(
-                                    onNext = { navigateTo(AppRoute.ScreeningOneReport.route) },
-                                    onBack = { navigateBack(AppRoute.ScreeningScreen.route) })
-
-                                AppRoute.TrackRequestScreen.route -> {
-                                    TrackRequestScreen(
-                                        onNext = {},
-                                        onBack = { navigateBack(AppRoute.ProfileScreen.route) })
-                                }
-
-                                AppRoute.NotificationScreen.route -> {
-                                    NotificationScreen(
-                                        onNext = {},
-                                        onBack = { navigateBack(AppRoute.DashboardScreen.route) })
-                                }
-
-                                AppRoute.ScreeningOneReport.route -> {
-                                    ScreeningOneReportScreen(
-                                        showReportScreen = true,
-                                        onNext = { navigateTo(AppRoute.ProfilerFormPage.route) },
-                                        onNextCongratulate = { navigateTo(AppRoute.AdvanceScreeningReport.route) },
-                                        onBack = { navigateBack(AppRoute.ScreeningScreen.route) })
-                                }
-
-                                AppRoute.ProfilerFormPage.route -> {
-                                    ProfilerFormPageScreen(
-                                        onNext = { navigateTo(AppRoute.ProfilerFormPage.route) },
-                                        onBack = { navigateBack(AppRoute.ScreeningScreen.route) })
-                                }
-
-                                AppRoute.AdvanceScreening.route -> AdvanceScreeningScreen(
-                                    onNext = { navigateTo(AppRoute.AdvanceScreeningReport.route) },
-                                    onBack = { navigateBack(AppRoute.ScreeningScreen.route) })
-
-                                AppRoute.AdvanceScreeningReport.route -> {
-                                    ReportAdvanceScreen(
-                                        onNext = { navigateTo(AppRoute.InterventionScreen.route) },
-                                        onViewProfileDetails = { navigateTo(AppRoute.ViewScreeningProfileDetails.route) },
-                                        onBack = { navigateBack(AppRoute.ScreeningScreen.route) })
-                                }
-
-                                AppRoute.ViewScreeningProfileDetails.route -> {
-                                    ViewScreeningProfileDetailsScreen(
-                                        onNext = { navigateTo(AppRoute.ScreeningScreen.route) },
-                                        onBack = { navigateBack(AppRoute.ScreeningScreen.route) })
-                                }
-
-                                AppRoute.AddStudentRegister.route -> AddNewStudentDetailsScreen(
-                                    onNext = { navigateTo(AppRoute.AddNewStudentMoreDetails.route) },
-                                    onBack = { navigateBack(AppRoute.ScreeningScreen.route) })
-
-                                AppRoute.AddNewStudentMoreDetails.route -> AddNewStudentMoreDetailsScreen(
-                                    onNext = { navigateTo(AppRoute.ScreeningScreen.route) },
-                                    onBack = { navigateBack(AppRoute.AddStudentRegister.route) })
-
-                                // This is for intervention
-                                AppRoute.InterventionScreen.route -> InterventionHomeScreen(
-                                    onNext = { navigateTo(AppRoute.InterventionStudentDetails.route) },
-                                    onBack = { navigateBack(AppRoute.DashboardScreen.route) })
-
-                                AppRoute.InterventionStudentDetails.route -> InterventionStudentDetailsScreen(
-                                    uploadedDocumentScreen = { navigateTo(AppRoute.UploadedDocuments.route) },
-                                    acceptLevelScreen = { navigateTo(AppRoute.InterventionAcceptLevel.route) },
-                                    onBack = { navigateBack(AppRoute.InterventionScreen.route) })
-
-                                AppRoute.UploadedDocuments.route -> UploadedDocumentsScreen(
-                                    onBack = { navigateBack(AppRoute.InterventionStudentDetails.route) })
-
-                                AppRoute.InterventionAcceptLevel.route -> InterventionAcceptLevelScreen(
-                                    onNext = { navigateTo(AppRoute.TeachingPlan.route) },
-                                    onBack = { navigateBack(AppRoute.InterventionStudentDetails.route) })
-
-                                AppRoute.TeachingPlan.route -> TeachingPlanScreen(onBack = {
-                                    navigateBack(
-                                        AppRoute.InterventionAcceptLevel.route
+                            key(route) { ////  force state reset per route
+                                when (route) {
+                                    AppRoute.DashboardScreen.route -> DashboardScreen(
+                                        onProfile = { navigateTo(AppRoute.EnterUserProfileScreen.route) },
                                     )
-                                })
+
+                                    AppRoute.EnterUserProfileScreen.route -> EnterUserScreen1(
+                                        viewModel = viewModel,
+                                        onNextTeacher = { navigateTo(AppRoute.EnterTeacherRegScreen.route) },
+                                        onNextSpecialEdu = { navigateTo(AppRoute.SpecialEducatorRegistration.route) },
+                                        onNextProfessional = { navigateTo(AppRoute.EnterProfessionalScreen.route) },
+                                        onBack = { navigateBack(AppRoute.UserNameScreen.route) },
+                                        onBackDashboard = { navigateBack(AppRoute.DashboardScreen.route) }
+                                    )
+
+                                    AppRoute.CourseScreen.route -> LMSCourseHomeScreen()
+
+                                    AppRoute.ProfileScreen.route -> ViewProfileScreen(
+                                        viewModel = viewModel,
+                                        onNext = { navigateTo(AppRoute.EditProfileScreen.route) },
+                                        onTrackRequest = { navigateTo(AppRoute.TrackRequestScreen.route) },
+                                        onBackLogin = { navigateTo(AppRoute.UserNameScreen.route) },
+                                        onBack = {
+                                            context.startActivity(
+                                                Intent(
+                                                    context, StudentDashboardActivity::class.java
+                                                )
+                                            )
+                                            (context as? Activity)?.finish()
+                                        })
+                                    // for logout & delete account we need to route to login screen
+                                    AppRoute.UserNameScreen.route -> EnterUserNameScreen(
+                                        viewModel = viewModel,
+                                        onNext = { navigateTo(AppRoute.UserPasswordScreen.route) },
+                                        onRegister = {
+                                            navigateTo(AppRoute.OtpSendVerifyUI.route)
+                                        },
+                                        onPrivacyPolicy = {
+                                            navigateTo(AppRoute.PrivacyPolicyScreen.route)
+                                        },
+                                        onBack = { navigateBack(AppRoute.UserTypeSelect.route) })
+
+                                    AppRoute.PrivacyPolicyScreen.route -> PrivacyPolicy(
+                                        onBack = { navigateBack(AppRoute.UserNameScreen.route) }
+                                    )
+
+                                    AppRoute.EditProfileScreen.route -> EditProfileScreen1(
+                                        loginViewModel = viewModel,
+                                        onNextTeacher = { navigateTo(AppRoute.EditTeacherProfileScreen.route) },
+                                        onNextProfessional = { navigateTo(AppRoute.EditProfessionalEditProfile.route) },
+                                        onNextSpecialEducator = { navigateTo(AppRoute.EditSpeEduEditProfile.route) },
+                                        onBack = { navigateBack(AppRoute.ProfileScreen.route) })
+
+                                    AppRoute.EditTeacherProfileScreen.route -> EditProfileScreen2(
+                                        loginViewModel = viewModel,
+                                        onNext = {
+                                            context.startActivity(
+                                                Intent(
+                                                    context, StudentDashboardActivity::class.java
+                                                )
+                                            )
+                                            (context as? Activity)?.finish()
+                                        },)
+//                                        onBack = { navigateBack(AppRoute.ProfileScreen.route) })
+
+                                    AppRoute.EditProfessionalEditProfile.route -> ProfessionalsEditProfile(
+                                        loginViewModel = viewModel,
+                                        onNext = {
+                                            context.startActivity(
+                                                Intent(
+                                                    context, StudentDashboardActivity::class.java
+                                                )
+                                            )
+                                            (context as? Activity)?.finish()
+                                        },
+                                        onBack = { navigateBack(AppRoute.ProfileScreen.route) })
+
+                                    AppRoute.EditSpeEduEditProfile.route -> SpecialEducatorEditProfile(
+                                        loginViewModel = viewModel,
+                                        onNext = {
+                                            context.startActivity(
+                                                Intent(
+                                                    context, StudentDashboardActivity::class.java
+                                                )
+                                            )
+                                            (context as? Activity)?.finish()
+                                        },
+                                        onBack = { navigateBack(AppRoute.ProfileScreen.route) })
+
+                                    // Screening
+                                    AppRoute.ScreeningScreen.route -> ScreeningHomeScreen(
+                                        addStudent = { navigateTo(AppRoute.AddStudentRegister.route) },
+                                        screeningOne = { navigateTo(AppRoute.ScreeningOne.route) },
+                                        profilerForm = { navigateTo(AppRoute.ProfilerFormPage.route) },
+                                        advanceScreening = { navigateTo(AppRoute.AdvanceScreening.route) },
+                                        onBack = { navigateBack(AppRoute.DashboardScreen.route) })
+
+                                    AppRoute.ScreeningOne.route -> ScreeningOneScreen(
+                                        onNext = { navigateTo(AppRoute.ScreeningOneReport.route) },
+                                        onBack = { navigateBack(AppRoute.ScreeningScreen.route) })
+
+                                    AppRoute.TrackRequestScreen.route -> {
+                                        TrackRequestScreen(
+                                            onNext = {},
+                                            onBack = { navigateBack(AppRoute.ProfileScreen.route) })
+                                    }
+
+                                    AppRoute.NotificationScreen.route -> {
+                                        NotificationScreen(
+                                            onNext = {},
+                                            onBack = { navigateBack(AppRoute.DashboardScreen.route) })
+                                    }
+
+                                    AppRoute.ScreeningOneReport.route -> {
+                                        ScreeningOneReportScreen(
+                                            showReportScreen = true,
+                                            onNext = { navigateTo(AppRoute.ProfilerFormPage.route) },
+                                            onNextCongratulate = { navigateTo(AppRoute.AdvanceScreeningReport.route) },
+                                            onBack = { navigateBack(AppRoute.ScreeningScreen.route) })
+                                    }
+
+                                    AppRoute.ProfilerFormPage.route -> {
+                                        ProfilerFormPageScreen(
+                                            onNext = { navigateTo(AppRoute.ProfilerFormPage.route) },
+                                            onBack = { navigateBack(AppRoute.ScreeningScreen.route) })
+                                    }
+
+                                    AppRoute.AdvanceScreening.route -> AdvanceScreeningScreen(
+                                        onNext = { navigateTo(AppRoute.AdvanceScreeningReport.route) },
+                                        onBack = { navigateBack(AppRoute.ScreeningScreen.route) })
+
+                                    AppRoute.AdvanceScreeningReport.route -> {
+                                        ReportAdvanceScreen(
+                                            onNext = { navigateTo(AppRoute.InterventionScreen.route) },
+                                            onViewProfileDetails = { navigateTo(AppRoute.ViewScreeningProfileDetails.route) },
+                                            onBack = { navigateBack(AppRoute.ScreeningScreen.route) })
+                                    }
+
+                                    AppRoute.ViewScreeningProfileDetails.route -> {
+                                        ViewScreeningProfileDetailsScreen(
+                                            onNext = { navigateTo(AppRoute.ScreeningScreen.route) },
+                                            onBack = { navigateBack(AppRoute.ScreeningScreen.route) })
+                                    }
+
+                                    AppRoute.AddStudentRegister.route -> AddNewStudentDetailsScreen(
+                                        onNext = { navigateTo(AppRoute.AddNewStudentMoreDetails.route) },
+                                        onBack = { navigateBack(AppRoute.ScreeningScreen.route) })
+
+                                    AppRoute.AddNewStudentMoreDetails.route -> AddNewStudentMoreDetailsScreen(
+                                        onNext = { navigateTo(AppRoute.ScreeningScreen.route) },
+                                        onBack = { navigateBack(AppRoute.AddStudentRegister.route) })
+
+                                    // This is for intervention
+                                    AppRoute.InterventionScreen.route -> InterventionHomeScreen(
+                                        onNext = { navigateTo(AppRoute.InterventionStudentDetails.route) },
+                                        onBack = { navigateBack(AppRoute.DashboardScreen.route) })
+
+                                    AppRoute.InterventionStudentDetails.route -> InterventionStudentDetailsScreen(
+                                        uploadedDocumentScreen = { navigateTo(AppRoute.UploadedDocuments.route) },
+                                        acceptLevelScreen = { navigateTo(AppRoute.InterventionAcceptLevel.route) },
+                                        onBack = { navigateBack(AppRoute.InterventionScreen.route) })
+
+                                    AppRoute.UploadedDocuments.route -> UploadedDocumentsScreen(
+                                        onBack = { navigateBack(AppRoute.InterventionStudentDetails.route) })
+
+                                    AppRoute.InterventionAcceptLevel.route -> InterventionAcceptLevelScreen(
+                                        onNext = { navigateTo(AppRoute.TeachingPlan.route) },
+                                        onBack = { navigateBack(AppRoute.InterventionStudentDetails.route) })
+
+                                    AppRoute.TeachingPlan.route -> TeachingPlanScreen(onBack = {
+                                        navigateBack(
+                                            AppRoute.InterventionAcceptLevel.route
+                                        )
+                                    })
+                                }
                             }
                         }
+
                     }
                 })
             }

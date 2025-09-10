@@ -479,10 +479,8 @@ fun TextViewFieldEmail(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
-    val shownEmail = decryptedEmail(text.value.toString().trim()) // for email
-    val keyboardController = LocalSoftwareKeyboardController.current
     TextField(
-        value = shownEmail,
+        value = text.value,
         onValueChange = {
             text.value = it
         },

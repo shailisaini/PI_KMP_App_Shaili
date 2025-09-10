@@ -1,7 +1,17 @@
 package com.pi.ProjectInclusion.data.model.authenticationModel.response
 
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.LoginApiResponse.LoginResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.SendOTPResponse.OTPResponse
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonDecoder
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
 
 @Serializable
 data class LoginApiResponse(
@@ -20,6 +30,7 @@ data class LoginApiResponse(
     @SerialName("error")
     val error: String? = null,
 
+    @Serializable(with = verifyOtpResponseSerializer::class)
     @SerialName("response")
     val response: LoginResponse? = null,
 
@@ -98,4 +109,30 @@ data class LoginApiResponse(
         @SerialName("lastAccountRestoredDate")
         val lastAccountRestoredDate: String? = null
     )
+}
+
+// response is different
+object verifyOtpResponseSerializer : KSerializer<LoginResponse?> {
+    override val descriptor: SerialDescriptor =
+        LoginResponse.serializer().descriptor
+
+    override fun deserialize(decoder: Decoder): LoginResponse? {
+        val input = decoder as? JsonDecoder ?: error("")
+        val element = input.decodeJsonElement()
+
+        return when (element) {
+            is JsonObject -> input.json.decodeFromJsonElement(LoginResponse.serializer(), element)
+            is JsonArray -> null  // [] → null
+            is JsonNull -> null   // null → null
+            else -> null
+        }
+    }
+
+    override fun serialize(encoder: Encoder, value: LoginResponse?) {
+        if (value == null) {
+            encoder.encodeNull()
+        } else {
+            encoder.encodeSerializableValue(LoginResponse.serializer(), value)
+        }
+    }
 }
