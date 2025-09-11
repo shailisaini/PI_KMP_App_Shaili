@@ -17,6 +17,7 @@ object ConstantVariables {
     var IS_COMING_FROM: String = "isComingFrom"
     var USER_MOBILE_NO: String = "userMobileNo"
     var USER_NAME: String = "userName"
+    var USER_ID: String = "userId"
 
     // for Screens
     var IMG_DESCRIPTION: String = "img"

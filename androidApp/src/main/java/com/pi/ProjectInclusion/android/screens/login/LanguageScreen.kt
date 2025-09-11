@@ -82,7 +82,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetLangua
 import kotlinx.coroutines.launch
 
 @Composable
-    fun LanguageScreen(viewModel: LoginViewModel, onNext: () -> Unit) {
+fun LanguageScreen(viewModel: LoginViewModel, onNext: () -> Unit) {
 
     val context = LocalContext.current
 
@@ -112,7 +112,7 @@ fun LanguageResponseUI(
     val errColor = PrimaryBlue
     val scrollState = rememberLazyGridState()
     val coroutineScope = rememberCoroutineScope()
-    var noData  = stringResource(R.string.txt_oops_no_data_found)
+    var noData = stringResource(R.string.txt_oops_no_data_found)
     var isInternetAvailable by remember { mutableStateOf(true) }
     val internetMessage = stringResource(R.string.txt_oops_no_internet)
     var noDataMessage by remember { mutableStateOf(noData) }
