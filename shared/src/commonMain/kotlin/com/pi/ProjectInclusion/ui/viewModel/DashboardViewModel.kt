@@ -87,10 +87,10 @@ class DashboardViewModel(
     val getAccountDelete = MutableStateFlow(UiState<AccountDeleteResponse>())
     val getAccountDeleteResponse: StateFlow<UiState<AccountDeleteResponse>> = getAccountDelete
 
-    private val changePassword = MutableStateFlow(UiState<ForgetPasswordResponse>())
+    val changePassword = MutableStateFlow(UiState<ForgetPasswordResponse>())
     val changePasswordResponse: StateFlow<UiState<ForgetPasswordResponse>> = changePassword
 
-    private val checkProfile = MutableStateFlow(UiState<CheckProfileCompletionResponse>())
+    val checkProfile = MutableStateFlow(UiState<CheckProfileCompletionResponse>())
     val checkProfileResponse: StateFlow<UiState<CheckProfileCompletionResponse>> = checkProfile
 
     fun isNetworkAvailable(): Boolean {

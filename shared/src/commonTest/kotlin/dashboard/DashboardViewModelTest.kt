@@ -1,14 +1,10 @@
 package dashboard
 
-import authentication.FakeAuthenticationRepository
 import FakeConnectivityObserver
 import FakeLocalDataSource
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
-import com.pi.ProjectInclusion.data.model.authenticationModel.request.LoginRequest
-import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
+import com.pi.ProjectInclusion.data.model.profileModel.ChangePasswordRequest
 import com.pi.ProjectInclusion.data.model.profileModel.ProfileNameChangeRequest
-import com.pi.ProjectInclusion.domain.useCases.AuthenticationUsesCases
 import com.pi.ProjectInclusion.domain.useCases.DashboardUsesCases
 import com.pi.ProjectInclusion.ui.viewModel.DashboardViewModel
 import io.ktor.utils.io.core.toByteArray
@@ -22,7 +18,6 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
@@ -110,7 +105,10 @@ class LoginViewModelTest {
         // Assert
         val state = dashboardViewModel.getTrackRequest.first { !it.isLoading }
         assertNotNull(state.success)
-        assertEquals("Track request successful", state.success.message) // adapt to your fake response
+        assertEquals(
+            "Track request successful",
+            state.success.message
+        ) // adapt to your fake response
     }
 
     @Test
@@ -132,25 +130,25 @@ class LoginViewModelTest {
         assertEquals("Request Not found!", state.error) // adapt to your fake response
     }
 
-     // Certificate
+    // Certificate
     @Test
     fun lms_certificate_emits_success() = runTest {
-            // Arrange
-            fakeRepo.shouldSucceed = true
+        // Arrange
+        fakeRepo.shouldSucceed = true
 
-            // Act
-            dashboardViewModel.getLMSUserCertificate(
-                CertificateRequest(),
-                strToken = "fake_token"
-            )
+        // Act
+        dashboardViewModel.getLMSUserCertificate(
+            CertificateRequest(),
+            strToken = "fake_token"
+        )
 
-            testDispatcher.scheduler.advanceUntilIdle()
+        testDispatcher.scheduler.advanceUntilIdle()
 
-            // Assert
-            val state = dashboardViewModel.getCertificate.first { !it.isLoading }
-            assertNotNull(state.success)
-            assertEquals("LMS request successful", state.success.message) // adapt to your fake response
-        }
+        // Assert
+        val state = dashboardViewModel.getCertificate.first { !it.isLoading }
+        assertNotNull(state.success)
+        assertEquals("LMS request successful", state.success.message) // adapt to your fake response
+    }
 
     @Test
     fun lms_certificate_emits_error() = runTest {
@@ -179,13 +177,12 @@ class LoginViewModelTest {
 
         // Act
         dashboardViewModel.getAllCategory()
-
         testDispatcher.scheduler.advanceUntilIdle()
 
         // Assert
-        val state = dashboardViewModel.getCertificate.first { !it.isLoading }
+        val state = dashboardViewModel.getCategoryList.first { !it.isLoading }
         assertNotNull(state.success)
-        assertEquals("FAQ request successful", state.success.message) // adapt to your fake response
+        assertEquals("Faq Category", state.success[0].name)
     }
 
     @Test
@@ -199,7 +196,7 @@ class LoginViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
 
         // Assert
-        val state = dashboardViewModel.getCertificate.first { !it.isLoading }
+        val state = dashboardViewModel.getCategoryList.first { !it.isLoading }
         assertNotNull(state.error)
         assertEquals("Request Not found!", state.error) // adapt to your fake response
     }
@@ -216,9 +213,9 @@ class LoginViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
 
         // Assert
-        val state = dashboardViewModel.getCertificate.first { !it.isLoading }
+        val state = dashboardViewModel.getSubCategoryList.first { !it.isLoading }
         assertNotNull(state.success)
-        assertEquals("LMS request successful", state.success.message) // adapt to your fake response
+        assertEquals("Faq Sub Category", state.success[0].name) // adapt to your fake response
     }
 
     @Test
@@ -227,17 +224,178 @@ class LoginViewModelTest {
         fakeRepo.shouldSucceed = false
 
         // Act
-        dashboardViewModel.getLMSUserCertificate(
-            CertificateRequest(),
-            strToken = "fake_token"
-        )
+        dashboardViewModel.getAllSubCategory()
 
         testDispatcher.scheduler.advanceUntilIdle()
 
         // Assert
-        val state = dashboardViewModel.getCertificate.first { !it.isLoading }
+        val state = dashboardViewModel.getSubCategoryList.first { !it.isLoading }
         assertNotNull(state.error)
         assertEquals("Sub-Category Not found!", state.error) // adapt to your fake response
+    }
+
+    // Faq Sub Category
+    @Test
+    fun faq_sub_category_by_category_emits_success() = runTest {
+        // Arrange
+        fakeRepo.shouldSucceed = true
+
+        // Act
+        dashboardViewModel.getAllSubCategoryByCategoryId(1)
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Assert
+        val state = dashboardViewModel.getSubCategoryByCategoryIdList.first { !it.isLoading }
+        assertNotNull(state.success)
+        assertEquals("All Sub-category by Category", state.success.message) // adapt to your fake response
+    }
+
+    @Test
+    fun aq_sub_category_by_category_emits_error() = runTest {
+        // Arrange
+        fakeRepo.shouldSucceed = false
+
+        // Act
+        dashboardViewModel.getAllSubCategoryByCategoryId(1)
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Assert
+        val state = dashboardViewModel.getSubCategoryByCategoryIdList.first { !it.isLoading }
+        assertNotNull(state.error)
+        assertEquals("No Sub-category by Category", state.error) // adapt to your fake response
+    }
+
+    // get All FAQ
+    @Test
+    fun all_faq_emits_success() = runTest {
+        // Arrange
+        fakeRepo.shouldSucceed = true
+
+        // Act
+        dashboardViewModel.getAllFAQs("1","","","","","")
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Assert
+        val state = dashboardViewModel.getFAQsList.first { !it.isLoading }
+        assertNotNull(state.success)
+        assertEquals("All FAQ", state.success.message) // adapt to your fake response
+    }
+
+    @Test
+    fun all_faq_emits_error() = runTest {
+        // Arrange
+        fakeRepo.shouldSucceed = false
+
+        // Act
+        dashboardViewModel.getAllFAQs("1","","","","","")
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Assert
+        val state = dashboardViewModel.getFAQsList.first { !it.isLoading }
+        assertNotNull(state.error)
+        assertEquals("All FAQ", state.error) // adapt to your fake response
+    }
+
+    @Test
+    fun change_password_emits_success() = runTest {
+        // Arrange
+        fakeRepo.shouldSucceed = true
+
+        // Act
+        dashboardViewModel.changePassword(ChangePasswordRequest("",""),"Token")
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Assert
+        val state = dashboardViewModel.changePassword.first { !it.isLoading }
+        assertNotNull(state.success)
+        assertEquals("Password change Successfully!", state.success.message) // adapt to your fake response
+    }
+
+    @Test
+    fun change_password_emits_error() = runTest {
+        // Arrange
+        fakeRepo.shouldSucceed = false
+
+        // Act
+        dashboardViewModel.changePassword(ChangePasswordRequest("",""),"Token")
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Assert
+        val state = dashboardViewModel.changePassword.first { !it.isLoading }
+        assertNotNull(state.error)
+        assertEquals("Password Error!", state.error) // adapt to your fake response
+    }
+
+    // deactivate
+    @Test
+    fun deactivate_user_emits_success() = runTest {
+        // Arrange
+        fakeRepo.shouldSucceed = true
+
+        // Act
+        dashboardViewModel.deactivateUser("token", "1")
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Assert
+        val state = dashboardViewModel.getAccountDelete.first { !it.isLoading }
+        assertNotNull(state.success)
+        assertEquals("Deactivate user!", state.success.message) // adapt to your fake response
+    }
+
+    @Test
+    fun deactivate_user_emits_error() = runTest {
+        // Arrange
+        fakeRepo.shouldSucceed = false
+
+        // Act
+        dashboardViewModel.deactivateUser("token", "1")
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Assert
+        val state = dashboardViewModel.getAccountDelete.first { !it.isLoading }
+        assertNotNull(state.error)
+        assertEquals("Error to deactivate user", state.error) // adapt to your fake response
+    }
+
+    // check profile completion
+    @Test
+    fun profile_completion_emits_success() = runTest {
+        // Arrange
+        fakeRepo.shouldSucceed = true
+
+        // Act
+        dashboardViewModel.checkProfileCompletion("1")
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Assert
+        val state = dashboardViewModel.checkProfile.first { !it.isLoading }
+        assertNotNull(state.success)
+        assertEquals("Check Profile Completion", state.success.message) // adapt to your fake response
+    }
+
+    @Test
+    fun profile_completion_emits_error() = runTest {
+        // Arrange
+        fakeRepo.shouldSucceed = false
+
+        // Act
+        dashboardViewModel.checkProfileCompletion("1")
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Assert
+        val state = dashboardViewModel.checkProfile.first { !it.isLoading }
+        assertNotNull(state.error)
+        assertEquals("Error!", state.error) // adapt to your fake response
     }
 
 }

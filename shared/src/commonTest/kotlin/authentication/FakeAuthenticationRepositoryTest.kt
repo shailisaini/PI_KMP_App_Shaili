@@ -81,7 +81,11 @@ class FakeAuthenticationRepository : AuthenticationRepository {
         token: String,
         userName: String
     ): ViewProfileResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            ViewProfileResponse(status = true, message = "User Success", error ="")
+        } else {
+            throw Exception("Invalid User")
+        }
     }
 
     override suspend fun forgetPasswordRepo(

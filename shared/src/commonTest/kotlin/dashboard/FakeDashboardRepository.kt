@@ -79,7 +79,11 @@ class FakeDashboardRepository : DashboardRepository {
     }
 
     override suspend fun getAllSubCategoryByCategoryIdRepo(categoryId: Int): SubCategoryByCategoryIdResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            SubCategoryByCategoryIdResponse(status = 0, errorCode = "200", message = "All Sub-category by Category")
+        } else {
+            throw Exception("No Sub-category by Category")
+        }
     }
 
     override suspend fun getAllFAQsRepo(
@@ -90,7 +94,11 @@ class FakeDashboardRepository : DashboardRepository {
         userId: String,
         languageId: String
     ): FAQsListResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            FAQsListResponse(status = 0, errorCode = "200", message = "All FAQ")
+        } else {
+            throw Exception("All FAQ")
+        }
     }
 
     override suspend fun getRefreshTokenRepo(): ZoomMeetingTokenResponse {
@@ -120,18 +128,30 @@ class FakeDashboardRepository : DashboardRepository {
         passwordRequest: ChangePasswordRequest,
         strToken: String
     ): ForgetPasswordResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            ForgetPasswordResponse(status = true, message = "Password change Successfully!")
+        } else {
+            throw Exception("Password Error!")
+        }
     }
 
     override suspend fun deactivateUserRepo(
         tokenKey: String,
         userId: String
     ): AccountDeleteResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            AccountDeleteResponse(status = true, message = "Deactivate user!")
+        } else {
+            throw Exception("Error to deactivate user")
+        }
     }
 
     override suspend fun checkProfileCompletionRepo(tokenKey: String): CheckProfileCompletionResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            CheckProfileCompletionResponse(status = true, message = "Check Profile Completion")
+        } else {
+            throw Exception("Error!")
+        }
     }
 
 }

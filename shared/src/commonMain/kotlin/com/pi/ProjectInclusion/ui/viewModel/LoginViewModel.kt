@@ -85,7 +85,7 @@ class LoginViewModel(
     private val loginWithOtpState = MutableStateFlow(UiState<LoginApiResponse>())
     val loginWithOtpResponse: StateFlow<UiState<LoginApiResponse>> = loginWithOtpState
 
-    private val viewUserProfile = MutableStateFlow(UiState<ViewProfileResponse>())
+    val viewUserProfile = MutableStateFlow(UiState<ViewProfileResponse>())
     val viewUserProfileResponse: StateFlow<UiState<ViewProfileResponse>> = viewUserProfile
 
     private val verifyLogin = MutableStateFlow(UiState<VerifyOtpResponse>())
@@ -555,17 +555,18 @@ class LoginViewModel(
 
         shouldRefreshProfile = false // Reset on successful start
 
-        viewUserProfile.update { it.copy(isLoading = true, error = "") }
+        viewUserProfile.update { it.copy(isLoading = true) }
 
         getAuthViewModel.getViewUserProfile(token, data)
             .catch { exception ->
+                // Handle exception thrown before collect
                 if (exception.message?.contains(serverError) == true) {
                     viewUserProfile.update {
-                        UiState(error = serverMsg)
+                        UiState(error = serverMsg.takeIf { it.isNotBlank() } ?: somethingWentWrong)
                     }
                 } else {
                     viewUserProfile.update {
-                        UiState(error = exception.message ?: somethingWentWrong)
+                        UiState(error = exception.message?.takeIf { it.isNotBlank() } ?: somethingWentWrong)
                     }
                 }
             }
@@ -575,13 +576,14 @@ class LoginViewModel(
                         viewUserProfile.update { UiState(success = data) }
                     },
                     onFailure = { exception ->
+                        // Handle exception inside Result
                         if (exception.message?.contains(serverError) == true) {
                             viewUserProfile.update {
-                                UiState(error = serverMsg)
+                                UiState(error = serverMsg.takeIf { it.isNotBlank() } ?: somethingWentWrong)
                             }
                         } else {
                             viewUserProfile.update {
-                                UiState(error = exception.message ?: somethingWentWrong)
+                                UiState(error = exception.message?.takeIf { it.isNotBlank() } ?: somethingWentWrong)
                             }
                         }
                     }
