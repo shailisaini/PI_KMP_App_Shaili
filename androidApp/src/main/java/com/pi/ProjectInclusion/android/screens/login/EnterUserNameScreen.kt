@@ -11,8 +11,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -61,7 +64,6 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
 import com.pi.ProjectInclusion.constants.ConstantVariables.SUCCESS
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_MOBILE_NO
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
-import com.pi.ProjectInclusion.constants.ConstantVariables.UnableToSendMsg
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 
@@ -311,7 +313,14 @@ fun LoginUI(
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 15.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+            Column(
+                modifier = Modifier
                     .padding(10.dp)
+                    .verticalScroll(rememberScrollState())
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -364,18 +373,15 @@ fun LoginUI(
 
                     Spacer(modifier = Modifier.height(15.dp))
                     BtnUi(
-                        enabled = userName.value.length >= 6,
+                        enabled = userName.value.isNotEmpty(),
                         title = txtContinue,
                         onClick = {
-                            if (userName.value.isEmpty()) {
-                                inValidMobNo = true
-                            } else {
+                            if (userName.value.isNotEmpty() || userName.value.length >= 6) {
                                 if (showError || userName.value.length < 6) {
                                     inValidMobNo = true
                                 } else {
                                     isInternetAvailable = isNetworkAvailable(context)
                                     // if first digit of mobile is less than 6 then error will show
-
                                     if (!isInternetAvailable) {
                                         context.toast(internetMessage)
                                     } else {
@@ -387,23 +393,22 @@ fun LoginUI(
                             }
                         },
                     )
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .weight(1f)
-                            .padding(horizontal = 8.dp, vertical = 8.dp),
-                        verticalArrangement = Arrangement.Bottom
-                    ) {
-                        TermsAndPrivacyText(
-                            onTermsClick = {
-                                onPrivacyPolicy()
-                            },
-                            onPrivacyClick = {
-                                onPrivacyPolicy()
-                            }
-                        )
-                    }
+                }
+                }
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 8.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+                    TermsAndPrivacyText(
+                        onTermsClick = {
+                            onPrivacyPolicy()
+                        },
+                        onPrivacyClick = {
+                            onPrivacyPolicy()
+                        }
+                    )
                 }
             }
         }

@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -312,8 +314,8 @@ fun PasswordUI(
             Column(
                 modifier = Modifier
                     .padding(10.dp)
-                    .fillMaxWidth(),
-//                    .verticalScroll(rememberScrollState()),
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
@@ -361,7 +363,6 @@ fun PasswordUI(
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .weight(1f)
                             .padding(8.dp)
                     ) {
                         Text(
@@ -382,17 +383,11 @@ fun PasswordUI(
                         Spacer(modifier = Modifier.height(10.dp))
 
                         BtnUi(
-                            enabled = passwordText.value.length >= 8,
+                            enabled = passwordText.value.length >= 6,
                             title = txtContinue,
                             onClick = {
-                                if (passwordText.value.isEmpty()) {
-                                    isValidMobNo = true
-                                } else {
-                                    if (passwordText.value.length < 8) {
-                                        isValidMobNo = true
-                                    } else {
-                                        loginWithPassword = true
-                                    }
+                                if (passwordText.value.isNotEmpty() || passwordText.value.length >= 6) {
+                                    loginWithPassword = true
                                 }
                             },
                         )

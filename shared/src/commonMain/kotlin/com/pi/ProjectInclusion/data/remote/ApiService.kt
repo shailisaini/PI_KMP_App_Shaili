@@ -60,6 +60,10 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.Parameters
 import io.ktor.http.appendPathSegments
 import io.ktor.http.contentType
+import io.ktor.http.encodeURLParameter
+import io.ktor.http.encodeURLPath
+import io.ktor.http.encodeURLPathPart
+import io.ktor.http.encodedPath
 import io.ktor.http.takeFrom
 
 class ApiService(private val client: HttpClient) {
@@ -285,13 +289,14 @@ class ApiService(private val client: HttpClient) {
         client.get {
             url {
                 takeFrom(STUDENT_BASE_URL)
-                appendPathSegments(appendUser, "get-user-by-username", username)
+
+                encodedPath = "$encodedPath/$appendUser/get-user-by-username/${username.trim().encodeURLParameter()}"
             }
             headers {
                 append(HttpHeaders.Accept, "application/json")
                 append(HttpHeaders.Authorization, token)
             }
-        }.body<ViewProfileResponse>()
+        }.body()
 
     suspend fun createFirstStepProfile(
         firstStepProfileRequest: FirstStepProfileRequest,

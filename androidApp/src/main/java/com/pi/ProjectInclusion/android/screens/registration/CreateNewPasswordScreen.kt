@@ -27,7 +27,9 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -67,7 +69,6 @@ import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import coil.size.Size
-import com.example.kmptemplate.logger.LoggerProvider
 import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Bg_Gray
 import com.pi.ProjectInclusion.Bg_Gray1
@@ -107,7 +108,6 @@ import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CreatePasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetUserTypeResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 
@@ -232,397 +232,406 @@ fun CreateNewPasswordUI(
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp)
-                .fillMaxWidth()
-        ) {
-            LoginScreenTitle(
-                stringResource(R.string.txt_Set_your_Password), Black, Gray, Transparent,
-                stringResource(R.string.txt_set_password_desc)
-            )
+                .padding(horizontal = 16.dp, vertical = 10.dp)
+                .fillMaxSize(),
 
-            Row(
+        ) {
+            Column(
                 modifier = Modifier
-                    .padding(start = 5.dp, end = 16.dp)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(start = 16.dp, end = 16.dp)
+                    .fillMaxWidth()
+                    .fillMaxSize()
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.Top
             ) {
-                Card(
+                LoginScreenTitle(
+                    stringResource(R.string.txt_Set_your_Password), Black, Gray, Transparent,
+                    stringResource(R.string.txt_set_password_desc)
+                )
+
+                Row(
                     modifier = Modifier
-                        .padding(8.dp)
-                        .background(color = PrimaryBlueLt1)
-                        .wrapContentSize(),
-                    elevation = CardDefaults.cardElevation(1.dp),
-                    colors = CardDefaults.cardColors(
-                        if (isSystemInDarkTheme()) {
-                            Dark_02
-                        } else {
-                            PrimaryBlueLt1
-                        }
-                    ),
-                    border = BorderStroke(width = 1.dp, PrimaryBlue),
-                    shape = RoundedCornerShape(12.dp)
+                        .padding(start = 5.dp, end = 16.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Card(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .background(color = PrimaryBlueLt1)
+                            .wrapContentSize(),
+                        elevation = CardDefaults.cardElevation(1.dp),
+                        colors = CardDefaults.cardColors(
+                            if (isSystemInDarkTheme()) {
+                                Dark_02
+                            } else {
+                                PrimaryBlueLt1
+                            }
+                        ),
+                        border = BorderStroke(width = 1.dp, PrimaryBlue),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .padding(vertical = 5.dp, horizontal = 15.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Image(
+                                painter = rememberAsyncImagePainter(
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data(R.drawable.img_teacher)
+                                        .decoderFactory(SvgDecoder.Factory())
+                                        .placeholder(R.drawable.img_teacher)
+                                        .error(R.drawable.img_teacher)
+                                        .build()
+                                ),
+                                contentDescription = IMG_DESCRIPTION,
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .background(Color.Unspecified),
+                                contentScale = ContentScale.Crop
+                            )
+
+                            Text(
+                                text = userTypeName,
+                                modifier = Modifier.padding(
+                                    top = 5.dp,
+                                    bottom = 5.dp
+                                ),
+                                textAlign = TextAlign.Start,
+                                fontFamily = fontRegular,
+                                fontSize = 10.sp,
+                                color = Black
+                            )
+                        }
+                    }
                     Column(
                         modifier = Modifier
-                            .wrapContentSize()
-                            .padding(vertical = 5.dp, horizontal = 15.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                            .padding(start = 10.dp, end = 10.dp)
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.Center
                     ) {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = ImageRequest.Builder(LocalContext.current)
-                                    .data(R.drawable.img_teacher)
-                                    .decoderFactory(SvgDecoder.Factory())
-                                    .placeholder(R.drawable.img_teacher)
-                                    .error(R.drawable.img_teacher)
-                                    .build()
-                            ),
-                            contentDescription = IMG_DESCRIPTION,
-                            modifier = Modifier
-                                .size(50.dp)
-                                .background(Color.Unspecified),
-                            contentScale = ContentScale.Crop
-                        )
-
                         Text(
-                            text = userTypeName,
+                            text = stringResource(R.string.txt_change_user),
                             modifier = Modifier.padding(
                                 top = 5.dp,
                                 bottom = 5.dp
                             ),
                             textAlign = TextAlign.Start,
                             fontFamily = fontRegular,
-                            fontSize = 10.sp,
+                            fontSize = 12.sp,
                             color = Black
                         )
+                        Card(
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier
+                                .wrapContentHeight()
+                                .clickable {
+                                    showBottomSheet = true
+                                },
+                            colors = if (isSystemInDarkTheme()) {
+                                CardDefaults.cardColors(Dark_01)
+                            } else {
+                                CardDefaults.cardColors(
+                                    containerColor = White,
+                                    contentColor = White,
+                                    disabledContentColor = White,
+                                    disabledContainerColor = White
+                                )
+                            },
+                            border = BorderStroke(0.8.dp, color = PrimaryBlue)
+                        ) {
+                            TextWithIconOnLeft(
+                                text = stringResource(R.string.txt_change),
+                                icon = ImageVector.vectorResource(id = R.drawable.ic_refresh),
+                                textColor = PrimaryBlue,
+                                iconColor = Color.Unspecified,
+                                modifier = Modifier.padding(10.dp),
+                                onClick = { showBottomSheet = true })
+                        }
                     }
                 }
-                Column(
-                    modifier = Modifier
-                        .padding(start = 10.dp, end = 10.dp)
-                        .fillMaxWidth(),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.txt_change_user),
-                        modifier = Modifier.padding(
-                            top = 5.dp,
-                            bottom = 5.dp
-                        ),
-                        textAlign = TextAlign.Start,
-                        fontFamily = fontRegular,
-                        fontSize = 12.sp,
-                        color = Black
+
+                Text(
+                    text = buildAnnotatedString {
+                        append(stringResource(R.string.txt_New_Password))
+                        pushStyle(SpanStyle(color = Color.Red))
+                        append("*")
+                        pop()
+                    },
+                    modifier = Modifier.padding(
+                        top = 24.dp,
+                        bottom = 10.dp,
+                        start = 8.dp, end = 8.dp
+                    ),
+                    textAlign = TextAlign.Start,
+                    fontStyle = FontStyle.Normal,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 14.sp,
+                    color = if (isSystemInDarkTheme()) {
+                        DARK_BODY_TEXT
+                    } else {
+                        Bg_Gray
+                    }
+                )
+
+                PasswordTextField(
+                    password = enterPasswordStr,
+                    showPassword = showPassword,
+                    hint = enterPassword
+                )
+
+
+                Text(
+                    text = buildAnnotatedString {
+                        append(stringResource(R.string.txt_Confirm_Password))
+                        pushStyle(SpanStyle(color = Color.Red))
+                        append("*")
+                        pop()
+                    },
+                    modifier = Modifier.padding(
+                        top = 24.dp,
+                        bottom = 10.dp,
+                        start = 8.dp, end = 8.dp
+                    ),
+                    textAlign = TextAlign.Start,
+                    fontStyle = FontStyle.Normal,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 14.sp,
+                    color = if (isSystemInDarkTheme()) {
+                        DARK_BODY_TEXT
+                    } else {
+                        Bg_Gray
+                    }
+                )
+
+                PasswordTextField(
+                    password = enterConfirmPasswordStr,
+                    showPassword = showConfirmPassword,
+                    hint = enterConfirmPassword
+                )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(
+                        top = 16.dp,
+                        start = 12.dp,
+                        end = 12.dp,
+                        bottom = 8.dp
                     )
-                    Card(
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier
-                            .wrapContentHeight()
-                            .clickable {
-                                showBottomSheet = true
-                            },
+                ) {
+                    Checkbox(
+                        checked = minLength,
+                        onCheckedChange = null,
                         colors = if (isSystemInDarkTheme()) {
-                            CardDefaults.cardColors(Dark_01)
+                            CheckboxDefaults.colors(
+                                checkedColor = Color.Transparent,
+                                uncheckedColor = Color.LightGray,
+                                checkmarkColor = PrimaryBlue
+                            )
                         } else {
-                            CardDefaults.cardColors(
-                                containerColor = White,
-                                contentColor = White,
-                                disabledContentColor = White,
-                                disabledContainerColor = White
+                            CheckboxDefaults.colors(
+                                checkedColor = Color.Transparent,
+                                uncheckedColor = Color.LightGray,
+                                checkmarkColor = PrimaryBlue
                             )
                         },
-                        border = BorderStroke(0.8.dp, color = PrimaryBlue)
-                    ) {
-                        TextWithIconOnLeft(
-                            text = stringResource(R.string.txt_change),
-                            icon = ImageVector.vectorResource(id = R.drawable.ic_refresh),
-                            textColor = PrimaryBlue,
-                            iconColor = Color.Unspecified,
-                            modifier = Modifier.padding(10.dp),
-                            onClick = { showBottomSheet = true })
-                    }
+                        modifier = Modifier.size(20.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Text(
+                        text = txtCharacter,
+                        modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                        textAlign = TextAlign.Center,
+                        fontStyle = FontStyle.Normal,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 12.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_BODY_TEXT
+                        } else {
+                            Gray
+                        }
+                    )
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
+                ) {
+                    Checkbox(
+                        checked = hasLetter,
+                        onCheckedChange = null,
+                        colors = if (isSystemInDarkTheme()) {
+                            CheckboxDefaults.colors(
+                                checkedColor = Color.Transparent,
+                                uncheckedColor = Color.LightGray,
+                                checkmarkColor = PrimaryBlue
+                            )
+                        } else {
+                            CheckboxDefaults.colors(
+                                checkedColor = Color.Transparent,
+                                uncheckedColor = Color.LightGray,
+                                checkmarkColor = PrimaryBlue
+                            )
+                        },
+                        modifier = Modifier.size(20.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Text(
+                        text = txtUppercase,
+                        modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                        textAlign = TextAlign.Center,
+                        fontStyle = FontStyle.Normal,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 12.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_BODY_TEXT
+                        } else {
+                            Gray
+                        }
+                    )
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
+                ) {
+                    Checkbox(
+                        checked = hasDigit,
+                        onCheckedChange = null,
+                        colors = if (isSystemInDarkTheme()) {
+                            CheckboxDefaults.colors(
+                                checkedColor = Color.Transparent,
+                                uncheckedColor = Color.LightGray,
+                                checkmarkColor = PrimaryBlue
+                            )
+                        } else {
+                            CheckboxDefaults.colors(
+                                checkedColor = Color.Transparent,
+                                uncheckedColor = Color.LightGray,
+                                checkmarkColor = PrimaryBlue
+                            )
+                        },
+                        modifier = Modifier.size(20.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Text(
+                        text = txtAtleastOne,
+                        modifier = Modifier
+                            .padding(start = 8.dp, end = 8.dp),
+                        textAlign = TextAlign.Center,
+                        fontStyle = FontStyle.Normal,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 12.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_BODY_TEXT
+                        } else {
+                            Gray
+                        }
+                    )
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
+                ) {
+                    Checkbox(
+                        checked = hasSymbol,
+                        onCheckedChange = null,
+                        colors = if (isSystemInDarkTheme()) {
+                            CheckboxDefaults.colors(
+                                checkedColor = Color.Transparent,
+                                uncheckedColor = Color.LightGray,
+                                checkmarkColor = PrimaryBlue
+                            )
+                        } else {
+                            CheckboxDefaults.colors(
+                                checkedColor = Color.Transparent,
+                                uncheckedColor = Color.LightGray,
+                                checkmarkColor = PrimaryBlue
+                            )
+                        },
+                        modifier = Modifier.size(20.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Text(
+                        text = txtSpecialCharacter,
+                        modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                        textAlign = TextAlign.Center,
+                        fontStyle = FontStyle.Normal,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 12.sp,
+                        color = if (isSystemInDarkTheme()) {
+                            DARK_BODY_TEXT
+                        } else {
+                            Gray
+                        }
+                    )
                 }
             }
 
-            Text(
-                text = buildAnnotatedString {
-                    append(stringResource(R.string.txt_New_Password))
-                    pushStyle(SpanStyle(color = Color.Red))
-                    append("*")
-                    pop()
-                },
-                modifier = Modifier.padding(
-                    top = 24.dp,
-                    bottom = 10.dp,
-                    start = 8.dp, end = 8.dp
-                ),
-                textAlign = TextAlign.Start,
-                fontStyle = FontStyle.Normal,
-                fontWeight = FontWeight.Medium,
-                fontSize = 14.sp,
-                color = if (isSystemInDarkTheme()) {
-                    DARK_BODY_TEXT
-                } else {
-                    Bg_Gray
-                }
-            )
-
-            PasswordTextField(
-                password = enterPasswordStr,
-                showPassword = showPassword,
-                hint = enterPassword
-            )
-
-
-            Text(
-                text = buildAnnotatedString {
-                    append(stringResource(R.string.txt_Confirm_Password))
-                    pushStyle(SpanStyle(color = Color.Red))
-                    append("*")
-                    pop()
-                },
-                modifier = Modifier.padding(
-                    top = 24.dp,
-                    bottom = 10.dp,
-                    start = 8.dp, end = 8.dp
-                ),
-                textAlign = TextAlign.Start,
-                fontStyle = FontStyle.Normal,
-                fontWeight = FontWeight.Medium,
-                fontSize = 14.sp,
-                color = if (isSystemInDarkTheme()) {
-                    DARK_BODY_TEXT
-                } else {
-                    Bg_Gray
-                }
-            )
-
-            PasswordTextField(
-                password = enterConfirmPasswordStr,
-                showPassword = showConfirmPassword,
-                hint = enterConfirmPassword
-            )
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(
-                    top = 16.dp,
-                    start = 12.dp,
-                    end = 12.dp,
-                    bottom = 8.dp
-                )
-            ) {
-                Checkbox(
-                    checked = minLength,
-                    onCheckedChange = null,
-                    colors = if (isSystemInDarkTheme()) {
-                        CheckboxDefaults.colors(
-                            checkedColor = Color.Transparent,
-                            uncheckedColor = Color.LightGray,
-                            checkmarkColor = PrimaryBlue
-                        )
-                    } else {
-                        CheckboxDefaults.colors(
-                            checkedColor = Color.Transparent,
-                            uncheckedColor = Color.LightGray,
-                            checkmarkColor = PrimaryBlue
-                        )
-                    },
-                    modifier = Modifier.size(20.dp)
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(
-                    text = txtCharacter,
-                    modifier = Modifier.padding(start = 8.dp, end = 8.dp),
-                    textAlign = TextAlign.Center,
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 12.sp,
-                    color = if (isSystemInDarkTheme()) {
-                        DARK_BODY_TEXT
-                    } else {
-                        Gray
-                    }
-                )
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
-            ) {
-                Checkbox(
-                    checked = hasLetter,
-                    onCheckedChange = null,
-                    colors = if (isSystemInDarkTheme()) {
-                        CheckboxDefaults.colors(
-                            checkedColor = Color.Transparent,
-                            uncheckedColor = Color.LightGray,
-                            checkmarkColor = PrimaryBlue
-                        )
-                    } else {
-                        CheckboxDefaults.colors(
-                            checkedColor = Color.Transparent,
-                            uncheckedColor = Color.LightGray,
-                            checkmarkColor = PrimaryBlue
-                        )
-                    },
-                    modifier = Modifier.size(20.dp)
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(
-                    text = txtUppercase,
-                    modifier = Modifier.padding(start = 8.dp, end = 8.dp),
-                    textAlign = TextAlign.Center,
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 12.sp,
-                    color = if (isSystemInDarkTheme()) {
-                        DARK_BODY_TEXT
-                    } else {
-                        Gray
-                    }
-                )
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
-            ) {
-                Checkbox(
-                    checked = hasDigit,
-                    onCheckedChange = null,
-                    colors = if (isSystemInDarkTheme()) {
-                        CheckboxDefaults.colors(
-                            checkedColor = Color.Transparent,
-                            uncheckedColor = Color.LightGray,
-                            checkmarkColor = PrimaryBlue
-                        )
-                    } else {
-                        CheckboxDefaults.colors(
-                            checkedColor = Color.Transparent,
-                            uncheckedColor = Color.LightGray,
-                            checkmarkColor = PrimaryBlue
-                        )
-                    },
-                    modifier = Modifier.size(20.dp)
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(
-                    text = txtAtleastOne,
-                    modifier = Modifier
-                        .padding(start = 8.dp, end = 8.dp),
-                    textAlign = TextAlign.Center,
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 12.sp,
-                    color = if (isSystemInDarkTheme()) {
-                        DARK_BODY_TEXT
-                    } else {
-                        Gray
-                    }
-                )
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
-            ) {
-                Checkbox(
-                    checked = hasSymbol,
-                    onCheckedChange = null,
-                    colors = if (isSystemInDarkTheme()) {
-                        CheckboxDefaults.colors(
-                            checkedColor = Color.Transparent,
-                            uncheckedColor = Color.LightGray,
-                            checkmarkColor = PrimaryBlue
-                        )
-                    } else {
-                        CheckboxDefaults.colors(
-                            checkedColor = Color.Transparent,
-                            uncheckedColor = Color.LightGray,
-                            checkmarkColor = PrimaryBlue
-                        )
-                    },
-                    modifier = Modifier.size(20.dp)
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(
-                    text = txtSpecialCharacter,
-                    modifier = Modifier.padding(start = 8.dp, end = 8.dp),
-                    textAlign = TextAlign.Center,
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 12.sp,
-                    color = if (isSystemInDarkTheme()) {
-                        DARK_BODY_TEXT
-                    } else {
-                        Gray
-                    }
-                )
-            }
-        }
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(bottom = 16.dp)
-                .align(Alignment.BottomCenter)
-                .background(
-                    color = if (isSystemInDarkTheme()) {
-                        Dark_01
-                    } else {
-                        Color.White
-                    }
-                ),
-            contentAlignment = Alignment.CenterEnd
-        ) {
             Box(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                BtnUi(
-                    txtContinue,
-                    onClick = {
-                        if (enterPasswordStr.value.isEmpty()) {
-                            context.toast(enterPasswordMsgStr)
-                        } else if (enterConfirmPasswordStr.value.isEmpty()) {
-                            context.toast(enterConfirmPasswordMsgStr)
-                        } else if (enterConfirmPasswordStr.value != enterPasswordStr.value) {
-                            context.toast(enterConfirmPasswordSameMsgStr)
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(bottom = 10.dp)
+                    .background(
+                        color = if (isSystemInDarkTheme()) {
+                            Dark_01
                         } else {
-                            showError = enterConfirmPasswordStr.value.isEmpty()
-                            if (showError || enterConfirmPasswordStr.value.length < 8) {
-                                inValidPassword = true
+                            Color.White
+                        }
+                    ),
+                contentAlignment = Alignment.BottomCenter,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    BtnUi(
+                        txtContinue,
+                        onClick = {
+                            if (enterPasswordStr.value.isEmpty()) {
+                                context.toast(enterPasswordMsgStr)
+                            } else if (enterConfirmPasswordStr.value.isEmpty()) {
+                                context.toast(enterConfirmPasswordMsgStr)
+                            } else if (enterConfirmPasswordStr.value != enterPasswordStr.value) {
+                                context.toast(enterConfirmPasswordSameMsgStr)
                             } else {
-                                isInternetAvailable = isNetworkAvailable(context)
-                                if (!isInternetAvailable) {
-                                    context.toast(internetMessage)
+                                showError = enterConfirmPasswordStr.value.isEmpty()
+                                if (showError || enterConfirmPasswordStr.value.length < 8) {
+                                    inValidPassword = true
                                 } else {
-                                    isDialogVisible = true
-                                    val passwordRequest = CreatePasswordRequest(
-                                        encryptedUserName,
-                                        encryptedPassword,
-                                        encryptedMobile.toString(),
-                                        userTypeId.toInt(),
-                                        languageId.toInt()
-                                    )
-                                    viewModel.createRegisterPassword(passwordRequest, strToken)
+                                    isInternetAvailable = isNetworkAvailable(context)
+                                    if (!isInternetAvailable) {
+                                        context.toast(internetMessage)
+                                    } else {
+                                        isDialogVisible = true
+                                        val passwordRequest = CreatePasswordRequest(
+                                            encryptedUserName,
+                                            encryptedPassword,
+                                            encryptedMobile.toString(),
+                                            userTypeId.toInt(),
+                                            languageId.toInt()
+                                        )
+                                        viewModel.createRegisterPassword(passwordRequest, strToken)
+                                    }
                                 }
                             }
-                        }
-                    }, true
-                )
+                        }, true
+                    )
+                }
             }
         }
     }
