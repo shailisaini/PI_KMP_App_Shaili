@@ -68,6 +68,8 @@ fun OpenDashboardHeader(
     isNotification: Boolean = true,
     onNotificationClick: () -> Unit = {},
 ) {
+    val notificationDestination = AppRoute.NotificationScreen.route
+    var currentRoute by remember { mutableStateOf(notificationDestination) }
     Box(
         modifier = Modifier
             .wrapContentHeight()
@@ -85,9 +87,12 @@ fun OpenDashboardHeader(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Image(
-                        modifier = Modifier.padding(end = 10.dp)
-                            .clickable{
+                        modifier = Modifier
+                            .padding(end = 10.dp)
+                            .clickable {
                                 onNotificationClick()
+                                println("Hi Aashish.....")
+
                             },
                         painter = if (isNotification) painterResource(R.drawable.ic_notification) else painterResource(
                             R.drawable.ic_bell
@@ -210,7 +215,7 @@ fun AppBar(
 ) {
     when (currentRoute) {
         AppRoute.DashboardScreen.route -> {
-            OpenDashboardHeader(onNavigationIconClick, isNotification,onNotificationClick)
+            OpenDashboardHeader(onNavigationIconClick, isNotification, onNotificationClick = onNotificationClick)
         }
 
         AppRoute.ScreeningScreen.route -> {

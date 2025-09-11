@@ -448,8 +448,11 @@ class StudentDashboardActivity : ComponentActivity() {
                     if (currentRoute == AppRoute.DashboardScreen.route) {
                         AppBar(
                             isNotification, onNavigationIconClick = {
-                                scope.launch { drawerState.open() }
-                            }, currentRoute = currentRoute
+                                scope.launch {
+                                    drawerState.open()
+                                }
+                            }, currentRoute = currentRoute,
+                            onNotificationClick = {navigateTo(AppRoute.NotificationScreen.route)}
                         )
                     } else if (currentRoute == AppRoute.ScreeningScreen.route) {
                         AppBar(
