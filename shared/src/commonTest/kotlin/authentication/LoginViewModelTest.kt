@@ -70,4 +70,32 @@ class LoginViewModelTest {
         assertEquals("Invalid credentials", state.error.toString()) //  passes now
     }
 
+
+    // user Profile
+    @Test
+    fun user_Profile_emits_success() = runTest {
+        fakeRepo.shouldSucceed = true
+
+        viewModel.getUserProfileViewModel(
+           "token", "name"
+        )
+        // advance dispatcher so launched coroutines run
+        testDispatcher.scheduler.advanceUntilIdle()
+        val state = viewModel.viewUserProfile.first { !it.isLoading }
+        assertNotNull(state.success)
+        assertTrue(true,state.success.message)
+    }
+
+    @Test
+    fun user_profile_emits_error() = runTest {
+        fakeRepo.shouldSucceed = false
+
+        viewModel.getUserProfileViewModel("token", "wrongUser")
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val state = viewModel.viewUserProfile.first{ it.error.isNotEmpty() }
+        assertNotNull(state.error)
+        assertEquals("Invalid User", state.error)
+    }
 }

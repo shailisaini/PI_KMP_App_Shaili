@@ -52,29 +52,29 @@ class DashboardViewModel(
 
     private val query = MutableStateFlow("")
 
-    private val getCertificate = MutableStateFlow(UiState<CertificateListResponse>())
+    val getCertificate = MutableStateFlow(UiState<CertificateListResponse>())
     val getCertificateResponse: StateFlow<UiState<CertificateListResponse>> = getCertificate
 
-    private val getCategoryList = MutableStateFlow(UiState<List<CategoryListResponse>>())
+    val getCategoryList = MutableStateFlow(UiState<List<CategoryListResponse>>())
     val getCategoryListResponse: StateFlow<UiState<List<CategoryListResponse>>> = getCategoryList
 
-    private val getSubCategoryList = MutableStateFlow(UiState<List<SubCategoryListResponse>>())
+    val getSubCategoryList = MutableStateFlow(UiState<List<SubCategoryListResponse>>())
     val getSubCategoryListResponse: StateFlow<UiState<List<SubCategoryListResponse>>> =
         getSubCategoryList
 
-    private val getSubCategoryByCategoryIdList =
+    val getSubCategoryByCategoryIdList =
         MutableStateFlow(UiState<SubCategoryByCategoryIdResponse>())
     val getSubCategoryByCategoryIdListResponse: StateFlow<UiState<SubCategoryByCategoryIdResponse>> =
         getSubCategoryByCategoryIdList
 
-    private val getFAQsList = MutableStateFlow(UiState<FAQsListResponse>())
+    val getFAQsList = MutableStateFlow(UiState<FAQsListResponse>())
     val getFAQsListResponse: StateFlow<UiState<FAQsListResponse>> = getFAQsList
 
-    private val getZoomMeetingToken = MutableStateFlow(UiState<ZoomMeetingTokenResponse>())
+    val getZoomMeetingToken = MutableStateFlow(UiState<ZoomMeetingTokenResponse>())
     val getZoomMeetingTokenResponse: StateFlow<UiState<ZoomMeetingTokenResponse>> =
         getZoomMeetingToken
 
-    private val getToken = MutableStateFlow(UiState<TokenResponse>())
+    val getToken = MutableStateFlow(UiState<TokenResponse>())
     val getTokenResponse: StateFlow<UiState<TokenResponse>> = getToken
 
     private val getMeetingList = MutableStateFlow(UiState<ZoomMeetingListResponse>())
@@ -92,10 +92,10 @@ class DashboardViewModel(
     val getAccountDelete = MutableStateFlow(UiState<AccountDeleteResponse>())
     val getAccountDeleteResponse: StateFlow<UiState<AccountDeleteResponse>> = getAccountDelete
 
-    private val changePassword = MutableStateFlow(UiState<ForgetPasswordResponse>())
+    val changePassword = MutableStateFlow(UiState<ForgetPasswordResponse>())
     val changePasswordResponse: StateFlow<UiState<ForgetPasswordResponse>> = changePassword
 
-    private val checkProfile = MutableStateFlow(UiState<CheckProfileCompletionResponse>())
+    val checkProfile = MutableStateFlow(UiState<CheckProfileCompletionResponse>())
     val checkProfileResponse: StateFlow<UiState<CheckProfileCompletionResponse>> = checkProfile
 
     fun isNetworkAvailable(): Boolean {

@@ -4,6 +4,8 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.request.Certificat
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.AccountDeleteResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse.CertificateResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.CheckProfileCompletionResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
@@ -25,7 +27,13 @@ class FakeDashboardRepository : DashboardRepository {
         certificateRequest: CertificateRequest,
         strToken: String
     ): CertificateListResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            CertificateListResponse(status = 0, message = "LMS request successful",
+                response = arrayListOf(CertificateResponse(0,0,0,"",0,"","","","",0,"","","","",0,"","","","","","","","","","",0,"",0,"",0,"","")),
+                errorCode ="")
+        } else {
+            throw Exception("Request Not sent!")
+        }
     }
 
     override suspend fun getChangeRequestRepo(
@@ -55,15 +63,27 @@ class FakeDashboardRepository : DashboardRepository {
     }
 
     override suspend fun getAllCategoryRepo(): List<CategoryListResponse> {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            arrayListOf(CategoryListResponse(status = 0, name = "Faq Category", id =0, priority = 0))
+        } else {
+            throw Exception("Request Not found!")
+        }
     }
 
     override suspend fun getAllSubCategoryRepo(): List<SubCategoryListResponse> {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            arrayListOf(SubCategoryListResponse(status = 0, name = "Faq Sub Category", id =0, priority = 0))
+        } else {
+            throw Exception("Sub-Category Not found!")
+        }
     }
 
     override suspend fun getAllSubCategoryByCategoryIdRepo(categoryId: Int): SubCategoryByCategoryIdResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            SubCategoryByCategoryIdResponse(status = 0, errorCode = "200", message = "All Sub-category by Category")
+        } else {
+            throw Exception("No Sub-category by Category")
+        }
     }
 
     override suspend fun getAllFAQsRepo(
@@ -74,7 +94,11 @@ class FakeDashboardRepository : DashboardRepository {
         userId: String,
         languageId: String
     ): FAQsListResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            FAQsListResponse(status = 0, errorCode = "200", message = "All FAQ")
+        } else {
+            throw Exception("All FAQ")
+        }
     }
 
     override suspend fun getRefreshTokenRepo(): ZoomMeetingTokenResponse {
@@ -104,14 +128,30 @@ class FakeDashboardRepository : DashboardRepository {
         passwordRequest: ChangePasswordRequest,
         strToken: String
     ): ForgetPasswordResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            ForgetPasswordResponse(status = true, message = "Password change Successfully!")
+        } else {
+            throw Exception("Password Error!")
+        }
     }
 
     override suspend fun deactivateUserRepo(
         tokenKey: String,
         userId: String
     ): AccountDeleteResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            AccountDeleteResponse(status = true, message = "Deactivate user!")
+        } else {
+            throw Exception("Error to deactivate user")
+        }
+    }
+
+    override suspend fun checkProfileCompletionRepo(tokenKey: String): CheckProfileCompletionResponse {
+        return if (shouldSucceed) {
+            CheckProfileCompletionResponse(status = true, message = "Check Profile Completion")
+        } else {
+            throw Exception("Error!")
+        }
     }
 
 }

@@ -128,12 +128,7 @@ fun LanguageResponseUI(
     )
 
     LaunchedEffect(Unit) {
-        isInternetAvailable = isNetworkAvailable(context)
-        if (!isInternetAvailable) {
-            context.toast(noDataMessage)
-        } else {
-            viewModel.getLanguages()
-        }
+        viewModel.getLanguages()
     }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(uiState) {
@@ -216,10 +211,7 @@ fun LanguageResponseUI(
                                     selectedIndex =
                                         if (selectedIndex == index) null else index // Toggle selection
                                     selectedLanguage.value = languageData[index].id.toString()
-                                    viewModel.savePrefData(
-                                        SELECTED_LANGUAGE_ID,
-                                        languageData[index].id.toString()
-                                    )
+                                    viewModel.savePrefData(SELECTED_LANGUAGE_ID, languageData[index].id.toString())
                                 }
                             )
                         }
@@ -335,7 +327,7 @@ fun ItemLanguageCard(
                     contentDescription = IMG_DESCRIPTION
                 )
                 Text(
-                    (languageIndex.translated_name ?: languageIndex.name)!!,
+                    (languageIndex.translatedName?:languageIndex.name)!!,
                     textAlign = TextAlign.Start,
                     maxLines = 1,
                     fontSize = 16.sp,
