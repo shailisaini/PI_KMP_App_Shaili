@@ -582,7 +582,7 @@ class LoginViewModel(
 
         shouldRefreshProfile = false // Reset on successful start
 
-        viewUserProfile.update { it.copy(isLoading = true) }
+        viewUserProfile.update { it.copy(isLoading = true, error ="") }
 
         getAuthViewModel.getViewUserProfile(token, data)
             .catch { exception ->

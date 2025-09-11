@@ -53,8 +53,8 @@ class LoginNavigationScreen : ComponentActivity() {
         setContent {
             val context = LocalContext.current
             val viewModel: LoginViewModel = koinViewModel()
-
-            var startDestination = AppRoute.LanguageSelect.route
+            viewModel.saveUserName("9656474839")
+            var startDestination = AppRoute.CreatePasswordScreen.route
             val backStack = remember { mutableStateListOf(startDestination) }
 
             var encryptedUserName = viewModel.getPrefData(USER_NAME)

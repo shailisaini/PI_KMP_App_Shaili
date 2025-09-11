@@ -47,10 +47,12 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".screens.StudentDashboardActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
             android:name=".screens.LoginNavigationScreen"
+            android:windowSoftInputMode="adjustResize"
             android:screenOrientation="portrait" />
         <activity
             android:name=".screens.dashboardNavActivity.CertificateListActivity"
@@ -67,6 +69,7 @@
         <activity
             android:name=".screens.SplashActivity"
             android:exported="true"
+            android:windowSoftInputMode="adjustResize"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
