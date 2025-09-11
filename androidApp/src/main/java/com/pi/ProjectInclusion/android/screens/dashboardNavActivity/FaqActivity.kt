@@ -89,6 +89,7 @@ import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
@@ -167,6 +168,8 @@ private fun ShowFAQData(
 
     var languageId = loginViewModel.getPrefData(SELECTED_LANGUAGE_ID)
     var userTypeId = loginViewModel.getPrefData(USER_TYPE_ID)
+    var isInternetAvailable by remember { mutableStateOf(false) }
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
 
     CustomDialog(
         isVisible = isDialogVisible,
@@ -175,27 +178,32 @@ private fun ShowFAQData(
     )
 
     LaunchedEffect(Unit) {
-        isDialogVisible = true
-        viewModel.getAllCategory()
-
-        if (categorySelectedId.intValue != 0 && subCategoryByIdSelectedId.intValue != 0) {
-            viewModel.getAllFAQs(
-                searchKeyName.value.toString(),
-                userTypeId.toString(),
-                categorySelectedId.intValue.toString(),
-                subCategoryByIdSelectedId.intValue.toString(),
-                "",
-                languageId.toString()
-            )
+        isInternetAvailable = isNetworkAvailable(context)
+        if (!isInternetAvailable) {
+            context.toast(internetMessage)
         } else {
-            viewModel.getAllFAQs(
-                "",
-                "1",
-                "1",
-                "1",
-                "",
-                languageId.toString()
-            )
+            isDialogVisible = true
+            viewModel.getAllCategory()
+
+            if (categorySelectedId.intValue != 0 && subCategoryByIdSelectedId.intValue != 0) {
+                viewModel.getAllFAQs(
+                    searchKeyName.value.toString(),
+                    userTypeId.toString(),
+                    categorySelectedId.intValue.toString(),
+                    subCategoryByIdSelectedId.intValue.toString(),
+                    "",
+                    languageId.toString()
+                )
+            } else {
+                viewModel.getAllFAQs(
+                    "",
+                    "1",
+                    "1",
+                    "1",
+                    "",
+                    languageId.toString()
+                )
+            }
         }
     }
 

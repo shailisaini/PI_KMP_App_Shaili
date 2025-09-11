@@ -52,6 +52,7 @@ import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.SUCCESS
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
@@ -102,7 +103,8 @@ fun SetNewPasswordScreen(
         .find() || Pattern.compile("[^a-zA-Z0-9]").matcher(enterPasswordStr.value).find()
 
     val forgetPasswordState by viewModel.forgetPasswordResponse.collectAsStateWithLifecycle()
-
+    var isInternetAvailable by remember { mutableStateOf(true) }
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
     val encryptedPassword = enterConfirmPasswordStr.value.encryptAES().toString().trim()
     val encryptedUserName = viewModel.userNameValue!!.encryptAES().toString().trim()
     var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
@@ -413,14 +415,19 @@ fun SetNewPasswordScreen(
                                 if (showError || enterConfirmPasswordStr.value.length < 10) {
                                     inValidPassword = true
                                 } else {
-                                    isDialogVisible = true
-                                    val passwordRequest =
-                                        ForgetPasswordRequest(
-                                            userName,
-                                            userTypeId.toInt(),
-                                            encryptedPassword
-                                        )
-                                    viewModel.forgetPassword(passwordRequest, strToken)
+                                    isInternetAvailable = isNetworkAvailable(context)
+                                    if (!isInternetAvailable) {
+                                        context.toast(internetMessage)
+                                    } else {
+                                        isDialogVisible = true
+                                        val passwordRequest =
+                                            ForgetPasswordRequest(
+                                                userName,
+                                                userTypeId.toInt(),
+                                                encryptedPassword
+                                            )
+                                        viewModel.forgetPassword(passwordRequest, strToken)
+                                    }
                                 }
                             }
                         }, true

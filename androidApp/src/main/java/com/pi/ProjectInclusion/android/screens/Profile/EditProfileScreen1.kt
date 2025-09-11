@@ -166,7 +166,7 @@ fun EditProfileScreenUI(
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
     var isInternetAvailable by remember { mutableStateOf(true) }
-
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
     var isDialogVisible by remember { mutableStateOf(false) }
     val invalidMobNo = stringResource(id = R.string.text_enter_no)
 //  languageData[LanguageTranslationsResponse.KEY_INVALID_MOBILE_NO_ERROR].toString()
@@ -243,7 +243,12 @@ fun EditProfileScreenUI(
     }
 
     LaunchedEffect(Unit) {
-        loginViewModel.getUserProfileViewModel(strToken, encryptedUserName)
+        isInternetAvailable = isNetworkAvailable(context)
+        if (!isInternetAvailable) {
+            context.toast(internetMessage)
+        } else {
+            loginViewModel.getUserProfileViewModel(strToken, encryptedUserName)
+        }
     }
 
     val viewProfile by loginViewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
@@ -264,15 +269,13 @@ fun EditProfileScreenUI(
                     viewProfile.success?.response?.let { response ->
                         if (response.email.toString().isNotEmpty()) {
                             email.value = decrypt(response.email.toString().trim())
-                        }
-                        else{
+                        } else {
                             email.value = ""
                         }
 
-                        if (response.whatsapp.toString().isNotEmpty()){
+                        if (response.whatsapp.toString().isNotEmpty()) {
                             whatsappNo.value = decrypt(response.whatsapp.toString().trim())
-                        }
-                        else{
+                        } else {
                             whatsappNo.value = ""
                         }
                         mobNo.value = decrypt(response.mobile.toString().trim())
@@ -767,18 +770,19 @@ fun EditProfileScreenUI(
                                                     "O"
                                                 }
                                                 isDialogVisible = true
-                                                 if (email.value.toString().isEmpty()) {
+                                                if (email.value.toString().isEmpty()) {
                                                     email.value = ""
+                                                } else {
+                                                    email.value =
+                                                        email.value.encryptAES().toString().trim()
                                                 }
-                                                else{
-                                                    email.value = email.value.encryptAES().toString().trim()
-                                                 }
-                                                 if (whatsappNo.value.toString().isEmpty()) {
-                                                     whatsappNo.value = ""
+                                                if (whatsappNo.value.toString().isEmpty()) {
+                                                    whatsappNo.value = ""
+                                                } else {
+                                                    whatsappNo.value =
+                                                        whatsappNo.value.encryptAES().toString()
+                                                            .trim()
                                                 }
-                                                else{
-                                                     whatsappNo.value = whatsappNo.value.encryptAES().toString().trim()
-                                                 }
                                                 val firstStepProfileRequest =
                                                     FirstStepProfileRequest(
                                                         firstName.value.toString(),
@@ -804,7 +808,6 @@ fun EditProfileScreenUI(
                                                     isDialogVisible = true
                                                     // if image is not empty
                                                     if (selectedUri.value != null) {
-
                                                         loginViewModel.createFirstStepProfileRepo(
                                                             firstStepProfileRequest,
                                                             strToken,

@@ -60,6 +60,7 @@ import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.IS_COMING_FROM
 import com.pi.ProjectInclusion.constants.ConstantVariables.LOGIN_WITH_OTP
@@ -81,7 +82,7 @@ fun EnterPasswordScreen(
     onNext: () -> Unit, //OtpSendVerifyUI
     onBack: () -> Unit,
     onNextProfile: () -> Unit, // complete Profile
-    isForgetPassword: () -> Unit
+    isForgetPassword: () -> Unit,
 ) {
     val context = LocalContext.current
     val userType = remember { mutableStateListOf<GetUserTypeResponse.UserTypeResponse>() }
@@ -125,7 +126,7 @@ fun PasswordUI(
 
     val loginResponse by viewModel.uiStateLoginResponse.collectAsStateWithLifecycle()
 
-    val isInternetAvailable by remember { mutableStateOf(true) }
+    var isInternetAvailable by remember { mutableStateOf(true) }
     val internetMessage by remember { mutableStateOf("") }
     var showBottomSheet by remember { mutableStateOf(false) }
     val enterPassword = stringResource(R.string.txt_Enter_your_password)
@@ -133,7 +134,7 @@ fun PasswordUI(
 
     var isDialogVisible by remember { mutableStateOf(false) }
     var invalidMob = stringResource(id = R.string.txt_Please_enter_valid_password_)
-    var invalidMobNo by remember { mutableStateOf(invalidMob)}
+    var invalidMobNo by remember { mutableStateOf(invalidMob) }
 //  languageData[LanguageTranslationsResponse.KEY_INVALID_MOBILE_NO_ERROR].toString()
     val txtContinue = stringResource(id = R.string.txt_login)
     val tvPassword = stringResource(id = R.string.txt_password)
@@ -164,15 +165,20 @@ fun PasswordUI(
         LoggerProvider.logger.d("LoginWithPassword: $languageId .. $userTypeId .. $encryptedPhoneNo")
 
         LaunchedEffect(Unit) {
-        isDialogVisible = true
-            viewModel.loginWithPasswordViewModel(
-                LoginRequest(
-                    encryptedUserName,
-                    encryptedPassword,
-                    userTypeId.toInt(),
-                    languageId.toInt()
+            isInternetAvailable = isNetworkAvailable(context)
+            if (!isInternetAvailable) {
+                context.toast(internetMessage)
+            } else {
+                isDialogVisible = true
+                viewModel.loginWithPasswordViewModel(
+                    LoginRequest(
+                        encryptedUserName,
+                        encryptedPassword,
+                        userTypeId.toInt(),
+                        languageId.toInt()
+                    )
                 )
-            )
+            }
         }
 
         // Handle login response state
@@ -192,16 +198,21 @@ fun PasswordUI(
 
                 loginResponse.success != null -> {
                     loginWithPassword = false
-                    if (loginResponse.success!!.status == true){
+                    if (loginResponse.success!!.status == true) {
                         // save token
-                        viewModel.savePrefData(TOKEN_PREF_KEY,
-                            "Bearer "+loginResponse.success!!.response?.accessToken.toString()
+                        viewModel.savePrefData(
+                            TOKEN_PREF_KEY,
+                            "Bearer " + loginResponse.success!!.response?.accessToken.toString()
                         )
                         // save UserName
-                        viewModel.savePrefData(USER_NAME,
+                        viewModel.savePrefData(
+                            USER_NAME,
                             loginResponse.success!!.response?.user?.username.toString().trim()
                         )
-                        viewModel.savePrefData(USER_MOBILE_NO, loginResponse.success!!.response?.user?.mobile.toString())
+                        viewModel.savePrefData(
+                            USER_MOBILE_NO,
+                            loginResponse.success!!.response?.user?.mobile.toString()
+                        )
                         context.toast(loginSuccess)
 //                        onNextProfile()
                         context.startActivity(
@@ -210,8 +221,7 @@ fun PasswordUI(
                                 StudentDashboardActivity::class.java
                             )
                         )
-                    }
-                    else{
+                    } else {
                         isValidMobNo = true
                         invalidMobNo = loginResponse.success!!.message.toString()
                     }
@@ -223,17 +233,25 @@ fun PasswordUI(
 
     // api for otp on call
     if (sendOtpViaCall) {
-    LaunchedEffect(Unit) {
-            viewModel.getOTPViewModel(encryptedPhoneNo)
-
+        LaunchedEffect(Unit) {
+            isInternetAvailable = isNetworkAvailable(context)
+            if (!isInternetAvailable) {
+                context.toast(internetMessage)
+            } else {
+                viewModel.getOTPViewModel(encryptedPhoneNo)
+            }
         }
     }
 
     // api for otp on Whatsapp
     if (sendOtpViaWhatsApp) {
-    LaunchedEffect(Unit) {
-            viewModel.getOTPWhatsappViewModel(encryptedPhoneNo)
-
+        LaunchedEffect(Unit) {
+            isInternetAvailable = isNetworkAvailable(context)
+            if (!isInternetAvailable) {
+                context.toast(internetMessage)
+            } else {
+                viewModel.getOTPWhatsappViewModel(encryptedPhoneNo)
+            }
         }
     }
 
@@ -253,16 +271,15 @@ fun PasswordUI(
             sendOtpState.success != null -> {
                 if (sendOtpState.success!!.status == true) {
                     viewModel.savePrefData(IS_COMING_FROM, LOGIN_WITH_OTP)
-                   if (sendOtpState.success!!.response?.message == SUCCESS) {
-                       onNext()
-                   }
-                    else{
-                       val errorMessage = sendOtpState.success!!.response?.message
-                           ?: sendOtpState.success?.error
-                           ?: sendOtpState.success?.exception
-                           ?: error
-                       context.toast(errorMessage)
-                   }
+                    if (sendOtpState.success!!.response?.message == SUCCESS) {
+                        onNext()
+                    } else {
+                        val errorMessage = sendOtpState.success!!.response?.message
+                            ?: sendOtpState.success?.error
+                            ?: sendOtpState.success?.exception
+                            ?: error
+                        context.toast(errorMessage)
+                    }
                 } else {
                     val errorMessage = sendOtpState.success?.message
                         ?: sendOtpState.success?.error
@@ -428,6 +445,9 @@ fun LoginPassScreen() {
     PasswordUI(
         context,
         onNext = { onNext() },
-        onBack = onBack, isForgetPassword = isForgetPassword, viewModel = viewModel, onNextProfile = onNextProfile
+        onBack = onBack,
+        isForgetPassword = isForgetPassword,
+        viewModel = viewModel,
+        onNextProfile = onNextProfile
     )
 }

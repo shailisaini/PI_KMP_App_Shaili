@@ -171,8 +171,13 @@ fun ViewProfileScreen(
     logger.d("Screen: " + "ViewProfileScreen()" + strToken)
 
     LaunchedEffect(Unit) {
-        logger.d("viewProfileUI: $languageId  .. $encryptedUserName")
-        viewModel.getUserProfileViewModel(strToken, encryptedUserName)
+        isInternetAvailable = isNetworkAvailable(context)
+        if (!isInternetAvailable) {
+            context.toast(internetMessage)
+        } else {
+            logger.d("viewProfileUI: $languageId  .. $encryptedUserName")
+            viewModel.getUserProfileViewModel(strToken, encryptedUserName)
+        }
     }
 
     val viewProfile by viewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
@@ -584,12 +589,15 @@ fun ProfileViewUI(
                             }
                         }
 
-                        if ((viewModel.getPrefData(USER_TYPE_ID) == "7") || (viewModel.getPrefData(USER_TYPE_ID) == "8")) {
-                            if(profileData.response!!.email!!.isEmpty() || profileData.response!!.CRRNum!!.isEmpty() ){
+                        if ((viewModel.getPrefData(USER_TYPE_ID) == "7") || (viewModel.getPrefData(
+                                USER_TYPE_ID
+                            ) == "8")
+                        ) {
+                            if (profileData.response!!.email!!.isEmpty() || profileData.response!!.CRRNum!!.isEmpty()) {
                                 CompleteProfile(profileData, onNext)
                             }
                         } else {
-                            if(profileData.response!!.email!!.isEmpty()){
+                            if (profileData.response!!.email!!.isEmpty()) {
                                 CompleteProfile(profileData, onNext)
                             }
                         }
@@ -854,9 +862,10 @@ fun CompleteProfile(profileData: ViewProfileResponse, onNext: () -> Unit) {
             fontSize = 15.sp,
             fontFamily = fontMedium,
             color = PrimaryBlue,
-            modifier = Modifier.padding(15.dp)
+            modifier = Modifier
+                .padding(15.dp)
                 .clickable {
-                    if(profileData.response!!.email!!.isEmpty() ){
+                    if (profileData.response!!.email!!.isEmpty()) {
                         onNext()
                     }
                 }
@@ -999,6 +1008,7 @@ fun ChangeRequestSheet(
     onTrackRequest: () -> Unit = {},
     onDismiss: () -> Unit = {},
 ) {
+    val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState()
     var isSelectedSchool by remember { mutableStateOf(false) }
     var isSelectedName by remember { mutableStateOf(false) }
@@ -1010,6 +1020,8 @@ fun ChangeRequestSheet(
     var requestTypeId by remember { mutableStateOf("1") }
     var strToken = viewModel?.getPrefData(TOKEN_PREF_KEY).toString()
     val dashboardViewModel: DashboardViewModel = koinViewModel()
+    var isInternetAvailable by remember { mutableStateOf(false) }
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
 
     CustomDialog(
         isVisible = isDialogVisible.value,
@@ -1192,7 +1204,12 @@ fun ChangeRequestSheet(
                 title = txtContinue,
                 onClick = {
                     if (isSelectedSchool || isSelectedName) {
-                        dashboardViewModel.getTrackChangeRequest(strToken, requestTypeId)
+                        isInternetAvailable = isNetworkAvailable(context)
+                        if (!isInternetAvailable) {
+                            context.toast(internetMessage)
+                        } else {
+                            dashboardViewModel.getTrackChangeRequest(strToken, requestTypeId)
+                        }
                     }
                 },
             )
@@ -1224,7 +1241,8 @@ fun UploadIdDialog(
     var byteArray: ByteArray? = null
     var fileName: String? = null
     lateinit var bitmap: Bitmap
-
+    var isInternetAvailable by remember { mutableStateOf(false) }
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
 
     // App version
     var appPackageName: String = ""
@@ -1480,12 +1498,17 @@ fun UploadIdDialog(
                         Button(
                             onClick = {
                                 if (selectedUri.value != null) {
-                                    isDialogVisible.value = true
-                                    dashboardViewModel.getProfileChangeRequest(
-                                        ProfileNameChangeRequest(
-                                            requestId, appVersion, requestDescription
-                                        ), strToken.toString(), byteArray, fileName
-                                    )
+                                    isInternetAvailable = isNetworkAvailable(context)
+                                    if (!isInternetAvailable) {
+                                        context.toast(internetMessage)
+                                    } else {
+                                        isDialogVisible.value = true
+                                        dashboardViewModel.getProfileChangeRequest(
+                                            ProfileNameChangeRequest(
+                                                requestId, appVersion, requestDescription
+                                            ), strToken.toString(), byteArray, fileName
+                                        )
+                                    }
                                 } else {
                                     context.toast(docError)
                                 }

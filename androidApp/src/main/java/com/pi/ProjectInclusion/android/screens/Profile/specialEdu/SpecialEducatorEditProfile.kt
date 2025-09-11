@@ -78,6 +78,7 @@ import com.pi.ProjectInclusion.android.common_UI.UdiseTextField
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
@@ -128,7 +129,12 @@ fun SpecialEducatorEditProfile(
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            SpeEducatorScreenUI(context, onBack = onBack, onNext = onNext, loginViewModel = loginViewModel)
+            SpeEducatorScreenUI(
+                context,
+                onBack = onBack,
+                onNext = onNext,
+                loginViewModel = loginViewModel
+            )
         }
     }
 }
@@ -144,7 +150,7 @@ fun SpeEducatorScreenUI(
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
     var isApiResponded by remember { mutableStateOf(false) }
-    val internetMessage by remember { mutableStateOf("") }
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
 
     var isDialogVisible by remember { mutableStateOf(false) }
     var isUdiseDetails by remember { mutableStateOf(false) }
@@ -223,9 +229,15 @@ fun SpeEducatorScreenUI(
     var encryptedUserName = loginViewModel.getPrefData(USER_NAME)
     var profileData by remember { mutableStateOf<ViewProfileResponse?>(null) }
     var isDropDownSelected by rememberSaveable { mutableStateOf(false) }
+    var isInternetAvailable by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        loginViewModel.getUserProfileViewModel(strToken, encryptedUserName)
+        isInternetAvailable = isNetworkAvailable(context)
+        if (!isInternetAvailable) {
+            context.toast(internetMessage)
+        } else {
+            loginViewModel.getUserProfileViewModel(strToken, encryptedUserName)
+        }
     }
 
     val viewProfile by loginViewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
@@ -393,10 +405,12 @@ fun SpeEducatorScreenUI(
             allSchoolsState.isLoading -> {
                 isDialogVisible = true
             }
+
             allSchoolsState.error.isNotEmpty() -> {
                 logger.d("All Schools error : ${allSchoolsState.success}")
                 isDialogVisible = false
             }
+
             allSchoolsState.success != null -> {
                 logger.d("All Schools response : ${allSchoolsState.success}")
                 if (allSchoolsState.success?.status == 1) {

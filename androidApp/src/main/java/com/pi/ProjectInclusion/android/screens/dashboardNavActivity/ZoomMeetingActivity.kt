@@ -82,7 +82,9 @@ import com.pi.ProjectInclusion.android.screens.menu.TabItem
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
+import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingListResponse
@@ -143,10 +145,17 @@ private fun ShowZoomMeetingData(context: Context, viewModel: DashboardViewModel)
     val strRefreshKey = "refresh_token"
 
     var meetingListData by remember { mutableStateOf(mutableListOf<ZoomMeetingListResponse.Meetings>()) }
+    var isInternetAvailable by remember { mutableStateOf(false) }
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
 
     LaunchedEffect(Unit) {
-        isDialogVisible = true
-        viewModel.getRefreshToken()
+        isInternetAvailable = isNetworkAvailable(context)
+        if (!isInternetAvailable) {
+            context.toast(internetMessage)
+        } else {
+            isDialogVisible = true
+            viewModel.getRefreshToken()
+        }
     }
 
     LaunchedEffect(firstTokenState) {

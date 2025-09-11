@@ -22,7 +22,6 @@ import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -33,7 +32,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -69,17 +67,18 @@ import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.MARKET_ID
 import com.pi.ProjectInclusion.constants.ConstantVariables.PLAY_STORE_LINK
 import com.pi.ProjectInclusion.constants.ConstantVariables.ROUTE
 import com.pi.ProjectInclusion.constants.ConstantVariables.SPLASH_KEY
+import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForceUpdateResponse
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
-import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : ComponentActivity() {
@@ -102,6 +101,10 @@ class SplashActivity : ComponentActivity() {
             }
             var isForceUpdate by remember { mutableStateOf(false) }
             var serverDownDialog by remember { mutableStateOf(false) }
+            var serverHeader = stringResource(R.string.key_Server_Not_Responding)
+            var serverDescr = stringResource(R.string.key_server_respond_taking)
+            var isInternetAvailable by remember { mutableStateOf(false) }
+            val internetMessage = stringResource(R.string.txt_oops_no_internet)
 
             fun navigateTo(route: String) {
                 isForward = route != SPLASH_KEY // You can define logic to detect back
@@ -115,7 +118,7 @@ class SplashActivity : ComponentActivity() {
             )
 
             if (serverDownDialog) {
-                ServerDownDialog {
+                ServerDownDialog(serverHeader, serverDescr, viewModel) {
                     serverDownDialog = false
                 }
             }
@@ -132,7 +135,12 @@ class SplashActivity : ComponentActivity() {
                     context.packageManager.getPackageInfo(appPackageName, 0)
                 appVersion = pInfo.versionName.toString()
                 logger.d("Android version name & application version :- ${androidVersion.toDouble()}, ${appVersion.toDouble()}")
-                viewModel.getForceUpdateApp(androidVersion.toDouble(), appVersion.toDouble())
+                isInternetAvailable = isNetworkAvailable(context)
+                if (!isInternetAvailable) {
+                    context.toast(internetMessage)
+                } else {
+                    viewModel.getForceUpdateApp(androidVersion.toDouble(), appVersion.toDouble())
+                }
             } catch (e: PackageManager.NameNotFoundException) {
                 e.printStackTrace()
             }
@@ -219,8 +227,7 @@ class SplashActivity : ComponentActivity() {
                                 var userToken = viewModel.getPrefData(TOKEN_PREF_KEY)
                                 if (userToken.isNotEmpty()) {
                                     navigateTo(AppRoute.TeacherDashboard.route)
-                                }
-                                else {
+                                } else {
                                     navigateTo(AppRoute.LanguageSelect.route)
                                 }
                             }
@@ -244,8 +251,7 @@ class SplashActivity : ComponentActivity() {
                             if (isForceUpdate) {
                                 context.startActivity(
                                     Intent(context, StudentDashboardActivity::class.java)
-                                )
-                                (context as? Activity)?.finish()
+                                ).apply { (context as? Activity)?.finish() }
                             }
                         }
                     }
@@ -276,7 +282,30 @@ private fun SplashActivity.SplashUI(appVersion: String) {
 }
 
 @Composable
-fun ServerDownDialog(onDismiss: () -> Unit) {
+fun ServerDownDialog(
+    serverHeader: String,
+    serverDescr: String,
+    viewModel: LoginViewModel,
+    onDismiss: () -> Unit,
+) {
+
+    val context = LocalContext.current
+    var appPackageName: String = ""
+    var appVersion: String = ""
+    val deviceVersion = Build.VERSION.RELEASE
+    val androidVersion = deviceVersion.substringBeforeLast(".")
+    appPackageName = context.packageName
+    var isInternetAvailable by remember { mutableStateOf(false) }
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
+
+    try {
+        val pInfo: PackageInfo =
+            context.packageManager.getPackageInfo(appPackageName, 0)
+        appVersion = pInfo.versionName.toString()
+    } catch (e: PackageManager.NameNotFoundException) {
+        e.printStackTrace()
+    }
+
     Dialog(onDismissRequest = { onDismiss() }) {
         Box(
             modifier = Modifier
@@ -298,7 +327,7 @@ fun ServerDownDialog(onDismiss: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = stringResource(R.string.app_upgradation),
+                    text = serverHeader,
                     modifier = Modifier
                         .wrapContentWidth()
                         .padding(top = 16.dp, start = 8.dp, end = 8.dp),
@@ -327,7 +356,7 @@ fun ServerDownDialog(onDismiss: () -> Unit) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = stringResource(R.string.app_upgradation),
+                    text = serverDescr,
                     modifier = Modifier
                         .wrapContentWidth()
                         .padding(start = 8.dp, end = 8.dp),
@@ -351,7 +380,16 @@ fun ServerDownDialog(onDismiss: () -> Unit) {
                 ) {
                     BtnUi(
                         onClick = {
-                            onDismiss()
+                            isInternetAvailable = isNetworkAvailable(context)
+                            if (!isInternetAvailable) {
+                                context.toast(internetMessage)
+                            } else {
+                                onDismiss()
+                                viewModel.getForceUpdateApp(
+                                    androidVersion.toDouble(),
+                                    appVersion.toDouble()
+                                )
+                            }
                         },
                         title = stringResource(R.string.key_Retry),
                         enabled = true
