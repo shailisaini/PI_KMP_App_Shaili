@@ -8,6 +8,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryL
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CheckProfileCompletionResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.NotificationResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResponse
@@ -25,6 +26,10 @@ interface DashboardRepository {
         certificateRequest: CertificateRequest,
         strToken: String,
     ): CertificateListResponse
+
+    suspend fun getSentNotification(
+        userId: Int
+    ): NotificationResponse
 
     suspend fun getChangeRequestRepo(
         certificateRequest: ProfileNameChangeRequest,

@@ -1,7 +1,9 @@
 package com.pi.ProjectInclusion.android.screens.notification
 
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -53,24 +55,91 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
+import androidx.core.content.ContextCompat.startActivity
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.BorderBlue
 import com.pi.ProjectInclusion.CancelColor7
 import com.pi.ProjectInclusion.GrayLight04
 import com.pi.ProjectInclusion.TransferColor7
 import com.pi.ProjectInclusion.Yellow1
+import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
+import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_ID
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.NotificationList
+import com.pi.ProjectInclusion.ui.viewModel.DashboardViewModel
+import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
+import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
-fun NotificationScreen(onNext: () -> Unit,onBack: () -> Unit) {
+fun NotificationScreen(
+    onNext: () -> Unit,
+    onBack: () -> Unit,
+    dashboardViewModel: DashboardViewModel,
+    ) {
+    val loginViewModel: LoginViewModel = koinViewModel()
     var isDialogVisible by remember { mutableStateOf(false) }
+    val notificationState by dashboardViewModel.getNotificationResponse.collectAsStateWithLifecycle()
+    var isInternetAvailable by remember { mutableStateOf(false) }
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
+    var userId = loginViewModel.getPrefData(USER_ID)
+    logger.d("NotiScreen $userId")
     val context = LocalContext.current
+    var notificationData by remember { mutableStateOf(mutableListOf<NotificationList>()) }
+
+    BackHandler {
+        startActivity(
+            context, Intent(context, StudentDashboardActivity::class.java), null
+        ).apply { (context as? Activity)?.finish() }
+    }
+
+    LaunchedEffect(Unit) {
+        isInternetAvailable = isNetworkAvailable(context)
+        if (!isInternetAvailable) {
+            context.toast(internetMessage)
+        } else {
+            isDialogVisible = true
+            dashboardViewModel.getSentNotification(270)
+        }
+    }
+
+    LaunchedEffect(notificationState) {
+        when {
+            notificationState.isLoading -> {
+                isDialogVisible = true
+            }
+
+            notificationState.error.isNotEmpty() -> {
+                logger.d("Certificate Error: ${notificationState.error}")
+                isDialogVisible = false
+            }
+
+            notificationState.success != null -> {
+                logger.d("Certificate Response :- ${notificationState.success!!.response}")
+                if (notificationState.success!!.response != null) {
+                    if (notificationState.success!!.response?.size != 0) {
+                        notificationData = notificationState.success!!.response as MutableList<NotificationList>
+                        println("Certificate Data :- $notificationData")
+                    } else {
+                        context.toast(notificationState.success!!.message)
+                    }
+                } else {
+                    context.toast(notificationState.success?.message ?: "")
+                }
+                isDialogVisible = false
+            }
+        }
+    }
 
     CustomDialog(
         isVisible = isDialogVisible,

@@ -25,6 +25,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.CheckProf
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.DistrictListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForceUpdateResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.NotificationResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ProfessionListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.QualificationListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ReasonListResponse
@@ -82,12 +83,14 @@ class ApiService(private val client: HttpClient) {
         const val BASIC_LIVE_BASE_URL = "https://api-pi.projectinclusion.in"
         const val SCHOOL_LIVE_BASE_URL = "https://api-school.projectinclusion.in"
         const val FAQ_BASE_URL = "https://api-faq.projectinclusion.in"
+        const val NOTIFICATION_BASE_URL = "https://api-comm.projectinclusion.in/api"
 
         const val ZOOM_FIRST_TOKEN_URL = "https://admin.projectinclusion.in/Upload"
         const val ZOOM_ACTUAL_TOKEN_URL = "https://zoom.us"
         const val ZOOM_BASE_URL = "https://api.zoom.us"
 
         const val appendUser = "users"
+        const val appendNotification = "Notification/PRIN"
         const val appendGrievance = "grievance"
         const val appendCertificate = "Certificate"
         const val appendLive = "api"
@@ -107,6 +110,16 @@ class ApiService(private val client: HttpClient) {
             append(HttpHeaders.Accept, "application/json")
         }
     }.body<GetLanguageListResponse>()
+
+    suspend fun getSentNotification(userId: Int): NotificationResponse = client.get {
+        url {
+            takeFrom(NOTIFICATION_BASE_URL)
+            appendPathSegments(appendNotification, "GetSentNotification/${userId}")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+        }
+    }.body<NotificationResponse>()
 
 
     // it is commenting if we need it later for testing response

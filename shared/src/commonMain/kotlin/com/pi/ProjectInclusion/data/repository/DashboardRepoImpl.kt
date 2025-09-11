@@ -8,6 +8,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryL
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CheckProfileCompletionResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.NotificationResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResponse
@@ -28,6 +29,9 @@ class DashboardRepoImpl(private val apiService: ApiService) : DashboardRepositor
         strToken: String,
     ): CertificateListResponse {
         return apiService.getLMSUserCertificate(certificateRequest, strToken)
+    }
+    override suspend fun getSentNotification(userId: Int): NotificationResponse {
+        return apiService.getSentNotification(userId)
     }
 
     override suspend fun getChangeRequestRepo(
