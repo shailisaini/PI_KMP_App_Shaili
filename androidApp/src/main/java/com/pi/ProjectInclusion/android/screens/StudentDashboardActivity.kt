@@ -958,7 +958,12 @@ fun BottomSheetLanguageScreen(
     )
 
     LaunchedEffect(Unit) {
-        viewModel.getLanguages()
+        isInternetAvailable = isNetworkAvailable(context)
+        if (!isInternetAvailable) {
+            context.toast(noDataMessage)
+        } else {
+            viewModel.getLanguages()
+        }
     }
 
     LaunchedEffect(uiState) {
@@ -1263,7 +1268,7 @@ fun ItemLanguageChangeCard(
                 )
 
                 Text(
-                    (languageIndex.translated_name ?: languageIndex.name)!!,
+                    (languageIndex.translatedName ?: languageIndex.name)!!,
                     textAlign = TextAlign.Start,
                     maxLines = 1,
                     fontSize = 16.sp,

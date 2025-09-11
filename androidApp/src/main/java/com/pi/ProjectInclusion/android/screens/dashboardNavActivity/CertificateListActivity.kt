@@ -84,14 +84,20 @@ import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.ALL
 import com.pi.ProjectInclusion.constants.ConstantVariables.COURSE
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.MODULE
+import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_ID
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
 import com.pi.ProjectInclusion.ui.viewModel.DashboardViewModel
+import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 
 class CertificateListActivity : ComponentActivity() {
@@ -136,10 +142,18 @@ fun ShowCertificateData(
             context, Intent(context, StudentDashboardActivity::class.java), null
         ).apply { (context as? Activity)?.finish() }
     }
+    var isInternetAvailable by remember { mutableStateOf(false) }
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
+
+    val loginViewModel: LoginViewModel = koinViewModel()
 
     val certificateState by viewModel.getCertificateResponse.collectAsStateWithLifecycle()
     var isDialogVisible by remember { mutableStateOf(false) }
     var certificateData by remember { mutableStateOf(mutableListOf<CertificateListResponse.CertificateResponse>()) }
+
+    var userID = loginViewModel.getPrefData(USER_ID)
+    var strToken = loginViewModel.getPrefData(TOKEN_PREF_KEY)
+    var partnerId = loginViewModel.getPrefData(USER_TYPE_ID)
 
     CustomDialog(
         isVisible = isDialogVisible,
@@ -148,9 +162,14 @@ fun ShowCertificateData(
     )
 
     LaunchedEffect(Unit) {
-        isDialogVisible = true
-        val certificateRequest = CertificateRequest(2, 270)
-        viewModel.getLMSUserCertificate(certificateRequest, "")
+        isInternetAvailable = isNetworkAvailable(context)
+        if (!isInternetAvailable) {
+            context.toast(internetMessage)
+        } else {
+            isDialogVisible = true
+            val certificateRequest = CertificateRequest(partnerId.toInt(), userID.toInt())
+            viewModel.getLMSUserCertificate(certificateRequest, strToken)
+        }
     }
 
     LaunchedEffect(certificateState) {

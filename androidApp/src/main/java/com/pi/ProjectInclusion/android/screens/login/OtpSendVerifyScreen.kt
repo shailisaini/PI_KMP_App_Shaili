@@ -133,7 +133,7 @@ fun OtpSendVerifyScreen(
     }
 
     BackHandler {
-        handleBack(viewModel, onBack, onBackUserName,onBackPassword)
+        handleBack(viewModel, onBack, onBackUserName, onBackPassword)
     }
 
     CustomDialog(
@@ -193,8 +193,7 @@ fun OtpSendVerifyScreen(
                         ?: errorResponse
 
                     context.toast(errorMessage)
-                }
-                else{
+                } else {
                     if (sendOtpState.success!!.response?.message != SUCCESS) {
                         val errorMessage = sendOtpState.success!!.response?.message
                             ?: sendOtpState.success?.error
@@ -223,6 +222,10 @@ fun OtpSendVerifyScreen(
             verifyOtpState.success != null -> {
                 if (verifyOtpState.success!!.status == true) {
                     if (viewModel.getPrefData(IS_COMING_FROM) == REGISTER_NEW) {
+                        viewModel.savePrefData(
+                            TOKEN_PREF_KEY,
+                            "Bearer " + loginWithOtp.success!!.response?.accessToken.toString()
+                        )
                         onNextCreatePass()
                     } else {
                         onNext()
@@ -287,26 +290,28 @@ fun OtpSendVerifyScreen(
 
     // verify Api request & response
     if (isVerifyOtpApi) {
-
-        isDialogVisible = true
-        if (viewModel.getPrefData(IS_COMING_FROM) == LOGIN_WITH_OTP) {
-            viewModel.getLoginWithOtpViewModel(
-                LoginWithOtpRequest(
-                    encryptedPhoneNo,
-                    encryptedOtp,
-                    userTypeId.toInt()
-                )
-            )
-
+        isInternetAvailable = isNetworkAvailable(context)
+        if (!isInternetAvailable) {
+            context.toast(internetMessage)
         } else {
-            viewModel.getVerifyOtpViewModel(encryptedPhoneNo, encryptedOtp)
+            isDialogVisible = true
+            if (viewModel.getPrefData(IS_COMING_FROM) == LOGIN_WITH_OTP) {
+                viewModel.getLoginWithOtpViewModel(
+                    LoginWithOtpRequest(
+                        encryptedPhoneNo,
+                        encryptedOtp,
+                        userTypeId.toInt()
+                    )
+                )
+            } else {
+                viewModel.getVerifyOtpViewModel(encryptedPhoneNo, encryptedOtp)
+            }
         }
-
         isVerifyOtpApi = false
     }
 
     DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
-        handleBack(viewModel, onBack, onBackUserName,onBackPassword)
+        handleBack(viewModel, onBack, onBackUserName, onBackPassword)
     }, content = {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -447,8 +452,7 @@ fun handleBack(
         onBackUserName()
     } else if (comingFrom == LOGIN_WITH_OTP) {
         onBackPassword()
-    }
-    else{
+    } else {
         logger.d("OtpSendVerify:Back to ForgetPassword -> $comingFrom")
         onBack()
     }

@@ -151,7 +151,12 @@ fun LoginUI(
 
         LoggerProvider.logger.d("ValidateUserParams: ${userName.value} .. $encryptedPhoneNo")
         LaunchedEffect(Unit) {
-            viewModel.getValidateUser(encryptedPhoneNo, userTypeId)
+            isInternetAvailable = isNetworkAvailable(context)
+            if (!isInternetAvailable) {
+                context.toast(internetMessage)
+            } else {
+                viewModel.getValidateUser(encryptedPhoneNo, userTypeId)
+            }
         }
 
         val validateUserState by viewModel.validateUserResponse.collectAsStateWithLifecycle()
@@ -216,8 +221,12 @@ fun LoginUI(
     // api for otp on Whatsapp
     if (sendOtpViaWhatsApp) {
         LaunchedEffect(Unit) {
-            viewModel.getOTPWhatsappViewModel(encryptedPhoneNo)
-
+            isInternetAvailable = isNetworkAvailable(context)
+            if (!isInternetAvailable) {
+                context.toast(internetMessage)
+            } else {
+                viewModel.getOTPWhatsappViewModel(encryptedPhoneNo)
+            }
         }
     }
 
@@ -275,8 +284,7 @@ fun LoginUI(
                         viewModel.savePrefData(USER_MOBILE_NO, encryptedPhoneNo)
                         viewModel.savePrefData(IS_COMING_FROM, REGISTER_NEW)
                         onRegister() // Go to OTP Verify screen
-                    }
-                    else{
+                    } else {
                         val errorMessage = sendOtpState.success!!.response?.message
                             ?: sendOtpState.success?.error
                             ?: sendOtpState.success?.exception

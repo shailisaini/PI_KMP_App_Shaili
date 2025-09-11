@@ -90,6 +90,7 @@ import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
@@ -289,6 +290,8 @@ fun AccountDeleteDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
     var isDialogVisible by remember { mutableStateOf(false) }
     var userId = loginViewModel.userIdValue
     var strToken = loginViewModel.getPrefData(TOKEN_PREF_KEY).toString()
+    var isInternetAvailable by remember { mutableStateOf(false) }
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
 
     println("User ID :- $userId")
 
@@ -405,8 +408,13 @@ fun AccountDeleteDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
                         // check Status
                         Button(
                             onClick = {
-                                isDialogVisible = true
-                                viewModel.deactivateUser(strToken, userId.toString())
+                                isInternetAvailable = isNetworkAvailable(context)
+                                if (!isInternetAvailable) {
+                                    context.toast(internetMessage)
+                                } else {
+                                    isDialogVisible = true
+                                    viewModel.deactivateUser(strToken, userId.toString())
+                                }
                             },
                             modifier = Modifier
                                 .fillMaxWidth()

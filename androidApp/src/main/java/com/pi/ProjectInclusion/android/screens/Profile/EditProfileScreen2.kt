@@ -77,6 +77,7 @@ import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
@@ -97,7 +98,7 @@ import org.koin.ext.clearQuotes
 @Composable
 fun EditProfileScreen2(
     onNext: () -> Unit,  //Dashboard
-    loginViewModel: LoginViewModel
+    loginViewModel: LoginViewModel,
 ) {
 
     val context = LocalContext.current
@@ -135,14 +136,14 @@ fun EditProfileScreen2(
 fun EditProfileScreen2UI(
     context: Context,
     onNext: () -> Unit,
-    loginViewModel: LoginViewModel
+    loginViewModel: LoginViewModel,
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
-    val isInternetAvailable by remember { mutableStateOf(true) }
+    var isInternetAvailable by remember { mutableStateOf(true) }
     var isApiResponded by remember { mutableStateOf(false) }
-    val internetMessage by remember { mutableStateOf("") }
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
 
     var isDialogVisible by remember { mutableStateOf(false) }
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
@@ -205,7 +206,12 @@ fun EditProfileScreen2UI(
         message = stringResource(R.string.txt_loading)
     )
     LaunchedEffect(Unit) {
-        loginViewModel.getUserProfileViewModel(strToken, encryptedUserName)
+        isInternetAvailable = isNetworkAvailable(context)
+        if (!isInternetAvailable) {
+            context.toast(internetMessage)
+        } else {
+            loginViewModel.getUserProfileViewModel(strToken, encryptedUserName)
+        }
     }
 
     val viewProfile by loginViewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
@@ -372,10 +378,12 @@ fun EditProfileScreen2UI(
             allSchoolsState.isLoading -> {
                 isDialogVisible = true
             }
+
             allSchoolsState.error.isNotEmpty() -> {
                 logger.d("All Schools error : ${allSchoolsState.success}")
                 isDialogVisible = false
             }
+
             allSchoolsState.success != null -> {
                 logger.d("All Schools response : ${allSchoolsState.success}")
                 if (allSchoolsState.success?.status == 1) {
@@ -942,7 +950,7 @@ fun EditProfileScreen2UI(
                                             0,
                                             0,
                                             0,
-                                            0,""
+                                            0, ""
 
                                         )
                                         loginViewModel.createProfessionalProfileRepo(
