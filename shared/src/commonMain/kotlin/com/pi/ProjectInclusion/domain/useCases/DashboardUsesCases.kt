@@ -8,6 +8,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.Certifica
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CheckProfileCompletionResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.NotificationResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResponse
@@ -35,6 +36,17 @@ class DashboardUsesCases(private val repository: DashboardRepository) {
     ): Flow<Result<CertificateListResponse>> = flow {
         try {
             val response = repository.getLMSUserCertificateRepo(certificateRequest, strToken)
+            emit(Result.success(response))
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: unableToConnectServer
+            logger.d("Exception in certificate $errorMessage")
+            emit(Result.failure(Exception(errorMessage)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getSentNotification(userId: Int): Flow<Result<NotificationResponse>> = flow {
+        try {
+            val response = repository.getSentNotification(userId)
             emit(Result.success(response))
         } catch (e: Exception) {
             val errorMessage = e.message ?: unableToConnectServer

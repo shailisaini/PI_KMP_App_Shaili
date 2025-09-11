@@ -166,6 +166,7 @@ import org.koin.androidx.compose.koinViewModel
 import androidx.core.net.toUri
 import com.pi.ProjectInclusion.android.common_UI.LogoutDialog
 import com.pi.ProjectInclusion.android.screens.registration.EnterUserScreen1
+import com.pi.ProjectInclusion.ui.viewModel.DashboardViewModel
 
 class StudentDashboardActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -184,6 +185,7 @@ class StudentDashboardActivity : ComponentActivity() {
             var isNotification by remember { mutableStateOf(true) }
             val context = LocalContext.current
             val viewModel: LoginViewModel = koinViewModel()
+            val dashboardViewModel: DashboardViewModel = koinViewModel()
             var strToken = viewModel.getPrefData(TOKEN_PREF_KEY)
             var logOutSheet by remember { mutableStateOf(false) }
             val backStack = remember { mutableStateListOf(startDestination) }
@@ -585,7 +587,8 @@ class StudentDashboardActivity : ComponentActivity() {
                                     AppRoute.NotificationScreen.route -> {
                                         NotificationScreen(
                                             onNext = {},
-                                            onBack = { navigateBack(AppRoute.DashboardScreen.route) })
+                                            onBack = { navigateBack(AppRoute.DashboardScreen.route) },
+                                        dashboardViewModel = dashboardViewModel)
                                     }
 
                                     AppRoute.ScreeningOneReport.route -> {

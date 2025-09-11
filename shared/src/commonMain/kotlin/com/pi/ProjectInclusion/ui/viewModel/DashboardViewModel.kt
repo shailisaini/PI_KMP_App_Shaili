@@ -6,11 +6,11 @@ import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.AccountDeleteResponse
-import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CheckProfileCompletionResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.FAQsListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ForgetPasswordResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.NotificationResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResponse
@@ -54,6 +54,9 @@ class DashboardViewModel(
 
     val getCertificate = MutableStateFlow(UiState<CertificateListResponse>())
     val getCertificateResponse: StateFlow<UiState<CertificateListResponse>> = getCertificate
+
+    val getNotification = MutableStateFlow(UiState<NotificationResponse>())
+    val getNotificationResponse: StateFlow<UiState<NotificationResponse>> = getNotification
 
     val getCategoryList = MutableStateFlow(UiState<List<CategoryListResponse>>())
     val getCategoryListResponse: StateFlow<UiState<List<CategoryListResponse>>> = getCategoryList
@@ -156,6 +159,36 @@ class DashboardViewModel(
                     }
                 } else {
                     getCertificate.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
+                }
+            })
+        }
+    }
+    fun getSentNotification(
+        userId: Int
+    ) = viewModelScope.launch {
+        getNotification.update { UiState(isLoading = true) }
+        getUsesCases.getSentNotification(userId).catch { exception ->
+            if (exception.message?.contains(serverError) == true) {
+                getNotification.update {
+                    UiState(error = serverMsg)
+                }
+            } else {
+                getNotification.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+        }.collect { result ->
+            result.fold(onSuccess = { data ->
+                getNotification.update { UiState(success = data) }
+            }, onFailure = { exception ->
+                if (exception.message?.contains(serverError) == true) {
+                    getNotification.update {
+                        UiState(error = serverMsg)
+                    }
+                } else {
+                    getNotification.update {
                         UiState(error = exception.message ?: somethingWentWrong)
                     }
                 }
