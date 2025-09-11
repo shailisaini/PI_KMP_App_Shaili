@@ -149,7 +149,7 @@ fun LoginUI(
         // saving userName & mobile no as a local variable in view Model
         viewModel.saveUserName(userName.value)
 
-        LoggerProvider.logger.d("ValidateUserParams: ${userName.value} .. $userTypeId")
+        LoggerProvider.logger.d("ValidateUserParams: ${userName.value} .. $encryptedPhoneNo")
         LaunchedEffect(Unit) {
             viewModel.getValidateUser(encryptedPhoneNo, userTypeId)
         }

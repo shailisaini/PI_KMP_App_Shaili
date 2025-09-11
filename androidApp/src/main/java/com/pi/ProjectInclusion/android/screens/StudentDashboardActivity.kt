@@ -320,8 +320,13 @@ class StudentDashboardActivity : ComponentActivity() {
                             LogoutDialog(onDismiss = { logOutSheet = false }, onClick = {
                                 logOutSheet = false
                                 viewModel.clearPref()
-                                context.startActivity(Intent(context, LoginNavigationScreen::class.java))
-                                    (context as? Activity)?.finish()
+                                context.startActivity(
+                                    Intent(
+                                        context,
+                                        LoginNavigationScreen::class.java
+                                    )
+                                )
+                                (context as? Activity)?.finish()
                             })
                         }
 
@@ -407,9 +412,11 @@ class StudentDashboardActivity : ComponentActivity() {
                                 onClick = {
                                     logOutSheet = false
                                     viewModel.clearPref()
-                                    val intent = Intent(context, LoginNavigationScreen::class.java).apply {
-                                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                    }
+                                    val intent =
+                                        Intent(context, LoginNavigationScreen::class.java).apply {
+                                            flags =
+                                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                        }
                                     context.startActivity(intent)
                                     (context as? Activity)?.finish()
                                 }
@@ -441,8 +448,11 @@ class StudentDashboardActivity : ComponentActivity() {
                     if (currentRoute == AppRoute.DashboardScreen.route) {
                         AppBar(
                             isNotification, onNavigationIconClick = {
-                                scope.launch { drawerState.open() }
-                            }, currentRoute = currentRoute
+                                scope.launch {
+                                    drawerState.open()
+                                }
+                            }, currentRoute = currentRoute,
+                            onNotificationClick = {navigateTo(AppRoute.NotificationScreen.route)}
                         )
                     } else if (currentRoute == AppRoute.ScreeningScreen.route) {
                         AppBar(
@@ -526,7 +536,8 @@ class StudentDashboardActivity : ComponentActivity() {
                                                 )
                                             )
                                             (context as? Activity)?.finish()
-                                        },)
+                                        },
+                                    )
 //                                        onBack = { navigateBack(AppRoute.ProfileScreen.route) })
 
                                     AppRoute.EditProfessionalEditProfile.route -> ProfessionalsEditProfile(
