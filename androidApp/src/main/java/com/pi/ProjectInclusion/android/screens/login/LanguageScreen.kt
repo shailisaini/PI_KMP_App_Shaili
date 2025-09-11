@@ -82,7 +82,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.GetLangua
 import kotlinx.coroutines.launch
 
 @Composable
-    fun LanguageScreen(viewModel: LoginViewModel, onNext: () -> Unit) {
+fun LanguageScreen(viewModel: LoginViewModel, onNext: () -> Unit) {
 
     val context = LocalContext.current
 
@@ -112,7 +112,7 @@ fun LanguageResponseUI(
     val errColor = PrimaryBlue
     val scrollState = rememberLazyGridState()
     val coroutineScope = rememberCoroutineScope()
-    var noData  = stringResource(R.string.txt_oops_no_data_found)
+    var noData = stringResource(R.string.txt_oops_no_data_found)
     var isInternetAvailable by remember { mutableStateOf(true) }
     val internetMessage = stringResource(R.string.txt_oops_no_internet)
     var noDataMessage by remember { mutableStateOf(noData) }
@@ -128,7 +128,12 @@ fun LanguageResponseUI(
     )
 
     LaunchedEffect(Unit) {
-        viewModel.getLanguages()
+        isInternetAvailable = isNetworkAvailable(context)
+        if (!isInternetAvailable) {
+            context.toast(noDataMessage)
+        } else {
+            viewModel.getLanguages()
+        }
     }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(uiState) {
@@ -211,7 +216,10 @@ fun LanguageResponseUI(
                                     selectedIndex =
                                         if (selectedIndex == index) null else index // Toggle selection
                                     selectedLanguage.value = languageData[index].id.toString()
-                                    viewModel.savePrefData(SELECTED_LANGUAGE_ID, languageData[index].id.toString())
+                                    viewModel.savePrefData(
+                                        SELECTED_LANGUAGE_ID,
+                                        languageData[index].id.toString()
+                                    )
                                 }
                             )
                         }
@@ -327,7 +335,7 @@ fun ItemLanguageCard(
                     contentDescription = IMG_DESCRIPTION
                 )
                 Text(
-                    (languageIndex.translated_name?:languageIndex.name)!!,
+                    (languageIndex.translated_name ?: languageIndex.name)!!,
                     textAlign = TextAlign.Start,
                     maxLines = 1,
                     fontSize = 16.sp,

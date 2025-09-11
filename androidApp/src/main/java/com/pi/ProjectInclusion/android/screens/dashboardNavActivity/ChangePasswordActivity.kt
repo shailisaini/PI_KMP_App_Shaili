@@ -73,6 +73,7 @@ import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
 import com.pi.ProjectInclusion.android.screens.StudentDashboardActivity
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ForgetPasswordRequest
 import com.pi.ProjectInclusion.data.model.profileModel.ChangePasswordRequest
@@ -114,8 +115,9 @@ class ChangePasswordActivity : ComponentActivity() {
 private fun ShowChangePasswordData(
     controller: NavHostController,
     context: Context,
-    viewModel: DashboardViewModel
-) {            val loginViewModel: LoginViewModel = koinViewModel()
+    viewModel: DashboardViewModel,
+) {
+    val loginViewModel: LoginViewModel = koinViewModel()
 
     var enterOldPasswordStr = rememberSaveable { mutableStateOf("") }
     var enterPasswordStr = rememberSaveable { mutableStateOf("") }
@@ -150,6 +152,8 @@ private fun ShowChangePasswordData(
     var strToken = loginViewModel.getPrefData(TOKEN_PREF_KEY)
     val changePasswordState by viewModel.changePasswordResponse.collectAsStateWithLifecycle()
 
+    var isInternetAvailable by remember { mutableStateOf(false) }
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
 
     val minLength = enterConfirmPasswordStr.value.length >= 8 || enterPasswordStr.value.length >= 8
     val hasLetter =
@@ -158,8 +162,6 @@ private fun ShowChangePasswordData(
         enterConfirmPasswordStr.value.any { it.isDigit() } || enterPasswordStr.value.any { it.isDigit() }
     val hasSymbol = Pattern.compile("[^a-zA-Z0-9]").matcher(enterConfirmPasswordStr.value)
         .find() || Pattern.compile("[^a-zA-Z0-9]").matcher(enterPasswordStr.value).find()
-
-
 
     LaunchedEffect(changePasswordState) {
         when {
@@ -486,12 +488,17 @@ private fun ShowChangePasswordData(
                                 if (showError || enterConfirmPasswordStr.value.length < 10) {
                                     inValidPassword = true
                                 } else {
-
-                                    val passwordRequest = ChangePasswordRequest(
-                                        enterOldPasswordStr.value.encryptAES().toString().trim(),
-                                        enterPasswordStr.value.encryptAES().toString().trim())
-                                    viewModel.changePassword(passwordRequest, strToken)
-
+                                    isInternetAvailable = isNetworkAvailable(context)
+                                    if (!isInternetAvailable) {
+                                        context.toast(internetMessage)
+                                    } else {
+                                        val passwordRequest = ChangePasswordRequest(
+                                            enterOldPasswordStr.value.encryptAES().toString()
+                                                .trim(),
+                                            enterPasswordStr.value.encryptAES().toString().trim()
+                                        )
+                                        viewModel.changePassword(passwordRequest, strToken)
+                                    }
                                 }
                             }
                         }, true

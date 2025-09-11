@@ -68,10 +68,12 @@ import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.DASHBOARD_SCREEN
 import com.pi.ProjectInclusion.constants.ConstantVariables.IS_COMING_FROM
 import com.pi.ProjectInclusion.constants.ConstantVariables.LOGIN_WITH_OTP
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_ID
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.profileModel.response.ViewProfileResponse
@@ -102,7 +104,8 @@ fun DashboardScreen(onProfile: () -> Unit) {
     val selectedLanguage = remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
     var showDialog by remember { mutableStateOf(false) }
-
+    var isInternetAvailable by remember { mutableStateOf(false) }
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
     var strToken = viewModel.getPrefData(TOKEN_PREF_KEY)
     val viewProfile by viewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
     val checkProfile by dashboardViewModel.checkProfileResponse.collectAsStateWithLifecycle()
@@ -111,7 +114,12 @@ fun DashboardScreen(onProfile: () -> Unit) {
     var profileData by remember { mutableStateOf<ViewProfileResponse.ProfileResponse?>(null) }
 
     LaunchedEffect(Unit) {
-        viewModel.getUserProfileViewModel(strToken, encryptedUserName)
+        isInternetAvailable = isNetworkAvailable(context)
+        if (!isInternetAvailable) {
+            context.toast(internetMessage)
+        } else {
+            viewModel.getUserProfileViewModel(strToken, encryptedUserName)
+        }
     }
 
     LaunchedEffect(viewProfile) {
@@ -134,6 +142,7 @@ fun DashboardScreen(onProfile: () -> Unit) {
                     if (profileData != null) {
                         viewModel.saveFirstName(profileData?.firstname.toString())
                         viewModel.saveLastName(profileData?.lastname.toString())
+                        viewModel.savePrefData(USER_ID, profileData?.userId.toString())
                     }
                 } else {
                     context.toast(viewProfile.success!!.message.toString())

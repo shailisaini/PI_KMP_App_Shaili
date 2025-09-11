@@ -172,6 +172,8 @@ fun CreateNewPasswordUI(
     val enterConfirmPasswordMsgStr = stringResource(R.string.txt_Please_enter_confirm_Password)
     val enterConfirmPasswordSameMsgStr =
         stringResource(R.string.txt_Please_enter_confirm_Password_same)
+    var isInternetAvailable by remember { mutableStateOf(true) }
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
 
     val minLength = enterConfirmPasswordStr.value.length >= 8 || enterPasswordStr.value.length >= 8
     val hasLetter =
@@ -207,7 +209,10 @@ fun CreateNewPasswordUI(
                 logger.d("Create/Register Password Response :- ${createRegisterPasswordState.success!!.response}")
                 if (createRegisterPasswordState.success!!.status == true) {
                     context.toast(createRegisterPasswordState.success!!.message!!)
-                    viewModel.savePrefData(USER_MOBILE_NO, createRegisterPasswordState.success!!.response?.mobile.toString())
+                    viewModel.savePrefData(
+                        USER_MOBILE_NO,
+                        createRegisterPasswordState.success!!.response?.mobile.toString()
+                    )
                     onNext()
                 } else {
                     context.toast(createRegisterPasswordState.success!!.message!!)
@@ -220,8 +225,8 @@ fun CreateNewPasswordUI(
     if (showBottomSheet) {
         SelectUserBottomSheet(
             viewModel = viewModel, onDismiss = {
-            showBottomSheet = false
-        })
+                showBottomSheet = false
+            })
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -600,15 +605,20 @@ fun CreateNewPasswordUI(
                             if (showError || enterConfirmPasswordStr.value.length < 8) {
                                 inValidPassword = true
                             } else {
-                                isDialogVisible = true
-                                val passwordRequest = CreatePasswordRequest(
-                                    encryptedUserName,
-                                    encryptedPassword,
-                                    encryptedMobile.toString(),
-                                    userTypeId.toInt(),
-                                    languageId.toInt()
-                                )
-                                viewModel.createRegisterPassword(passwordRequest, strToken)
+                                isInternetAvailable = isNetworkAvailable(context)
+                                if (!isInternetAvailable) {
+                                    context.toast(internetMessage)
+                                } else {
+                                    isDialogVisible = true
+                                    val passwordRequest = CreatePasswordRequest(
+                                        encryptedUserName,
+                                        encryptedPassword,
+                                        encryptedMobile.toString(),
+                                        userTypeId.toInt(),
+                                        languageId.toInt()
+                                    )
+                                    viewModel.createRegisterPassword(passwordRequest, strToken)
+                                }
                             }
                         }
                     }, true
@@ -643,7 +653,12 @@ fun SelectUserBottomSheet(
         message = stringResource(R.string.txt_loading)
     )
     LaunchedEffect(Unit) {
-        viewModel.getUserType()
+        isInternetAvailable = isNetworkAvailable(context)
+        if (!isInternetAvailable) {
+            context.toast(internetMessage)
+        } else {
+            viewModel.getUserType()
+        }
     }
     val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
     LaunchedEffect(uiState) {

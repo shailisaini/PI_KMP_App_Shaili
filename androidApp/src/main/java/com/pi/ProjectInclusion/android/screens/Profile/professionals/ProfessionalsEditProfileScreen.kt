@@ -77,6 +77,7 @@ import com.pi.ProjectInclusion.android.common_UI.UdiseTextField
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
+import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
@@ -127,7 +128,12 @@ fun ProfessionalsEditProfile(
                 .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
-            ProfessionalScreenUI(context, onBack = onBack, onNext = onNext, loginViewModel = loginViewModel)
+            ProfessionalScreenUI(
+                context,
+                onBack = onBack,
+                onNext = onNext,
+                loginViewModel = loginViewModel
+            )
         }
     }
 }
@@ -143,7 +149,7 @@ fun ProfessionalScreenUI(
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
     var isApiResponded by remember { mutableStateOf(false) }
-    val internetMessage by remember { mutableStateOf("") }
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
 
     var isDialogVisible by remember { mutableStateOf(false) }
     var isUdiseDetails by remember { mutableStateOf(false) }
@@ -211,15 +217,20 @@ fun ProfessionalScreenUI(
     var profileData by remember { mutableStateOf<ViewProfileResponse?>(null) }
     var isDropDownSelected by rememberSaveable { mutableStateOf(false) }
 
-   /* var isDistrictListCalled by rememberSaveable { mutableStateOf(false) }
-    var isBlockListCalled by rememberSaveable { mutableStateOf(false) }
-    var isSchoolListCalled by rememberSaveable { mutableStateOf(false) }*/
+    /* var isDistrictListCalled by rememberSaveable { mutableStateOf(false) }
+     var isBlockListCalled by rememberSaveable { mutableStateOf(false) }
+     var isSchoolListCalled by rememberSaveable { mutableStateOf(false) }*/
     var isUdiseCalled by rememberSaveable { mutableStateOf(false) }
-
+    var isInternetAvailable by remember { mutableStateOf(true) }
     val allStatesState by loginViewModel.allStatesResponse.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        loginViewModel.getUserProfileViewModel(strToken, encryptedUserName)
+        isInternetAvailable = isNetworkAvailable(context)
+        if (!isInternetAvailable) {
+            context.toast(internetMessage)
+        } else {
+            loginViewModel.getUserProfileViewModel(strToken, encryptedUserName)
+        }
     }
 
     val viewProfile by loginViewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
@@ -389,10 +400,12 @@ fun ProfessionalScreenUI(
             allSchoolsState.isLoading -> {
                 isDialogVisible = true
             }
+
             allSchoolsState.error.isNotEmpty() -> {
                 logger.d("All Schools error : ${allSchoolsState.success}")
                 isDialogVisible = false
             }
+
             allSchoolsState.success != null -> {
                 logger.d("All Schools response : ${allSchoolsState.success}")
                 if (allSchoolsState.success?.status == 1) {
@@ -418,7 +431,7 @@ fun ProfessionalScreenUI(
         }
     }
 
-    if (isUdiseCalled){
+    if (isUdiseCalled) {
         loginViewModel.getAllDetailsByUdiseId(udiseNo.value.toString())
         isDialogVisible = true
         val allUdiseState by loginViewModel.allUdiseCodeResponse.collectAsStateWithLifecycle()

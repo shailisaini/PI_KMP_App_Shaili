@@ -2,6 +2,7 @@ package com.pi.ProjectInclusion.ui.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.CertificateListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.CertificateRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.AccountDeleteResponse
@@ -28,6 +29,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -40,10 +42,13 @@ class DashboardViewModel(
 
     var noInternetConnection: String = "No Internet Found!"
     var somethingWentWrong: String = "Something went wrong"
+    var serverError: String = "Failed to connect to"
+    var serverMsg: String = "Server not responding!"
 
     // check if which API has to call if internet comes
     private var shouldRefreshLanguages = false
-    private var shouldRefreshUserType = false
+    private var shouldRefreshAllCategory = false
+    private var shouldRefreshRefreshToken = false
 
     private val query = MutableStateFlow("")
 
@@ -98,8 +103,31 @@ class DashboardViewModel(
     }
 
     init {
+        observeNetworkChangesRefresh()
         viewModelScope.launch {
-            query.debounce(1000).filter { it.isNotEmpty() }.collectLatest { }
+            query.debounce(1000).filter { it.isNotEmpty() }.collectLatest {
+                // Your logic
+            }
+        }
+    }
+
+    // observer function for data syncing
+    private fun observeNetworkChangesRefresh() {
+        viewModelScope.launch {
+            var wasPreviouslyOffline = !isNetworkAvailable()
+
+            connectivityObserver.observe().distinctUntilChanged().collect { status ->
+                val isNowOnline = status == ConnectivityObserver.Status.Available
+
+                if (wasPreviouslyOffline && isNowOnline) {
+                    logger.d("Reconnected - checking which APIs to retry")
+
+                    if (shouldRefreshAllCategory) getAllCategory()
+                    if (shouldRefreshRefreshToken) getRefreshToken()
+                }
+
+                wasPreviouslyOffline = !isNowOnline
+            }
         }
     }
 
@@ -109,32 +137,67 @@ class DashboardViewModel(
     ) = viewModelScope.launch {
         getCertificate.update { UiState(isLoading = true) }
         getUsesCases.getLMSUserCertificate(certificateRequest, strToken).catch { exception ->
-            getCertificate.update {
-                UiState(error = exception.message ?: somethingWentWrong)
+            if (exception.message?.contains(serverError) == true) {
+                getCertificate.update {
+                    UiState(error = serverMsg)
+                }
+            } else {
+                getCertificate.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
             }
         }.collect { result ->
             result.fold(onSuccess = { data ->
                 getCertificate.update { UiState(success = data) }
             }, onFailure = { exception ->
-                getCertificate.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true) {
+                    getCertificate.update {
+                        UiState(error = serverMsg)
+                    }
+                } else {
+                    getCertificate.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             })
         }
     }
 
     fun getAllCategory() = viewModelScope.launch {
-        getCategoryList.update { UiState(isLoading = true) }
-        getUsesCases.getAllCategoryRepo().catch { exception ->
+        if (!isNetworkAvailable()) {
+            shouldRefreshAllCategory = true
             getCategoryList.update {
-                UiState(error = exception.message ?: somethingWentWrong)
+                UiState(error = noInternetConnection)
+            }
+            return@launch
+        }
+
+        shouldRefreshAllCategory = false // Reset on successful start
+
+        getCategoryList.update { it.copy(isLoading = true, error = "") }
+
+        getUsesCases.getAllCategoryRepo().catch { exception ->
+            if (exception.message?.contains(serverError) == true) {
+                getCategoryList.update {
+                    UiState(error = serverMsg)
+                }
+            } else {
+                getCategoryList.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
             }
         }.collect { result ->
             result.fold(onSuccess = { data ->
                 getCategoryList.update { UiState(success = data) }
             }, onFailure = { exception ->
-                getCategoryList.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true) {
+                    getCategoryList.update {
+                        UiState(error = serverMsg)
+                    }
+                } else {
+                    getCategoryList.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             })
         }
@@ -143,15 +206,27 @@ class DashboardViewModel(
     fun getAllSubCategory() = viewModelScope.launch {
         getSubCategoryList.update { UiState(isLoading = true) }
         getUsesCases.getAllSubCategoryRepo().catch { exception ->
-            getSubCategoryList.update {
-                UiState(error = exception.message ?: somethingWentWrong)
+            if (exception.message?.contains(serverError) == true) {
+                getSubCategoryList.update {
+                    UiState(error = serverMsg)
+                }
+            } else {
+                getSubCategoryList.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
             }
         }.collect { result ->
             result.fold(onSuccess = { data ->
                 getSubCategoryList.update { UiState(success = data) }
             }, onFailure = { exception ->
-                getSubCategoryList.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true) {
+                    getSubCategoryList.update {
+                        UiState(error = serverMsg)
+                    }
+                } else {
+                    getSubCategoryList.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             })
         }
@@ -160,15 +235,27 @@ class DashboardViewModel(
     fun getAllSubCategoryByCategoryId(categoryId: Int) = viewModelScope.launch {
         getSubCategoryByCategoryIdList.update { UiState(isLoading = true) }
         getUsesCases.getAllSubCategoryByCategoryIdRepo(categoryId).catch { exception ->
-            getSubCategoryByCategoryIdList.update {
-                UiState(error = exception.message ?: somethingWentWrong)
+            if (exception.message?.contains(serverError) == true) {
+                getSubCategoryByCategoryIdList.update {
+                    UiState(error = serverMsg)
+                }
+            } else {
+                getSubCategoryByCategoryIdList.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
             }
         }.collect { result ->
             result.fold(onSuccess = { data ->
                 getSubCategoryByCategoryIdList.update { UiState(success = data) }
             }, onFailure = { exception ->
-                getSubCategoryByCategoryIdList.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true) {
+                    getSubCategoryByCategoryIdList.update {
+                        UiState(error = serverMsg)
+                    }
+                } else {
+                    getSubCategoryByCategoryIdList.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             })
         }
@@ -186,33 +273,67 @@ class DashboardViewModel(
         getUsesCases.getAllFAQsRepo(
             strKeyword, userTypeId, categoryId, subCategoryId, userId, languageId
         ).catch { exception ->
-            getFAQsList.update {
-                UiState(error = exception.message ?: somethingWentWrong)
+            if (exception.message?.contains(serverError) == true) {
+                getFAQsList.update {
+                    UiState(error = serverMsg)
+                }
+            } else {
+                getFAQsList.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
             }
         }.collect { result ->
             result.fold(onSuccess = { data ->
                 getFAQsList.update { UiState(success = data) }
             }, onFailure = { exception ->
-                getFAQsList.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true) {
+                    getFAQsList.update {
+                        UiState(error = serverMsg)
+                    }
+                } else {
+                    getFAQsList.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             })
         }
     }
 
-
     fun getRefreshToken() = viewModelScope.launch {
-        getZoomMeetingToken.update { UiState(isLoading = true) }
-        getUsesCases.getRefreshTokenRepo().catch { exception ->
+        if (!isNetworkAvailable()) {
+            shouldRefreshRefreshToken = true
             getZoomMeetingToken.update {
-                UiState(error = exception.message ?: somethingWentWrong)
+                UiState(error = noInternetConnection)
+            }
+            return@launch
+        }
+
+        shouldRefreshRefreshToken = false // Reset on successful start
+
+        getZoomMeetingToken.update { it.copy(isLoading = true, error = "") }
+
+        getUsesCases.getRefreshTokenRepo().catch { exception ->
+            if (exception.message?.contains(serverError) == true) {
+                getZoomMeetingToken.update {
+                    UiState(error = serverMsg)
+                }
+            } else {
+                getZoomMeetingToken.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
             }
         }.collect { result ->
             result.fold(onSuccess = { data ->
                 getZoomMeetingToken.update { UiState(success = data) }
             }, onFailure = { exception ->
-                getZoomMeetingToken.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true) {
+                    getZoomMeetingToken.update {
+                        UiState(error = serverMsg)
+                    }
+                } else {
+                    getZoomMeetingToken.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             })
         }
@@ -226,15 +347,27 @@ class DashboardViewModel(
         getToken.update { UiState(isLoading = true) }
         getUsesCases.getZoomMeetingsActualTokenRepo(strAuthKey, strGrantType, strRefreshToken)
             .catch { exception ->
-                getToken.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true) {
+                    getToken.update {
+                        UiState(error = serverMsg)
+                    }
+                } else {
+                    getToken.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             }.collect { result ->
                 result.fold(onSuccess = { data ->
                     getToken.update { UiState(success = data) }
                 }, onFailure = { exception ->
-                    getToken.update {
-                        UiState(error = exception.message ?: somethingWentWrong)
+                    if (exception.message?.contains(serverError) == true) {
+                        getToken.update {
+                            UiState(error = serverMsg)
+                        }
+                    } else {
+                        getToken.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
                     }
                 })
             }
@@ -249,15 +382,27 @@ class DashboardViewModel(
         getChangeRequest.update { UiState(isLoading = true) }
         getUsesCases.getChangeRequestCases(requestChange, strToken, docPic, fileName)
             .catch { exception ->
-                getChangeRequest.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true) {
+                    getChangeRequest.update {
+                        UiState(error = serverMsg)
+                    }
+                } else {
+                    getChangeRequest.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             }.collect { result ->
                 result.fold(onSuccess = { data ->
                     getChangeRequest.update { UiState(success = data) }
                 }, onFailure = { exception ->
-                    getChangeRequest.update {
-                        UiState(error = exception.message ?: somethingWentWrong)
+                    if (exception.message?.contains(serverError) == true) {
+                        getChangeRequest.update {
+                            UiState(error = serverMsg)
+                        }
+                    } else {
+                        getChangeRequest.update {
+                            UiState(error = exception.message ?: somethingWentWrong)
+                        }
                     }
                 })
             }
@@ -269,15 +414,27 @@ class DashboardViewModel(
     ) = viewModelScope.launch {
         getTrackRequest.update { UiState(isLoading = true) }
         getUsesCases.getTrackRequestCases(strToken, requestTypeId).catch { exception ->
-            getTrackRequest.update {
-                UiState(error = exception.message ?: somethingWentWrong)
+            if (exception.message?.contains(serverError) == true) {
+                getTrackRequest.update {
+                    UiState(error = serverMsg)
+                }
+            } else {
+                getTrackRequest.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
             }
         }.collect { result ->
             result.fold(onSuccess = { data ->
                 getTrackRequest.update { UiState(success = data) }
             }, onFailure = { exception ->
-                getTrackRequest.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true) {
+                    getTrackRequest.update {
+                        UiState(error = serverMsg)
+                    }
+                } else {
+                    getTrackRequest.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             })
         }
@@ -288,15 +445,27 @@ class DashboardViewModel(
     ) = viewModelScope.launch {
         getMeetingList.update { UiState(isLoading = true) }
         getUsesCases.getAllZoomMeetingsRepo(tokenKey).catch { exception ->
-            getMeetingList.update {
-                UiState(error = exception.message ?: somethingWentWrong)
+            if (exception.message?.contains(serverError) == true) {
+                getMeetingList.update {
+                    UiState(error = serverMsg)
+                }
+            } else {
+                getMeetingList.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
             }
         }.collect { result ->
             result.fold(onSuccess = { data ->
                 getMeetingList.update { UiState(success = data) }
             }, onFailure = { exception ->
-                getMeetingList.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true) {
+                    getMeetingList.update {
+                        UiState(error = serverMsg)
+                    }
+                } else {
+                    getMeetingList.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             })
         }
@@ -308,15 +477,27 @@ class DashboardViewModel(
     ) = viewModelScope.launch {
         getMeetingJoin.update { UiState(isLoading = true) }
         getUsesCases.getJoinZoomMeetingsRepo(tokenKey, meetingId).catch { exception ->
-            getMeetingJoin.update {
-                UiState(error = exception.message ?: somethingWentWrong)
+            if (exception.message?.contains(serverError) == true) {
+                getMeetingJoin.update {
+                    UiState(error = serverMsg)
+                }
+            } else {
+                getMeetingJoin.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
             }
         }.collect { result ->
             result.fold(onSuccess = { data ->
                 getMeetingJoin.update { UiState(success = data) }
             }, onFailure = { exception ->
-                getMeetingJoin.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true) {
+                    getMeetingJoin.update {
+                        UiState(error = serverMsg)
+                    }
+                } else {
+                    getMeetingJoin.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             })
         }
@@ -328,15 +509,27 @@ class DashboardViewModel(
     ) = viewModelScope.launch {
         changePassword.update { UiState(isLoading = true) }
         getUsesCases.changePassword(passwordRequest, strToken).catch { exception ->
-            changePassword.update {
-                UiState(error = exception.message ?: somethingWentWrong)
+            if (exception.message?.contains(serverError) == true) {
+                changePassword.update {
+                    UiState(error = serverMsg)
+                }
+            } else {
+                changePassword.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
             }
         }.collect { result ->
             result.fold(onSuccess = { data ->
                 changePassword.update { UiState(success = data) }
             }, onFailure = { exception ->
-                changePassword.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true) {
+                    changePassword.update {
+                        UiState(error = serverMsg)
+                    }
+                } else {
+                    changePassword.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             })
         }
@@ -348,15 +541,27 @@ class DashboardViewModel(
     ) = viewModelScope.launch {
         getAccountDelete.update { UiState(isLoading = true) }
         getUsesCases.deactivateUserRepo(tokenKey, userId).catch { exception ->
-            getAccountDelete.update {
-                UiState(error = exception.message ?: somethingWentWrong)
+            if (exception.message?.contains(serverError) == true) {
+                getAccountDelete.update {
+                    UiState(error = serverMsg)
+                }
+            } else {
+                getAccountDelete.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
             }
         }.collect { result ->
             result.fold(onSuccess = { data ->
                 getAccountDelete.update { UiState(success = data) }
             }, onFailure = { exception ->
-                getAccountDelete.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true) {
+                    getAccountDelete.update {
+                        UiState(error = serverMsg)
+                    }
+                } else {
+                    getAccountDelete.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             })
         }
@@ -367,15 +572,27 @@ class DashboardViewModel(
     ) = viewModelScope.launch {
         checkProfile.update { UiState(isLoading = true) }
         getUsesCases.checkProfileCompletionRepo(tokenKey).catch { exception ->
-            checkProfile.update {
-                UiState(error = exception.message ?: somethingWentWrong)
+            if (exception.message?.contains(serverError) == true) {
+                checkProfile.update {
+                    UiState(error = serverMsg)
+                }
+            } else {
+                checkProfile.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
             }
         }.collect { result ->
             result.fold(onSuccess = { data ->
                 checkProfile.update { UiState(success = data) }
             }, onFailure = { exception ->
-                checkProfile.update {
-                    UiState(error = exception.message ?: somethingWentWrong)
+                if (exception.message?.contains(serverError) == true) {
+                    checkProfile.update {
+                        UiState(error = serverMsg)
+                    }
+                } else {
+                    checkProfile.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
                 }
             })
         }

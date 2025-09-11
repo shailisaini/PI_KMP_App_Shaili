@@ -91,7 +91,8 @@ fun UserTypeScreen(
 ) {
     var isDialogVisible by remember { mutableStateOf(false) }
     val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
-
+    var isInternetAvailable by remember { mutableStateOf(true) }
+    val internetMessage = stringResource(R.string.txt_oops_no_internet)
     val context = LocalContext.current
     val userType = remember { mutableStateListOf<GetUserTypeResponse.UserTypeResponse>() }
     CustomDialog(
@@ -102,7 +103,12 @@ fun UserTypeScreen(
 
     LoggerProvider.logger.d("Screen: " + "UserTypeScreen()")
     LaunchedEffect(Unit) {
-        viewModel.getUserType()
+        isInternetAvailable = isNetworkAvailable(context)
+        if (!isInternetAvailable) {
+            context.toast(internetMessage)
+        } else {
+            viewModel.getUserType()
+        }
     }
 
     LaunchedEffect(uiState) {
@@ -151,7 +157,7 @@ fun UserTypeResponseUI(
     userTypeData: MutableList<GetUserTypeResponse.UserTypeResponse>,
     onNext: () -> Unit,
     onBack: () -> Unit,
-    viewModel: LoginViewModel
+    viewModel: LoginViewModel,
 ) {
     val errColor = PrimaryBlue
     val scrollState = rememberLazyGridState()
