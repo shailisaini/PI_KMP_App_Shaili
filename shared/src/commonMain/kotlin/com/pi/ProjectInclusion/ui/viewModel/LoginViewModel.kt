@@ -70,73 +70,73 @@ class LoginViewModel(
     val _uiState = MutableStateFlow(UiState<GetLanguageListResponse>())
     val uiState: StateFlow<UiState<GetLanguageListResponse>> = _uiState
 
-    private val _uiStateUserType = MutableStateFlow(UiState<GetUserTypeResponse>())
+    val _uiStateUserType = MutableStateFlow(UiState<GetUserTypeResponse>())
     val uiStateType: StateFlow<UiState<GetUserTypeResponse>> = _uiStateUserType
 
-    private val _uiStateValidateUser = MutableStateFlow(UiState<ValidateUserResponse>())
+    val _uiStateValidateUser = MutableStateFlow(UiState<ValidateUserResponse>())
     val validateUserResponse: StateFlow<UiState<ValidateUserResponse>> = _uiStateValidateUser
 
-    private val _uiStateSendOtp = MutableStateFlow(UiState<SendOTPResponse>())
+    val _uiStateSendOtp = MutableStateFlow(UiState<SendOTPResponse>())
     val uiStateSendOtpResponse: StateFlow<UiState<SendOTPResponse>> = _uiStateSendOtp
 
     private val _uiStateLogin = MutableStateFlow(UiState<LoginApiResponse>())
     val uiStateLoginResponse: StateFlow<UiState<LoginApiResponse>> = _uiStateLogin
 
-    private val loginWithOtpState = MutableStateFlow(UiState<LoginApiResponse>())
+    val loginWithOtpState = MutableStateFlow(UiState<LoginApiResponse>())
     val loginWithOtpResponse: StateFlow<UiState<LoginApiResponse>> = loginWithOtpState
 
     val viewUserProfile = MutableStateFlow(UiState<ViewProfileResponse>())
     val viewUserProfileResponse: StateFlow<UiState<ViewProfileResponse>> = viewUserProfile
 
-    private val verifyLogin = MutableStateFlow(UiState<VerifyOtpResponse>())
+    val verifyLogin = MutableStateFlow(UiState<VerifyOtpResponse>())
     val verifyLoginResponse: StateFlow<UiState<VerifyOtpResponse>> = verifyLogin
 
-    private val forgetPassword = MutableStateFlow(UiState<ForgetPasswordResponse>())
+    val forgetPassword = MutableStateFlow(UiState<ForgetPasswordResponse>())
     val forgetPasswordResponse: StateFlow<UiState<ForgetPasswordResponse>> = forgetPassword
 
-    private val createRegPassword = MutableStateFlow(UiState<CreateRegisterPasswordResponse>())
+    val createRegPassword = MutableStateFlow(UiState<CreateRegisterPasswordResponse>())
     val createRegPasswordResponse: StateFlow<UiState<CreateRegisterPasswordResponse>> =
         createRegPassword
 
-    private val firstStepProfilePassword =
+    val firstStepProfilePassword =
         MutableStateFlow(UiState<CreateFirstStepProfileResponse>())
     val firstStepProfilePasswordResponse: StateFlow<UiState<CreateFirstStepProfileResponse>> =
         firstStepProfilePassword
 
-    private val allStates = MutableStateFlow(UiState<List<StateListResponse>>())
+    val allStates = MutableStateFlow(UiState<List<StateListResponse>>())
     val allStatesResponse: StateFlow<UiState<List<StateListResponse>>> = allStates
 
-    private val allDistricts = MutableStateFlow(UiState<List<DistrictListResponse>>())
+    val allDistricts = MutableStateFlow(UiState<List<DistrictListResponse>>())
     val allDistrictsResponse: StateFlow<UiState<List<DistrictListResponse>>> = allDistricts
 
-    private val allBlocks = MutableStateFlow(UiState<List<BlockListResponse>>())
+    val allBlocks = MutableStateFlow(UiState<List<BlockListResponse>>())
     val allBlocksResponse: StateFlow<UiState<List<BlockListResponse>>> = allBlocks
 
-    private val allSchools = MutableStateFlow(UiState<SchoolListResponse>())
+    val allSchools = MutableStateFlow(UiState<SchoolListResponse>())
     val allSchoolsResponse: StateFlow<UiState<SchoolListResponse>> = allSchools
 
-    private val allUdiseCode = MutableStateFlow(UiState<SchoolByUdiseCodeResponse>())
+    val allUdiseCode = MutableStateFlow(UiState<SchoolByUdiseCodeResponse>())
     val allUdiseCodeResponse: StateFlow<UiState<SchoolByUdiseCodeResponse>> = allUdiseCode
 
-    private val professionalProfile = MutableStateFlow(UiState<CreateFirstStepProfileResponse>())
+    val professionalProfile = MutableStateFlow(UiState<CreateFirstStepProfileResponse>())
     val professionalProfileResponse: StateFlow<UiState<CreateFirstStepProfileResponse>> =
         professionalProfile
 
-    private val professionList = MutableStateFlow(UiState<List<ProfessionListResponse>>())
+    val professionList = MutableStateFlow(UiState<List<ProfessionListResponse>>())
     val professionListResponse: StateFlow<UiState<List<ProfessionListResponse>>> = professionList
 
-    private val qualificationList = MutableStateFlow(UiState<List<QualificationListResponse>>())
+    val qualificationList = MutableStateFlow(UiState<List<QualificationListResponse>>())
     val qualificationListResponse: StateFlow<UiState<List<QualificationListResponse>>> =
         qualificationList
 
-    private val specializationList = MutableStateFlow(UiState<List<SpecializationListResponse>>())
+    val specializationList = MutableStateFlow(UiState<List<SpecializationListResponse>>())
     val specializationListResponse: StateFlow<UiState<List<SpecializationListResponse>>> =
         specializationList
 
-    private val reasonList = MutableStateFlow(UiState<ReasonListResponse>())
+    val reasonList = MutableStateFlow(UiState<ReasonListResponse>())
     val reasonListResponse: StateFlow<UiState<ReasonListResponse>> = reasonList
 
-    private val forceUpdate = MutableStateFlow(UiState<ForceUpdateResponse>())
+    val forceUpdate = MutableStateFlow(UiState<ForceUpdateResponse>())
     val forceUpdateResponse: StateFlow<UiState<ForceUpdateResponse>> = forceUpdate
 
     private val query = MutableStateFlow("")
@@ -241,7 +241,7 @@ class LoginViewModel(
 
         shouldRefreshLanguages = false // Reset on successful start
 
-        _uiState.update { it.copy(isLoading = true, error = "") }
+        _uiState.update { it.copy(isLoading = true) }
 
         getAuthViewModel.getLanguage().catch { exception ->
             if (exception.message?.contains(serverError) == true) {
@@ -311,7 +311,6 @@ class LoginViewModel(
 
     fun getValidateUser(userName: String, userTypeId: String) = viewModelScope.launch {
         // no need to sync data
-
         _uiStateValidateUser.update { UiState(isLoading = true) }
         getAuthViewModel.getValidateUserCase(userName, userTypeId).catch { exception ->
             if (exception.message?.contains(serverError) == true) {
@@ -593,7 +592,8 @@ class LoginViewModel(
                     }
                 } else {
                     viewUserProfile.update {
-                        UiState(error = exception.message?.takeIf { it.isNotBlank() } ?: somethingWentWrong)
+                        UiState(error = exception.message?.takeIf { it.isNotBlank() }
+                            ?: somethingWentWrong)
                     }
                 }
             }
@@ -606,11 +606,13 @@ class LoginViewModel(
                         // Handle exception inside Result
                         if (exception.message?.contains(serverError) == true) {
                             viewUserProfile.update {
-                                UiState(error = serverMsg.takeIf { it.isNotBlank() } ?: somethingWentWrong)
+                                UiState(error = serverMsg.takeIf { it.isNotBlank() }
+                                    ?: somethingWentWrong)
                             }
                         } else {
                             viewUserProfile.update {
-                                UiState(error = exception.message?.takeIf { it.isNotBlank() } ?: somethingWentWrong)
+                                UiState(error = exception.message?.takeIf { it.isNotBlank() }
+                                    ?: somethingWentWrong)
                             }
                         }
                     }
