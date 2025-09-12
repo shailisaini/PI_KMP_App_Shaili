@@ -136,14 +136,11 @@ private fun ShowChangePasswordData(
     val txtCharacter = stringResource(R.string.txt_Passwords_must_be_8_16_characters)
     val txtUppercase = stringResource(R.string.txt_Including_one_uppercase_letter)
     val txtAtleastOne = stringResource(R.string.txt_Must_include_at_least_one_number)
-    val txtSpecialCharacter =
-        stringResource(R.string.txt_Must_include_one_special_characters)
+    val txtSpecialCharacter = stringResource(R.string.txt_Must_include_one_special_characters)
     val passwordOldMsgStr = stringResource(R.string.txt_Please_enter_old_Password)
     val passwordNewMsgStr = stringResource(R.string.txt_Please_enter_your_New_Password)
-    val passwordConfirmMsgStr =
-        stringResource(R.string.txt_Please_enter_confirm_your_New_Password)
-    val confirmPasswordSameMsgStr =
-        stringResource(R.string.txt_Please_enter_confirm_Password_same)
+    val passwordConfirmMsgStr = stringResource(R.string.txt_Please_enter_confirm_your_New_Password)
+    val confirmPasswordSameMsgStr = stringResource(R.string.txt_Please_enter_confirm_Password_same)
     var isCheckedCharacter by remember { mutableStateOf(false) }
     var isCheckedUppercase by remember { mutableStateOf(false) }
     var isCheckedAtleastOne by remember { mutableStateOf(false) }
@@ -177,7 +174,9 @@ private fun ShowChangePasswordData(
             changePasswordState.success != null -> {
                 logger.d("Forget Password Response :- ${changePasswordState.success!!.response}")
                 if (changePasswordState.success!!.status == true) {
-                    context.toast(changePasswordState.success!!.response!!)
+                    if (changePasswordState.success?.message == "Success")
+//                    context.toast(changePasswordState.success!!.response!!)
+                        showDialog = true
                 } else {
                     context.toast(changePasswordState.success!!.response!!)
                 }
@@ -285,13 +284,13 @@ private fun ShowChangePasswordData(
                 )
 
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(
+                    verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(
                         top = 16.dp, start = 12.dp, end = 12.dp, bottom = 8.dp
                     )
                 ) {
                     Checkbox(
-                        checked = minLength, onCheckedChange = null,
+                        checked = minLength,
+                        onCheckedChange = null,
                         colors = if (isSystemInDarkTheme()) {
                             CheckboxDefaults.colors(
                                 checkedColor = Color.Transparent,     // Light purple-gray
@@ -304,7 +303,8 @@ private fun ShowChangePasswordData(
                                 uncheckedColor = Color.LightGray,   // Same for unchecked
                                 checkmarkColor = PrimaryBlue
                             )
-                        }, modifier = Modifier.size(20.dp)
+                        },
+                        modifier = Modifier.size(20.dp)
                     )
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -325,11 +325,8 @@ private fun ShowChangePasswordData(
                 }
 
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(
-                        start = 12.dp,
-                        end = 12.dp,
-                        bottom = 8.dp
+                    verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(
+                        start = 12.dp, end = 12.dp, bottom = 8.dp
                     )
                 ) {
                     Checkbox(
@@ -367,11 +364,8 @@ private fun ShowChangePasswordData(
                 }
 
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(
-                        start = 12.dp,
-                        end = 12.dp,
-                        bottom = 8.dp
+                    verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(
+                        start = 12.dp, end = 12.dp, bottom = 8.dp
                     )
                 ) {
                     Checkbox(
@@ -409,11 +403,8 @@ private fun ShowChangePasswordData(
                 }
 
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(
-                        start = 12.dp,
-                        end = 12.dp,
-                        bottom = 8.dp
+                    verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(
+                        start = 12.dp, end = 12.dp, bottom = 8.dp
                     )
                 ) {
                     Checkbox(
@@ -463,8 +454,7 @@ private fun ShowChangePasswordData(
                         } else {
                             White
                         }
-                    ),
-                contentAlignment = Alignment.CenterEnd
+                    ), contentAlignment = Alignment.CenterEnd
             ) {
                 Box(
                     modifier = Modifier
@@ -474,7 +464,6 @@ private fun ShowChangePasswordData(
                 ) {
                     BtnUi(
                         txtContinue, onClick = {
-                            showDialog = true
                             if (enterOldPasswordStr.value.isEmpty()) {
                                 context.toast(passwordOldMsgStr)
                             } else if (enterPasswordStr.value.isEmpty()) {
@@ -528,8 +517,7 @@ fun PasswordUpdateDialog(onDismiss: () -> Unit) {
             Column(
                 modifier = Modifier
                     .padding(bottom = 16.dp, start = 8.dp, end = 8.dp)
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box(
                     modifier = Modifier
@@ -580,15 +568,12 @@ fun PasswordUpdateDialog(onDismiss: () -> Unit) {
                 Column(
                     modifier = Modifier
                         .padding(bottom = 8.dp, start = 8.dp, end = 8.dp)
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     BtnUi(
                         onClick = {
                             onDismiss()
-                        },
-                        title = stringResource(R.string.txt_Ok_Got_it),
-                        enabled = true
+                        }, title = stringResource(R.string.txt_Ok_Got_it), enabled = true
                     )
                 }
             }
