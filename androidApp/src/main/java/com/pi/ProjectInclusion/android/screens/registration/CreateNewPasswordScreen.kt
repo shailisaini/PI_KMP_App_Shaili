@@ -91,6 +91,7 @@ import com.pi.ProjectInclusion.android.common_UI.CustomToastMessage
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.EncryptedCommonFunction.isEncryptedPhone
 import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
+import com.pi.ProjectInclusion.android.common_UI.SnackbarWithProgress
 import com.pi.ProjectInclusion.android.common_UI.TextWithIconOnLeft
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
@@ -159,7 +160,7 @@ fun CreateNewPasswordUI(
     var enterConfirmPasswordStr = rememberSaveable { mutableStateOf("") }
     val enterPassword = stringResource(R.string.txt_Enter_your_password)
     val enterConfirmPassword = stringResource(R.string.txt_Confirm_your_password)
-    val txtContinue = stringResource(R.string.txt_Update)
+    val txtContinue = stringResource(R.string.key_create_password)
     var showError by remember { mutableStateOf(false) }
     var inValidPassword by remember { mutableStateOf(false) }
     var isDialogVisible by remember { mutableStateOf(false) }
@@ -240,11 +241,9 @@ fun CreateNewPasswordUI(
     }
 
     if (showToast) {
-        CustomToastMessage(
-            titleStr = "",
-            messageStr = stringResource(R.string.key_password_created),
-            visible = showToast,
-            onClose = { showToast = false })
+        SnackbarWithProgress(
+            message = stringResource(R.string.key_password_created),
+            onDismiss = { showToast = false })
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -264,7 +263,10 @@ fun CreateNewPasswordUI(
                 verticalArrangement = Arrangement.Top
             ) {
                 LoginScreenTitle(
-                    stringResource(R.string.txt_Set_your_Password), Black, Gray, Transparent,
+                    stringResource(R.string.txt_Set_your_Password),
+                    Black,
+                    Gray,
+                    Transparent,
                     stringResource(R.string.txt_set_password_desc)
                 )
 
@@ -302,8 +304,7 @@ fun CreateNewPasswordUI(
                                         .data(R.drawable.img_teacher)
                                         .decoderFactory(SvgDecoder.Factory())
                                         .placeholder(R.drawable.img_teacher)
-                                        .error(R.drawable.img_teacher)
-                                        .build()
+                                        .error(R.drawable.img_teacher).build()
                                 ),
                                 contentDescription = IMG_DESCRIPTION,
                                 modifier = Modifier
@@ -315,8 +316,7 @@ fun CreateNewPasswordUI(
                             Text(
                                 text = userTypeName,
                                 modifier = Modifier.padding(
-                                    top = 5.dp,
-                                    bottom = 5.dp
+                                    top = 5.dp, bottom = 5.dp
                                 ),
                                 textAlign = TextAlign.Start,
                                 fontFamily = fontRegular,
@@ -334,8 +334,7 @@ fun CreateNewPasswordUI(
                         Text(
                             text = stringResource(R.string.txt_change_user),
                             modifier = Modifier.padding(
-                                top = 5.dp,
-                                bottom = 5.dp
+                                top = 5.dp, bottom = 5.dp
                             ),
                             textAlign = TextAlign.Start,
                             fontFamily = fontRegular,
@@ -380,9 +379,7 @@ fun CreateNewPasswordUI(
                         pop()
                     },
                     modifier = Modifier.padding(
-                        top = 24.dp,
-                        bottom = 10.dp,
-                        start = 8.dp, end = 8.dp
+                        top = 24.dp, bottom = 10.dp, start = 8.dp, end = 8.dp
                     ),
                     textAlign = TextAlign.Start,
                     fontStyle = FontStyle.Normal,
@@ -396,9 +393,7 @@ fun CreateNewPasswordUI(
                 )
 
                 PasswordTextField(
-                    password = enterPasswordStr,
-                    showPassword = showPassword,
-                    hint = enterPassword
+                    password = enterPasswordStr, showPassword = showPassword, hint = enterPassword
                 )
 
 
@@ -410,9 +405,7 @@ fun CreateNewPasswordUI(
                         pop()
                     },
                     modifier = Modifier.padding(
-                        top = 24.dp,
-                        bottom = 10.dp,
-                        start = 8.dp, end = 8.dp
+                        top = 24.dp, bottom = 10.dp, start = 8.dp, end = 8.dp
                     ),
                     textAlign = TextAlign.Start,
                     fontStyle = FontStyle.Normal,
@@ -432,12 +425,8 @@ fun CreateNewPasswordUI(
                 )
 
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(
-                        top = 16.dp,
-                        start = 12.dp,
-                        end = 12.dp,
-                        bottom = 8.dp
+                    verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(
+                        top = 16.dp, start = 12.dp, end = 12.dp, bottom = 8.dp
                     )
                 ) {
                     Checkbox(
@@ -543,8 +532,7 @@ fun CreateNewPasswordUI(
 
                     Text(
                         text = txtAtleastOne,
-                        modifier = Modifier
-                            .padding(start = 8.dp, end = 8.dp),
+                        modifier = Modifier.padding(start = 8.dp, end = 8.dp),
                         textAlign = TextAlign.Center,
                         fontStyle = FontStyle.Normal,
                         fontWeight = FontWeight.Normal,
@@ -613,13 +601,10 @@ fun CreateNewPasswordUI(
                 contentAlignment = Alignment.BottomCenter,
             ) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
                 ) {
                     BtnUi(
-                        txtContinue,
-                        onClick = {
+                        txtContinue, onClick = {
                             if (enterPasswordStr.value.isEmpty()) {
                                 context.toast(enterPasswordMsgStr)
                             } else if (enterConfirmPasswordStr.value.isEmpty()) {
@@ -711,8 +696,7 @@ fun SelectUserBottomSheet(
     ModalBottomSheet(
         onDismissRequest = {
             onDismiss()
-        },
-        sheetState = sheetState
+        }, sheetState = sheetState
     ) {
         // Sheet content
         Column(
@@ -770,10 +754,8 @@ fun SelectUserBottomSheet(
                                     onItemClicked = {
                                         selectedIndex =
                                             if (selectedIndex == index) null else index // Toggle selection
-                                        selectedLanguage.value =
-                                            userType[index].id.toString()
-                                    }
-                                )
+                                        selectedLanguage.value = userType[index].id.toString()
+                                    })
                             }
                         }
                     }
@@ -781,9 +763,7 @@ fun SelectUserBottomSheet(
                     isInternetAvailable = isNetworkAvailable(context)
                     if (!isInternetAvailable) {
                         ShowError(
-                            internetMessage,
-                            errColor,
-                            painterResource(R.drawable.sad_emoji)
+                            internetMessage, errColor, painterResource(R.drawable.sad_emoji)
                         )
                     } else {
                         NoDataFound(noDataMessage, painterResource(R.drawable.sad_emoji))
@@ -817,8 +797,7 @@ fun UserTypeCard(
     val errorToast = stringResource(R.string.select_userType)
 
     val selectedBorder = if (isSelected) BorderStroke(
-        width = 1.dp,
-        if (isSystemInDarkTheme()) {
+        width = 1.dp, if (isSystemInDarkTheme()) {
             PRIMARY_AURO_BLUE
         } else {
             PrimaryBlue
@@ -864,8 +843,7 @@ fun UserTypeCard(
             }
         ),
         border = selectedBorder,
-        shape = RoundedCornerShape(12.dp)
-    ) {
+        shape = RoundedCornerShape(12.dp)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -885,16 +863,12 @@ fun UserTypeCard(
                         .size(65.dp),
                     contentScale = ContentScale.Fit,
 //                    painter = if (userTypeIndex.isNotEmpty()) {
-                    painter =
-                        rememberAsyncImagePainter(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(userTypeIndex.icon)
-                                .decoderFactory(SvgDecoder.Factory())
-                                .size(Size.ORIGINAL)
-                                .placeholder(R.drawable.img_teacher)
-                                .error(R.drawable.img_teacher)
-                                .build()
-                        ),
+                    painter = rememberAsyncImagePainter(
+                        model = ImageRequest.Builder(LocalContext.current).data(userTypeIndex.icon)
+                            .decoderFactory(SvgDecoder.Factory()).size(Size.ORIGINAL)
+                            .placeholder(R.drawable.img_teacher).error(R.drawable.img_teacher)
+                            .build()
+                    ),
                     contentDescription = IMG_DESCRIPTION
                 )
 

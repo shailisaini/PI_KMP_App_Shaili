@@ -23,15 +23,22 @@ import com.pi.ProjectInclusion.Dark_01
 import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.navigation.AppRoute
 import com.pi.ProjectInclusion.constants.BackHandler
+import com.pi.ProjectInclusion.constants.ConstantVariables.IS_COMING_FROM
+import com.pi.ProjectInclusion.constants.ConstantVariables.REGISTER_NEW
+import com.pi.ProjectInclusion.constants.ConstantVariables.TERMS_CONDITION
+import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun PrivacyPolicy(onBack: () -> Unit) {
 
-    var strLMSUrl = "https://projectinclusion.in/privacy-policy.aspx"
+    var strLMSPrivacyUrl = "https://projectinclusion.in/privacy-policy.aspx"
+    var strLMSTermsUrl = "https://projectinclusion.in/terms-and-condition"
     var strPartnerName by remember { mutableStateOf("") }
     var strLanguageName by remember { mutableStateOf("") }
     var userId by remember { mutableStateOf(0) }
     var languageId by remember { mutableStateOf(0) }
+    val viewModel: LoginViewModel = koinViewModel()
 
     BackHandler {
         onBack()
@@ -42,7 +49,11 @@ fun PrivacyPolicy(onBack: () -> Unit) {
             .fillMaxSize()
             .background(White)
     ) {
-        WebViewScreen(strLMSUrl)
+        if (viewModel.getPrefData(IS_COMING_FROM) == TERMS_CONDITION) {
+            WebViewScreen(strLMSTermsUrl)
+        } else {
+            WebViewScreen(strLMSPrivacyUrl)
+        }
     }
 }
 
@@ -63,49 +74,48 @@ fun WebViewScreen(url: String) {
     ) {
         AndroidView(
             factory = { context ->
-                WebView(context).requestFocusFromTouch()
-                WebView(context).apply {
-                    settings.javaScriptEnabled = true
-                    isFocusable = true
-                    isFocusableInTouchMode = true
-                    requestFocus()
+            WebView(context).requestFocusFromTouch()
+            WebView(context).apply {
+                settings.javaScriptEnabled = true
+                isFocusable = true
+                isFocusableInTouchMode = true
+                requestFocus()
 
-                    webViewClient = WebViewClient()
+                webViewClient = WebViewClient()
 
-                    webViewClient = object : WebViewClient() {
-                        override fun onPageFinished(view: WebView?, url: String?) {
-                            super.onPageFinished(view, url)
-                            webViewState = WebViewState.Loaded
+                webViewClient = object : WebViewClient() {
+                    override fun onPageFinished(view: WebView?, url: String?) {
+                        super.onPageFinished(view, url)
+                        webViewState = WebViewState.Loaded
 
-                            view?.evaluateJavascript(
-                                """
+                        view?.evaluateJavascript(
+                            """
                                 document.querySelector('#menuButton')?.addEventListener('click', function() {
                                     Android.openDrawerFromWeb();
                                 });
-                                """.trimIndent(),
-                                null
-                            )
-                        }
+                                """.trimIndent(), null
+                        )
+                    }
 
-                        @Deprecated("Deprecated in Java")
-                        override fun onReceivedError(
-                            view: WebView?,
-                            errorCode: Int,
-                            description: String?,
-                            failingUrl: String?,
-                        ) {
-                            super.onReceivedError(view, errorCode, description, failingUrl)
-                            webViewState = WebViewState.Error
-                            println("Web view error information :- $failingUrl")
-                            Toast.makeText(
-                                context, "$url is not working.", Toast.LENGTH_SHORT
-                            ).show()
-                        }
+                    @Deprecated("Deprecated in Java")
+                    override fun onReceivedError(
+                        view: WebView?,
+                        errorCode: Int,
+                        description: String?,
+                        failingUrl: String?,
+                    ) {
+                        super.onReceivedError(view, errorCode, description, failingUrl)
+                        webViewState = WebViewState.Error
+                        println("Web view error information :- $failingUrl")
+                        Toast.makeText(
+                            context, "$url is not working.", Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
-            }, update = { webView ->
-                webView.loadUrl(url)
-            }, modifier = Modifier.fillMaxSize()
+            }
+        }, update = { webView ->
+            webView.loadUrl(url)
+        }, modifier = Modifier.fillMaxSize()
         )
         if (webViewState == WebViewState.Loading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))

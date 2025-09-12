@@ -59,9 +59,11 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.USER_EXIST
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.IS_COMING_FROM
 import com.pi.ProjectInclusion.constants.ConstantVariables.NEW_USER
+import com.pi.ProjectInclusion.constants.ConstantVariables.PRIVACY_POLICY
 import com.pi.ProjectInclusion.constants.ConstantVariables.REGISTER_NEW
 import com.pi.ProjectInclusion.constants.ConstantVariables.SELECTED_LANGUAGE_ID
 import com.pi.ProjectInclusion.constants.ConstantVariables.SUCCESS
+import com.pi.ProjectInclusion.constants.ConstantVariables.TERMS_CONDITION
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_MOBILE_NO
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
 import com.pi.ProjectInclusion.constants.CustomDialog
@@ -192,8 +194,7 @@ fun LoginUI(
                         } else if (apiResponse?.message == USER_EXIST) {
                             // if login with password
                             viewModel.savePrefData(
-                                USER_MOBILE_NO,
-                                apiResponse.user!!.mobile.toString()
+                                USER_MOBILE_NO, apiResponse.user!!.mobile.toString()
                             )
                             onNext()
                         } else {
@@ -246,26 +247,20 @@ fun LoginUI(
     // Error dialog
     if (isNewUserError) {
         CommonAlertDialog(
-            alertMessage = stringResource(R.string.key_phn_error),
-            onDismiss = {
+            alertMessage = stringResource(R.string.key_phn_error), onDismiss = {
                 isNewUserError = false
-            }
-        )
+            })
     }
 
     // recover dialog
     if (confirmRecoverState) {
-        AccountRecoverDialog(
-            msg = recoverMessage,
-            onRestore = {
-                confirmRecoverState = false
-                showOtpBottomSheet = true
+        AccountRecoverDialog(msg = recoverMessage, onRestore = {
+            confirmRecoverState = false
+            showOtpBottomSheet = true
 //                viewModel.getOTPViewModel(userName.value)
-            },
-            onDismiss = {
-                confirmRecoverState = false
-            }
-        )
+        }, onDismiss = {
+            confirmRecoverState = false
+        })
     }
 
     LaunchedEffect(sendOtpState) {
@@ -287,17 +282,14 @@ fun LoginUI(
                         viewModel.savePrefData(IS_COMING_FROM, REGISTER_NEW)
                         onRegister() // Go to OTP Verify screen
                     } else {
-                        val errorMessage = sendOtpState.success!!.response?.message
-                            ?: sendOtpState.success?.error
-                            ?: sendOtpState.success?.exception
-                            ?: errorResponse
+                        val errorMessage =
+                            sendOtpState.success!!.response?.message ?: sendOtpState.success?.error
+                            ?: sendOtpState.success?.exception ?: errorResponse
                         context.toast(errorMessage)
                     }
                 } else {
-                    val errorMessage = sendOtpState.success?.message
-                        ?: sendOtpState.success?.error
-                        ?: sendOtpState.success?.exception
-                        ?: errorResponse
+                    val errorMessage = sendOtpState.success?.message ?: sendOtpState.success?.error
+                    ?: sendOtpState.success?.exception ?: errorResponse
 
                     context.toast(errorMessage)
                 }
@@ -317,83 +309,82 @@ fun LoginUI(
                     .padding(vertical = 15.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-            Column(
-                modifier = Modifier
-                    .padding(10.dp)
-                    .verticalScroll(rememberScrollState())
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Image(
-                    modifier = Modifier
-                        .padding(horizontal = 10.dp)
-                        .wrapContentHeight()
-                        .fillMaxWidth(),
-                    painter = painterResource(id = R.drawable.login_img),
-                    contentDescription = IMG_DESCRIPTION,
-                    contentScale = ContentScale.Crop
-                )
-
                 Column(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 8.dp, vertical = 8.dp),
+                        .padding(10.dp)
+                        .verticalScroll(rememberScrollState())
+                        .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Text(
-                        tvMobNo,
-                        modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),
-                        fontFamily = fontMedium,
-                        fontSize = 14.sp,
-                        color = if (isSystemInDarkTheme()) {
-                            DARK_DEFAULT_BUTTON_TEXT
-                        } else {
-                            Gray
-                        }
+                    Image(
+                        modifier = Modifier
+                            .padding(horizontal = 10.dp)
+                            .wrapContentHeight()
+                            .fillMaxWidth(),
+                        painter = painterResource(id = R.drawable.login_img),
+                        contentDescription = IMG_DESCRIPTION,
+                        contentScale = ContentScale.Crop
                     )
 
-                    UserNameTextField(
-                        isIcon = false,
-                        icon = null,
-                        colors = colors,
-                        number = userName,
-                        trueFalse = true,
-                        hint = enterMobile.toString()
-                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 8.dp, vertical = 8.dp),
+                    ) {
+                        Spacer(modifier = Modifier.height(10.dp))
 
-                    if (inValidMobNo) {
                         Text(
-                            invalidMobNo.toString(),
-                            color = LightRed01,
-                            modifier = Modifier.padding(5.dp),
-                            fontSize = 10.sp
+                            tvMobNo,
+                            modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),
+                            fontFamily = fontMedium,
+                            fontSize = 14.sp,
+                            color = if (isSystemInDarkTheme()) {
+                                DARK_DEFAULT_BUTTON_TEXT
+                            } else {
+                                Gray
+                            }
                         )
-                    }
 
-                    Spacer(modifier = Modifier.height(15.dp))
-                    BtnUi(
-                        enabled = userName.value.isNotEmpty(),
-                        title = txtContinue,
-                        onClick = {
-                            if (userName.value.isNotEmpty() || userName.value.length >= 6) {
-                                if (showError || userName.value.length < 6) {
-                                    inValidMobNo = true
-                                } else {
-                                    isInternetAvailable = isNetworkAvailable(context)
-                                    // if first digit of mobile is less than 6 then error will show
-                                    if (!isInternetAvailable) {
-                                        context.toast(internetMessage)
+                        UserNameTextField(
+                            isIcon = false,
+                            icon = null,
+                            colors = colors,
+                            number = userName,
+                            trueFalse = true,
+                            hint = enterMobile.toString()
+                        )
+
+                        if (inValidMobNo) {
+                            Text(
+                                invalidMobNo.toString(),
+                                color = LightRed01,
+                                modifier = Modifier.padding(5.dp),
+                                fontSize = 10.sp
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(15.dp))
+                        BtnUi(
+                            enabled = userName.value.isNotEmpty(),
+                            title = txtContinue,
+                            onClick = {
+                                if (userName.value.isNotEmpty() || userName.value.length >= 6) {
+                                    if (showError || userName.value.length < 6) {
+                                        inValidMobNo = true
                                     } else {
-                                        // call Api
-                                        isDialogVisible = true
-                                        isApiCalled = true
+                                        isInternetAvailable = isNetworkAvailable(context)
+                                        // if first digit of mobile is less than 6 then error will show
+                                        if (!isInternetAvailable) {
+                                            context.toast(internetMessage)
+                                        } else {
+                                            // call Api
+                                            isDialogVisible = true
+                                            isApiCalled = true
+                                        }
                                     }
                                 }
-                            }
-                        },
-                    )
-                }
+                            },
+                        )
+                    }
                 }
                 Column(
                     modifier = Modifier
@@ -401,14 +392,13 @@ fun LoginUI(
                         .padding(horizontal = 8.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.Bottom
                 ) {
-                    TermsAndPrivacyText(
-                        onTermsClick = {
-                            onPrivacyPolicy()
-                        },
-                        onPrivacyClick = {
-                            onPrivacyPolicy()
-                        }
-                    )
+                    TermsAndPrivacyText(onTermsClick = {
+                        onPrivacyPolicy()
+                        viewModel.savePrefData(IS_COMING_FROM, TERMS_CONDITION)
+                    }, onPrivacyClick = {
+                        onPrivacyPolicy()
+                        viewModel.savePrefData(IS_COMING_FROM, PRIVACY_POLICY)
+                    })
                 }
             }
         }
