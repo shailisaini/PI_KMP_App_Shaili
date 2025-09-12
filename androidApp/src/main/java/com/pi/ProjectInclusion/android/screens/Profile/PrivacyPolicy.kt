@@ -57,6 +57,7 @@ fun PrivacyPolicy(onBack: () -> Unit) {
     }
 }
 
+
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun WebViewScreen(url: String) {
