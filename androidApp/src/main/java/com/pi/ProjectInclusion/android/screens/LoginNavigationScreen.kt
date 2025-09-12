@@ -91,26 +91,26 @@ class LoginNavigationScreen : ComponentActivity() {
 
                 if (toRoute != null) {
                     if (backStack.contains(toRoute)) {
-                        // Pop until we reach that route
                         while (backStack.isNotEmpty() && backStack.last() != toRoute) {
                             backStack.removeAt(backStack.lastIndex)
                         }
                     } else {
-                        // Reset stack to only that route
                         backStack.clear()
                         backStack.add(toRoute)
                     }
                 } else {
                     if (backStack.size > 1) {
-                        logger.d("backStack:"+backStack)
+                        logger.d("backStack before pop: $backStack")
                         backStack.removeAt(backStack.lastIndex)
-                    }
-                    else{
-                        logger.d("backStack:1"+currentRoute)
+                    } else {
+                        // last screen → finish activity
+                        (context as? Activity)?.finish()
+                        return
                     }
                 }
 
                 currentRoute = backStack.last()
+                logger.d("backStack after pop: $backStack, currentRoute: $currentRoute")
             }
 
             MyApplicationTheme {

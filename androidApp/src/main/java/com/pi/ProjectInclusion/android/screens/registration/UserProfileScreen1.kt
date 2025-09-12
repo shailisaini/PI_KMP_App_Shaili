@@ -1,6 +1,8 @@
 package com.pi.ProjectInclusion.android.screens.registration
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -31,6 +33,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,12 +77,14 @@ import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
 import com.pi.ProjectInclusion.android.common_UI.CameraGalleryDialog
 import com.pi.ProjectInclusion.android.common_UI.CameraPermission
 import com.pi.ProjectInclusion.android.common_UI.GenderOption
+import com.pi.ProjectInclusion.android.common_UI.LeavingDialog
 import com.pi.ProjectInclusion.android.common_UI.MobileTextField
 import com.pi.ProjectInclusion.android.common_UI.RegistrationHeader
 import com.pi.ProjectInclusion.android.common_UI.SmallBtnUi
 import com.pi.ProjectInclusion.android.common_UI.TextFieldWithLeftIcon
 import com.pi.ProjectInclusion.android.common_UI.TextViewField
 import com.pi.ProjectInclusion.android.common_UI.showDatePickerDialog
+import com.pi.ProjectInclusion.android.screens.LoginNavigationScreen
 import com.pi.ProjectInclusion.android.screens.dashboardScreen.PermissionScreen
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
@@ -93,7 +98,6 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.IS_COMING_FROM
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_FEMALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_MALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_OTHER
-import com.pi.ProjectInclusion.constants.ConstantVariables.REGISTER_NEW
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_TYPE_ID
@@ -117,17 +121,33 @@ fun EnterUserScreen1(
     val context = LocalContext.current
     var hasAllPermissions = remember { mutableStateOf(false) }
 
+    var isBackDialogVisible = remember { mutableStateOf(false) }
+
     CameraPermission(hasAllPermissions, context)
 
     BackHandler {
-        if (viewModel.getPrefData(IS_COMING_FROM) == DASHBOARD_SCREEN) {
-            onBackDashboard()
-        } else {
-            onBack()
-        }
+            isBackDialogVisible.value = true
+
     }
 
     logger.d("Screen: " + "EnterUserScreen1()")
+
+    if (isBackDialogVisible.value) {
+        LeavingDialog(
+            onClick = {
+                viewModel.clearPref()
+                val intent =
+                    Intent(context, LoginNavigationScreen::class.java).apply {
+                        flags =
+                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    }
+                context.startActivity(intent)
+                (context as? Activity)?.finish()
+            }
+        ){
+            isBackDialogVisible.value = false
+        }
+    }
 
     Surface(
         modifier = Modifier.fillMaxWidth(), color = White
@@ -140,12 +160,12 @@ fun EnterUserScreen1(
         ) {
             ProfileScreenUI(
                 context,
-                onBack = onBack,
                 onBackDashboard = onBackDashboard,
                 onNextTeacher = onNextTeacher,
                 onNextProfessional = onNextProfessional,
                 onNextSpecialEdu = onNextSpecialEdu,
-                viewModel = viewModel
+                viewModel = viewModel,
+                isBackDialogVisible = isBackDialogVisible
             )
         }
     }
@@ -154,12 +174,12 @@ fun EnterUserScreen1(
 @Composable
 fun ProfileScreenUI(
     context: Context,
-    onBack: () -> Unit,
     onBackDashboard: () -> Unit,
     onNextTeacher: () -> Unit,
     onNextSpecialEdu: () -> Unit,
     onNextProfessional: () -> Unit,
     viewModel: LoginViewModel,
+    isBackDialogVisible: MutableState<Boolean>,
 ) {
     val colors = MaterialTheme.colorScheme
     val scrollState = rememberScrollState()
@@ -200,12 +220,10 @@ fun ProfileScreenUI(
     val genderEg = stringResource(R.string.txt_select_your_gender_msg)
     val whatsAppNumberEg = stringResource(R.string.txt_enter_whatsApp)
     val mailEg = stringResource(R.string.txt_enter_mail)
-    var showError by remember { mutableStateOf(false) }
     var inValidMobNo by remember { mutableStateOf(false) }
     var isAddImageClicked by remember { mutableStateOf(false) }
     var date by remember { mutableStateOf("") }
     var selectedUri = remember { mutableStateOf<Uri?>(null) }
-    var hasAllPermissions = remember { mutableStateOf(false) }
     val selectedGender = remember { mutableStateOf("") }
     val genderOptions = listOf(KEY_MALE, KEY_FEMALE, KEY_OTHER)
     var strToken = viewModel.getPrefData(TOKEN_PREF_KEY)
@@ -267,7 +285,6 @@ fun ProfileScreenUI(
         message = "Loading your data..."
     )
 
-//    CameraPermission(hasAllPermissions, context)
     PermissionScreen()
 
     if (isAddImageClicked) {
@@ -319,7 +336,7 @@ fun ProfileScreenUI(
                     if (viewModel.getPrefData(IS_COMING_FROM) == DASHBOARD_SCREEN) {
                         onBackDashboard()
                     } else {
-                        onBack()
+                        isBackDialogVisible.value = true
                     }
                 })
             Column(
@@ -723,5 +740,14 @@ fun UserProfileUI() {
     val speEdu: () -> Unit = {}
     val profession: () -> Unit = {}
     val viewModel: LoginViewModel = koinViewModel()
-    ProfileScreenUI(context, onNext, onBack, onBackDashboard, profession, speEdu, viewModel)
+   /* ProfileScreenUI(
+        context,
+        onNext,
+        onBack,
+        onBackDashboard,
+        profession,
+        speEdu,
+        viewModel,
+        isBackDialogVisible.value
+    )*/
 }

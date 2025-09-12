@@ -75,12 +75,13 @@ fun EnterUserNameScreen(
     onPrivacyPolicy: () -> Unit,
     onBack: () -> Unit,
 ) {
+
     val context = LocalContext.current
     BackHandler {
         onBack()
     }
 
-    LoggerProvider.logger.d("Screen: " + "EnterUserNameScreen()")
+    logger.d("Screen: " + "EnterUserNameScreen()")
 
     Surface(
         modifier = Modifier.fillMaxWidth(), color = White

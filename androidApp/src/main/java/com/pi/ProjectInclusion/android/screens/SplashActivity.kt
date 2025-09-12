@@ -124,25 +124,29 @@ class SplashActivity : ComponentActivity() {
             }
 
             var appPackageName: String = ""
-            var appVersion: String = ""
+            var appVersion by remember { mutableStateOf("") }
             var appMsg: String = stringResource(R.string.app_update)
             val deviceVersion = Build.VERSION.RELEASE
             val androidVersion = deviceVersion.substringBeforeLast(".")
             appPackageName = context.packageName
-
-            try {
-                val pInfo: PackageInfo =
-                    context.packageManager.getPackageInfo(appPackageName, 0)
-                appVersion = pInfo.versionName.toString()
-                logger.d("Android version name & application version :- ${androidVersion.toDouble()}, ${appVersion.toDouble()}")
-                isInternetAvailable = isNetworkAvailable(context)
-                if (!isInternetAvailable) {
-                    context.toast(internetMessage)
-                } else {
-                    viewModel.getForceUpdateApp(androidVersion.toDouble(), appVersion.toDouble())
+            LaunchedEffect(Unit) {
+                try {
+                    val pInfo: PackageInfo =
+                        context.packageManager.getPackageInfo(appPackageName, 0)
+                    appVersion = pInfo.versionName.toString()
+                    logger.d("Android version name & application version :- ${androidVersion.toDouble()}, ${appVersion.toDouble()}")
+                    isInternetAvailable = isNetworkAvailable(context)
+                    if (!isInternetAvailable) {
+                        context.toast(internetMessage)
+                    } else {
+                        viewModel.getForceUpdateApp(
+                            androidVersion.toDouble(),
+                            appVersion.toDouble()
+                        )
+                    }
+                } catch (e: PackageManager.NameNotFoundException) {
+                    e.printStackTrace()
                 }
-            } catch (e: PackageManager.NameNotFoundException) {
-                e.printStackTrace()
             }
 
             LaunchedEffect(forceUpdateState) {
@@ -164,6 +168,7 @@ class SplashActivity : ComponentActivity() {
                             forceUpdateData = forceUpdateState.success!!.response
                             logger.d("Force update data details : $forceUpdateData")
                             if (forceUpdateState.success?.response?.isForceUpdate == 1) {
+                                isForceUpdate = true
                                 try {
                                     startActivity(
                                         Intent(
@@ -182,17 +187,19 @@ class SplashActivity : ComponentActivity() {
                                 }
                                 context.toast(appMsg)
                             } else {
-                                isForceUpdate = true
+                                isForceUpdate = false
                             }
                         } else {
                             isDialogVisible = false
-                            isForceUpdate = true
+                            isForceUpdate = false
                             context.toast(forceUpdateState.success!!.message.toString())
                         }
                     }
                 }
             }
+            if (appVersion.isNotEmpty()){
             SplashUI(appVersion)
+                }
             MyApplicationTheme {
                 AnimatedContent(
                     targetState = currentRoute,
@@ -222,7 +229,7 @@ class SplashActivity : ComponentActivity() {
                 ) { route ->
                     when (route) {
                         SPLASH_KEY -> SplashScreen {
-                            if (isForceUpdate) {
+                            if (!isForceUpdate) {
                                 // shaili
                                 var userToken = viewModel.getPrefData(TOKEN_PREF_KEY)
                                 if (userToken.isNotEmpty()) {
@@ -234,7 +241,7 @@ class SplashActivity : ComponentActivity() {
                         }
 
                         AppRoute.LanguageSelect.route -> {
-                            if (isForceUpdate) {
+                            if (!isForceUpdate) {
                                 LaunchedEffect(Unit) {
                                     delay(300) // optional smooth transition
                                     startActivity(
@@ -248,7 +255,7 @@ class SplashActivity : ComponentActivity() {
                         }
 
                         AppRoute.TeacherDashboard.route -> {
-                            if (isForceUpdate) {
+                            if (!isForceUpdate) {
                                 context.startActivity(
                                     Intent(context, StudentDashboardActivity::class.java)
                                 ).apply { (context as? Activity)?.finish() }
@@ -262,7 +269,7 @@ class SplashActivity : ComponentActivity() {
 }
 
 @Composable
-private fun SplashActivity.SplashUI(appVersion: String) {
+private fun SplashUI(appVersion: String) {
     Box(
         modifier = Modifier
             .fillMaxSize()

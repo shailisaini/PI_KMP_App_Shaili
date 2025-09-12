@@ -137,7 +137,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.BannerColor03
 import com.pi.ProjectInclusion.Bg_Gray2
 import com.pi.ProjectInclusion.Bg_Gray3
@@ -168,9 +167,6 @@ import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.PrimaryBlueLt
 import com.pi.ProjectInclusion.PrimaryBlueLt1
 import com.pi.ProjectInclusion.android.R
-import com.pi.ProjectInclusion.android.common_UI.EncryptedCommonFunction.decryptedEmail
-import com.pi.ProjectInclusion.android.common_UI.EncryptedCommonFunction.decryptedPhoneNo
-import com.pi.ProjectInclusion.android.common_UI.EncryptedCommonFunction.encryptedPhoneNo
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.fontRegular
@@ -2790,7 +2786,7 @@ fun createImageUri(context: Context): Uri? {
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Preview
 @Composable
-fun LeavingDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
+fun LeavingDialog(onClick: () -> Unit = {}, onDismiss: () -> Unit = {}) {
     val context = LocalContext.current
 
     Dialog(onDismissRequest = { onDismiss() }) {
