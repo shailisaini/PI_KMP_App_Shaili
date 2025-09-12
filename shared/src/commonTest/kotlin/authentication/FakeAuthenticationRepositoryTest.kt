@@ -27,16 +27,26 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.ValidateU
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.VerifyOtpResponse
 import com.pi.ProjectInclusion.data.model.profileModel.response.ViewProfileResponse
 import com.pi.ProjectInclusion.domain.repository.AuthenticationRepository
+import kotlinx.serialization.SerialName
 
 class FakeAuthenticationRepository : AuthenticationRepository {
+
     var shouldSucceed = true
 
     override suspend fun getLanguage(): GetLanguageListResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            GetLanguageListResponse(status = true, message = "Login Success")
+        } else {
+            throw Exception("data not found")
+        }
     }
 
     override suspend fun getUserType(): GetUserTypeResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            GetUserTypeResponse(status = true, message = "Login Success")
+        } else {
+            throw Exception("data not found")
+        }
     }
 
     override suspend fun getOTPOnCall(mobNo: String): SendOTPResponse {
@@ -56,33 +66,49 @@ class FakeAuthenticationRepository : AuthenticationRepository {
     }
 
     override suspend fun getOTPOnWhatsapp(mobNo: String): SendOTPResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            SendOTPResponse(status = true, message = "Login success")
+        } else {
+            throw Exception("Invalid User")
+        }
     }
 
     override suspend fun getValidate(
         userName: String,
-        userTypeId: String
+        userTypeId: String,
     ): ValidateUserResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            ValidateUserResponse(status = true, message = "Login success")
+        } else {
+            throw Exception("Invalid User")
+        }
     }
 
     override suspend fun getVerifyOtpRepo(
         userName: String,
-        userTypeId: String
+        userTypeId: String,
     ): VerifyOtpResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            VerifyOtpResponse(status = true, message = "Login success")
+        } else {
+            throw Exception("Invalid OTP")
+        }
     }
 
     override suspend fun getLoginWithOTPRepo(request: LoginWithOtpRequest): LoginApiResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            LoginApiResponse(status = true, message = "Login success")
+        } else {
+            throw Exception("Invalid OTP")
+        }
     }
 
     override suspend fun getUserProfileRepo(
         token: String,
-        userName: String
+        userName: String,
     ): ViewProfileResponse {
         return if (shouldSucceed) {
-            ViewProfileResponse(status = true, message = "User Success", error ="")
+            ViewProfileResponse(status = true, message = "User Success", error = "")
         } else {
             throw Exception("Invalid User")
         }
@@ -90,77 +116,167 @@ class FakeAuthenticationRepository : AuthenticationRepository {
 
     override suspend fun forgetPasswordRepo(
         passwordRequest: ForgetPasswordRequest,
-        strToken: String
+        strToken: String,
     ): ForgetPasswordResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            ForgetPasswordResponse(status = true, message = "User Success", error = "")
+        } else {
+            throw Exception("Invalid Password")
+        }
     }
 
     override suspend fun createRegisterPasswordRepo(
         passwordRequest: CreatePasswordRequest,
-        strToken: String
+        strToken: String,
     ): CreateRegisterPasswordResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            CreateRegisterPasswordResponse(status = true, message = "User Success", error = "")
+        } else {
+            throw Exception("Invalid User/Password")
+        }
     }
 
     override suspend fun createFirstStepProfileRepo(
         firstStepProfileRequest: FirstStepProfileRequest,
         strToken: String,
         profilePic: ByteArray?,
-        fileName: String?
+        fileName: String?,
     ): CreateFirstStepProfileResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            CreateFirstStepProfileResponse(status = true, message = "User Success", error = "")
+        } else {
+            throw Exception("Invalid Fields")
+        }
     }
 
     override suspend fun getAllStateListRepo(): List<StateListResponse> {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            arrayListOf(
+                StateListResponse(
+                    "name", "code", 0, "countryName", 0, "createdDate", "updatedDate", 0, 0, 0, 0
+                )
+            )
+        } else {
+            throw Exception("Data not found")
+        }
     }
 
     override suspend fun getAllDistrictByStateIdRepo(stateId: Int): List<DistrictListResponse> {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            arrayListOf(
+                DistrictListResponse(
+                    0, "name", "code", 0, "stateName", 0, "divisionName", 0, 0
+                )
+            )
+        } else {
+            throw Exception("Data not found")
+        }
     }
 
     override suspend fun getAllBlockByDistrictIdRepo(stateId: Int): List<BlockListResponse> {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            arrayListOf(
+                BlockListResponse(
+                    0,
+                    "createdDate",
+                    "updatedDate",
+                    0,
+                    "updatedBy",
+                    0,
+                    0,
+                    "name",
+                    "code",
+                    0,
+                    "districtName",
+                )
+            )
+        } else {
+            throw Exception("Data not found")
+        }
     }
 
     override suspend fun getAllSchoolsByBlockIdRepo(blockId: Int): SchoolListResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            SchoolListResponse(status = 0, message = "User Success")
+        } else {
+            throw Exception("Data not found")
+        }
     }
 
     override suspend fun getAllDetailsByUdiseIdRepo(udiseCode: String): SchoolByUdiseCodeResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            SchoolByUdiseCodeResponse(status = 0, message = "User Success")
+        } else {
+            throw Exception("Data not found")
+        }
     }
 
     override suspend fun createProfessionalProfileRepo(
         professionalProfileRequest: ProfessionalProfileRequest,
-        strToken: String
+        strToken: String,
     ): CreateFirstStepProfileResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            CreateFirstStepProfileResponse(status = true, message = "User Success")
+        } else {
+            throw Exception("Invalid Fields")
+        }
     }
 
     override suspend fun getAllProfessionRepo(): List<ProfessionListResponse> {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            arrayListOf(
+                ProfessionListResponse(
+                    "name", 0, "createdDate", "updatedDate", 0, "updatedBy", 0, 0
+                )
+            )
+        } else {
+            throw Exception("Data not found")
+        }
     }
 
     override suspend fun getAllQualificationRepo(profession: Int): List<QualificationListResponse> {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            arrayListOf(
+                QualificationListResponse(
+                    0, "name", 0, 0, 0, 0, "createdDate", "updatedBy", "updatedDate"
+                )
+            )
+        } else {
+            throw Exception("Data not found")
+        }
     }
 
     override suspend fun getAllSpecializationRepo(
         profession: Int,
-        qualification: Int
+        qualification: Int,
     ): List<SpecializationListResponse> {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            arrayListOf(
+                SpecializationListResponse(
+                    0, "name", 0, 0, 0, 0, 0, "createdDate", "updatedBy", "updatedDate"
+                )
+            )
+        } else {
+            throw Exception("Data not found")
+        }
     }
 
     override suspend fun getAllReasonRepo(): ReasonListResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            ReasonListResponse(status = true, message = "User Success")
+        } else {
+            throw Exception("Data not found")
+        }
     }
 
     override suspend fun getForceUpdateAppRepo(
         deviceOsVersion: Double,
-        latestAppVersion: Double
+        latestAppVersion: Double,
     ): ForceUpdateResponse {
-        TODO("Not yet implemented")
+        return if (shouldSucceed) {
+            ForceUpdateResponse(status = 1, message = "User Success")
+        } else {
+            throw Exception("Data not found")
+        }
     }
 }
