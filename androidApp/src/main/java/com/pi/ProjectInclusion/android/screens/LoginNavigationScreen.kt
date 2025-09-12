@@ -102,7 +102,11 @@ class LoginNavigationScreen : ComponentActivity() {
                     }
                 } else {
                     if (backStack.size > 1) {
+                        logger.d("backStack:"+backStack)
                         backStack.removeAt(backStack.lastIndex)
+                    }
+                    else{
+                        logger.d("backStack:1"+currentRoute)
                     }
                 }
 
