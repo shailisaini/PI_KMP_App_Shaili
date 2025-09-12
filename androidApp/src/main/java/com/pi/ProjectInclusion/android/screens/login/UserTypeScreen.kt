@@ -97,7 +97,7 @@ fun UserTypeScreen(
     val userType = remember { mutableStateListOf<GetUserTypeResponse.UserTypeResponse>() }
     CustomDialog(
         isVisible = isDialogVisible,
-        onDismiss = { isDialogVisible = false },
+        onDismiss = { isDialogVisible = true },
         message = stringResource(R.string.txt_loading)
     )
 
@@ -107,6 +107,7 @@ fun UserTypeScreen(
         if (!isInternetAvailable) {
             context.toast(internetMessage)
         } else {
+            isDialogVisible = true
             viewModel.getUserType()
         }
     }
@@ -122,7 +123,7 @@ fun UserTypeScreen(
                 userType.clear()
                 LoggerProvider.logger.d("Error: ${uiState.error}")
                 context.toast(uiState.error)
-                isDialogVisible = false
+//                isDialogVisible = false
             }
 
             uiState.success != null -> {
@@ -131,7 +132,7 @@ fun UserTypeScreen(
                     userType.addAll(it.response!!)
                 }
                 LoggerProvider.logger.d("Languages fetched: ${uiState.success!!}")
-                isDialogVisible = false
+//                isDialogVisible = false
             }
         }
     }
@@ -145,6 +146,7 @@ fun UserTypeScreen(
                 .background(color = Bg_Gray1),
             verticalArrangement = Arrangement.Top
         ) {
+            isDialogVisible = false
             UserTypeResponseUI(context, userType, onNext, onBack, viewModel)
         }
     }
@@ -164,7 +166,6 @@ fun UserTypeResponseUI(
     val coroutineScope = rememberCoroutineScope()
     var isInternetAvailable by remember { mutableStateOf(true) }
 
-    var isDialogVisible by remember { mutableStateOf(false) }
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
     val selectedLanguage = remember { mutableStateOf<String?>(null) }
     val title = stringResource(R.string.select_userType)

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
@@ -38,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.kmptemplate.logger.LoggerProvider
+import com.example.kmptemplate.logger.LoggerProvider.logger
 import com.pi.ProjectInclusion.Bg_Gray1
 import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
 import com.pi.ProjectInclusion.Gray
@@ -82,7 +82,7 @@ fun EnterUserNameScreen(
         onBack()
     }
 
-    LoggerProvider.logger.d("Screen: " + "EnterUserNameScreen()")
+    logger.d("Screen: " + "EnterUserNameScreen()")
 
     Surface(
         modifier = Modifier.fillMaxWidth(), color = White
@@ -270,7 +270,7 @@ fun LoginUI(
             }
 
             sendOtpState.error.isNotEmpty() -> {
-                LoggerProvider.logger.d("Error: ${sendOtpState.error}")
+                logger.d("Error: ${sendOtpState.error}")
                 isDialogVisible = false
             }
 
@@ -280,6 +280,7 @@ fun LoginUI(
                     if (sendOtpState.success!!.response?.message == SUCCESS) {
                         viewModel.savePrefData(USER_MOBILE_NO, encryptedPhoneNo)
                         viewModel.savePrefData(IS_COMING_FROM, REGISTER_NEW)
+                        logger.d("OtpSendVerify:Back to UserName ->"+ sendOtpState.success!!.response?.message)
                         onRegister() // Go to OTP Verify screen
                     } else {
                         val errorMessage =
@@ -362,29 +363,29 @@ fun LoginUI(
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(15.dp))
-                        BtnUi(
-                            enabled = userName.value.isNotEmpty(),
-                            title = txtContinue,
-                            onClick = {
-                                if (userName.value.isNotEmpty() || userName.value.length >= 6) {
-                                    if (showError || userName.value.length < 6) {
-                                        inValidMobNo = true
+                    Spacer(modifier = Modifier.height(15.dp))
+                    BtnUi(
+                        enabled = userName.value.isNotEmpty() && userName.value.length >= 6,
+                        title = txtContinue,
+                        onClick = {
+                            if (userName.value.isNotEmpty() || userName.value.length >= 6) {
+                                if (showError || userName.value.length < 6) {
+                                    inValidMobNo = true
+                                } else {
+                                    isInternetAvailable = isNetworkAvailable(context)
+                                    // if first digit of mobile is less than 6 then error will show
+                                    if (!isInternetAvailable) {
+                                        context.toast(internetMessage)
                                     } else {
-                                        isInternetAvailable = isNetworkAvailable(context)
-                                        // if first digit of mobile is less than 6 then error will show
-                                        if (!isInternetAvailable) {
-                                            context.toast(internetMessage)
-                                        } else {
-                                            // call Api
-                                            isDialogVisible = true
-                                            isApiCalled = true
-                                        }
+                                        // call Api
+                                        isDialogVisible = true
+                                        isApiCalled = true
                                     }
                                 }
-                            },
-                        )
-                    }
+                            }
+                        },
+                    )
+                }
                 }
                 Column(
                     modifier = Modifier

@@ -120,7 +120,7 @@ fun LanguageResponseUI(
     val selectedLanguage = remember { mutableStateOf<String?>(null) }
     val title = stringResource(R.string.select_language)
     val languageData = remember { mutableStateListOf<GetLanguageListResponse.LanguageResponse>() }
-    var isDialogVisible by remember { mutableStateOf(false) }
+    var isDialogVisible by remember { mutableStateOf(true) }
     CustomDialog(
         isVisible = isDialogVisible,
         onDismiss = { isDialogVisible = false },
@@ -128,6 +128,7 @@ fun LanguageResponseUI(
     )
 
     LaunchedEffect(Unit) {
+        isDialogVisible = true
         viewModel.getLanguages()
     }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -135,14 +136,13 @@ fun LanguageResponseUI(
         when {
             uiState.isLoading -> {
                 languageData.clear()
-                isDialogVisible = true
+//                isDialogVisible = true
             }
 
             uiState.error.isNotEmpty() -> {
                 languageData.clear()
                 LoggerProvider.logger.d("Error: ${uiState.error}")
                 context.toast(uiState.error)
-                isDialogVisible = false
                 noDataMessage = uiState.error
             }
 
@@ -156,7 +156,6 @@ fun LanguageResponseUI(
                 } else {
                     LoggerProvider.logger.d("Languages fetched: 0 (null or empty response)")
                 }
-                isDialogVisible = false
             }
         }
     }
@@ -181,6 +180,7 @@ fun LanguageResponseUI(
         ) {
             LoginScreenTitle(title, Black, Gray, Transparent, "")
             if (languageData.isNotEmpty()) {
+                isDialogVisible = false
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -224,8 +224,10 @@ fun LanguageResponseUI(
                 isInternetAvailable = isNetworkAvailable(context)
                 if (!isInternetAvailable) {
                     ShowError(internetMessage, errColor, painterResource(R.drawable.sad_emoji))
+                    isDialogVisible = false
                 } else {
                     NoDataFound(noDataMessage, painterResource(R.drawable.sad_emoji))
+
                 }
             }
         }
