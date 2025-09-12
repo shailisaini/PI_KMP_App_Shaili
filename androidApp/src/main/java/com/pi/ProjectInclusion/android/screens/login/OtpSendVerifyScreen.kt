@@ -226,6 +226,12 @@ fun OtpSendVerifyScreen(
                     } else {
                         onNext()
                     }
+                    if (verifyOtpState.success!!.response != null) {
+                        viewModel.savePrefData(
+                            TOKEN_PREF_KEY,
+                            "Bearer " + verifyOtpState.success!!.response?.token.toString()
+                        )
+                    }
                 } else {
                     val errorMessage = sendOtpState.success?.message
                         ?: sendOtpState.success?.error

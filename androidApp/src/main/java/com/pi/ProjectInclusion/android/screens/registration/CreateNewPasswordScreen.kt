@@ -87,6 +87,7 @@ import com.pi.ProjectInclusion.White
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
+import com.pi.ProjectInclusion.android.common_UI.CustomToastMessage
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
 import com.pi.ProjectInclusion.android.common_UI.EncryptedCommonFunction.isEncryptedPhone
 import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
@@ -164,6 +165,7 @@ fun CreateNewPasswordUI(
     var isDialogVisible by remember { mutableStateOf(false) }
     val showPassword = remember { mutableStateOf(false) }
     val showConfirmPassword = remember { mutableStateOf(false) }
+    var showToast by remember { mutableStateOf(false) }
     val txtCharacter = stringResource(R.string.txt_Passwords_must_be_8_16_characters)
     val txtUppercase = stringResource(R.string.txt_Including_one_uppercase_letter)
     val txtAtleastOne = stringResource(R.string.txt_Must_include_at_least_one_number)
@@ -208,11 +210,19 @@ fun CreateNewPasswordUI(
             createRegisterPasswordState.success != null -> {
                 logger.d("Create/Register Password Response :- ${createRegisterPasswordState.success!!.response}")
                 if (createRegisterPasswordState.success!!.status == true) {
-                    context.toast(createRegisterPasswordState.success!!.message!!)
-                    viewModel.savePrefData(
-                        USER_MOBILE_NO,
-                        createRegisterPasswordState.success!!.response?.mobile.toString()
-                    )
+                    if (createRegisterPasswordState.success!!.message != null) {
+                        if (createRegisterPasswordState.success!!.message == "Success") {
+                            showToast = true
+                        } else {
+                            context.toast(createRegisterPasswordState.success!!.message!!)
+                        }
+                    }
+                    if (createRegisterPasswordState.success!!.response != null) {
+                        viewModel.savePrefData(
+                            USER_MOBILE_NO,
+                            createRegisterPasswordState.success!!.response?.mobile.toString()
+                        )
+                    }
                     onNext()
                 } else {
                     context.toast(createRegisterPasswordState.success!!.message!!)
@@ -229,13 +239,21 @@ fun CreateNewPasswordUI(
             })
     }
 
+    if (showToast) {
+        CustomToastMessage(
+            titleStr = "",
+            messageStr = stringResource(R.string.key_password_created),
+            visible = showToast,
+            onClose = { showToast = false })
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .padding(horizontal = 16.dp, vertical = 10.dp)
                 .fillMaxSize(),
 
-        ) {
+            ) {
             Column(
                 modifier = Modifier
                     .padding(start = 16.dp, end = 16.dp)

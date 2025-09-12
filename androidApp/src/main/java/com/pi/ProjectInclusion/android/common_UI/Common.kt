@@ -86,6 +86,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -183,6 +184,7 @@ import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_FEMALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.KEY_MALE
 import com.pi.ProjectInclusion.constants.ConstantVariables.PI_DOCUMENT
 import com.pi.ProjectInclusion.contactUsTxt
+import kotlinx.coroutines.launch
 import java.util.Calendar
 
 fun BackButtonPress(navController: NavHostController, route: String) {
@@ -580,10 +582,9 @@ fun MobileTextField(
         enabled = enable,
         placeholder = {
             Text(
-                hint,
-                color = GrayLight01,
-                fontFamily = fontRegular,
-                fontSize = 14.sp) },
+                hint, color = GrayLight01, fontFamily = fontRegular, fontSize = 14.sp
+            )
+        },
         shape = RoundedCornerShape(8.dp),
         singleLine = true,
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
@@ -751,16 +752,15 @@ fun UserNameTextField(
     TextField(
         value = number.value,
         onValueChange = {
-
-//            if (it.length <= 10) {
+            if (it.length <= 10) {
                 number.value = it
-//            }
+            }
         },
         enabled = trueFalse,
         placeholder = { Text(hint, color = GrayLight01, fontSize = 14.sp) },
         shape = RoundedCornerShape(8.dp),
         singleLine = true,
-        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
         visualTransformation = VisualTransformation.None,
 
         leadingIcon = if (isIcon) {
@@ -1241,14 +1241,11 @@ fun InputTextField(
         } else null,
         placeholder = {
             Text(
-                text = placeholder,
-                color = if (isSystemInDarkTheme()) {
+                text = placeholder, color = if (isSystemInDarkTheme()) {
                     colors.onSurface // Light background
                 } else {
                     Color.Gray
-                },
-                fontSize = 14.sp,
-                fontFamily = fontRegular
+                }, fontSize = 14.sp, fontFamily = fontRegular
             )
         },
         modifier = modifier
@@ -1270,13 +1267,13 @@ fun InputTextField(
         ),
         colors = TextFieldDefaults.colors(
             focusedContainerColor = if (isSystemInDarkTheme()) Dark_03 else White,
-    focusedTextColor = if (isSystemInDarkTheme()) Dark_03 else Gray,
-    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-    focusedIndicatorColor = Transparent,
-    unfocusedContainerColor = if (isSystemInDarkTheme()) Dark_03 else White,
-    unfocusedIndicatorColor = Transparent,
-    disabledContainerColor = GrayLight03
-    )
+            focusedTextColor = if (isSystemInDarkTheme()) Dark_03 else Gray,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+            focusedIndicatorColor = Transparent,
+            unfocusedContainerColor = if (isSystemInDarkTheme()) Dark_03 else White,
+            unfocusedIndicatorColor = Transparent,
+            disabledContainerColor = GrayLight03
+        )
     )
 }
 
@@ -1442,8 +1439,7 @@ internal fun CharacterContainer(
             modifier = Modifier
                 .size(45.dp) // Ensure this is wide enough
                 .border(
-                    width = if (isFocused) 2.dp else 1.dp,
-                    color = if (isFocused) {
+                    width = if (isFocused) 2.dp else 1.dp, color = if (isFocused) {
                         if (isSystemInDarkTheme()) {
                             Dark_03
                         } else {
@@ -1511,13 +1507,11 @@ fun TextWithIconOnLeft(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
-    Row(
-        modifier = modifier
-            .clickable { onClick() }
-            .wrapContentSize(),
+    Row(modifier = modifier
+        .clickable { onClick() }
+        .wrapContentSize(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    ) {
+        horizontalArrangement = Arrangement.Center) {
         Icon(
             imageVector = icon, contentDescription = null, // Decorative element
             tint = iconColor
@@ -2120,7 +2114,7 @@ fun CustomCircularImageViewWithBorder(
 
 @Composable
 fun TextFieldWithLeftIcon(
-    text : String = "",
+    text: String = "",
     modifier: Modifier = Modifier,
     value: MutableState<String> = remember { mutableStateOf("") },
     placeholder: String = stringResource(R.string.enter_here),
@@ -2164,10 +2158,9 @@ fun TextFieldWithLeftIcon(
                     .padding(start = 7.dp)
             )
             Text(
-                text =  if (text.isEmpty()){
+                text = if (text.isEmpty()) {
                     placeholder
-                }
-                else{
+                } else {
                     text
                 },
                 modifier = Modifier
@@ -2179,16 +2172,14 @@ fun TextFieldWithLeftIcon(
                 } else {
                     if (text.isEmpty()) {
                         BodyTextLight
-                    }
-                    else{
+                    } else {
                         Black
                     }
                 },
                 fontSize = 14.sp,
                 fontFamily = if (text.isEmpty()) {
                     fontRegular
-                }
-                else {
+                } else {
                     fontSemiBold
                 }
             )
@@ -2288,10 +2279,9 @@ fun GenderOption(
         else -> R.drawable.ic_other_selected
     }
 
-    Column(
-        modifier = Modifier
-            .clickable { onSelected() }
-            .padding(12.dp),
+    Column(modifier = Modifier
+        .clickable { onSelected() }
+        .padding(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(
             painter = if (isSelected) painterResource(id = selectedIcon) else painterResource(id = icon),
@@ -2509,10 +2499,10 @@ fun SchoolListBottomSheet(
                             )
                         }
                     }
-                }
-                else {
+                } else {
                     Column(
-                        Modifier.padding(bottom = 10.dp)
+                        Modifier
+                            .padding(bottom = 10.dp)
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -2615,8 +2605,8 @@ fun ProfileWithFullProgress(
             painter = if (image.isNotEmpty()) {
                 rememberAsyncImagePainter(
                     ImageRequest.Builder(LocalContext.current).data(image)
-                        .placeholder(R.drawable.dummy_image)
-                        .error(R.drawable.dummy_image).crossfade(true).build()
+                        .placeholder(R.drawable.dummy_image).error(R.drawable.dummy_image)
+                        .crossfade(true).build()
                 )
             } else {
                 painterResource(R.drawable.dummy_image)
@@ -2666,14 +2656,13 @@ fun DropdownMenuUi(
         border = selectedBorder,
     ) {
         Box(modifier = modifier.fillMaxWidth()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        if (options.isNotEmpty()) menuExpanded = true
-                        onClick()
-                    }
-                    .padding(vertical = 15.dp, horizontal = 10.dp),
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    if (options.isNotEmpty()) menuExpanded = true
+                    onClick()
+                }
+                .padding(vertical = 15.dp, horizontal = 10.dp),
                 verticalAlignment = Alignment.CenterVertically) {
 
                 Text(
@@ -2732,20 +2721,15 @@ fun DropdownMenuUi(
                     )
             ) {
                 options.forEach { option ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                option,
-                                fontSize = 15.sp,
-                                fontFamily = fontSemiBold,
-                                color = Black
-                            )
-                        },
-                        onClick = {
-                            onItemSelected(option)
-                            selectedOption = option
-                            menuExpanded = false
-                        })
+                    DropdownMenuItem(text = {
+                        Text(
+                            option, fontSize = 15.sp, fontFamily = fontSemiBold, color = Black
+                        )
+                    }, onClick = {
+                        onItemSelected(option)
+                        selectedOption = option
+                        menuExpanded = false
+                    })
                 }
             }
         }
@@ -2768,8 +2752,7 @@ fun Modifier.drawDashedBorder(
 ) = this.then(
     Modifier.drawBehind {
         val stroke = Stroke(
-            width = strokeWidth.toPx(),
-            pathEffect = PathEffect.dashPathEffect(
+            width = strokeWidth.toPx(), pathEffect = PathEffect.dashPathEffect(
                 floatArrayOf(dashLength.toPx(), gapLength.toPx()), 0f
             )
         )
@@ -2784,14 +2767,12 @@ fun Modifier.drawDashedBorder(
             cornerRadius = CornerRadius(corner, corner),
             style = stroke
         )
-    }
-)
+    })
 
 @Composable
 fun SectionDivider() {
     Divider(
-        thickness = 1.dp,
-        color = Bg_Gray2
+        thickness = 1.dp, color = Bg_Gray2
     )
 }
 
@@ -2802,8 +2783,7 @@ fun createImageUri(context: Context): Uri? {
         put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
     }
     return context.contentResolver.insert(
-        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-        contentValues
+        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues
     )
 }
 
@@ -2874,8 +2854,7 @@ fun LeavingDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
                                 .clip(RoundedCornerShape(8.dp)),
                             shape = RoundedCornerShape(8.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = White,
-                                contentColor = BorderBlue
+                                containerColor = White, contentColor = BorderBlue
                             ),
                             border = BorderStroke(1.dp, BorderBlue)
                         ) {
@@ -2898,8 +2877,7 @@ fun LeavingDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
                                 .clip(RoundedCornerShape(8.dp)),
                             shape = RoundedCornerShape(8.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue,
-                                contentColor = White
+                                containerColor = PrimaryBlue, contentColor = White
                             ),
                             border = BorderStroke(1.dp, BorderBlue)
                         ) {
@@ -2943,7 +2921,7 @@ fun CustomToastMessage(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 32.dp),
+                .padding(bottom = 75.dp),
             contentAlignment = Alignment.BottomCenter,
         ) {
             Card(
@@ -2961,12 +2939,14 @@ fun CustomToastMessage(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = titleStr,
-                                fontFamily = fontRegular,
-                                fontSize = 16.sp,
-                                color = White
-                            )
+                            if (titleStr != "") {
+                                Text(
+                                    text = titleStr,
+                                    fontFamily = fontRegular,
+                                    fontSize = 16.sp,
+                                    color = White
+                                )
+                            }
 
                             Spacer(modifier = Modifier.height(4.dp))
 
@@ -2997,6 +2977,73 @@ fun CustomToastMessage(
                             .animateContentSize()
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun SnackbarWithProgress(
+    message: String,
+    durationMillis: Int = 4000, // auto dismiss time
+    onDismiss: () -> Unit,
+) {
+    var progress by remember { mutableFloatStateOf(1f) }
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        scope.launch {
+            val steps = 100
+            val delayPerStep = durationMillis / steps
+            for (i in steps downTo 0) {
+                progress = i / steps.toFloat()
+                delay(delayPerStep.toLong())
+            }
+            onDismiss()
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 75.dp),
+        contentAlignment = Alignment.BottomCenter,
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(horizontal = 16.dp),
+            shape = RoundedCornerShape(12.dp),
+            elevation = CardDefaults.cardElevation(8.dp),
+            colors = CardDefaults.cardColors(containerColor = Bg_Gray4)
+        ) {
+            Column {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                ) {
+                    Text(
+                        text = message,
+                        color = Color.White,
+                        modifier = Modifier.weight(1f)
+                    )
+                    IconButton(onClick = onDismiss) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close",
+                            tint = Color.White
+                        )
+                    }
+                }
+
+                LinearProgressIndicator(
+                    progress = progress,
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Color.LightGray,
+                    trackColor = Color(0xFF6F6684) // faded track
+                )
             }
         }
     }
@@ -3248,13 +3295,11 @@ fun SelectOptBtnUi(
     )
 
     Card(
-        shape = RoundedCornerShape(8.dp),
-        modifier = Modifier
+        shape = RoundedCornerShape(8.dp), modifier = Modifier
             .wrapContentHeight()
             .clickable {
                 onClick()
-            },
-        colors = if (isSystemInDarkTheme()) {
+            }, colors = if (isSystemInDarkTheme()) {
             if (enabled) {
                 CardDefaults.cardColors(PrimaryBlueLt1)
             } else {
@@ -3276,8 +3321,7 @@ fun SelectOptBtnUi(
                     disabledContainerColor = White
                 )
             }
-        },
-        border = selectedBorder
+        }, border = selectedBorder
     ) {
         Text(
             text = title,
@@ -3363,8 +3407,7 @@ fun SubmissionDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
                                 .clip(RoundedCornerShape(9.dp)),
                             shape = RoundedCornerShape(9.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = White,
-                                contentColor = BorderBlue
+                                containerColor = White, contentColor = BorderBlue
                             ),
                             border = BorderStroke(1.dp, BorderBlue)
                         ) {
@@ -3387,8 +3430,7 @@ fun SubmissionDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
                                 .clip(RoundedCornerShape(9.dp)),
                             shape = RoundedCornerShape(9.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue,
-                                contentColor = White
+                                containerColor = PrimaryBlue, contentColor = White
                             ),
                             border = BorderStroke(1.dp, BorderBlue)
                         ) {
@@ -3432,8 +3474,7 @@ fun ThemeSwitch(
                 .background(if (isLightSelected) selectedColor else unselectedColor)
                 .clickable { onToggle(true) }
                 .padding(horizontal = 15.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+            verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_sun),
                 contentDescription = "",
@@ -3456,8 +3497,7 @@ fun ThemeSwitch(
                 .background(if (!isLightSelected) selectedColor else unselectedColor)
                 .clickable { onToggle(false) }
                 .padding(horizontal = 12.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+            verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_moon),
                 contentDescription = "",
@@ -3497,14 +3537,12 @@ fun CameraGalleryButtons(
     fun createImageUri(): Uri? {
         val contentValues = ContentValues().apply {
             put(
-                MediaStore.Images.Media.DISPLAY_NAME,
-                PI_DOCUMENT + System.currentTimeMillis() + JPG
+                MediaStore.Images.Media.DISPLAY_NAME, PI_DOCUMENT + System.currentTimeMillis() + JPG
             )
             put(MediaStore.Images.Media.MIME_TYPE, IMAGE_MIME)
         }
         return context.contentResolver.insert(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            contentValues
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues
         )
     }
 
@@ -3525,8 +3563,7 @@ fun CameraGalleryButtons(
                 .clip(RoundedCornerShape(8.dp)),
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = White,
-                contentColor = PrimaryBlue
+                containerColor = White, contentColor = PrimaryBlue
             ),
             border = BorderStroke(1.dp, GrayLight01)
         ) {
@@ -3539,8 +3576,7 @@ fun CameraGalleryButtons(
                     val uri = createImageUri()
                     cameraImageUri.value = uri
                     uri?.let { cameraLauncher.launch(it) }
-                }
-            )
+                })
         }
 
         Button(
@@ -3552,8 +3588,7 @@ fun CameraGalleryButtons(
                 .clip(RoundedCornerShape(8.dp)),
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = White,
-                contentColor = PrimaryBlue
+                containerColor = White, contentColor = PrimaryBlue
             ),
             border = BorderStroke(1.dp, GrayLight01)
         ) {
@@ -3564,8 +3599,7 @@ fun CameraGalleryButtons(
                 iconColor = Color.Unspecified,
                 onClick = {
                     galleryLauncher.launch(IMAGE_ALL_TYPE)
-                }
-            )
+                })
         }
     }
 }
@@ -3592,14 +3626,12 @@ fun BottomSheetCameraGallery(
     fun createImageUri(): Uri? {
         val contentValues = ContentValues().apply {
             put(
-                MediaStore.Images.Media.DISPLAY_NAME,
-                PI_DOCUMENT + System.currentTimeMillis() + JPG
+                MediaStore.Images.Media.DISPLAY_NAME, PI_DOCUMENT + System.currentTimeMillis() + JPG
             )
             put(MediaStore.Images.Media.MIME_TYPE, IMAGE_MIME)
         }
         return context.contentResolver.insert(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            contentValues
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues
         )
     }
 
@@ -3615,8 +3647,7 @@ fun BottomSheetCameraGallery(
                     val uri = createImageUri()
                     cameraImageUri.value = uri
                     uri?.let { cameraLauncher.launch(it) }
-                },
-            horizontalAlignment = Alignment.CenterHorizontally
+                }, horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_circle_camera),
@@ -3642,8 +3673,7 @@ fun BottomSheetCameraGallery(
                 .padding(start = 15.dp)
                 .clickable {
                     galleryLauncher.launch(IMAGE_ALL_TYPE)
-                },
-            horizontalAlignment = Alignment.CenterHorizontally
+                }, horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_circle_gallery),

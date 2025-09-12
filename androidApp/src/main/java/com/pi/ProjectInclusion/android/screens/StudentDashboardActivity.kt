@@ -166,6 +166,9 @@ import org.koin.androidx.compose.koinViewModel
 import androidx.core.net.toUri
 import com.pi.ProjectInclusion.android.common_UI.LogoutDialog
 import com.pi.ProjectInclusion.android.screens.registration.EnterUserScreen1
+import com.pi.ProjectInclusion.android.screens.registration.TeacherRegistrationScreen
+import com.pi.ProjectInclusion.android.screens.registration.professionals.ProfessionalsRegistrationScreen
+import com.pi.ProjectInclusion.android.screens.registration.specialEdu.SpecialEducatorRegistrationScreen
 import com.pi.ProjectInclusion.ui.viewModel.DashboardViewModel
 
 class StudentDashboardActivity : ComponentActivity() {
@@ -489,6 +492,39 @@ class StudentDashboardActivity : ComponentActivity() {
                                         onNextProfessional = { navigateTo(AppRoute.EnterProfessionalScreen.route) },
                                         onBack = { navigateBack(AppRoute.UserNameScreen.route) },
                                         onBackDashboard = { navigateBack(AppRoute.DashboardScreen.route) }
+                                    )
+
+                                    // teacher
+                                    AppRoute.EnterTeacherRegScreen.route -> TeacherRegistrationScreen(
+                                        viewModel = viewModel,
+                                        onNext = {
+                                            context.startActivity(
+                                                Intent(context, StudentDashboardActivity::class.java)
+                                            ).apply { (context as? Activity)?.finish() }
+                                        },
+                                        onBack = { navigateBack(AppRoute.EnterUserProfileScreen.route) }
+                                    )
+
+                                    // Special Educator
+                                    AppRoute.SpecialEducatorRegistration.route -> SpecialEducatorRegistrationScreen(
+                                        viewModel = viewModel,
+                                        onNext = {
+                                            context.startActivity(
+                                                Intent(context, StudentDashboardActivity::class.java)
+                                            ).apply { (context as? Activity)?.finish() }
+                                        },
+                                        onBack = { navigateBack(AppRoute.EnterUserProfileScreen.route) }
+                                    )
+
+                                    // Professional
+                                    AppRoute.EnterProfessionalScreen.route -> ProfessionalsRegistrationScreen(
+                                        viewModel = viewModel,
+                                        onNext = {
+                                            context.startActivity(
+                                                Intent(context, StudentDashboardActivity::class.java)
+                                            ).apply { (context as? Activity)?.finish() }
+                                        },
+                                        onBack = { navigateBack(AppRoute.UserNameScreen.route) }
                                     )
 
                                     AppRoute.CourseScreen.route -> LMSCourseHomeScreen()
