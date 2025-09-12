@@ -43,6 +43,7 @@ object CommonFunction {
         }
         return false
     }
+
     @Composable
     fun LoginScreenTitle(
         title: String,
@@ -60,9 +61,9 @@ object CommonFunction {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                title,
+                text = title,
                 textAlign = TextAlign.Center,
-                fontSize = 17.sp,
+                fontSize = 25.sp,
                 fontWeight = FontWeight.Bold,
                 color = colors,
                 modifier = Modifier

@@ -112,7 +112,6 @@ fun DashboardScreen(onProfile: () -> Unit) {
     var encryptedUserName = viewModel.getPrefData(USER_NAME)
     logger.d("Profile details on dashboard page :- $encryptedUserName")
     var profileData by remember { mutableStateOf<ViewProfileResponse.ProfileResponse?>(null) }
-    var showSnackbar by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         isInternetAvailable = isNetworkAvailable(context)
@@ -164,7 +163,6 @@ fun DashboardScreen(onProfile: () -> Unit) {
             }
 
             checkProfile.success != null -> {
-                showSnackbar = true
                 logger.d("Check profile completion response Data:- ${checkProfile.success}")
                 if (checkProfile.success!!.status == true) {
                     logger.d("Check profile completion data details : ${checkProfile.success?.response}")
@@ -181,13 +179,6 @@ fun DashboardScreen(onProfile: () -> Unit) {
     }
 
     PermissionScreen()
-
-    if (showSnackbar) {
-        SnackbarWithProgress(
-            message = "Your password has been created successfully",
-            onDismiss = { showSnackbar = false }
-        )
-    }
 
     Surface(
         modifier = Modifier
