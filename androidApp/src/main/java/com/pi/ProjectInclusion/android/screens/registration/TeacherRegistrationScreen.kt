@@ -81,6 +81,7 @@ import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.ASTRICK
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
+import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
 import com.pi.ProjectInclusion.constants.CustomDialog
 import com.pi.ProjectInclusion.data.model.authenticationModel.request.ProfessionalProfileRequest
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.BlockListResponse
@@ -352,6 +353,12 @@ fun TeacherScreenUI(
                 logger.d("All professional response : ${professionalProfileState.success}")
                 if (professionalProfileState.success?.statusCode == 200) {
                     println("All professional data :- ${professionalProfileState.success?.message}")
+                    if (professionalProfileState.success?.response != null) {
+                        viewModel.savePrefData(
+                            USER_NAME,
+                            professionalProfileState.success?.response?.username.toString()
+                        )
+                    }
                     onNext()
                 }
                 isDialogVisible = false

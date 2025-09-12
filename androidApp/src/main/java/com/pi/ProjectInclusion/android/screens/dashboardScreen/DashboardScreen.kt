@@ -65,13 +65,13 @@ import com.pi.ProjectInclusion.GreenGradient2
 import com.pi.ProjectInclusion.LightBlueBox
 import com.pi.ProjectInclusion.Transparent
 import com.pi.ProjectInclusion.android.R
+import com.pi.ProjectInclusion.android.common_UI.SnackbarWithProgress
 import com.pi.ProjectInclusion.android.utils.fontBold
 import com.pi.ProjectInclusion.android.utils.fontRegular
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.DASHBOARD_SCREEN
 import com.pi.ProjectInclusion.constants.ConstantVariables.IS_COMING_FROM
-import com.pi.ProjectInclusion.constants.ConstantVariables.LOGIN_WITH_OTP
 import com.pi.ProjectInclusion.constants.ConstantVariables.TOKEN_PREF_KEY
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_ID
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_NAME
@@ -112,6 +112,7 @@ fun DashboardScreen(onProfile: () -> Unit) {
     var encryptedUserName = viewModel.getPrefData(USER_NAME)
     logger.d("Profile details on dashboard page :- $encryptedUserName")
     var profileData by remember { mutableStateOf<ViewProfileResponse.ProfileResponse?>(null) }
+    var showSnackbar by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         isInternetAvailable = isNetworkAvailable(context)
@@ -163,6 +164,7 @@ fun DashboardScreen(onProfile: () -> Unit) {
             }
 
             checkProfile.success != null -> {
+                showSnackbar = true
                 logger.d("Check profile completion response Data:- ${checkProfile.success}")
                 if (checkProfile.success!!.status == true) {
                     logger.d("Check profile completion data details : ${checkProfile.success?.response}")
@@ -179,6 +181,13 @@ fun DashboardScreen(onProfile: () -> Unit) {
     }
 
     PermissionScreen()
+
+    if (showSnackbar) {
+        SnackbarWithProgress(
+            message = "Your password has been created successfully",
+            onDismiss = { showSnackbar = false }
+        )
+    }
 
     Surface(
         modifier = Modifier

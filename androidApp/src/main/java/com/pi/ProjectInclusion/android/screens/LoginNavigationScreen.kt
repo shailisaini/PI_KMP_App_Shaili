@@ -218,8 +218,7 @@ class LoginNavigationScreen : ComponentActivity() {
                             onNext = {
                                 context.startActivity(
                                     Intent(context, StudentDashboardActivity::class.java)
-                                )
-                                (context as? Activity)?.finish()
+                                ).apply { (context as? Activity)?.finish() }
                             },
                             onBack = { navigateBack(AppRoute.EnterUserProfileScreen.route) }
                         )
@@ -230,8 +229,7 @@ class LoginNavigationScreen : ComponentActivity() {
                             onNext = {
                                 context.startActivity(
                                     Intent(context, StudentDashboardActivity::class.java)
-                                )
-                                (context as? Activity)?.finish()
+                                ).apply { (context as? Activity)?.finish() }
                             },
                             onBack = { navigateBack(AppRoute.EnterUserProfileScreen.route) }
                         )
@@ -242,8 +240,7 @@ class LoginNavigationScreen : ComponentActivity() {
                             onNext = {
                                 context.startActivity(
                                     Intent(context, StudentDashboardActivity::class.java)
-                                )
-                                (context as? Activity)?.finish()
+                                ).apply { (context as? Activity)?.finish() }
                             },
                             onBack = { navigateBack(AppRoute.UserNameScreen.route) }
                         )
