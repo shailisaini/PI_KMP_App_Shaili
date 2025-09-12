@@ -211,7 +211,10 @@ fun LanguageResponseUI(
                                     selectedIndex =
                                         if (selectedIndex == index) null else index // Toggle selection
                                     selectedLanguage.value = languageData[index].id.toString()
-                                    viewModel.savePrefData(SELECTED_LANGUAGE_ID, languageData[index].id.toString())
+                                    viewModel.savePrefData(
+                                        SELECTED_LANGUAGE_ID,
+                                        languageData[index].id.toString()
+                                    )
                                 }
                             )
                         }
@@ -329,7 +332,7 @@ fun ItemLanguageCard(
                     contentDescription = IMG_DESCRIPTION
                 )
                 Text(
-                    (languageIndex.translatedName?:languageIndex.name)!!,
+                    (languageIndex.translatedName ?: languageIndex.name)!!,
                     textAlign = TextAlign.Start,
                     maxLines = 1,
                     fontSize = 16.sp,
@@ -340,7 +343,7 @@ fun ItemLanguageCard(
                 )
 
                 Text(
-                    "${languageIndex.name} ",
+                    "${languageIndex.name ?: languageIndex.translatedName}",
                     textAlign = TextAlign.Start,
                     maxLines = 1,
                     fontSize = 14.sp,
@@ -349,7 +352,6 @@ fun ItemLanguageCard(
                     modifier = Modifier
                         .wrapContentWidth()
                         .padding(top = 5.dp)
-//                            .heightIn(min = 40.dp)
                 )
             }
         }

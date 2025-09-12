@@ -61,4 +61,6 @@ object ConstantVariables {
     var PLAY_STORE_LINK: String = "https://play.google.com/store/apps/details?id="
     var MARKET_ID: String = "market://details?id="
     var DASHBOARD_SCREEN: String = "DashboardScreen"
+    var PRIVACY_POLICY: String = "PrivacyPolicy"
+    var TERMS_CONDITION: String = "TermsAndCondition"
 }

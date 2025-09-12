@@ -1503,9 +1503,10 @@ fun TextWithIconOnLeft(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
-    Row(modifier = modifier
-        .clickable { onClick() }
-        .wrapContentSize(),
+    Row(
+        modifier = modifier
+            .clickable { onClick() }
+            .wrapContentSize(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center) {
         Icon(
@@ -2275,9 +2276,10 @@ fun GenderOption(
         else -> R.drawable.ic_other_selected
     }
 
-    Column(modifier = Modifier
-        .clickable { onSelected() }
-        .padding(12.dp),
+    Column(
+        modifier = Modifier
+            .clickable { onSelected() }
+            .padding(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(
             painter = if (isSelected) painterResource(id = selectedIcon) else painterResource(id = icon),
@@ -2652,13 +2654,14 @@ fun DropdownMenuUi(
         border = selectedBorder,
     ) {
         Box(modifier = modifier.fillMaxWidth()) {
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    if (options.isNotEmpty()) menuExpanded = true
-                    onClick()
-                }
-                .padding(vertical = 15.dp, horizontal = 10.dp),
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        if (options.isNotEmpty()) menuExpanded = true
+                        onClick()
+                    }
+                    .padding(vertical = 15.dp, horizontal = 10.dp),
                 verticalAlignment = Alignment.CenterVertically) {
 
                 Text(
