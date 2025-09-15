@@ -315,10 +315,11 @@ fun DefaultBackgroundUi(
     modifier: Modifier = Modifier,
     isShowBackButton: Boolean = true,
     onBackButtonClick: () -> Unit = {},
+    colors: Color= White,
     content: @Composable () -> Unit,
 ) {
     Surface(
-        modifier = modifier.fillMaxWidth(), color = White
+        modifier = modifier.fillMaxWidth(), color = colors
     ) {
         Column(
             modifier = modifier

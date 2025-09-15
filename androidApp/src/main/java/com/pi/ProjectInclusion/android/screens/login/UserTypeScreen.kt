@@ -89,7 +89,7 @@ fun UserTypeScreen(
     onNext: () -> Unit,
     onBack: () -> Unit,
 ) {
-    var isDialogVisible by remember { mutableStateOf(false) }
+    var isDialogVisible by remember { mutableStateOf(true) }
     val uiState by viewModel.uiStateType.collectAsStateWithLifecycle()
     var isInternetAvailable by remember { mutableStateOf(true) }
     val internetMessage = stringResource(R.string.txt_oops_no_internet)
@@ -97,7 +97,7 @@ fun UserTypeScreen(
     val userType = remember { mutableStateListOf<GetUserTypeResponse.UserTypeResponse>() }
     CustomDialog(
         isVisible = isDialogVisible,
-        onDismiss = { isDialogVisible = true },
+        onDismiss = { isDialogVisible = false },
         message = stringResource(R.string.txt_loading)
     )
 
@@ -117,7 +117,6 @@ fun UserTypeScreen(
         when {
             uiState.isLoading -> {
                 userType.clear()
-                isDialogVisible = true
             }
 
             uiState.error.isNotEmpty() -> {
@@ -174,10 +173,10 @@ fun UserTypeResponseUI(
     val internetMessage = stringResource(R.string.txt_oops_no_internet)
     val noDataMessage = stringResource(R.string.txt_oops_no_data_found)
 
-    DefaultBackgroundUi(isShowBackButton = true, onBackButtonClick = {
+    DefaultBackgroundUi(colors = Bg_Gray1, isShowBackButton = true, onBackButtonClick = {
         onBack()
     }, content = {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize().background(Bg_Gray1)) {
             Column(
                 modifier = Modifier
                     .padding(15.dp)
@@ -185,7 +184,7 @@ fun UserTypeResponseUI(
                         color = if (isSystemInDarkTheme()) {
                             Dark_01
                         } else {
-                            Transparent
+                            Bg_Gray1
                         }
                     )
                     .fillMaxWidth(),
@@ -294,17 +293,9 @@ fun UserTypeCard(
         }
     )
     val backGroundColor = if (isSelected) {
-        if (isSystemInDarkTheme()) {
-            Dark_Selected_BG
-        } else {
             PrimaryBlueLt1
-        }
     } else {
-        if (isSystemInDarkTheme()) {
-            Dark_02
-        } else {
             White
-        }
     }
 
     Card(
@@ -320,11 +311,8 @@ fun UserTypeCard(
             .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(1.dp),
         colors = CardDefaults.cardColors(
-            if (isSystemInDarkTheme()) {
-                Dark_02
-            } else {
                 White
-            }
+
         ),
         border = selectedBorder,
         shape = RoundedCornerShape(12.dp)

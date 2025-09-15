@@ -101,7 +101,7 @@ fun EnterPasswordScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = Bg_Gray1),
+                .background(color = White),
             verticalArrangement = Arrangement.Top
         ) {
             PasswordUI(
