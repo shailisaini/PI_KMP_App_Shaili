@@ -525,8 +525,8 @@ and make a difference together!</string>
     <string name="key_Retry">Retry</string>
     <string name="key_Confirm">Confirm</string>
     <string name="key_error_response">Something went wrong</string>
-    <string name="key_Server_Not_Responding">Server Not Responding</string>
-    <string name="key_server_respond_taking">It looks like our server is taking too long to respond. Please check your internet connection or try again.</string>
+    <string name="key_Server_Not_Responding">No Internet Connection</string>
+    <string name="key_server_respond_taking">Please check your internet connection or try again.</string>
     <string name="key_password_created">Your password has been created successfully</string>
     <string name="key_create_password">Create password</string>
 

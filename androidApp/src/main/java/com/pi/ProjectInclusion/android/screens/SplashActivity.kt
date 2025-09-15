@@ -197,9 +197,10 @@ class SplashActivity : ComponentActivity() {
                     }
                 }
             }
-            if (appVersion.isNotEmpty()){
-            SplashUI(appVersion)
-                }
+            if (appVersion.isNotEmpty()) {
+                SplashUI(appVersion)
+            }
+
             MyApplicationTheme {
                 AnimatedContent(
                     targetState = currentRoute,

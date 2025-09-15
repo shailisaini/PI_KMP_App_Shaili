@@ -42,6 +42,7 @@ import com.pi.ProjectInclusion.Bg_Gray1
 import com.pi.ProjectInclusion.DARK_DEFAULT_BUTTON_TEXT
 import com.pi.ProjectInclusion.Gray
 import com.pi.ProjectInclusion.LightRed01
+import com.pi.ProjectInclusion.PrimaryBlue
 import com.pi.ProjectInclusion.android.R
 import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
 import com.pi.ProjectInclusion.android.common_UI.AccountRecoverDialog
@@ -54,6 +55,7 @@ import com.pi.ProjectInclusion.android.common_UI.UserNameTextField
 import com.pi.ProjectInclusion.android.utils.fontMedium
 import com.pi.ProjectInclusion.android.utils.toast
 import com.pi.ProjectInclusion.constants.BackHandler
+import com.pi.ProjectInclusion.constants.CommonFunction.ShowError
 import com.pi.ProjectInclusion.constants.CommonFunction.isNetworkAvailable
 import com.pi.ProjectInclusion.constants.ConstantVariables.USER_EXIST
 import com.pi.ProjectInclusion.constants.ConstantVariables.IMG_DESCRIPTION
@@ -118,6 +120,7 @@ fun LoginUI(
     var isDialogVisible by remember { mutableStateOf(false) }
     var noData = stringResource(R.string.txt_oops_no_data_found)
     var isInternetAvailable by remember { mutableStateOf(true) }
+    var isShowInternetDialog by remember { mutableStateOf(false) }
     val internetMessage = stringResource(R.string.txt_oops_no_internet)
     val invalidMobNo = stringResource(id = R.string.txt_enter_valid_mob_user)
 
@@ -142,6 +145,7 @@ fun LoginUI(
     var sendOtpViaWhatsApp by remember { mutableStateOf(false) }
     var errorResponse = stringResource(R.string.key_error_response)
     val sendOtpState by viewModel.uiStateSendOtpResponse.collectAsStateWithLifecycle()
+    val errColor = PrimaryBlue
 
     CustomDialog(
         isVisible = isDialogVisible,
@@ -266,6 +270,14 @@ fun LoginUI(
         })
     }
 
+    if (isShowInternetDialog) {
+        ShowError(
+            internetMessage,
+            errColor,
+            painterResource(R.drawable.sad_emoji)
+        )
+    }
+
     LaunchedEffect(sendOtpState) {
         when {
             sendOtpState.isLoading -> {
@@ -286,7 +298,7 @@ fun LoginUI(
                     if (sendOtpState.success!!.response?.message == SUCCESS) {
                         viewModel.savePrefData(USER_MOBILE_NO, encryptedPhoneNo)
                         viewModel.savePrefData(IS_COMING_FROM, REGISTER_NEW)
-                        logger.d("OtpSendVerify:Back to UserName ->"+ sendOtpState.success!!.response?.message)
+                        logger.d("OtpSendVerify:Back to UserName ->" + sendOtpState.success!!.response?.message)
                         onRegister() // Go to OTP Verify screen
                     } else {
                         val errorMessage =
@@ -370,29 +382,29 @@ fun LoginUI(
                             )
                         }
 
-                    Spacer(modifier = Modifier.height(15.dp))
-                    BtnUi(
-                        enabled = userName.value.isNotEmpty() && userName.value.length >= 6,
-                        title = txtContinue,
-                        onClick = {
-                            if (userName.value.isNotEmpty() || userName.value.length >= 6) {
-                                if (showError || userName.value.length < 6) {
-                                    inValidMobNo = true
-                                } else {
-                                    isInternetAvailable = isNetworkAvailable(context)
-                                    // if first digit of mobile is less than 6 then error will show
-                                    if (!isInternetAvailable) {
-                                        context.toast(internetMessage)
+                        Spacer(modifier = Modifier.height(15.dp))
+                        BtnUi(
+                            enabled = userName.value.isNotEmpty() && userName.value.length >= 6,
+                            title = txtContinue,
+                            onClick = {
+                                if (userName.value.isNotEmpty() || userName.value.length >= 6) {
+                                    if (showError || userName.value.length < 6) {
+                                        inValidMobNo = true
                                     } else {
-                                        // call Api
-                                        isDialogVisible = true
-                                        isApiCalled = true
+                                        isInternetAvailable = isNetworkAvailable(context)
+                                        // if first digit of mobile is less than 6 then error will show
+                                        if (!isInternetAvailable) {
+                                            context.toast(internetMessage)
+                                        } else {
+                                            // call Api
+                                            isDialogVisible = true
+                                            isApiCalled = true
+                                        }
                                     }
                                 }
-                            }
-                        },
-                    )
-                }
+                            },
+                        )
+                    }
                 }
                 Column(
                     modifier = Modifier
@@ -401,11 +413,21 @@ fun LoginUI(
                     verticalArrangement = Arrangement.Bottom
                 ) {
                     TermsAndPrivacyText(onTermsClick = {
-                        onPrivacyPolicy()
-                        viewModel.savePrefData(IS_COMING_FROM, TERMS_CONDITION)
+                        isInternetAvailable = isNetworkAvailable(context)
+                        if (!isInternetAvailable) {
+                            isShowInternetDialog = true
+                        } else {
+                            onPrivacyPolicy()
+                            viewModel.savePrefData(IS_COMING_FROM, TERMS_CONDITION)
+                        }
                     }, onPrivacyClick = {
-                        onPrivacyPolicy()
-                        viewModel.savePrefData(IS_COMING_FROM, PRIVACY_POLICY)
+                        isInternetAvailable = isNetworkAvailable(context)
+                        if (!isInternetAvailable) {
+                            isShowInternetDialog = true
+                        } else {
+                            onPrivacyPolicy()
+                            viewModel.savePrefData(IS_COMING_FROM, PRIVACY_POLICY)
+                        }
                     })
                 }
             }
