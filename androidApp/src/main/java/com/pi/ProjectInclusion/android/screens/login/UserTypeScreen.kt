@@ -102,6 +102,7 @@ fun UserTypeScreen(
     )
 
     LoggerProvider.logger.d("Screen: " + "UserTypeScreen()")
+
     LaunchedEffect(Unit) {
         isInternetAvailable = isNetworkAvailable(context)
         if (!isInternetAvailable) {

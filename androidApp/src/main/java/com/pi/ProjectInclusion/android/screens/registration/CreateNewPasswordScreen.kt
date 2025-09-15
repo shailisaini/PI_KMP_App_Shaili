@@ -89,6 +89,7 @@ import com.pi.ProjectInclusion.android.common_UI.AESEncryption.encryptAES
 import com.pi.ProjectInclusion.android.common_UI.BtnUi
 import com.pi.ProjectInclusion.android.common_UI.CustomToastMessage
 import com.pi.ProjectInclusion.android.common_UI.DefaultBackgroundUi
+import com.pi.ProjectInclusion.android.common_UI.EncryptedCommonFunction.encryptedPhoneNo
 import com.pi.ProjectInclusion.android.common_UI.EncryptedCommonFunction.isEncryptedPhone
 import com.pi.ProjectInclusion.android.common_UI.PasswordTextField
 import com.pi.ProjectInclusion.android.common_UI.SnackbarWithProgress
@@ -190,7 +191,7 @@ fun CreateNewPasswordUI(
     val createRegisterPasswordState by viewModel.createRegPasswordResponse.collectAsStateWithLifecycle()
     val encryptedPassword = enterConfirmPasswordStr.value.encryptAES().toString().trim()
     val encryptedUserName = viewModel.userNameValue!!.encryptAES().toString().trim()
-    val encryptedMobile = isEncryptedPhone(mobileNo?.encryptAES().toString().trim())
+    val encryptedMobile = encryptedPhoneNo(mobileNo.toString().trim())
     var languageId = viewModel.getPrefData(SELECTED_LANGUAGE_ID)
     var userTypeId = viewModel.getPrefData(USER_TYPE_ID)
     var strToken = viewModel.getPrefData(TOKEN_PREF_KEY)
@@ -677,15 +678,18 @@ fun SelectUserBottomSheet(
         when {
             uiState.isLoading -> {
                 isDialogVisible = true
+                userType.clear()
             }
 
             uiState.error.isNotEmpty() -> {
                 context.toast(uiState.error)
+                userType.clear()
                 isDialogVisible = false
             }
 
             uiState.success != null -> {
                 uiState.success!!.let {
+                    userType.clear()
                     userType.addAll(it.response!!)
                 }
                 isDialogVisible = false
