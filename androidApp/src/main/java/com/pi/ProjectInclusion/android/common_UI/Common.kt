@@ -122,6 +122,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -1309,7 +1310,10 @@ fun OtpInputField(
             }
         },
         visualTransformation = if (otpText.isNotEmpty()) {
-            VisualTransformation.None
+//            VisualTransformation.None
+            PasswordVisualTransformation(
+                '*'
+            )
         } else {
             PasswordVisualTransformation(
                 '*'
@@ -1317,7 +1321,8 @@ fun OtpInputField(
         },
 
         keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number
+            keyboardType = KeyboardType.NumberPassword,
+            imeAction = ImeAction.Done
         ),
         modifier = modifier
             .fillMaxWidth()
@@ -1328,18 +1333,37 @@ fun OtpInputField(
                 horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()
             ) {
                 repeat(otpLength) { index ->    // repeating box 6 times for otp & 4 times for PIN
-                    CharacterContainer(
-                        index = index,
-                        text = textState.value.text,
-                        shouldShowCursor = shouldShowCursor,
-                        shouldCursorBlink = shouldCursorBlink,
-                        colors = colors
+//                    CharacterContainer(
+//                        index = index,
+//                        text = textState.value.text,
+//                        shouldShowCursor = shouldShowCursor,
+//                        shouldCursorBlink = shouldCursorBlink,
+//                        colors = colors
+//                    )
+
+                    SingleOtpBox(
+                        char = otpText.getOrNull(index)?.let { '*' } ?: ' ',
                     )
                 }
             }
         })
 }
 
+@Composable
+fun SingleOtpBox(char: Char) {
+    Box(
+        modifier = Modifier
+            .size(48.dp)
+            .border(1.dp, Color.Gray, RoundedCornerShape(8.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = char.toString(),
+            style = MaterialTheme.typography.titleLarge,
+            textAlign = TextAlign.Center
+        )
+    }
+}
 
 @Composable
 fun TermsAndPrivacyText(
