@@ -153,7 +153,7 @@ fun LoginUI(
         // saving userName & mobile no as a local variable in view Model
         viewModel.saveUserName(userName.value)
 
-        LoggerProvider.logger.d("ValidateUserParams: ${userName.value} .. $encryptedPhoneNo")
+        logger.d("ValidateUserParams: ${userName.value} .. $encryptedPhoneNo")
         LaunchedEffect(Unit) {
             isInternetAvailable = isNetworkAvailable(context)
             if (!isInternetAvailable) {
@@ -172,8 +172,9 @@ fun LoginUI(
 
                 validateUserState.error.isNotEmpty() -> {
                     isDialogVisible = false
-                    LoggerProvider.logger.d("Error: ${validateUserState.error}")
+                    logger.d("Error: ${validateUserState.error}")
                     context.toast(validateUserState.error)
+                    viewModel.resetState(viewModel._uiStateValidateUser)
                 }
 
                 validateUserState.success != null -> {
@@ -208,6 +209,8 @@ fun LoginUI(
                     }
                     isDialogVisible = false
                     isApiCalled = false
+                    viewModel.resetState(viewModel._uiStateValidateUser)
+
                 }
             }
         }
@@ -272,6 +275,9 @@ fun LoginUI(
             sendOtpState.error.isNotEmpty() -> {
                 logger.d("Error: ${sendOtpState.error}")
                 isDialogVisible = false
+
+                // reset state
+                viewModel.resetState(viewModel._uiStateSendOtp)
             }
 
             sendOtpState.success != null -> {
@@ -296,6 +302,7 @@ fun LoginUI(
                 }
                 sendOtpViaWhatsApp = false
                 sendOtpViaCall = false
+                viewModel.resetState(viewModel._uiStateSendOtp)
             }
         }
     }

@@ -229,6 +229,10 @@ class LoginViewModel(
             }
         }
     }
+// reset states
+fun <T> resetState(state: MutableStateFlow<UiState<T>>) {
+        state.value = UiState()
+    }
 
     fun getLanguages() = viewModelScope.launch {
         if (!isNetworkAvailable()) {
