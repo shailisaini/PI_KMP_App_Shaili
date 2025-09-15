@@ -233,9 +233,7 @@ fun OtpSendVerifyScreen(
                         )
                     }
                 } else {
-                    val errorMessage = sendOtpState.success?.message
-                        ?: sendOtpState.success?.error
-                        ?: sendOtpState.success?.exception
+                    val errorMessage = verifyOtpState.success?.message
                         ?: error
 //                    context.toast(errorMessage)
                     inValidOTP = true
@@ -283,7 +281,12 @@ fun OtpSendVerifyScreen(
                         )
                     )
                 } else {
+                    val errorMessage = loginWithOtp.success?.message
+                        ?: loginWithOtp.success?.error
+                        ?: error
+//                    context.toast(errorMessage)
                     inValidOTP = true
+                    invalidText = errorMessage
                 }
                 isDialogVisible = false
             }
