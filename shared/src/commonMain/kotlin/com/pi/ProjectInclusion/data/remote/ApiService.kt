@@ -36,6 +36,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.StateList
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.UserTrackRequestResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingTokenResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
@@ -290,7 +291,9 @@ class ApiService(private val client: HttpClient) {
             url {
                 takeFrom(STUDENT_BASE_URL)
 
-                encodedPath = "$encodedPath/$appendUser/get-user-by-username/${username.trim().encodeURLParameter()}"
+                encodedPath = "$encodedPath/$appendUser/get-user-by-username/${
+                    username.trim().encodeURLParameter()
+                }"
             }
             headers {
                 append(HttpHeaders.Accept, "application/json")
@@ -674,5 +677,18 @@ class ApiService(private val client: HttpClient) {
             append(HttpHeaders.Authorization, strToken)
         }
     }.body<CheckProfileCompletionResponse>()
+
+    suspend fun getTrackRequest(
+        strToken: String,
+    ): UserTrackRequestResponse = client.get {
+        url {
+            takeFrom(STUDENT_BASE_URL)
+            appendPathSegments(appendGrievance, "get-track-request")
+        }
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+            append(HttpHeaders.Authorization, strToken)
+        }
+    }.body<UserTrackRequestResponse>()
 
 }

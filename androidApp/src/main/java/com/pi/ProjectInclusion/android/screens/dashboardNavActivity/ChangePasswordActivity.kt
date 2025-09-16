@@ -80,6 +80,7 @@ import com.pi.ProjectInclusion.data.model.profileModel.ChangePasswordRequest
 import com.pi.ProjectInclusion.ui.viewModel.DashboardViewModel
 import com.pi.ProjectInclusion.ui.viewModel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
+import org.koin.androidx.compose.viewModel
 import java.util.regex.Pattern
 
 class ChangePasswordActivity : ComponentActivity() {
@@ -169,6 +170,7 @@ private fun ShowChangePasswordData(
             changePasswordState.error.isNotEmpty() -> {
                 logger.d("Forget Password Error: ${changePasswordState.error}")
                 isDialogVisible = false
+                viewModel.resetState(viewModel.changePassword)
             }
 
             changePasswordState.success != null -> {
@@ -181,6 +183,7 @@ private fun ShowChangePasswordData(
                     context.toast(changePasswordState.success!!.response!!)
                 }
                 isDialogVisible = false
+                viewModel.resetState(viewModel.changePassword)
             }
         }
     }

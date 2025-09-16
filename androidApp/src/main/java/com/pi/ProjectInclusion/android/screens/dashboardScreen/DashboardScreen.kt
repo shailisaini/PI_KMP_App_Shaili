@@ -131,6 +131,7 @@ fun DashboardScreen(onProfile: () -> Unit) {
             viewProfile.error.isNotEmpty() -> {
                 logger.d("view profile error data: ${viewProfile.success}")
                 isDialogVisible = false
+                viewModel.resetState(viewModel.viewUserProfile)
             }
 
             viewProfile.success != null -> {
@@ -147,6 +148,7 @@ fun DashboardScreen(onProfile: () -> Unit) {
                 } else {
                     context.toast(viewProfile.success!!.message.toString())
                 }
+                viewModel.resetState(viewModel.viewUserProfile)
             }
         }
     }
@@ -160,6 +162,7 @@ fun DashboardScreen(onProfile: () -> Unit) {
             checkProfile.error.isNotEmpty() -> {
                 logger.d("Check profile completion error data: ${checkProfile.success}")
                 isDialogVisible = false
+                dashboardViewModel.resetState(dashboardViewModel.checkProfile)
             }
 
             checkProfile.success != null -> {
@@ -174,6 +177,7 @@ fun DashboardScreen(onProfile: () -> Unit) {
                     context.toast(checkProfile.success!!.message.toString())
                 }
                 isDialogVisible = false
+                dashboardViewModel.resetState(dashboardViewModel.checkProfile)
             }
         }
     }

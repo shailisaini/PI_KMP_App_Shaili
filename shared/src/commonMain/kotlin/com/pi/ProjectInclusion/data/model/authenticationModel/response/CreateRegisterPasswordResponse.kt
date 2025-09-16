@@ -16,28 +16,33 @@ data class CreateRegisterPasswordResponse(
 ) {
     @Serializable
     data class CreateRegisterResponse(
+        @SerialName("access_token") var accessToken: String? = null,
+        @SerialName("user") var user: User? = null,
+    ) {
+        @Serializable
+        data class User(
 
-        @SerialName("username") var username: String? = null,
-        @SerialName("password") var password: String? = null,
-        @SerialName("mobile") var mobile: String? = null,
-        @SerialName("userTypeId") var userTypeId: Int? = null,
-        @SerialName("email") var email: String? = null,
-        @SerialName("loginAttempt") var loginAttempt: String? = null,
-        @SerialName("lastlogin") var lastlogin: String? = null,
-        @SerialName("loginflag") var loginflag: String? = null,
-        @SerialName("userExpInDays") var userExpInDays: String? = null,
-        @SerialName("passwordExpInDays") var passwordExpInDays: String? = null,
-        @SerialName("isProfileLocked") var isProfileLocked: String? = null,
-        @SerialName("registrationSource") var registrationSource: String? = null,
-        @SerialName("roleId") var roleId: String? = null,
-        @SerialName("createdDate") var createdDate: String? = null,
-        @SerialName("updatedDate") var updatedDate: String? = null,
-        @SerialName("createdBy") var createdBy: String? = null,
-        @SerialName("updatedBy") var updatedBy: String? = null,
-        @SerialName("status") var status: Int? = null,
-        @SerialName("lastAccountInactiveDate") var lastAccountInactiveDate: String? = null,
-        @SerialName("lastAccountRestoredDate") var lastAccountRestoredDate: String? = null,
-        @SerialName("id") var id: String? = null,
-
+            @SerialName("username") var username: String? = null,
+            @SerialName("password") var password: String? = null,
+            @SerialName("mobile") var mobile: String? = null,
+            @SerialName("userTypeId") var userTypeId: Int? = null,
+            @SerialName("email") var email: String? = null,
+            @SerialName("loginAttempt") var loginAttempt: String? = null,
+            @SerialName("lastlogin") var lastlogin: String? = null,
+            @SerialName("loginflag") var loginflag: String? = null,
+            @SerialName("userExpInDays") var userExpInDays: String? = null,
+            @SerialName("passwordExpInDays") var passwordExpInDays: String? = null,
+            @SerialName("isProfileLocked") var isProfileLocked: String? = null,
+            @SerialName("registrationSource") var registrationSource: String? = null,
+            @SerialName("roleId") var roleId: String? = null,
+            @SerialName("createdDate") var createdDate: String? = null,
+            @SerialName("updatedDate") var updatedDate: String? = null,
+            @SerialName("createdBy") var createdBy: String? = null,
+            @SerialName("updatedBy") var updatedBy: String? = null,
+            @SerialName("status") var status: Int? = null,
+            @SerialName("lastAccountInactiveDate") var lastAccountInactiveDate: String? = null,
+            @SerialName("lastAccountRestoredDate") var lastAccountRestoredDate: String? = null,
+            @SerialName("id") var id: String? = null,
         )
+    }
 }

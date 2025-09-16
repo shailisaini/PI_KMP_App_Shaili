@@ -12,6 +12,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.Notificat
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.UserTrackRequestResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingTokenResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
@@ -233,6 +234,18 @@ class DashboardUsesCases(private val repository: DashboardRepository) {
             } catch (e: Exception) {
                 val errorMessage = e.message ?: unableToConnectServer
                 logger.d("Exception in checkProfileCompletionRepo() $errorMessage")
+                emit(Result.failure(Exception(errorMessage)))
+            }
+        }.flowOn(Dispatchers.IO)
+
+    fun getTrackRequestRepoRepo(strToken: String): Flow<Result<UserTrackRequestResponse>> =
+        flow {
+            try {
+                val response = repository.getTrackRequestRepo(strToken)
+                emit(Result.success(response))
+            } catch (e: Exception) {
+                val errorMessage = e.message ?: unableToConnectServer
+                logger.d("Exception in getTrackRequestRepoRepo() $errorMessage")
                 emit(Result.failure(Exception(errorMessage)))
             }
         }.flowOn(Dispatchers.IO)

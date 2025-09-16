@@ -181,6 +181,7 @@ fun ShowCertificateData(
             certificateState.error.isNotEmpty() -> {
                 logger.d("Certificate Error: ${certificateState.error}")
                 isDialogVisible = false
+                viewModel.resetState(viewModel.getCertificate)
             }
 
             certificateState.success != null -> {
@@ -196,6 +197,7 @@ fun ShowCertificateData(
                     context.toast(certificateState.success!!.message!!)
                 }
                 isDialogVisible = false
+                viewModel.resetState(viewModel.getCertificate)
             }
         }
     }

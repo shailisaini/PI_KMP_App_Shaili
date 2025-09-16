@@ -190,6 +190,7 @@ fun ViewProfileScreen(
             viewProfile.error.isNotEmpty() -> {
                 logger.d("viewProfileData: ${viewProfile.success}")
                 isDialogVisible = false
+                viewModel.resetState(viewModel.viewUserProfile)
             }
 
             viewProfile.success != null -> {
@@ -199,12 +200,11 @@ fun ViewProfileScreen(
                     logger.d("viewProfileData 1: ${viewProfile.success}")
                     profilePic.value = PROFILE_BASE_URL + profileData!!.response?.profilepic
                     viewModel.saveUserName(profileData?.response?.username.toString())
-
-//                    context.toast(sendOtpState.success!!.response!!.message.toString())
                 } else {
                     context.toast(viewProfile.success!!.message.toString())
                 }
                 isDialogVisible = false
+                viewModel.resetState(viewModel.viewUserProfile)
             }
         }
     }
@@ -294,6 +294,7 @@ fun ProfileViewUI(
             allStatesState.error.isNotEmpty() -> {
                 logger.d("All state error : ${allStatesState.success}")
 //                isDialogVisible = false
+                viewModel.resetState(viewModel.allStates)
             }
 
             allStatesState.success != null -> {
@@ -317,6 +318,7 @@ fun ProfileViewUI(
                     println("All states list data :- $selectedState")
                 }
 //                isDialogVisible = false
+                viewModel.resetState(viewModel.allStates)
             }
         }
     }
@@ -341,6 +343,7 @@ fun ProfileViewUI(
             allDistrictsState.error.isNotEmpty() -> {
                 logger.d("All district error : ${allDistrictsState.success}")
 //                isDialogVisible = false
+                viewModel.resetState(viewModel.allDistricts)
             }
 
             allDistrictsState.success != null -> {
@@ -357,6 +360,7 @@ fun ProfileViewUI(
                     }
                 }
 //                isDialogVisible = false
+                viewModel.resetState(viewModel.allDistricts)
             }
         }
     }
@@ -371,6 +375,7 @@ fun ProfileViewUI(
             allBlocksState.error.isNotEmpty() -> {
                 logger.d("All Blocks error : ${allBlocksState.success}")
 //                isDialogVisible = false
+                viewModel.resetState(viewModel.allBlocks)
             }
 
             allBlocksState.success != null -> {
@@ -392,6 +397,7 @@ fun ProfileViewUI(
                     println("All Blocks list data :- $selectedBlock")
                 }
 //                isDialogVisible = false
+                viewModel.resetState(viewModel.allBlocks)
             }
         }
     }
@@ -406,6 +412,7 @@ fun ProfileViewUI(
             allSchoolsState.error.isNotEmpty() -> {
                 logger.d("All Schools error : ${allSchoolsState.success}")
 //                isDialogVisible = false
+                viewModel.resetState(viewModel.allSchools)
             }
 
             allSchoolsState.success != null -> {
@@ -422,12 +429,17 @@ fun ProfileViewUI(
                     println("All Schools list data :- $selectedSchool")
                 }
 //                isDialogVisible = false
+                viewModel.resetState(viewModel.allSchools)
             }
         }
     }
 
     if (showSheetMenu) {
-        ProfileBottomSheetMenu(viewModel = viewModel, onBackLogin = onBackLogin) {
+        ProfileBottomSheetMenu(
+            viewModel = viewModel,
+            onBackLogin = onBackLogin,
+            onTrackRequest = onTrackRequest
+        ) {
             showSheetMenu = false
         }
     }
@@ -878,18 +890,18 @@ fun CompleteProfile(profileData: ViewProfileResponse, onNext: () -> Unit) {
 fun ProfileBottomSheetMenu(
     viewModel: LoginViewModel?,
     onBackLogin: () -> Unit = {},
+    onTrackRequest: () -> Unit = {},
     onDismiss: () -> Unit = {},
 ) {
     val sheetState = rememberModalBottomSheetState()
     val context = LocalContext.current
 
     var logOutSheet by remember { mutableStateOf(false) }
-    // show logout sheet while click on logout
+
     if (logOutSheet) {
         LogoutDialog(onDismiss = { logOutSheet = false }, onClick = {
             logOutSheet = false
             viewModel?.clearPref()
-//            onBackLogin() // move to Login Screen
             ContextCompat.startActivity(
                 context, Intent(context, LoginNavigationScreen::class.java), null
             ).apply { (context as? Activity)?.finish() }
@@ -897,13 +909,14 @@ fun ProfileBottomSheetMenu(
     }
     var confirmDeleteState by remember { mutableStateOf(false) }
     var deleteAccountDialog by remember { mutableStateOf(false) }
-    // show logout sheet while click on logout
+
     if (confirmDeleteState) {
         DeleteAccountPasswordDialog(onSubmit = {
             confirmDeleteState = false
             deleteAccountDialog = true
         }, onDismiss = { confirmDeleteState = false })
     }
+
     if (deleteAccountDialog) {
         AccountDeleteDialog(onDismiss = { deleteAccountDialog = false }, onClick = {
             deleteAccountDialog = false
@@ -937,7 +950,7 @@ fun ProfileBottomSheetMenu(
                 )
 
                 TextButton(onClick = {
-
+                    onTrackRequest()
                 }) {
                     Text(
                         text = stringResource(R.string.txt_track_request),
@@ -1041,6 +1054,7 @@ fun ChangeRequestSheet(
                 isDialogVisible.value = false
                 isRequestedAlready = false
                 uploadShowDialog = false
+                dashboardViewModel.resetState(dashboardViewModel.getTrackRequest)
             }
 
             requestTrackState.success != null -> {
@@ -1053,6 +1067,7 @@ fun ChangeRequestSheet(
                     }
                 }
                 isDialogVisible.value = false
+                dashboardViewModel.resetState(dashboardViewModel.getTrackRequest)
             }
         }
     }
@@ -1273,6 +1288,7 @@ fun UploadIdDialog(
             requestChangeState.error.isNotEmpty() -> {
                 logger.d("requestChangeState: ${requestChangeState.success}")
                 isDialogVisible.value = false
+                dashboardViewModel.resetState(dashboardViewModel.getChangeRequest)
             }
 
             requestChangeState.success != null -> {
@@ -1284,6 +1300,7 @@ fun UploadIdDialog(
                     context.toast(requestChangeState.success!!.message.toString())
                 }
                 isDialogVisible.value = false
+                dashboardViewModel.resetState(dashboardViewModel.getChangeRequest)
             }
         }
     }

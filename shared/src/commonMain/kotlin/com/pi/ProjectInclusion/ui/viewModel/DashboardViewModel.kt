@@ -14,6 +14,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.Notificat
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.UserTrackRequestResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingTokenResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
@@ -80,7 +81,7 @@ class DashboardViewModel(
     val getToken = MutableStateFlow(UiState<TokenResponse>())
     val getTokenResponse: StateFlow<UiState<TokenResponse>> = getToken
 
-    private val getMeetingList = MutableStateFlow(UiState<ZoomMeetingListResponse>())
+    val getMeetingList = MutableStateFlow(UiState<ZoomMeetingListResponse>())
     val getMeetingListResponse: StateFlow<UiState<ZoomMeetingListResponse>> = getMeetingList
 
     private val getMeetingJoin = MutableStateFlow(UiState<ZoomMeetingsJoinResponse>())
@@ -100,6 +101,9 @@ class DashboardViewModel(
 
     val checkProfile = MutableStateFlow(UiState<CheckProfileCompletionResponse>())
     val checkProfileResponse: StateFlow<UiState<CheckProfileCompletionResponse>> = checkProfile
+
+    val trackRequest = MutableStateFlow(UiState<UserTrackRequestResponse>())
+    val trackRequestResponse: StateFlow<UiState<UserTrackRequestResponse>> = trackRequest
 
     fun isNetworkAvailable(): Boolean {
         return connectivityObserver.getCurrentStatus() == ConnectivityObserver.Status.Available
@@ -134,6 +138,11 @@ class DashboardViewModel(
         }
     }
 
+    // reset states
+    fun <T> resetState(state: MutableStateFlow<UiState<T>>) {
+        state.value = UiState()
+    }
+
     fun getLMSUserCertificate(
         certificateRequest: CertificateRequest,
         strToken: String,
@@ -165,8 +174,9 @@ class DashboardViewModel(
             })
         }
     }
+
     fun getSentNotification(
-        userId: Int
+        userId: Int,
     ) = viewModelScope.launch {
         getNotification.update { UiState(isLoading = true) }
         getUsesCases.getSentNotification(userId).catch { exception ->
@@ -624,6 +634,37 @@ class DashboardViewModel(
                     }
                 } else {
                     checkProfile.update {
+                        UiState(error = exception.message ?: somethingWentWrong)
+                    }
+                }
+            })
+        }
+    }
+
+    fun getTrackRequest(
+        tokenKey: String,
+    ) = viewModelScope.launch {
+        trackRequest.update { UiState(isLoading = true) }
+        getUsesCases.getTrackRequestRepoRepo(tokenKey).catch { exception ->
+            if (exception.message?.contains(serverError) == true) {
+                trackRequest.update {
+                    UiState(error = serverMsg)
+                }
+            } else {
+                trackRequest.update {
+                    UiState(error = exception.message ?: somethingWentWrong)
+                }
+            }
+        }.collect { result ->
+            result.fold(onSuccess = { data ->
+                trackRequest.update { UiState(success = data) }
+            }, onFailure = { exception ->
+                if (exception.message?.contains(serverError) == true) {
+                    trackRequest.update {
+                        UiState(error = serverMsg)
+                    }
+                } else {
+                    trackRequest.update {
                         UiState(error = exception.message ?: somethingWentWrong)
                     }
                 }

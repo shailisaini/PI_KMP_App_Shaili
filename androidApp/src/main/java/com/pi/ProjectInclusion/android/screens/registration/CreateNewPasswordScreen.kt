@@ -222,7 +222,11 @@ fun CreateNewPasswordUI(
                     if (createRegisterPasswordState.success!!.response != null) {
                         viewModel.savePrefData(
                             USER_MOBILE_NO,
-                            createRegisterPasswordState.success!!.response?.mobile.toString()
+                            createRegisterPasswordState.success!!.response?.user?.mobile.toString()
+                        )
+                        viewModel.savePrefData(
+                            TOKEN_PREF_KEY,
+                            "Bearer " + createRegisterPasswordState.success!!.response?.accessToken.toString()
                         )
                     }
                     onNext()

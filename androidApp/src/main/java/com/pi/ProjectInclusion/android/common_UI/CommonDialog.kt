@@ -144,6 +144,7 @@ fun DeleteAccountPasswordDialog(
             loginResponse.error.isNotEmpty() -> {
                 logger.d("Error: ${loginResponse.error}")
                 isDialogVisible = false
+                viewModel.resetState(viewModel._uiStateLogin)
             }
 
             loginResponse.success != null -> {
@@ -154,6 +155,7 @@ fun DeleteAccountPasswordDialog(
                     loginResponse.success!!.message.toString()
                 }
                 isDialogVisible = false
+                viewModel.resetState(viewModel._uiStateLogin)
             }
         }
     }
@@ -306,6 +308,7 @@ fun AccountDeleteDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
             deleteResponse.error.isNotEmpty() -> {
                 logger.d("Error: ${deleteResponse.error}")
                 isDialogVisible = false
+                viewModel.resetState(viewModel.getAccountDelete)
             }
 
             deleteResponse.success != null -> {
@@ -320,6 +323,7 @@ fun AccountDeleteDialog(onDismiss: () -> Unit = {}, onClick: () -> Unit = {}) {
                     context.toast(deleteResponse.success!!.message.toString())
                 }
                 isDialogVisible = false
+                viewModel.resetState(viewModel.getAccountDelete)
             }
         }
     }

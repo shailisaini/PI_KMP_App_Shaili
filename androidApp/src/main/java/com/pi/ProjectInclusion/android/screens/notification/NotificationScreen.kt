@@ -86,7 +86,7 @@ fun NotificationScreen(
     onNext: () -> Unit,
     onBack: () -> Unit,
     dashboardViewModel: DashboardViewModel,
-    ) {
+) {
     val loginViewModel: LoginViewModel = koinViewModel()
     var isDialogVisible by remember { mutableStateOf(false) }
     val notificationState by dashboardViewModel.getNotificationResponse.collectAsStateWithLifecycle()
@@ -122,13 +122,15 @@ fun NotificationScreen(
             notificationState.error.isNotEmpty() -> {
                 logger.d("Certificate Error: ${notificationState.error}")
                 isDialogVisible = false
+                dashboardViewModel.resetState(dashboardViewModel.getNotification)
             }
 
             notificationState.success != null -> {
                 logger.d("Certificate Response :- ${notificationState.success!!.response}")
                 if (notificationState.success!!.response != null) {
                     if (notificationState.success!!.response?.size != 0) {
-                        notificationData = notificationState.success!!.response as MutableList<NotificationList>
+                        notificationData =
+                            notificationState.success!!.response as MutableList<NotificationList>
                         println("Certificate Data :- $notificationData")
                     } else {
                         context.toast(notificationState.success!!.message)
@@ -137,6 +139,7 @@ fun NotificationScreen(
                     context.toast(notificationState.success?.message ?: "")
                 }
                 isDialogVisible = false
+                dashboardViewModel.resetState(dashboardViewModel.getNotification)
             }
         }
     }
@@ -170,7 +173,7 @@ fun NotificationScreen(
 fun Notifications(
     context: Context,
     onBack: () -> Unit,
-    onNext: () -> Unit
+    onNext: () -> Unit,
 ) {
 
     DetailsNoImgBackgroundUi(
@@ -217,7 +220,7 @@ fun NotificationList() {
         modifier = Modifier.fillMaxSize()
     ) {
         items(dummyTrackList) { item ->
-            if (item.title==stringResource(R.string.txt_case_transfer)){
+            if (item.title == stringResource(R.string.txt_case_transfer)) {
                 StudentTransferRequestCard(
                     date = stringResource(R.string.txt_date),
                     time = stringResource(R.string.txt_time),
@@ -229,15 +232,14 @@ fun NotificationList() {
                     onCancel = {},
                     onTransfer = {}
                 )
-            }
-            else{
-               NotificationCard(
-                   date = stringResource(R.string.txt_date),
-                   time = stringResource(R.string.txt_time),
-                   senderName = stringResource(R.string.user_name),
-                   senderSchool = stringResource(R.string.txt_dummy_school),
-                   studentImage = R.drawable.profile_user_icon
-               )
+            } else {
+                NotificationCard(
+                    date = stringResource(R.string.txt_date),
+                    time = stringResource(R.string.txt_time),
+                    senderName = stringResource(R.string.user_name),
+                    senderSchool = stringResource(R.string.txt_dummy_school),
+                    studentImage = R.drawable.profile_user_icon
+                )
             }
 
         }
@@ -254,7 +256,7 @@ fun StudentTransferRequestCard(
     studentName: String,
     studentClass: String,
     onCancel: () -> Unit,
-    onTransfer: () -> Unit
+    onTransfer: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -268,7 +270,7 @@ fun StudentTransferRequestCard(
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(top = 4 .dp, bottom = 6.dp)
+            modifier = Modifier.padding(top = 4.dp, bottom = 6.dp)
         ) {
             Text(
                 text = date,
@@ -321,10 +323,10 @@ fun StudentTransferRequestCard(
                 .fillMaxWidth()
                 .padding(12.dp)
         ) {
-            Column (
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-            ){
+            ) {
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -346,7 +348,8 @@ fun StudentTransferRequestCard(
                     ) {
                         Text(
                             modifier = Modifier
-                                .padding(start = 4 .dp
+                                .padding(
+                                    start = 4.dp
                                 ),
                             text = studentName,
                             fontSize = 17.sp,
@@ -355,7 +358,8 @@ fun StudentTransferRequestCard(
                         )
                         Text(
                             modifier = Modifier
-                                .padding(start = 4 .dp
+                                .padding(
+                                    start = 4.dp
                                 ),
                             text = studentClass,
                             fontSize = 15.sp,
@@ -364,7 +368,7 @@ fun StudentTransferRequestCard(
                         )
                         Row(
                             modifier = Modifier
-                                .padding(start = 4.dp, top = 16 .dp),
+                                .padding(start = 4.dp, top = 16.dp),
                             horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             OutlinedButton(
@@ -406,7 +410,6 @@ fun StudentTransferRequestCard(
             }
 
 
-
         }
     }
 }
@@ -431,7 +434,7 @@ fun NotificationCard(
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(top = 4 .dp, bottom = 6.dp)
+            modifier = Modifier.padding(top = 4.dp, bottom = 6.dp)
         ) {
             Text(
                 text = date,
@@ -468,10 +471,10 @@ fun NotificationCard(
                 .fillMaxWidth()
                 .padding(12.dp)
         ) {
-            Column (
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-            ){
+            ) {
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -490,12 +493,22 @@ fun NotificationCard(
                     Text(
                         text = buildAnnotatedString {
 
-                            append(stringResource(R.string.txt_first_noti)+" ")
+                            append(stringResource(R.string.txt_first_noti) + " ")
 
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = Black)) {
+                            withStyle(
+                                style = SpanStyle(
+                                    fontWeight = FontWeight.Bold,
+                                    color = Black
+                                )
+                            ) {
                                 append(senderName)
                             }
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = Black)) {
+                            withStyle(
+                                style = SpanStyle(
+                                    fontWeight = FontWeight.Bold,
+                                    color = Black
+                                )
+                            ) {
                                 append("$senderSchool ")
                             }
                             append(stringResource(R.string.txt_last_noti))
@@ -508,7 +521,6 @@ fun NotificationCard(
                 }
 
             }
-
 
 
         }
