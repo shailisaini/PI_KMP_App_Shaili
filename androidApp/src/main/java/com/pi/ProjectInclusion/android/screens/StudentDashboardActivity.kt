@@ -85,7 +85,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
@@ -239,7 +238,7 @@ class StudentDashboardActivity : ComponentActivity() {
             }*/
 
 
-            val viewProfile by viewModel.viewUserProfileResponse.collectAsStateWithLifecycle()
+            val viewProfile by viewModel.viewUserPcicdrofileResponse.collectAsStateWithLifecycle()
             var encryptedUserName = viewModel.getPrefData(USER_NAME)
             logger.d("Profile details on dashboard page for header in drawer :- $encryptedUserName")
             var profileData by remember { mutableStateOf<ViewProfileResponse.ProfileResponse?>(null) }
