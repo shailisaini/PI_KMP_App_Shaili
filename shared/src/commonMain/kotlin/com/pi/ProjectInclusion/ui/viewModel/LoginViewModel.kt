@@ -79,7 +79,7 @@ class LoginViewModel(
     val _uiStateSendOtp = MutableStateFlow(UiState<SendOTPResponse>())
     val uiStateSendOtpResponse: StateFlow<UiState<SendOTPResponse>> = _uiStateSendOtp
 
-    private val _uiStateLogin = MutableStateFlow(UiState<LoginApiResponse>())
+    val _uiStateLogin = MutableStateFlow(UiState<LoginApiResponse>())
     val uiStateLoginResponse: StateFlow<UiState<LoginApiResponse>> = _uiStateLogin
 
     val loginWithOtpState = MutableStateFlow(UiState<LoginApiResponse>())
@@ -229,8 +229,9 @@ class LoginViewModel(
             }
         }
     }
-// reset states
-fun <T> resetState(state: MutableStateFlow<UiState<T>>) {
+
+    // reset states
+    fun <T> resetState(state: MutableStateFlow<UiState<T>>) {
         state.value = UiState()
     }
 
@@ -585,7 +586,7 @@ fun <T> resetState(state: MutableStateFlow<UiState<T>>) {
 
         shouldRefreshProfile = false // Reset on successful start
 
-        viewUserProfile.update { it.copy(isLoading = true, error ="") }
+        viewUserProfile.update { it.copy(isLoading = true, error = "") }
 
         getAuthViewModel.getViewUserProfile(token, data)
             .catch { exception ->

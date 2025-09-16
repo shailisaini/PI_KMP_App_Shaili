@@ -217,6 +217,7 @@ private fun ShowFAQData(
                 logger.d("Category List Error: ${categoryListState.error}")
                 isDialogVisible = false
                 categoryListData.clear()
+                viewModel.resetState(viewModel.getCategoryList)
             }
 
             categoryListState.success != null -> {
@@ -229,6 +230,7 @@ private fun ShowFAQData(
                     context.toast(categoryListState.success!!.toString())
                 }
                 isDialogVisible = false
+                viewModel.resetState(viewModel.getCategoryList)
             }
         }
     }
@@ -243,6 +245,7 @@ private fun ShowFAQData(
                 logger.d("SubCategory List Error: ${subCategoryListState.error}")
                 isDialogVisible = false
                 subCategoryListData.clear()
+                viewModel.resetState(viewModel.getSubCategoryList)
             }
 
             subCategoryListState.success != null -> {
@@ -261,6 +264,7 @@ private fun ShowFAQData(
                     context.toast(subCategoryListState.success!!.toString())
                 }
                 isDialogVisible = false
+                viewModel.resetState(viewModel.getSubCategoryList)
             }
         }
     }
@@ -275,6 +279,7 @@ private fun ShowFAQData(
                 logger.d("SubCategory By Id List Error: ${subCategoryCategoryIdListState.error}")
                 isDialogVisible = false
                 subCategoryCategoryIdListData.clear()
+                viewModel.resetState(viewModel.getSubCategoryByCategoryIdList)
             }
 
             subCategoryCategoryIdListState.success != null -> {
@@ -293,6 +298,7 @@ private fun ShowFAQData(
                     context.toast(subCategoryCategoryIdListState.success!!.message.toString())
                 }
                 isDialogVisible = false
+                viewModel.resetState(viewModel.getSubCategoryByCategoryIdList)
             }
         }
     }
@@ -307,6 +313,7 @@ private fun ShowFAQData(
                 logger.d("Faqs List Error: ${faqsListState.error}")
                 isDialogVisible = false
                 faqsListData.clear()
+                viewModel.resetState(viewModel.getFAQsList)
             }
 
             faqsListState.success != null -> {
@@ -319,6 +326,7 @@ private fun ShowFAQData(
                     context.toast(faqsListState.success!!.message.toString())
                 }
                 isDialogVisible = false
+                viewModel.resetState(viewModel.getFAQsList)
             }
         }
     }

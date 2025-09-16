@@ -12,6 +12,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.Notificat
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.UserTrackRequestResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingTokenResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
@@ -30,6 +31,7 @@ class DashboardRepoImpl(private val apiService: ApiService) : DashboardRepositor
     ): CertificateListResponse {
         return apiService.getLMSUserCertificate(certificateRequest, strToken)
     }
+
     override suspend fun getSentNotification(userId: Int): NotificationResponse {
         return apiService.getSentNotification(userId)
     }
@@ -114,5 +116,9 @@ class DashboardRepoImpl(private val apiService: ApiService) : DashboardRepositor
 
     override suspend fun checkProfileCompletionRepo(tokenKey: String): CheckProfileCompletionResponse {
         return apiService.checkProfileCompletion(tokenKey)
+    }
+
+    override suspend fun getTrackRequestRepo(tokenKey: String): UserTrackRequestResponse {
+        return apiService.getTrackRequest(tokenKey)
     }
 }

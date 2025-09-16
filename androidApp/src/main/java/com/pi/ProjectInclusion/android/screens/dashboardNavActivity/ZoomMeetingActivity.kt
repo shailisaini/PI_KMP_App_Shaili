@@ -167,6 +167,7 @@ private fun ShowZoomMeetingData(context: Context, viewModel: DashboardViewModel)
             firstTokenState.error.isNotEmpty() -> {
                 logger.d("Refresh token Error: ${firstTokenState.error}")
                 isDialogVisible = false
+                viewModel.resetState(viewModel.getZoomMeetingToken)
             }
 
             firstTokenState.success != null -> {
@@ -179,6 +180,7 @@ private fun ShowZoomMeetingData(context: Context, viewModel: DashboardViewModel)
                             strBaseKey, strRefreshKey, strRefreshToken
                         )
                     }
+                    viewModel.resetState(viewModel.getZoomMeetingToken)
                 } else {
                     isDialogVisible = false
                     logger.d("Refresh token data not found...")
@@ -196,6 +198,7 @@ private fun ShowZoomMeetingData(context: Context, viewModel: DashboardViewModel)
             actualTokenState.error.isNotEmpty() -> {
                 logger.d("Actual Token  Error: ${actualTokenState.error}")
                 isDialogVisible = false
+                viewModel.resetState(viewModel.getToken)
             }
 
             actualTokenState.success != null -> {
@@ -206,6 +209,7 @@ private fun ShowZoomMeetingData(context: Context, viewModel: DashboardViewModel)
                         println("Actual token Data :- $strActualTokenKey")
                         viewModel.getAllZoomMeetings("bearer $strActualTokenKey")
                     }
+                    viewModel.resetState(viewModel.getToken)
                 } else {
                     isDialogVisible = false
                     logger.d("Actual token data not found...")
@@ -223,6 +227,7 @@ private fun ShowZoomMeetingData(context: Context, viewModel: DashboardViewModel)
             meetingListState.error.isNotEmpty() -> {
                 logger.d("Meeting list error: ${meetingListState.error}")
                 isDialogVisible = false
+                viewModel.resetState(viewModel.getMeetingList)
             }
 
             meetingListState.success != null -> {
@@ -234,6 +239,7 @@ private fun ShowZoomMeetingData(context: Context, viewModel: DashboardViewModel)
                             meetingListState.success?.meetings as MutableList<ZoomMeetingListResponse.Meetings>
                         println("Meeting list data :- $meetingListData")
                     }
+                    viewModel.resetState(viewModel.getMeetingList)
                 } else {
                     isDialogVisible = false
                     logger.d("Meeting list data not found...")

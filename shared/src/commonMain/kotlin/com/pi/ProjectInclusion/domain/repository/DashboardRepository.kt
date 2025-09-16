@@ -12,6 +12,7 @@ import com.pi.ProjectInclusion.data.model.authenticationModel.response.Notificat
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryByCategoryIdResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.SubCategoryListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.TokenResponse
+import com.pi.ProjectInclusion.data.model.authenticationModel.response.UserTrackRequestResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingListResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingTokenResponse
 import com.pi.ProjectInclusion.data.model.authenticationModel.response.ZoomMeetingsJoinResponse
@@ -86,4 +87,6 @@ interface DashboardRepository {
     ): AccountDeleteResponse
 
     suspend fun checkProfileCompletionRepo(tokenKey: String): CheckProfileCompletionResponse
+
+    suspend fun getTrackRequestRepo(tokenKey: String): UserTrackRequestResponse
 }
